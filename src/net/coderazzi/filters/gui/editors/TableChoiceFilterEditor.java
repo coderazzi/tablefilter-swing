@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( sen@coderazzi.net )
+ * Author:  Luis M Pena  ( lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ import net.coderazzi.filters.gui.ITableFilterEditor;
  * 
  * <p>Since version 1.5.0, the contents are automatically updated when the table changes</p>
  *
- * @author  Luis M Pena - sen@coderazzi.net
+ * @author  Luis M Pena - lu@coderazzi.net
  */
 public class TableChoiceFilterEditor extends ChoiceFilterEditor {
 

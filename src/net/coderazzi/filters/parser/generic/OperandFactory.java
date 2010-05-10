@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( sen@coderazzi.net )
+ * Author:  Luis M Pena  ( lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -77,7 +77,7 @@ import net.coderazzi.filters.resources.Messages;
  * </ul>
  * </li></p>
  *
- * @author  Luis M Pena - sen@coderazzi.net
+ * @author  Luis M Pena - lu@coderazzi.net
  */
 public class OperandFactory implements IRelationalOperandFactory {
 
@@ -198,13 +198,17 @@ public class OperandFactory implements IRelationalOperandFactory {
             true, true);
 
     /**
-     * Default constructor, sets the DateBuilder as default comparator, if
-     * net.coderazzi.filters.CompareDatesAsBuilt is defined as true
+     * Default constructor
+     * It sets the DateBuilder as default comparator, if
+     * net.coderazzi.filters.TextParser.CompareDatesAsRendered is defined as true
+     * In the same mode, it will be case insensitive if 
+     * net.coderazzi.filters.TextParser.IgnoreCase is defined as true
      */
     public OperandFactory() {
-    	if (Boolean.parseBoolean(Messages.getString("net.coderazzi.filters.CompareDatesAsBuilt", ""))){
+    	if (Boolean.parseBoolean(Messages.getString("TextParser.CompareDatesAsRendered", ""))){
         	setComparator(Date.class, DateHandler.getDefault());    		
     	}
+    	ignoreCase=Boolean.parseBoolean(Messages.getString("TextParser.IgnoreCase", ""));
 	}
 
     /**

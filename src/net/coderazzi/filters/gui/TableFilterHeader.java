@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( sen@coderazzi.net )
+ * Author:  Luis M Pena  ( lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +101,7 @@ import net.coderazzi.filters.resources.Messages;
  * read its documentation to understand the requirements on the table and its model, and how it is
  * affected by this filter</p>
  *
- * @author  Luis M Pena - sen@coderazzi.net
+ * @author  Luis M Pena - lu@coderazzi.net
  */
 public class TableFilterHeader extends JPanel {
 
@@ -111,7 +111,7 @@ public class TableFilterHeader extends JPanel {
     public static final float DEFAULT_FONT_PROPORTION = .9f; //in comparison to normal font
 
     private final static String[] BOOLEAN_CHOICES = {
-            Messages.getString("Filters.BooleanTrue"), Messages.getString("Filters.BooleanFalse")
+            Messages.getString("TextParser.BooleanTrue"), Messages.getString("TextParser.BooleanFalse")
         };
 
     /**
@@ -124,7 +124,7 @@ public class TableFilterHeader extends JPanel {
      * <li>CHOICE: combobox where user can only select one of the provided expressions.</li>
      * </ul>
      *
-     * @author  Luis M Pena - sen@coderazzi.net
+     * @author  Luis M Pena - lu@coderazzi.net
      */
     public enum EditorMode {
         NULL, SLIM, BASIC, CHOICE
@@ -139,7 +139,7 @@ public class TableFilterHeader extends JPanel {
      * <li>INLINE: the filter is placed below the table header, above the table's content.</li>
      * </ul>
      *
-     * @author  Luis M Pena - sen@coderazzi.net
+     * @author  Luis M Pena - lu@coderazzi.net
      * @since 1.3
      */
     public enum Position {
@@ -190,7 +190,8 @@ public class TableFilterHeader extends JPanel {
 
     /**
      * Constructor; the object is functional after a table is attached
-     * The default filter is the basic filter, with inline location.
+     * The default filter is the basic filter, with inline location,
+     * unless Header.Mode / Header.Position system variables override it
      *
      * @see  TableFilterHeader#setTable(JTable)
      */
@@ -199,14 +200,14 @@ public class TableFilterHeader extends JPanel {
     }
 
     /**
-     * Constructor, using the basic filter, with inline location.
+     * Constructor, using the basic filter, with default location.
      *
      * @see  TableFilterHeader#setTable(JTable)
      * 
      * @since 1.3
      */
     public TableFilterHeader(JTable table) {
-        this(table, EditorMode.BASIC);
+        this(table, getDefaultHeaderMode());
     }
 
     /**
@@ -220,7 +221,7 @@ public class TableFilterHeader extends JPanel {
     }
 
     /**
-     * Constructor, using the default inline location
+     * Constructor, using the default location
      *
      * @see  TableFilterHeader#setMode(net.coderazzi.filters.gui.TableFilterHeader.EditorMode)
      * @see  TableFilterHeader#setPosition(net.coderazzi.filters.gui.TableFilterHeader.Position)
@@ -228,7 +229,7 @@ public class TableFilterHeader extends JPanel {
      * @since 1.3
      */
     public TableFilterHeader(JTable table, EditorMode mode) {
-    	this(table, mode, Position.INLINE);
+    	this(table, mode, getDefaultHeaderPosition());
     }
 
     /**
@@ -844,8 +845,25 @@ public class TableFilterHeader extends JPanel {
     public void removeHeaderObserver(ITableFilterHeaderObserver observer) {
     	observers.remove(observer);
     }
-
     
+    /**
+     * Returns the default editor mode, as provided in the property
+     * net.coderazzi.filters.Header.Mode
+     * @since version 2.0.1
+     */
+    static public EditorMode getDefaultHeaderMode(){
+		return EditorMode.valueOf(Messages.getString("Header.Mode", "BASIC"));
+    }
+
+    /**
+     * Returns the default header position, as provided in the property
+     * net.coderazzi.filters.Header.Position
+     * @since version 2.0.1
+     */
+    static public Position getDefaultHeaderPosition(){
+		return Position.valueOf(Messages.getString("Header.Position", "INLINE"));
+    }
+
     /**
      * Class setting up together all the column filters Note that, while the TableFilterHeader
      * handles columns using their model numbering, the FilterColumnsControllerPanel manages the
@@ -1179,7 +1197,7 @@ public class TableFilterHeader extends JPanel {
         @Override public Dimension getPreferredSize() {
             return preferredSize;
         }
-
+        
         /**
          * Class controlling the filter applied to one specific column It resizes itself
          * automatically as the associated table column is resized

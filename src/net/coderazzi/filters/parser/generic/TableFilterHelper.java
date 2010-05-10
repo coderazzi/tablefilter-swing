@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( sen@coderazzi.net )
+ * Author:  Luis M Pena  ( lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ import javax.swing.table.TableModel;
  * Helper class, implementing funcionality commonly used, associated to the creation and usage of
  * {@link IFilterTextParser}
  *
- * @author  Luis M Pena - sen@coderazzi.net
+ * @author  Luis M Pena - lu@coderazzi.net
  */
 abstract public class TableFilterHelper {
 

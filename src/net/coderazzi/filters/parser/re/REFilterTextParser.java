@@ -4,6 +4,7 @@ import net.coderazzi.filters.parser.FilterTextParsingException;
 import net.coderazzi.filters.parser.IFilterTextParser;
 import net.coderazzi.filters.parser.ITypeBuilder;
 import net.coderazzi.filters.parser.IdentifierInfo;
+import net.coderazzi.filters.resources.Messages;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,7 +25,7 @@ import javax.swing.RowFilter;
  * <p>It does not accept the usage of identifiers in the expression: the whole expression is
  * evaluated as a java regular expression.</p>
  *
- * @author  Luis M Pena - sen@coderazzi.net
+ * @author  Luis M Pena - lu@coderazzi.net
  */
 public class REFilterTextParser extends RowFilter implements IFilterTextParser {
 
@@ -32,6 +33,10 @@ public class REFilterTextParser extends RowFilter implements IFilterTextParser {
     private Pattern pattern;
     private int filterPosition;
     List<IdentifierInfo> validIdentifiers;
+    
+    public REFilterTextParser() {
+    	ignoreCase=Boolean.parseBoolean(Messages.getString("TextParser.IgnoreCase", ""));
+	}
 
     @Override public boolean include(RowFilter.Entry entry) {
         if (pattern == null) {

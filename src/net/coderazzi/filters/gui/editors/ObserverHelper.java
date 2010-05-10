@@ -13,7 +13,7 @@ import net.coderazzi.filters.gui.ITableFilterEditorObserver;
 /**
  * Helper class to handle Observers in the table editors
  *
- * @author  Luis M Pena - sen@coderazzi.net
+ * @author  Luis M Pena - lu@coderazzi.net
  */
 class ObserverHelper {
 

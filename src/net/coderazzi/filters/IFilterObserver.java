@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( sen@coderazzi.net )
+ * Author:  Luis M Pena  ( lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ import javax.swing.RowFilter;
  * <p>A IFilterObserver instance receives notifications when the associated {@link
  * net.coderazzi.filters.IFilterObservable} instance updates the held filter.</p>
  *
- * @author  Luis M Pena - sen@coderazzi.net
+ * @author  Luis M Pena - lu@coderazzi.net
  */
 public interface IFilterObserver {
 

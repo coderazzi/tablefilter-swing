@@ -19,7 +19,40 @@
     
     <p>The last versions are available for download:</p>
 
-    <h2>Version x.y.z ( 1st September 2009 ) </h2>
+    <h2>Version 2.0.1 ( 13th November 2009 ) </h2>
+      <ul>
+       <li>Download for Java 6 or later
+        <ul>
+         <li><a href="download/tablefilter-v2.0.1.jar">Binary distribution</a>
+          (without sources, tests not included)</li>
+         <li><a href="download/tablefilterDbg-v2.0.1.jar">Binary distribution with sources</a>
+          (useful for debug purposes)</li>
+         <li><a href="download/tablefilter-v2.0.1.zip">Source distribution</a>
+          (with sources, and tests are included)</li>
+        </ul>
+       </li>
+       <li>Download for Java 5
+        <ul>
+         <li><a href="download/tablefilter5-v2.0.1.jar">Binary distribution</a> 
+          (without sources, tests not included)</li>
+         <li><a href="download/tablefilterDbg5-v2.0.1.jar">Binary distribution with sources</a>
+          (useful for debug purposes)</li>
+         <li><a href="download/tablefilter5-v2.0.1.zip">Source distribution</a> 
+          (with sources, and tests are included)</li>
+        </ul>
+       </li>
+       <li>This version is limited to defining properly the properties that
+       define the default behaviour. Although already partially included in
+       version 2.0.0, the inclusion was not complete and buggy in the case of
+       some of these properties.<br>
+       The full list of system properties that can be defined to override
+       the default TableFilter behavior is listed <a href='properties.html'>here</a>.
+       <br>
+       A new <a href='examples.html#AppTestProperties'>example</a> is provided to test the extended behaviour.
+       </li>
+      </ul>
+
+    <h2>Version 2.0.0 ( 1st September 2009 ) </h2>
       <ul>
        <li>Download for Java 6 or later
         <ul>
@@ -72,22 +105,8 @@
         to observe events on the <a href="api/net/coderazzi/filters/gui/TableFilterHeader.html">TableFilterHeader</a>.
         </li>
         <li>Dates are now <a href='types.html#dates'>automatically handled</a> in the library.</li>
-        <li>The user can provide properties that override some default behaviours. This includes:<ul>
-            <li><span class='mark'>net.coderazzi.filters.DateFormat</span> 
-            Defines the default date format to use on the filter parser.</li>
-            <li><span class='mark'>net.coderazzi.filters.CompareDatesAsBuilt</span> 
-            Defines the default behaviour when 
-            <a href='types.html#compare'>comparing dates</a>.</li>
-			<li><span class='mark'>net.coderazzi.filters.ChoiceFilterEditor.EmptyValue</span>
-			Defines how the <a href="api/net/coderazzi/filters/gui/editors/ChoiceFilterEditor.html">ChoiceFilterEditor</a>
-			displays empty strings. By default, it is <span class='mark'>(empty)</span></li>
-<li><span class='mark'>net.coderazzi.filters.ChoiceFilterEditor.NullValue</span>
-			Defines how the <a href="api/net/coderazzi/filters/gui/editors/ChoiceFilterEditor.html">ChoiceFilterEditor</a>
-			displays null values. By default, it is <span class='mark'>(null)</span></li>
-			<li><span class='mark'>net.coderazzi.filters.FilterTextParser.NullFilterText</span>
-			Defines the null string on the default filter text parser. By default, is is
-			<span class='mark'>null</span></li> 
-        </ul>
+        <li>The user can provide properties that override some default behaviours. These properties
+        have been later redefined in 2.0.1.
         </li>
         <li>Bug solved: usage of renderers on 
         <a href="api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html">TableChoiceFilterEditor</a> 

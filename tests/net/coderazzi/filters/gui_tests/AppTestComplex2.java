@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( sen@coderazzi.net )
+ * Author:  Luis M Pena  ( lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,6 @@ import net.coderazzi.filters.TableFilter;
 import net.coderazzi.filters.gui.ITableFilterEditor;
 import net.coderazzi.filters.gui.ITableFilterTextBasedEditor;
 import net.coderazzi.filters.gui.TableFilterHeader;
-import net.coderazzi.filters.gui.editors.ChoiceFilterEditor;
 import net.coderazzi.filters.gui.editors.TableChoiceFilterEditor;
 import net.coderazzi.filters.gui.editors.TextFilterEditor;
 import net.coderazzi.filters.gui_tests.TestData.ExamInformation;
@@ -71,14 +70,6 @@ import net.coderazzi.filters.parser.re.REFilterTextParser;
 public class AppTestComplex2 extends JFrame implements ListSelectionListener {
 
 	private static final long serialVersionUID = -3930735310073743381L;
-
-	static ExamenChoice[] ALL_EXAM_CHOICES = {
-            new ExamenChoice(ExamenChoice.Fraction.ONE_FIFTH),
-            new ExamenChoice(ExamenChoice.Fraction.TWO_FIFTH),
-            new ExamenChoice(ExamenChoice.Fraction.THREE_FIFTH),
-            new ExamenChoice(ExamenChoice.Fraction.FOUR_FIFTH),
-            new ExamenChoice(ExamenChoice.Fraction.FIVE_FIFTH)
-        };
 
     JTable table;
     TestTableModel tableModel;
@@ -250,14 +241,14 @@ public class AppTestComplex2 extends JFrame implements ListSelectionListener {
 
         if ((tableModel.getColumnCount() > examensColumn) &&
                 (filterHeader.getFilterEditor(examensColumn) instanceof TableChoiceFilterEditor)) {
-            filterHeader.setChoiceFilterEditor(examensColumn).setChoices(ALL_EXAM_CHOICES);
+            filterHeader.setChoiceFilterEditor(examensColumn).setChoices(ExamenChoice.ALL_EXAM_CHOICES);
         }
 
         examensColumn = tableModel.getColumn(TestTableModel.EXAMENSH);
 
         if ((tableModel.getColumnCount() > examensColumn) &&
                 (filterHeader.getFilterEditor(examensColumn) instanceof TableChoiceFilterEditor)) {
-            filterHeader.setChoiceFilterEditor(examensColumn).setChoices(ALL_EXAM_CHOICES);
+            filterHeader.setChoiceFilterEditor(examensColumn).setChoices(ExamenChoice.ALL_EXAM_CHOICES);
         }
 
         int agesColumn = tableModel.getColumn(TestTableModel.AGE);
@@ -459,67 +450,4 @@ public class AppTestComplex2 extends JFrame implements ListSelectionListener {
         }
     }
 
-    public static class ExamenChoice implements ChoiceFilterEditor.IChoice {
-        enum Fraction {
-            ONE_FIFTH, TWO_FIFTH, THREE_FIFTH, FOUR_FIFTH, FIVE_FIFTH
-        }
-
-        Fraction f;
-
-        ExamenChoice(Fraction f) {
-            this.f = f;
-        }
-
-        public boolean matches(Object value) {
-            TestData.ExamInformation info = (TestData.ExamInformation) value;
-
-            if ((info == null) || (info.testsDone == 0))
-                return true;
-
-            double d = info.testsPassed / (double) info.testsDone;
-
-            switch (f) {
-
-            case ONE_FIFTH:
-                return d <= .2;
-
-            case TWO_FIFTH:
-                return (d > .2) && (d <= .4);
-
-            case THREE_FIFTH:
-                return (d > .4) && (d <= .6);
-
-            case FOUR_FIFTH:
-                return (d > .6) && (d <= .8);
-
-            case FIVE_FIFTH:
-                return d > .8;
-            }
-
-            return false;
-        }
-
-        @Override public String toString() {
-
-            switch (f) {
-
-            case ONE_FIFTH:
-                return "< 20/100";
-
-            case TWO_FIFTH:
-                return "< 40/100";
-
-            case THREE_FIFTH:
-                return "< 60/100";
-
-            case FOUR_FIFTH:
-                return "< 80/100";
-
-            case FIVE_FIFTH:
-                return "< 100/100";
-            }
-
-            return null;
-        }
-    }
 }

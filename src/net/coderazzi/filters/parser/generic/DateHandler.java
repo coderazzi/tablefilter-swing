@@ -21,7 +21,7 @@ import net.coderazzi.filters.resources.Messages;
  * milliseconds, not shown on the table, do not affect to the filter.</p>
  * <p>It also provides a {@link TableCellRenderer}, using the provided date format</p>
  *
- * @author  Luis M Pena - sen@coderazzi.net
+ * @author  Luis M Pena - lu@coderazzi.net
  * @since version 2.0
  */
 public class DateHandler implements ITypeBuilder, Comparator<Date>{
@@ -32,13 +32,13 @@ public class DateHandler implements ITypeBuilder, Comparator<Date>{
 	/**
 	 * <p>Provides a default instance.</p>
 	 * <p>The user can specify the following system property to alter the behavior of this method:</p>
-	 * <ul><li>net.coderazzi.filters.DateFormat Identifies the expected date format
+	 * <ul><li>net.coderazzi.filters.TextParser.DateFormat Identifies the expected date format
 	 *   as defined in {@link SimpleDateFormat}.</li></ul>
 	 * </ul>
 	 */
 	public static DateHandler getDefault(){
 		if (defaultInstance==null){
-			String definition = Messages.getString("net.coderazzi.filters.DateFormat", null);
+			String definition = Messages.getString("TextParser.DateFormat", null);
 			if (definition==null){
 				defaultInstance = new DateHandler();
 			} else {

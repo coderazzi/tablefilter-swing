@@ -59,7 +59,7 @@
       specify its own 
       <a href='api/net/coderazzi/filters/parser/ITypeBuilder.html'>ITypeBuilder</a>
       as in previous versions. In addition, the user can define the property
-      <pre>net.coderazzi.filters.DateFormat</pre>
+      <pre>net.coderazzi.filters.TextParser.DateFormat</pre>
       to override the expected format. Although this second option is quite
       useful, the first option is required if the table or tables in the
       application use more than one date format
@@ -78,7 +78,8 @@
     <p>The 
     <a href='api/net/coderazzi/filters/parser/generic/DateHandler.html'>DateHandler</a>
     class implements a dates comparator that takes in account only the rendered
-    format. Library's users can enable it in two ways:
+    format. Please note that this comparison method can be quite slow. 
+    Library's users can enable it in two ways:
     <ul>
     <li>Setting it specifically in the text parser:
     <pre>filterHeader.getTextParser().setComparator(java.util.Date.class, dateHelperInstance)</pre>
@@ -86,7 +87,7 @@
     <a href='api/net/coderazzi/filters/parser/ITypeBuilder.html'>ITypeBuilder</a> instance.</li>
     
     <li>Setting the property
-      <pre>net.coderazzi.filters.CompareDatesAsBuilt</pre>
+      <pre>net.coderazzi.filters.TextParser.CompareDatesAsRendered</pre>
       to true</li>
     </ul>
     </p>

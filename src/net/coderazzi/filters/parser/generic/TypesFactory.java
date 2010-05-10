@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( sen@coderazzi.net )
+ * Author:  Luis M Pena  ( lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * <p>Default {@link ITypesFactory}, supporting all the basic java types and enumerations</p>
  *
- * @author  Luis M Pena - sen@coderazzi.net
+ * @author  Luis M Pena - lu@coderazzi.net
  */
 public class TypesFactory implements ITypesFactory {
 
@@ -51,8 +51,8 @@ public class TypesFactory implements ITypesFactory {
     public static ITypeBuilder byteTypeFactory = new ByteTypeFactory();
     public static ITypeBuilder charTypeFactory = new CharacterTypeFactory();
 
-    final static String BOOLEAN_TRUE_TEXT = Messages.getString("Filters.BooleanTrue");
-    final static String BOOLEAN_FALSE_TEXT = Messages.getString("Filters.BooleanFalse");
+    final static String BOOLEAN_TRUE_TEXT = Messages.getString("TextParser.BooleanTrue");
+    final static String BOOLEAN_FALSE_TEXT = Messages.getString("TextParser.BooleanFalse");
 
     protected Map<Class<?>, ITypeBuilder> factories = new HashMap<Class<?>, ITypeBuilder>();
 
