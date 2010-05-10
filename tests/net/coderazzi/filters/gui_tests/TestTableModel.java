@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ package net.coderazzi.filters.gui_tests;
 import net.coderazzi.filters.gui_tests.resources.Messages;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -48,14 +49,15 @@ public class TestTableModel extends AbstractTableModel {
     public final static String AGE = Messages.getString("TestTableModel.Age");
     public final static String CLUB = Messages.getString("TestTableModel.Club");
     public final static String LCNAME = Messages.getString("TestTableModel.NameLittle");
+    public final static String DATE = Messages.getString("TestTableModel.Date");
 
     private static String[] columnNames = {
-            NAME, AGE, MALE, TUTOR, COUNTRY, EXAMENS, EXAMENSH, CLUB, LCNAME
+            NAME, AGE, MALE, TUTOR, COUNTRY, EXAMENS, EXAMENSH, CLUB, LCNAME, DATE
         };
     private final static Class<?>[] columnTypes = {
             String.class, Integer.class, Boolean.class, String.class, Icon.class,
             TestData.ExamInformation.class, TestData.ExamInformation.class, TestData.Club.class,
-            String.class
+            String.class, Date.class
         };
 
 
@@ -193,6 +195,9 @@ public class TestTableModel extends AbstractTableModel {
 
         case 8:
             return td.firstName;
+
+        case 9:
+            return td.date;
         }
 
         return null;

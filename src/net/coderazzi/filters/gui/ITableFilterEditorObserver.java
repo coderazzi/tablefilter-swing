@@ -23,35 +23,27 @@
  * THE SOFTWARE.
  */
 
-package net.coderazzi.filters;
-
-import javax.swing.RowFilter;
-
+package net.coderazzi.filters.gui;
 
 /**
- * Composed set of filters, added via logical AND
+ * <p>A ITableFilterEditorObserver instance receives notifications when the associated 
+ * {@link net.coderazzi.filters.gui.ITableFilterEditor} instance updates the held filter.
+ * </p>
+ * <p>Its is uniquely a commodity class, its functionality could be carried out
+ * using the original {@link net.coderazzi.filters.IFilterObserver} interface
+ * </p>
  *
  * @author  Luis M Pena - sen@coderazzi.net
+ * @since version 2.0
  */
-public class AndFilter extends AbstractComposedFilter {
+public interface ITableFilterEditorObserver {
 
     /**
-     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilterObservable}
-     * instances
+     * <p>Notification made by the {@link net.coderazzi.filters.gui.ITableFilterEditor}
+     * when the filter's content is updated</p>
+     * @param editor the observable instance
+     * @param newValue the new content of the editor. Its type depends on the
+     * filter editor, {@link net.coderazzi.filters.gui.ITableFilterEditor#getFilter()}
      */
-    public AndFilter(IFilterObservable... observables) {
-        super(observables);
-    }
-
-    /**
-     * @see  RowFilter#include(javax.swing.RowFilter.Entry)
-     */
-    @SuppressWarnings("unchecked")
-	@Override public boolean include(RowFilter.Entry rowEntry) {
-        for (RowFilter filter : filters.values())
-            if ((filter != null) && !filter.include(rowEntry))
-                return false;
-
-        return true;
-    }
+    public void tableFilterUpdated(ITableFilterEditor editor, Object newValue);
 }

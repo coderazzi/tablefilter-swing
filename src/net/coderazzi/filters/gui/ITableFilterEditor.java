@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ import java.awt.Component;
 /**
  * Interface to be implemented by any filter editor used by the {@link TableFilterHeader}
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public interface ITableFilterEditor {
 
@@ -51,7 +51,7 @@ public interface ITableFilterEditor {
     /**
      * <p>Performs an update of the filter.</p>
      *
-     * <p>Each editor defines its own semantics for this operation, but is always ensure that the
+     * <p>Each editor defines its own semantics for this operation, but is always ensured that the
      * current filter is propagated to any observers.</p>
      */
     public void updateFilter();
@@ -62,5 +62,36 @@ public interface ITableFilterEditor {
      * editor.
      */
     public void resetFilter();
+    
+    /**
+     * <p>Sets the content of the filter.</p>
+     * <p>The content's type must conform to the type expected by the editor</p>
+     * @since version 2.0
+     */
+    public void setFilter(Object content);
+
+    /**
+     * <p>Returns the content of the filter.</p>
+     * <p>The content's type conforms to the type expected by the editor</p>
+     * @since version 2.0
+     */
+    public Object getFilter();
+    
+    /**
+     * Returns the associated column in the table
+     */
+    public int getFilterPosition();
+    
+    /**
+     * Adds a new observer to the editor
+     * @since version 2.0
+     */
+    public void addTableFilterObserver(ITableFilterEditorObserver observer);
+    
+    /**
+     * Removes an observer from the editor
+     * @since version 2.0
+     */
+    public void removeTableFilterObserver(ITableFilterEditorObserver observer);
 
 }

@@ -11,14 +11,16 @@
       <li><a href='#AppTestMain'>AppTestMain.java</a></li>
       <li><a href='#AppTestWithSeparatedComponents'>AppTestWithSeparatedComponents.java</a></li>
       <li><a href='#AppTestComplex'>AppTestComplex.java</a></li>
+      <li><a href='#AppUserFilter'>AppUserFilter.java</a></li>
+      <li><a href='#ChoiceEditorUpdatesTest'>ChoiceEditorUpdatesTest.java</a></li>
     </ul>
     </p>
 
     <p>These applications are used as tests, but also as example source code.</p>
 
     <p>
-      The first application can be <a href='download/example5.jar'>downloaded and 
-      executed directly</a> (it uses the Java 5 version).
+      The first application can be <a href='download/example6.jar'>downloaded and 
+      executed directly</a> (it uses the Java 6 version).
     </p>
 
     
@@ -31,6 +33,8 @@
         <li>Change the editor mode, showing all the available filter editors.</li>
         <li>Enable/disable programmatically the filters.</li>
         <li>Ignore the case, applicable only to the parsing-based filter editors.</li>
+        <li>Use exact or loose comparisons on dates, as explained  
+        <a href='types.html#compare'>here</a></li>
         <li>Three buttons, to add new data or remove it; this is useful to verify 
           the behaviour of the table when data is updated/removed/inserted. 
           In Java 6, this behaviour is defined in the 
@@ -99,5 +103,26 @@
       instance to the filters, implementing an extending dictionary.
     </p>
     
+    <h2><a name='AppUserFilter'>AppUserFilter.java</a></h2> 
+
+    <p><img src='images/test4.png' class="centered"></p>
+
+    <p>
+      Very simple example, showing how to define  
+      <a href='api/net/coderazzi/filters/gui/UserFilter.html'>user filters</a>.
+    </p>
+    
+
+    <h2><a name='ChoiceEditorUpdatesTest'>ChoiceEditorUpdatesTest.java</a></h2> 
+
+    <p><img src='images/test5.png' class="centered"></p>
+
+    <p>
+      Test program to show how to listen to events on the table editors, and
+      how the <a href='api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html'>TableChoiceFilterEditor</a>
+      is automatically updated when the table updates its contents.     
+    </p>
+    
+
 </div></body>
 </html>

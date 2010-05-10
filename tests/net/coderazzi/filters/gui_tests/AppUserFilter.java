@@ -12,6 +12,8 @@ import javax.swing.JTable;
 
 import net.coderazzi.filters.UserFilter;
 import net.coderazzi.filters.gui.TableFilterHeader;
+import net.coderazzi.filters.gui.TableFilterHeader.EditorMode;
+import net.coderazzi.filters.gui_tests.resources.Messages;
 
 /**
  * Adding new filters outside the TableHeader does not work (on release 1.4.0)
@@ -24,7 +26,7 @@ public class AppUserFilter extends JPanel{
 		super(new BorderLayout());
 		TestTableModel model = TestTableModel.createTestTableModel();
 		JTable table = new JTable(model);
-		TableFilterHeader filterHeader = new TableFilterHeader(table);
+		TableFilterHeader filterHeader = new TableFilterHeader(table, EditorMode.CHOICE);
 		add(new JScrollPane(table), BorderLayout.CENTER);
 		
 		final int nameColumn=model.getColumn(TestTableModel.NAME);
@@ -33,9 +35,9 @@ public class AppUserFilter extends JPanel{
 			public boolean include(Entry entry) {
 				return -1!=entry.getStringValue(nameColumn).indexOf('e');
 			}
-		};
+		};		
 
-		JCheckBox check = new JCheckBox("Filter out any row where the name does not contain a lower case 'e'");
+		JCheckBox check = new JCheckBox("Filter out any row where the name does not contain a lower case 'e'", true);
 		add(check, BorderLayout.SOUTH);
 		
 		check.addItemListener(new ItemListener() {			
@@ -48,8 +50,9 @@ public class AppUserFilter extends JPanel{
 	}
 	
 	public static void main(String[] args) {
+		System.setProperty("net.coderazzi.filters.ChoiceFilterEditor.EmptyValue", "(unassigned)");
 		AppUserFilter testTableFilter = new AppUserFilter();
-		JFrame frame = new JFrame();
+		JFrame frame = new JFrame(Messages.getString("TestUserFilter.Title"));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(testTableFilter);
 		frame.pack();

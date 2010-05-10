@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 
 package net.coderazzi.filters.parser;
 
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.RowFilter;
@@ -43,7 +44,7 @@ import javax.swing.RowFilter;
  * which can be used to request the value of the variable to a {@link javax.swing.RowFilter.Entry}
  * (in this class, the notation calls it 'index')</p>
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public interface IFilterTextParser {
 
@@ -76,5 +77,23 @@ public interface IFilterTextParser {
      * Ignores case on the conditions associated to variables with String type
      */
     public void setIgnoreCase(boolean ignore);
+
+    /**
+     * <p>Sets a specific comparator for a given class, that should override the default Compare
+     * algorithm for the given class.</p>
+     *
+     * <p>If the class is not {@link java.lang.Comparable}, this method should be invoked to support
+     * any comparison operator.</p>
+     * 
+     * @since version 2.0
+     */
+    public void setComparator(Class<?> c, Comparator<?> cmp);
+
+    /**
+     * Provides the {@link ITypeBuilder} to build non basic types
+     * 
+     * @since version 2.0
+     */
+    public void setTypeBuilder(Class<?> c, ITypeBuilder parser);
 
 }

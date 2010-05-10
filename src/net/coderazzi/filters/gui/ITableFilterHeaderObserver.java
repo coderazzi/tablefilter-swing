@@ -25,47 +25,39 @@
 
 package net.coderazzi.filters.gui;
 
-import net.coderazzi.filters.parser.IFilterTextParser;
-
-import java.awt.Color;
-
-
 /**
- * Interface to be implemented by {@link ITableFilterEditor} instances that are based on a text
- * parser.
+ * <p>A ITableFilterHeaderObserver instance receives notifications when the associated 
+ * {@link net.coderazzi.filters.gui.ITableFilterEditor} instances are created, destroyed,
+ * or update the held filter.
+ * </p>
  *
  * @author  Luis M Pena - sen@coderazzi.net
+ * @since version 2.0
  */
-public interface ITableFilterTextBasedEditor extends ITableFilterEditor {
+public interface ITableFilterHeaderObserver {
+	
+	/**
+	 * <p>Informs the observer than a new filter editor is created</p>
+     * @param header the associated table filfter header
+	 * @param editor
+	 */
+	public void tableFilterEditorCreated(TableFilterHeader header, ITableFilterEditor editor);
+
+	/**
+	 * <p>Informs the observer than an existing filter editor has been
+	 * excluded from the filter header</p>
+     * @param header the associated table filfter header
+	 * @param editor
+	 */
+	public void tableFilterEditorExcluded(TableFilterHeader header, ITableFilterEditor editor);
 
     /**
-     * Sets the parser used to parse the text.
+     * <p>Notification made by the {@link net.coderazzi.filters.gui.ITableFilterEditor}
+     * when the filter's content is updated</p>
+     * @param header the associated table filfter header
+     * @param editor the observable instance
+     * @param newValue the new content of the editor. Its type depends on the
+     * filter editor, {@link net.coderazzi.filters.gui.ITableFilterEditor#getFilter()}
      */
-    public void setTextParser(IFilterTextParser parser);
-
-    /**
-     * Returns the used parser
-     */
-    public IFilterTextParser getTextParser();
-
-    /**
-     * Sets the foreground color to be used on error conditions
-     */
-    public void setErrorForeground(Color fg);
-
-    /**
-     * Sets the background color to be used on error conditions
-     */
-    public void setErrorBackground(Color bg);
-
-    /**
-     * Sets the foreground color to be used on no error conditions
-     */
-    public void setFilterForeground(Color fg);
-
-    /**
-     * Sets the background color to be used on no error conditions
-     */
-    public void setFilterBackground(Color bg);
-
+    public void tableFilterUpdated(TableFilterHeader header, ITableFilterEditor editor, Object newValue);
 }

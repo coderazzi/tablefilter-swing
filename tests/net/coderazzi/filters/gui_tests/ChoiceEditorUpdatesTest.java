@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,20 +28,29 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.RowFilter;
 
+import net.coderazzi.filters.IFilterObservable;
+import net.coderazzi.filters.IFilterObserver;
 import net.coderazzi.filters.gui.TableFilterHeader;
 import net.coderazzi.filters.gui.TableFilterHeader.EditorMode;
 import net.coderazzi.filters.gui.editors.ChoiceFilterEditor;
+import net.coderazzi.filters.gui.editors.TableChoiceFilterEditor;
 import net.coderazzi.filters.gui_tests.TestData.ExamInformation;
 import net.coderazzi.filters.gui_tests.resources.Messages;
 import net.coderazzi.filters.parser.FilterTextParsingException;
@@ -49,7 +58,7 @@ import net.coderazzi.filters.parser.ITypeBuilder;
 import net.coderazzi.filters.parser.generic.FilterTextParser;
 
 
-public class ChoiceEditorUpdatesTest extends JFrame {
+public class ChoiceEditorUpdatesTest extends JFrame implements ItemListener, IFilterObserver{
 
 	private static final long serialVersionUID = 4521016104474569405L;
 
@@ -67,6 +76,8 @@ public class ChoiceEditorUpdatesTest extends JFrame {
     JButton addMaleButton;
     JButton addFemaleButton;
     JButton removeButton;
+    JTextField eventField = new JTextField();
+    TableChoiceFilterEditor eventFocus;
 
     public ChoiceEditorUpdatesTest() {
         super(Messages.getString("ChoiceEditorUpdatesTest.Title")); //$NON-NLS-1$
@@ -82,10 +93,25 @@ public class ChoiceEditorUpdatesTest extends JFrame {
     private void createGui() {
         JPanel main = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane();
-        JPanel south = new JPanel(new GridLayout(1, 3, 16, 0));
+        JPanel south = new JPanel(new GridLayout(2, 1, 0, 16));
+        JPanel southNorth = new JPanel(new BorderLayout(40, 0));
+        JPanel southNorthLeft = new JPanel(new BorderLayout(10, 0));
+        JPanel southSouth = new JPanel(new GridLayout(1, 3, 16, 0));
 
         main.add(scrollPane, BorderLayout.CENTER);
         main.add(south, BorderLayout.SOUTH);
+        southNorth.add(southNorthLeft, BorderLayout.WEST);
+        southNorth.add(eventField, BorderLayout.CENTER);
+        south.add(southNorth);
+        south.add(southSouth);
+        
+        Object selections[]=new Object[tableModel.getColumnCount()+1];
+        for (int i=0;i<tableModel.getColumnCount();i++){
+        	selections[i+1]=new Integer(i);
+        }
+        selections[0]=new String("None");
+        JComboBox columnSelector = new JComboBox(selections);
+        columnSelector.addItemListener(this);
 
         table = new JTable(tableModel);
         scrollPane.setViewportView(table);
@@ -93,17 +119,54 @@ public class ChoiceEditorUpdatesTest extends JFrame {
         addMaleButton = new JButton(Messages.getString("Tests.AddMale"));
         addFemaleButton = new JButton(Messages.getString("Tests.AddFemale"));
         removeButton = new JButton(Messages.getString("Tests.Remove"));
+        southNorthLeft.add(new JLabel(Messages.getString("TestsChoices.EventsColumn")), BorderLayout.WEST);
+        southNorthLeft.add(columnSelector, BorderLayout.EAST);
         south.setBorder(BorderFactory.createEmptyBorder(16, 40, 16, 40));
 
-        south.add(addMaleButton);
-        south.add(addFemaleButton);
-        south.add(removeButton);
+        southSouth.add(addMaleButton);
+        southSouth.add(addFemaleButton);
+        southSouth.add(removeButton);
 
 
         filterHeader.setFont(table.getFont().deriveFont(10f));
+        eventField.setEditable(false);
 
         getContentPane().add(main);
         pack();
+    }
+    
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+    	if (e.getStateChange()==ItemEvent.SELECTED){
+			eventField.setText("");
+    		if (eventFocus!=null){
+    			//stop listening for events now
+    			eventFocus.getFilterObservable().removeFilterObserver(this);
+    		}
+    		Object selection=e.getItem();
+    		if (selection instanceof Integer){
+    			int column=(Integer)selection;
+    			eventFocus=(TableChoiceFilterEditor) filterHeader.getFilterEditor(column);
+    			eventFocus.getFilterObservable().addFilterObserver(this);
+    		} else {
+    			eventFocus=null;
+    		}
+    	}
+    }
+    
+    @Override
+    public void filterUpdated(IFilterObservable obs, RowFilter newValue) {
+    	StringBuilder sb = new StringBuilder();
+    	Object selection = eventFocus.getSelectedItem();
+    	if (selection==null){
+    		sb.append("(null) selection");
+    	}else if (selection==ChoiceFilterEditor.NO_FILTER){
+        	sb.append("(no filter)");
+    	} else {
+    		sb.append("(").append(selection.getClass().getName()).append(") ");
+    		sb.append(selection.toString());
+    	}
+    	eventField.setText(sb.toString());
     }
 
 

@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@ package net.coderazzi.filters.gui_tests;
 import java.io.ByteArrayOutputStream;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -76,7 +78,7 @@ public class TestData {
             "Powell", "Long", "Patterson", "Hughes", "Flores", "Washington", "Butler", "Simmons",
             "Foster", "Gonzales", "Bryant", "Alexander", "Russell", "Griffin", "Diaz", "Hayes"
         };
-
+    
     static List<Icon> served = new ArrayList<Icon>(), allIcons;
 
     static {
@@ -95,6 +97,7 @@ public class TestData {
     public ExamInformation examensSciences;
     public ExamInformation examensHumanities;
     public Club club;
+    public Date date;
 
     public TestData() {
         age = 17 + random.nextInt(random.nextBoolean() ? 10 : 25);
@@ -109,6 +112,8 @@ public class TestData {
         examensSciences = getExamInformation();
         examensHumanities = getExamInformation();
         club = getClub();
+        //date is not exact (not everybody can be born at 00:00!)
+        date = new GregorianCalendar(random.nextInt(50)+1940,random.nextInt(12), random.nextInt(28), 1, 1).getTime();
     }
 
     static void getAllIcons() {

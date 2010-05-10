@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import net.coderazzi.filters.parser.FilterTextParsingException;
 import net.coderazzi.filters.parser.ITypeBuilder;
 import net.coderazzi.filters.resources.Messages;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ import java.util.Map;
 /**
  * <p>Default {@link ITypesFactory}, supporting all the basic java types and enumerations</p>
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public class TypesFactory implements ITypesFactory {
 
@@ -65,6 +66,7 @@ public class TypesFactory implements ITypesFactory {
         factories.put(Double.class, doubleTypeFactory);
         factories.put(Byte.class, byteTypeFactory);
         factories.put(Character.class, charTypeFactory);
+        factories.put(Date.class, DateHandler.getDefault());
     }
 
     /**

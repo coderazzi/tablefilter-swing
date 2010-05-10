@@ -2,9 +2,11 @@ package net.coderazzi.filters.parser.re;
 
 import net.coderazzi.filters.parser.FilterTextParsingException;
 import net.coderazzi.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.parser.ITypeBuilder;
 import net.coderazzi.filters.parser.IdentifierInfo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -22,7 +24,7 @@ import javax.swing.RowFilter;
  * <p>It does not accept the usage of identifiers in the expression: the whole expression is
  * evaluated as a java regular expression.</p>
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public class REFilterTextParser extends RowFilter implements IFilterTextParser {
 
@@ -75,4 +77,11 @@ public class REFilterTextParser extends RowFilter implements IFilterTextParser {
         ignoreCase = ignore;
     }
 
+    @Override
+    public void setComparator(Class<?> c, Comparator<?> cmp) {
+    }
+    
+    @Override
+    public void setTypeBuilder(Class<?> c, ITypeBuilder parser) {
+    }
 }

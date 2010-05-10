@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of e, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ package net.coderazzi.filters.gui.editors;
 import net.coderazzi.filters.AbstractObservableRowFilter;
 import net.coderazzi.filters.IFilterObservable;
 import net.coderazzi.filters.gui.ITableFilterEditor;
+import net.coderazzi.filters.gui.ITableFilterEditorObserver;
 import net.coderazzi.filters.resources.Messages;
 
 import java.awt.Component;
@@ -62,7 +63,7 @@ import javax.swing.RowFilter;
  * <p>An example of this second customization would be, in a column displaying people's ages, to
  * setup several age ranges as choices, like 'ages below 25', '25 to 35', 'over 35'</p>
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor {
 
@@ -73,7 +74,9 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      * The object representing 'no filter', that is, it is the option to be selected for this editor
      * to perform no filtering.
      */
-    public static final String NO_FILTER = new String(" ");
+    public static final Object NO_FILTER = new Object(){
+    	@Override public String toString() {return " ";}
+    };
 
 
     /**
@@ -112,6 +115,9 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
     /** The internal filter implementation */
     protected Filter filter;
 
+    /** Helper to handle the table filter observers **/
+    private ObserverHelper observerHelper;
+
     /**
      * Default constructor. It is yet needed to set, at least, the choices to show to the user
      */
@@ -137,8 +143,9 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      */
     public ChoiceFilterEditor(int filterPosition, Object labelForOtherChoices, Object... choices) {
         filter = new Filter();
-        setFilterPosition(filterPosition);
+        observerHelper = new ObserverHelper(this);        
         setChoices(otherChoices, choices);
+        setFilterPosition(filterPosition);
         addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     filter.propagateFilterChange(false);
@@ -156,9 +163,7 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
                     int index, boolean isSelected, boolean cellHasFocus) {
                     String val;
 
-                    if (value == NO_FILTER)
-                        val = (String) value;
-                    else if (value == null)
+                    if (value == null)
                         val = NULL_VALUE;
                     else {
                         val = value.toString();
@@ -227,6 +232,7 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      * Returns the filter position
      *
      * @see  ChoiceFilterEditor#setFilterPosition(int)
+     * @see  ITableFilterEditor#getFilterPosition()
      */
     public int getFilterPosition() {
         return filterPosition;
@@ -259,6 +265,28 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
         getModel().setSelectedItem(NO_FILTER);
         filter.propagateFilterChange(false);
     }
+
+    /**
+     * <p>Returns the content of the filter, whose type will match the type 
+     * of the associated table's column, or be {@link ChoiceFilterEditor#NO_FILTER}</p>
+     * @see  ITableFilterEditor#getFilter()
+     */
+    public Object getFilter() {
+    	return getSelectedItem();
+    }
+    
+    /**
+     * <p>Sets the content of the filter, which must always be of the
+     * types of the associated table's column. To remove the filter, use
+     * as parameter {@link ChoiceFilterEditor#NO_FILTER}, 
+     * or better call {@link ChoiceFilterEditor#resetFilter()}</p>
+     * @see  ITableFilterEditor#setFilter(Object)
+     */
+    public void setFilter(Object content) {
+        getModel().setSelectedItem(content);
+        filter.propagateFilterChange(false);
+    }
+
 
     /**
      * @see  ITableFilterEditor#getComponent()
@@ -298,11 +326,25 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
     }
 
     /**
+     * @see ITableFilterEditor#addTableFilterObserver(ITableFilterEditorObserver)
+     */
+    @Override public void addTableFilterObserver(ITableFilterEditorObserver observer) {
+    	observerHelper.addTableFilterObserver(observer);
+    }
+    
+    /**
+     * @see ITableFilterEditor#removeTableFilterObserver(ITableFilterEditorObserver)
+     */
+    @Override public void removeTableFilterObserver(ITableFilterEditorObserver observer) {
+    	observerHelper.removeTableFilterObserver(observer);
+    }
+
+    /**
      * <p>Renderer to display the different choices</p>
      *
      * <p>It must take special care of the object {@link ChoiceFilterEditor#NO_FILTER}</p>
      *
-     * @author  Luis M Pena - dr.lu@coderazzi.net
+     * @author  Luis M Pena - sen@coderazzi.net
      */
     public interface IRenderer {
         Component getChoiceComponent(Object value, boolean selected, boolean hasFocus);
@@ -319,7 +361,7 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      * <p>Note that the list renderer -if any- must know how to display the IChoice objects. The the
      * default Renderer will display them as the string returned by their toString method</p>
      *
-     * @author  Luis M Pena - dr.lu@coderazzi.net
+     * @author  Luis M Pena - sen@coderazzi.net
      */
     public interface IChoice {
         boolean matches(Object value);
@@ -329,7 +371,7 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
     /**
      * <p>Implementation of a RowFilter for the ChoiceFilterEditor</p>
      *
-     * @author  Luis M Pena - dr.lu@coderazzi.net
+     * @author  Luis M Pena - sen@coderazzi.net
      */
     protected class Filter extends AbstractObservableRowFilter {
 

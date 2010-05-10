@@ -16,7 +16,7 @@ import net.coderazzi.filters.gui.TableFilterHeader.Position;
 /**
  * <p>Helper class to locate the filter header on the expected place by the table header</p>
  * 
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 class PositionHelper implements PropertyChangeListener{
 

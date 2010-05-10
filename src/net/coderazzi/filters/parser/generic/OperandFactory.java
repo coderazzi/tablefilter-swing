@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,11 @@ package net.coderazzi.filters.parser.generic;
 
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import net.coderazzi.filters.resources.Messages;
 
 
 /**
@@ -74,7 +77,7 @@ import java.util.Map;
  * </ul>
  * </li></p>
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public class OperandFactory implements IRelationalOperandFactory {
 
@@ -193,6 +196,16 @@ public class OperandFactory implements IRelationalOperandFactory {
      */
     public final StringWildcardOperand distinctICaseREOperand = new StringWildcardOperand("!~@",
             true, true);
+
+    /**
+     * Default constructor, sets the DateBuilder as default comparator, if
+     * net.coderazzi.filters.CompareDatesAsBuilt is defined as true
+     */
+    public OperandFactory() {
+    	if (Boolean.parseBoolean(Messages.getString("net.coderazzi.filters.CompareDatesAsBuilt", ""))){
+        	setComparator(Date.class, DateHandler.getDefault());    		
+    	}
+	}
 
     /**
      * @see  IRelationalOperandFactory#getOperand(char, String, int)

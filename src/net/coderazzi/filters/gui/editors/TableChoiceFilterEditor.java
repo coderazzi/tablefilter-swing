@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ import net.coderazzi.filters.gui.ITableFilterEditor;
  * 
  * <p>Since version 1.5.0, the contents are automatically updated when the table changes</p>
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public class TableChoiceFilterEditor extends ChoiceFilterEditor {
 
@@ -92,7 +92,6 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
 				if (c == TableModelEvent.ALL_COLUMNS || c == filterPosition){
 					
 					int last = e.getLastRow();
-					
 					if (r==0 && last >= table.getRowCount()){
 						extractFilterContentsFromModel(getSelectedItem());
 					} else {
@@ -103,6 +102,16 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
 		}
 	};
 
+	private final static JTable ROGUE_TABLE = new JTable(){
+		
+		private static final long serialVersionUID = 1L;
+		
+		@Override
+		public boolean isCellEditable(int row, int column) {
+			return false;
+		}
+	};
+	
     /** Max number of elements to show as choices */
     private int maxShow = Integer.MAX_VALUE;
 
@@ -193,8 +202,7 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
                     if (value == NO_FILTER)
                         return super.getListCellRendererComponent(list, value, index, isSelected,
                                 cellHasFocus);
-
-                    return renderer.getTableCellRendererComponent(table, value, isSelected,
+                    return renderer.getTableCellRendererComponent(ROGUE_TABLE, value, isSelected,
                             cellHasFocus, 1, filterPosition);
                 }
             });
@@ -274,7 +282,10 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
      * TableChoiceFilterEditor#setFixedChoiceMode(Object, Object[])}
      */
     @Override public void setChoices(Object labelForOtherChoices, Object... choices) {
-        table = null;
+    	if (table != null){
+    		table.getModel().removeTableModelListener(tableModelListener);
+    		table = null;
+    	}
         setFixedChoiceMode(labelForOtherChoices, choices);
     }
 

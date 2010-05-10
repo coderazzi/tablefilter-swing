@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ import net.coderazzi.filters.parser.IFilterTextParser;
 /**
  * Class implementing all the filter logic via text parsing to a given JTextField
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 abstract class TextField implements IFilterObservable {
 
@@ -140,6 +140,13 @@ abstract class TextField implements IFilterObservable {
     public void setText(String t) {
         editor.setText(t);
         propagateFilter(false);
+    }
+    
+    /**
+     * Returns the current parsing expression
+     */
+    public String getText(){
+    	return editor.getText();
     }
 
     /**

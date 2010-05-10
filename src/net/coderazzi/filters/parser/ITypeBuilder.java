@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ package net.coderazzi.filters.parser;
  *
  * <p>A parser must know how to build any type out of its string representation.</p>
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public interface ITypeBuilder {
 
@@ -40,7 +40,7 @@ public interface ITypeBuilder {
      * <p>The parser implementation can require that the returned object belong to specific class
      * hierarchies</p>
      *
-     * <p>If the implementation cannot build a meaningfull object out of the passed string, it can
+     * <p>If the implementation cannot build a meaningful object out of the passed string, it can
      * raise a (@link FilterTextParsingException} exception, or simply return null.</p>
      */
     Object parse(String text) throws FilterTextParsingException;

@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,9 @@ import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -99,7 +101,7 @@ import net.coderazzi.filters.resources.Messages;
  * read its documentation to understand the requirements on the table and its model, and how it is
  * affected by this filter</p>
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public class TableFilterHeader extends JPanel {
 
@@ -122,7 +124,7 @@ public class TableFilterHeader extends JPanel {
      * <li>CHOICE: combobox where user can only select one of the provided expressions.</li>
      * </ul>
      *
-     * @author  Luis M Pena - dr.lu@coderazzi.net
+     * @author  Luis M Pena - sen@coderazzi.net
      */
     public enum EditorMode {
         NULL, SLIM, BASIC, CHOICE
@@ -137,7 +139,7 @@ public class TableFilterHeader extends JPanel {
      * <li>INLINE: the filter is placed below the table header, above the table's content.</li>
      * </ul>
      *
-     * @author  Luis M Pena - dr.lu@coderazzi.net
+     * @author  Luis M Pena - sen@coderazzi.net
      * @since 1.3
      */
     public enum Position {
@@ -167,18 +169,21 @@ public class TableFilterHeader extends JPanel {
      */
     TableFilter filtersHandler = new TableFilter();
 
-    /**
-     * The associated locator to handle the location of the filter in the table header
-     */
+    /** The set of currently subscribed observers */
+    private Set<ITableFilterHeaderObserver> observers = new HashSet<ITableFilterHeaderObserver>();
+
+    /** The associated locator to handle the location of the filter in the table header */
     private PositionHelper positionHelper = new PositionHelper(this);
-    
+        
     /**
      * Revalidate automatically the controller when the table changes size
      */
     private ComponentAdapter resizer = new ComponentAdapter(){
         @Override
         public void componentResized(ComponentEvent e) {
-            columnsController.revalidate();
+        	if (columnsController!=null){
+        		columnsController.revalidate();
+        	}
         }  
     };
 
@@ -263,8 +268,8 @@ public class TableFilterHeader extends JPanel {
             removeController();
         }
         else{
-            this.table.addComponentListener(resizer);
             recreateController();
+            this.table.addComponentListener(resizer);
             columnsController.updateIdentifiers();
         }
     }
@@ -534,7 +539,7 @@ public class TableFilterHeader extends JPanel {
         switch (mode) {
 
         case NULL:
-            return createNullEditor(old);
+            return createNullEditor(old, modelColumn);
 
         case SLIM:
             return createSlimEditor(old, modelColumn);
@@ -625,8 +630,8 @@ public class TableFilterHeader extends JPanel {
      * Creates a NullFilterEditor editor, if needed, for the given column If there is already a
      * NullFilterEditor editor in this column, it is just returned the existing one
      */
-    private ITableFilterEditor createNullEditor(ITableFilterEditor old) {
-        return (old instanceof NullFilterEditor) ? old : new NullFilterEditor();
+    private ITableFilterEditor createNullEditor(ITableFilterEditor old, int modelColumn) {
+        return (old instanceof NullFilterEditor) ? old : new NullFilterEditor(modelColumn);
     }
 
     /**
@@ -822,7 +827,25 @@ public class TableFilterHeader extends JPanel {
         }
     }
 
+    /**
+     * Adds a new observer to the header
+     * @param observer
+     * @since version 2.0
+     */
+    public void addHeaderObserver(ITableFilterHeaderObserver observer) {
+        observers.add(observer);
+    }
 
+    /**
+     * Removes an existing observer from the header
+     * @param observer
+     * @since version 2.0
+     */
+    public void removeHeaderObserver(ITableFilterHeaderObserver observer) {
+    	observers.remove(observer);
+    }
+
+    
     /**
      * Class setting up together all the column filters Note that, while the TableFilterHeader
      * handles columns using their model numbering, the FilterColumnsControllerPanel manages the
@@ -1161,7 +1184,7 @@ public class TableFilterHeader extends JPanel {
          * Class controlling the filter applied to one specific column It resizes itself
          * automatically as the associated table column is resized
          */
-        private class FilterColumnPanel extends JPanel implements PropertyChangeListener {
+        private class FilterColumnPanel extends JPanel implements PropertyChangeListener, ITableFilterEditorObserver {
 
 			private static final long serialVersionUID = 6858728575542289815L;
 
@@ -1196,30 +1219,45 @@ public class TableFilterHeader extends JPanel {
 
                 if (this.editor != null) {
                     filtersHandler.removeFilterObservable(this.editor.getFilterObservable());
-                    remove(this.editor.getComponent());
+                    removeEditor(this.editor);
                 }
 
                 tc.removePropertyChangeListener(this);
             }
 
-
             public void setFilterEditor(ITableFilterEditor editor) {
                 if (this.editor != null) {
-                    remove(this.editor.getComponent());
+                	removeEditor(this.editor);
                 }
                 this.editor = editor;
                 add(this.editor.getComponent(), BorderLayout.CENTER);
                 h = getPreferredSize().height;
+            	editor.addTableFilterObserver(this);
+                for (ITableFilterHeaderObserver observer : observers){
+                	observer.tableFilterEditorCreated(TableFilterHeader.this, editor);
+                }            	
                 repaint();
             }
-
+            
+            private void removeEditor(ITableFilterEditor editor){
+                remove(this.editor.getComponent());
+            	editor.removeTableFilterObserver(this);
+                for (ITableFilterHeaderObserver observer : observers){
+                	observer.tableFilterEditorExcluded(TableFilterHeader.this, editor);
+                }            	
+            }
 
             public void setFilterFont(Font font) {
                 editor.getComponent().setFont(font);
                 h = getPreferredSize().height;
             }
 
-
+            public void tableFilterUpdated(ITableFilterEditor editor, Object newValue) {
+                for (ITableFilterHeaderObserver observer : observers){
+                	observer.tableFilterUpdated(TableFilterHeader.this, editor, newValue);
+                }            	
+            }
+            
             @Override public void setEnabled(boolean enabled) {
                 super.setEnabled(enabled);
                 editor.getComponent().setEnabled(enabled);
@@ -1247,9 +1285,16 @@ public class TableFilterHeader extends JPanel {
 
 		private static final long serialVersionUID = 1802486919152113003L;
 
-		public NullFilterEditor() {
+		private int modelColumn;
+
+		public NullFilterEditor(int modelColumn) {
+			this.modelColumn=modelColumn;
             setBorder(BorderFactory.createEtchedBorder());
         }
+		
+		public int getFilterPosition() {
+			return modelColumn;
+		}
 
         public void addFilterObserver(IFilterObserver listener) {
         }
@@ -1263,6 +1308,13 @@ public class TableFilterHeader extends JPanel {
 
         public void resetFilter() {
         }
+        
+        public Object getFilter() {
+        	return null;
+        }
+
+        public void setFilter(Object content) {
+        }
 
         public IFilterObservable getFilterObservable() {
             return this;
@@ -1272,6 +1324,12 @@ public class TableFilterHeader extends JPanel {
         }
 
         @Override public void setEnabled(boolean enabled) {
+        }
+        
+        public void addTableFilterObserver(ITableFilterEditorObserver observer) {
+        }
+        
+        public void removeTableFilterObserver(ITableFilterEditorObserver observer) {
         }
     }
 }

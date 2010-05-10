@@ -186,30 +186,7 @@
     <h2>Supported types</h2>
 
       <p>
-        The library only supports directly the primitive java types. If a 
-        table contains a column whose type is not a primitive java type, it 
-        will be treated as a string.
-      </p>
-
-      <p>
-        This can be avoided by using the interface 
-        <a href='api/net/coderazzi/filters/parser/ITypeBuilder.html'>ITypeBuilder</a>, 
-        which specifies how to build and object using its string representation. The 
-        <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html'>IFilterTextParser</a> 
-        interface supports for this purpose the method 
-        <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html#setTypeBuilder(java.lang.Class, net.coderazzi.filters.parser.ITypeBuilder)'>setTypeBuilder</a>.
-      </p>
-
-
-      <p>
-        Types handled in this way should implement the generic java interface 
-        <a href='http://java.sun.com/javase/6/docs/api/java/lang/Comparable.html?is-external=true'>Comparable</a>,
-        in order to use most of the comparison operands. Alternatively, the 
-        IFilterTextParser interface supports the method
-        <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html#setComparator(java.lang.Class, java.util.Comparator)'>setComparator</a>
-        , requiring a valid 
-        <a href='http://java.sun.com/javase/6/docs/api/java/util/Comparator.html?is-external=true'>Comparator</a>
-        instance for its associated type.
+      <a href='types.html'>This section has been moved.</a>
       </p>
 
     <h2>Customizing the default parser</h2>

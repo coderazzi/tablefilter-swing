@@ -13,11 +13,22 @@ public class Messages {
     }
 
     public static String getString(String key) {
+    	String ret = getString(key, null);
+    	if (ret==null){
+            ret = '!' + key + '!';
+    	}
+    	return ret;
+    }
 
-        try {
-            return RESOURCE_BUNDLE.getString(key);
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
+    public static String getString(String key, String defaultValue) {
+    	String ret = System.getProperty("net.coderazzi.filters."+key);
+    	if (ret==null){
+	        try {
+	            ret = RESOURCE_BUNDLE.getString(key);
+	        } catch (MissingResourceException e) {
+	            ret = defaultValue;
+	        }
+    	}
+    	return ret;
     }
 }

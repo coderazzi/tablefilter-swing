@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@ import javax.swing.JTextField;
 
 import net.coderazzi.filters.IFilterObservable;
 import net.coderazzi.filters.gui.ITableFilterEditor;
+import net.coderazzi.filters.gui.ITableFilterEditorObserver;
 import net.coderazzi.filters.gui.ITableFilterTextBasedEditor;
 import net.coderazzi.filters.parser.IFilterTextParser;
 
@@ -47,7 +48,7 @@ import net.coderazzi.filters.parser.IFilterTextParser;
  * Table filter editor based on text parsing, represented by a {@link javax.swing.JTextField} with a
  * contextual menu to hold previous parsing expressions.
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public class TextFilterEditor extends JTextField implements ITableFilterTextBasedEditor {
 
@@ -65,11 +66,13 @@ public class TextFilterEditor extends JTextField implements ITableFilterTextBase
      */
     private int history = DEFAULT_HISTORY;
 
+    /** Helper to handle the table filter observers **/
+    private ObserverHelper observerHelper;
+
     /** The TextField instance that handles all the work */
     TextField editor;
 
     JPopupMenu popupMenu;
-
 
     /**
      * Default constructor. It is yet needed to set, at least, the text parser.
@@ -81,6 +84,7 @@ public class TextFilterEditor extends JTextField implements ITableFilterTextBase
                 }
             };
         createPopupMenu();
+        observerHelper = new ObserverHelper(this);
     }
 
     /**
@@ -139,6 +143,7 @@ public class TextFilterEditor extends JTextField implements ITableFilterTextBase
      * Returns the filter position
      *
      * @see  TextFilterEditor#setFilterPosition(int)
+     * @see  ITableFilterEditor#getFilterPosition()
      */
     public int getFilterPosition() {
         return editor.getFilterPosition();
@@ -173,6 +178,22 @@ public class TextFilterEditor extends JTextField implements ITableFilterTextBase
         setHistoricLength(0);
         setHistoricLength(oldHistory);
         editor.setText("");
+    }
+
+    /**
+     * <p>Returns the content of the filter, which is always a String.</p>
+     * @see  ITableFilterEditor#getFilter()
+     */
+    public String getFilter() {
+    	return editor.getText();
+    }
+    
+    /**
+     * <p>Sets the content of the filter, which must always be a String.</p>
+     * @see  ITableFilterEditor#setFilter(Object)
+     */
+    public void setFilter(Object content) {
+    	editor.setText(content==null? "" : content.toString());
     }
 
     /**
@@ -336,6 +357,22 @@ public class TextFilterEditor extends JTextField implements ITableFilterTextBase
 
             popupMenu.insert(new MenuItem(text), 0);
         }
+    }
+    
+    /**
+     * @see ITableFilterEditor#addTableFilterObserver(ITableFilterEditorObserver)
+     */
+    @Override
+    public void addTableFilterObserver(ITableFilterEditorObserver observer) {
+    	observerHelper.addTableFilterObserver(observer);
+    }
+    
+    /**
+     * @see ITableFilterEditor#removeTableFilterObserver(ITableFilterEditorObserver)
+     */
+    @Override
+    public void removeTableFilterObserver(ITableFilterEditorObserver observer) {
+    	observerHelper.removeTableFilterObserver(observer);
     }
 
     /**

@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
+ * Author:  Luis M Pena  ( sen@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
+ * Copyright (c) 2007 Luis M. Pena  -  sen@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ package net.coderazzi.filters.gui.editors;
 
 import net.coderazzi.filters.IFilterObservable;
 import net.coderazzi.filters.gui.ITableFilterEditor;
+import net.coderazzi.filters.gui.ITableFilterEditorObserver;
 import net.coderazzi.filters.gui.ITableFilterTextBasedEditor;
 import net.coderazzi.filters.parser.IFilterTextParser;
 
@@ -49,7 +50,7 @@ import javax.swing.JTextField;
  * <p>In addition, it supports the notion of 'choices', values provided as permanent entries in the
  * combobox.</p>
  *
- * @author  Luis M Pena - dr.lu@coderazzi.net
+ * @author  Luis M Pena - sen@coderazzi.net
  */
 public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTextBasedEditor {
 
@@ -76,6 +77,9 @@ public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTex
     /** The color currently set as background **/
     private Color backgroundColor;
 
+    /** Helper to handle the table filter observers **/
+    private ObserverHelper observerHelper;
+
     /** The TextField instance that handles all the work */
     TextField editor;
 
@@ -95,6 +99,9 @@ public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTex
                     addToHistoric(historic);
                 }
             };
+
+        observerHelper = new ObserverHelper(this);
+            
         addItemListener(new ItemListener() {
                 public void itemStateChanged(ItemEvent e) {
 
@@ -177,6 +184,7 @@ public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTex
      * Returns the filter position
      *
      * @see  TextChoiceFilterEditor#setFilterPosition(int)
+     * @see  ITableFilterEditor#getFilterPosition()
      */
     public int getFilterPosition() {
         return editor.getFilterPosition();
@@ -211,6 +219,22 @@ public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTex
         setHistoricLength(0);
         setHistoricLength(h);
         editor.setText("");
+    }
+
+    /**
+     * <p>Returns the content of the filter, which is always a String.</p>
+     * @see  ITableFilterEditor#getFilter()
+     */
+    public String getFilter() {
+    	return editor.getText();
+    }
+    
+    /**
+     * <p>Sets the content of the filter, which must always be a String.</p>
+     * @see  ITableFilterEditor#setFilter(Object)
+     */
+    public void setFilter(Object content) {
+    	editor.setText(content==null? "" : content.toString());
     }
 
     /**
@@ -358,4 +382,21 @@ public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTex
             comboBoxModelList.add(c);
         }
     }
+
+    /**
+     * @see ITableFilterEditor#addTableFilterObserver(ITableFilterEditorObserver)
+     */
+    @Override
+    public void addTableFilterObserver(ITableFilterEditorObserver observer) {
+    	observerHelper.addTableFilterObserver(observer);
+    }
+    
+    /**
+     * @see ITableFilterEditor#removeTableFilterObserver(ITableFilterEditorObserver)
+     */
+    @Override
+    public void removeTableFilterObserver(ITableFilterEditorObserver observer) {
+    	observerHelper.removeTableFilterObserver(observer);
+    }
+
 }
