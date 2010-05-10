@@ -1,0 +1,184 @@
+<html>
+<head>
+<title>TableFilter - header component</title>
+</head>
+<body><div id='content'>
+  <h1>TableFilterHeader</h1>
+
+    <p>
+      <ul>
+        <li><a href='#basic'>Basic usage</a></li>
+        <li><a href='#advanced'>Advanced usage</a></li>
+      </ul>
+    </p>
+
+    <p>
+      <span class='mark'>TableFilterHeader</span> is the main Gui component in 
+      the <span class='mark'>TableFilter</span> library; it is a set of filter 
+      editors  located just atop a table looking like in the figure below:
+    </p>
+    
+    <p>
+      <img src="images/example.png" class="centered">
+    </p>
+
+    <p>
+      This header places together a set of filter editors, one per table's 
+      column, and is responsible to resize / move them as the table's columns 
+      change their layout.
+    </p>
+
+    <p>
+      It is also possible to place the component just below the table, although 
+      in this case we should probably better speak of a footer; it would look 
+      like:
+    </p>
+    
+    <p>
+      <img src="images/exampledown.png" class="centered">
+    </p>
+
+    <p>
+      The real value of this component relies on the 
+      <a href='editors.html'>filter editors</a> used. 
+      The two figures above show the main available looks for those editors: as 
+      <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTextField.html?is-external=true'>JTextField</a>
+      or 
+      <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JComboBox.html?is-external=true'>JComboBox</a>.   </p> 
+
+      
+      
+      
+    <h2><a name='basic'>Basic usage</a></h2>
+
+      <p>
+        The <span class='mark'>TableFilterHeader</span> class is placed in the 
+        package 
+        <a href='api/com/byteslooser/filters/gui/package-summary.html'>com.byteslooser.filters.gui</a>
+      </p>
+
+      <p>
+        Setting up the <span class='mark'>TableFilterHeader</span> requires two 
+        steps: including the GUI component in the global layout of the 
+        application, and attaching it to the associated table.
+      </p>
+
+      <p>
+        The header should be located just above or below the table. Placing it 
+        anywhere else misses the point of this component, as the columns will 
+        resize and move automatically as the user modifies the table columns 
+        layout. In this case, it is better to consider using the editors as 
+        <a href='standalone.html'>standalone components</a>.
+      </p>
+
+      <p>
+        An example of code setting up this component is:
+      </p>
+
+<pre>JPane pane=new JPane(new BorderLayout());
+JScrollPane scrollPane = new JScrollPane();
+JTable table = new JTable();
+TableFilterHeader filterHeader = new TableFilterHeader();
+scrollPane.setViewportView(table);
+
+pane.add(scrollPane, BorderLayout.CENTER);
+pane.add(filterHeader, BorderLayout.NORTH);</pre>
+
+      <p>
+        Attaching now the filter header to the table is all that is needed to have a working filter
+      </p> 
+      
+      <pre>filterHeader.setTable(table);</pre>
+
+      <p>
+        Writing the previous code will use the default editor; the 
+        <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html'>TableFilterHeader</a> 
+        allows setting up its 
+        <a href='api/com/byteslooser/filters/gui/TableFilterHeader.EditorMode.html'>mode</a>,
+        which can be one of:
+        <ul>
+          <li><b>NONE</b>: no editor at all.</li>
+          <li><b>SLIM</b>: the parsing editor based on a JTextField shown above.</li>
+          <li><b>BASIC</b>: the default editor, is a parsing editor based on a 
+            JComboBox, shown also above.</li>
+          <li><b>CHOICE</b>: a fixed choice editor, where the options are taken 
+            from the table column values.</li>
+        </ul>
+      </p>
+
+      <p>
+        Setting up a different mode is as simple as writing:
+      </p> 
+      
+      <pre>filterHeader.setMode(TableFilterHeader.EditorMode.CHOICE);</pre>
+
+      <p>
+        Please note that each column could eventually use different editor 
+        types. In special, mixing the BASIC editor and the CHOICE can be in 
+        cases essential, to take advantage of the parsing capabilities of the 
+        <a href='editors.html#TextChoiceFilterEditor'>former editor</a>
+        and the configuration possibilies of the 
+        <a href='editors.html#ChoiceFilterEditor'>later</a>.
+      </p>
+
+      
+      
+      
+    <h2><a name='advanced'>Advanced usage of the TableFilterHeader</a></h2>
+
+      <p>
+        The component is quite simple, its interface just tries to simplify 
+        the controlling of all the filter editors behind. The 
+        <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html'>api documentation</a> 
+        for this component describes its functionality.
+      </p>
+
+      <p>
+        The <span class='mark'>TableFilterHeader</span> creates automatically 
+        filters of the defined mode, but it is possible to specify each 
+        column's editor separately. The following methods are the simples ways 
+        to create the library-defined editors:
+        <ul>
+          <li>
+            <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#setSlimFilterEditor(int)'>setSlimFilterEditor</a>
+            Creates, on the passed column, an editor of type 
+            <a href='editors.html#TextFilterEditor'>SLIM</a>
+            , a text parsing filter based on 
+            <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTextField.html?is-external=true'>JTextField</a>.
+          </li>
+          <li>
+            <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#setBasicFilterEditor(int)'>setBasicFilterEditor</a>
+            Creates, on the passed column, an editor of type 
+            <a href='editors.html#TextChoiceFilterEditor'>BASIC</a>
+            , a text parsing filter based on 
+            <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JComboBox.html?is-external=true'>JComboBox</a>.
+          </li>
+          <li>
+            <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#setChoiceFilterEditor(int)'>setChoiceFilterEditor</a>
+            Creates, on the passed column, an editor of type 
+            <a href='editors.html#ChoiceFilterEditor'>CHOICE</a> 
+            ,a fixed-choice filter based on 
+            <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JComboBox.html?is-external=true'>JComboBox</a>.
+          </li>
+        </ul>
+
+      </p>
+      
+      
+      <p>
+        It is also possible to create custom filter editors, setting them via the method
+        <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#setFilterEditor(int,%20com.byteslooser.filters.gui.ITableFilterEditor)'>setFilterEditor</a>.
+        In this case, the editor must implement the interface
+        <a href='api/com/byteslooser/filters/gui/ITableFilterEditor.html'>ITableFilterEditor</a>
+      </p>
+      <p>
+        The figure below shows a test, supplied with source distribution of this library, showing all the included editors:
+      </p>
+      
+      <p>
+        <img src="images/examplemx.png" class="centered">
+      </p>
+
+</div>
+</body>
+</html>

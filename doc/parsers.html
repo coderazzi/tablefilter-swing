@@ -1,0 +1,234 @@
+<html>
+<head>
+<title>TableFilter - standalone editors mode</title>
+</head>
+<body>
+<div id='content'>
+
+  <h1>Filter text expressions</h1>
+
+    <p>
+      The parsing filter editors do not perform the parsing of the text 
+      expressions by themselves, delegating this task to separated components; 
+      it is possible to provide more or less powerful parsers, making 
+      therefore this library more or less useful.
+    </p>
+
+    <p>
+    The library is delivered with two parsers:
+    <ul>
+      <li>
+        A parser that handles java regular expressions:  
+        <a href='api/com/byteslooser/filters/parser/re/REFilterTextParser.html'>REFilterTextParser</a>,
+        which is a simple wrapper around the java regular expression functionality.
+      </li>
+      <li>
+        A generic text parser, supporting complex expressions, and limited wildcard expressions,
+        which is detailed below.
+      </li>
+    </ul>
+    </p>
+
+    <p>
+      The library also supports customized parsers, which must implement a 
+      quite simple
+      <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html'>interface</a>.
+      The default parser implementation is called 
+      <a href='api/com/byteslooser/filters/parser/generic/FilterTextParser.html'>FilterTextParser</a>, 
+      in the package
+      <a href='api/com/byteslooser/filters/parser/generic/package-summary.html'>com.byteslooser.filters.parser.generic</a>, 
+      while the generic interfaces are defined in the
+      <a href='api/com/byteslooser/filters/parser/package-summary.html'>com.byteslooser.filters.parser</a>. 
+    </p> 
+
+    <h2>Default filter text parser</h2>
+
+      <p><img src="images/examplef.png" class="centered"></p>
+
+      <p>
+        The provided filter text parser can handle simple expressions mixing 
+        values related to one or more variables, where each variable is, in 
+        this context, the content of a cell in a table's row. Note that the 
+        parser has no direct relation with a Swing table: it only knows about 
+        identifiers and values, although the description below assumes that 
+        these identifiers are the header strings for each column.
+      </p>
+
+      <p>
+        The minimum filter has the syntax: 
+        <b> [ [ identifier ] operand ]  constant | identifier </b>
+      </p>
+
+      <p>
+      For example:
+      <ul>
+        <li><b>age &gt; 30</b> : 
+          the column <i>age</i> should contain a value above 30.</li>
+        <li><b>startDate &lt; endDate</b> : 
+          the column <i>startDate</i> should contain a value lower
+          than the value in the column <i>endDate</i>.</li>
+        <li><b>~ A*b</b>: 
+          the current column value must start with uppercase a and 
+          end with lowercase b</li>
+        <li><b>45</b>: 
+          the current column must have the value 45.</li>
+      </ul>
+      </p> 
+
+      <p>
+        These examples show some relational operands (&gt;, &lt;, ~); 
+        however, it is possible to customize the parser and 
+        define different operands.
+      </p>
+
+      <p>
+        It is not possible, however, to customize the logical operands used 
+        to compose more complex filters.
+        The default parser uses the following hardcoded symbols:
+        <ul>
+          <li><b>&amp;</b>: the AND operator</li>
+          <li><b>|</b>: the OR operator</li>
+        </ul>
+        In addition, it is possible to group filters using parenthesis <b>( )</b>
+      </p>
+
+      <p>
+        For example, it supports the following expression: 
+        <b> ( age &gt; 30 | age &lt; 20 ) & male = true</b>
+      </p>
+
+      <p>
+        If any expression would require using these hardcoded symbols, it 
+        should escape these characters with the symbol <b>\</b>.
+      </p>
+
+      <p>
+        There are important restrictions concerning the comparison between 
+        identifiers; these restrictions are intended to keep simple the 
+        grammar of the parser:
+        <ul>
+          <li>The types of both identifiers must be identical.</li>
+          <li>This type cannot be the string class (or handled as a string).</li>
+        </ul>
+      </p>
+
+
+
+    <h2>Relational operands</h2>
+
+      <p>The supplied relational operands are:
+      <ul>
+        <li>Comparison operators:
+          <ul> 
+            <b> &nbsp;&nbsp;&nbsp;&nbsp;
+            &gt; &nbsp;&nbsp;&nbsp;&nbsp;
+            &lt; &nbsp;&nbsp;&nbsp;&nbsp;
+            &gt;= &nbsp;&nbsp;&nbsp;&nbsp;
+            &lt;= &nbsp;&nbsp;&nbsp;&nbsp;
+            = &nbsp;&nbsp;&nbsp;&nbsp;
+            &lt;&gt;
+            </b>
+          </ul>
+        </li>
+
+        <li>Comparison operators ignoring the case, which work on the 
+        stringfied contents of the table; these are the same comparison operators, 
+        with the symbol <b>@</b> added:
+          <ul>
+            <b> &nbsp;&nbsp;&nbsp;&nbsp;
+            &gt;@ &nbsp;&nbsp;&nbsp;&nbsp;
+            &lt;@ &nbsp;&nbsp;&nbsp;&nbsp;
+            &gt;=@ &nbsp;&nbsp;&nbsp;&nbsp;
+            &lt;=@ &nbsp;&nbsp;&nbsp;&nbsp;
+            =@ &nbsp;&nbsp;&nbsp;&nbsp;
+            &lt;&gt;@
+            </b>
+          </ul>
+        </li>
+
+        <li>Wilcard operators, supporting expressions that can contain the 
+          wildcard characters <b>*</b>, which match zero or more characters, 
+          and <b>?</b>, which match exactly one any character:
+          <ul>
+            <li><b>~</b>: matching operator.</li>
+            <li><b>!~</b>: not matching operator.</li>
+            <li><b>~@</b>: matching operator, ignoring case.</li>
+            <li><b>!~@</b>: not matching operator, ignoring case.</li>
+          </ul>
+        </li>
+      </ul>
+      </p>
+
+      <p>If possible, the first set of operators (comparison operators) work 
+      with the types themselves, not with their string representation. Note 
+      that the number <b>2</b> is, as a string, higher than
+      the number <b>12</b>, so this distinction is quite important.</p>
+
+    <h2>&quot;null&quot;</h2>
+
+      <p>
+        The default parser has hardcoded the notion of <b>null</b>, making 
+        possible to build filters asking whether a given cell is null or not.
+      </p>
+
+      <p>
+        The default value associated to null is the string <b>null</b>, 
+        although using the method
+        <a href='api/com/byteslooser/filters/parser/generic/FilterTextParser.html#setNullString(java.lang.String)'>setNullString</a> 
+        in the filter parser, other representations could be provided.
+      </p>
+
+      <p>
+        A cell matches this filter when it contains a null object or when it 
+        is handled as a string and it is empty.
+      </p>
+
+    <h2>Supported types</h2>
+
+      <p>
+        The library only supports directly the primitive java types. If a 
+        table contains a column whose type is not a primitive java type, it 
+        will be treated as a string.
+      </p>
+
+      <p>
+        This can be avoided by using the interface 
+        <a href='api/com/byteslooser/filters/parser/ITypeBuilder.html'>ITypeBuilder</a>, 
+        which specifies how to build and object using its string representation. The 
+        <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html'>IFilterTextParser</a> 
+        interface supports for this purpose the method 
+        <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html#setTypeBuilder(java.lang.Class, com.byteslooser.filters.parser.ITypeBuilder)'>setTypeBuilder</a>.
+      </p>
+
+
+      <p>
+        Types handled in this way should implement the generic java interface 
+        <a href='http://java.sun.com/javase/6/docs/api/java/lang/Comparable.html?is-external=true'>Comparable</a>,
+        in order to use most of the comparison operands. Alternatively, the 
+        IFilterTextParser interface supports the method
+        <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html#setComparator(java.lang.Class, java.util.Comparator)'>setComparator</a>
+        , requiring a valid 
+        <a href='http://java.sun.com/javase/6/docs/api/java/util/Comparator.html?is-external=true'>Comparator</a>
+        instance for its associated type.
+      </p>
+
+    <h2>Customizing the default parser</h2>
+
+      <p>
+        It is possible to create the 
+        <a href='api/com/byteslooser/filters/parser/generic/FilterTextParser.html'>FilterTextParser</a>,
+        with a different set of operands and / or supported types.
+      </p> 
+
+      <p>
+        Implementing the interface 
+        <a href='api/com/byteslooser/filters/parser/generic/IRelationalOperandFactory.html'>IRelationalOperandFactory</a>,
+        or inheriting the default implementation 
+        <a href='api/com/byteslooser/filters/parser/generic/OperandFactory.html'>OperandFactory</a>, 
+        is the minimum requirement to modify the supported operators, but such 
+        operation is not described here. If this is needed, please
+        study the source code or contact me for additional support.
+      </p>
+
+</div></body>
+</html>

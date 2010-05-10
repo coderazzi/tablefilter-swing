@@ -1,0 +1,103 @@
+<html>
+<head>
+<title>TableFilter - examples</title>
+</head>
+<body><div id='content'>
+
+  <h1>Examples</h1>
+
+    <p>
+    The source distribution of the library includes several swing applications:<ul>
+      <li><a href='#AppTestMain'>AppTestMain.java</a></li>
+      <li><a href='#AppTestWithSeparatedComponents'>AppTestWithSeparatedComponents.java</a></li>
+      <li><a href='#AppTestComplex'>AppTestComplex.java</a></li>
+    </ul>
+    </p>
+
+    <p>These applications are used as tests, but also as example source code.</p>
+
+    <p>
+      The first application can be <a href='download/example5.jar'>downloaded and 
+      executed directly</a> (it uses the Java 5 version).
+    </p>
+
+    
+    <h2><a name='AppTestMain'>AppTestMain.java</a></h2>
+
+      <p><img src='images/test1.png' class="centered"></p>
+      
+      <p>This example shows the following functionality:
+      <ul>
+        <li>Change the editor mode, showing all the available filter editors.</li>
+        <li>Enable/disable programmatically the filters.</li>
+        <li>Ignore the case, applicable only to the parsing-based filter editors.</li>
+        <li>Three buttons, to add new data or remove it; this is useful to verify 
+          the behaviour of the table when data is updated/removed/inserted. 
+          In Java 6, this behaviour is defined in the 
+          <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTable.html?is-external=true'>JTable</a>
+          implementation, while in Java 5 has been included in the 
+          <a href='api5/com/byteslooser/filters/artifacts/TableModelFilter.html'>TableModelFilter</a>.
+          In special, note that inserts and removes imply the immediate 
+          appliance of the filter on all the rows, while updating data does not; 
+          this can be useful while updating rows (like the male state in the 
+          example), for the row not to disappear while the edition happens.</li>
+
+        <li><b>Change table</b> performs the adding of removal of some columns 
+          in the model. It shows the behaviour of the library in this event.</li>
+        <li><b>Reset model</b> sets a new model to the table.</li>
+        <li><b>Reset filter</b> shows the effect of executing
+          <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#resetFilters()'>resetFilters</a>
+          on the
+          <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html'>TableFilterHeader</a>.</li>
+      </ul>
+      </p>
+
+      <p>
+        When the expanded table is shown, with all the columns, the <b>name</b> 
+        column includes, if the editor is in parsing text mode, a 
+        <a href='api/com/byteslooser/filters/parser/re/REFilterTextParser.html'>regular expression</a>
+        parser (all the other columns include the 
+        <a href='api/com/byteslooser/filters/parser/generic/FilterTextParser.html'>default parser</a>).
+      </p> 
+
+
+    <h2><a name='AppTestWithSeparatedComponents'>AppTestWithSeparatedComponents.java</a></h2> 
+
+    <p><img src='images/test2.png' class="centered"></p>
+
+    <p>
+      This is a basic example showing the composition of multiple filters on 
+      <a href='standalone.html'>standalone mode</a>.
+    </p>
+    
+    <h2><a name='AppTestComplex'>AppTestComplex.java</a></h2> 
+
+    <p><img src='images/test3.png' class="centered"></p>
+
+    <p>
+      This is a more complex example showing the composition of multiple filters, using 
+      <a href='standalone.html'>standalone mode</a> and the generic header.
+    </p>
+    
+    <p>
+      It includes as well and additional feature: although the table contains only 5 columns,
+      filters can be used with additional variables, or identifiers. For example, the table
+      does not contain a <i>club</i> column, but the filter in the previous figure is using
+      the <i>club</i> value associated to each row to specify a condition. 
+    </p>
+    
+    <p>
+      There are several ways to implement this feature. In the example, it is implemented by
+      implementing an extended <span class='mark'>TableModel</span> which has only the initial
+      5 columns visible, but provides information on additional fields for each row. The other
+      way to implement this feature is by setting a specialized 
+      <a href='api/com/byteslooser/filters/TableFilter.html'>TableFilter</a> that
+      overrides the 
+      <a href='api/com/byteslooser/filters/AndFilter.html#include(javax.swing.RowFilter.Entry)'>include</a>
+      method to pass a different 
+      <a hhref='http://java.sun.com/javase/6/docs/api/javax/swing/RowFilter.Entry.html?is-external=true'>RowFilter.Entry</a>
+      instance to the filters, implementing an extending dictionary.
+    </p>
+    
+</div></body>
+</html>

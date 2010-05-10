@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+
+Name: com/byteslooser/filters/gui/TableFilterHeader.class
+Java-Bean: true
+
+Name: com/byteslooser/filters/gui/editors/ChoiceFilterEditor.class
+Java-Bean: true
+
+Name: com/byteslooser/filters/gui/editors/TextChoiceFilterEditor.class
+Java-Bean: true
+
+Name: com/byteslooser/filters/gui/editors/TextFilterEditor.class
+Java-Bean: true

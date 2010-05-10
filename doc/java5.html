@@ -1,0 +1,117 @@
+<html>
+<head>
+<title>TableFilter - Java 5 support</title>
+</head>
+<body><div id='content'>
+
+  <h1>Usage with Java 5</h1>
+
+    <p>
+      This library was initially developed targeting Java 5, and then modified 
+      to handle the new filtering capabilities in Java 6. Both versions were 
+      very different, but considering that the features in Java 6 will likely 
+      stay, I decided to retrofit the new implementation into the Java 5 ' 
+      library, adding some classes that only exist on the Java 6 standard 
+      library. These added classes are placed in the 
+      <a href='api5/com/byteslooser/filters/artifacts/package-summary.html'>com.byteslooser.filters.artifacts</a>
+      package (only for the Java 5 implementation).
+    </p>
+
+    <p>
+      At the end, both versions share most of the code, although the internal 
+      imports are different in some cases. And users see the 
+      <b>same interface</b> using Java 5 or Java 6, which is an important 
+      feature, in case some later migration happens.
+    </p>
+
+    <p>
+      There is, however, a difference between 
+      <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTable.html?is-external=true'>JTable</a>
+      users in Java 5 and Java 6: the former does not provide sorting 
+      capabilities. The solution is usually  to setup a table model with 
+      sorting capabilities, like the 
+      <a href='http://www.devdaily.com/java/jwarehouse/hsqldb/src/org/hsqldb/util/TableSorter.java.shtml'>TableSorter</a>. 
+      The source version of <span class='mark'>TableFilter</span> includes 
+      such class for the test programs, although the 
+      <span class='mark'>TableFilter</span> 
+      itself does obviously not require it.
+    </p>
+    
+   <p>
+      Starting with version 1.2.6, the TableSorter included in the tests package has
+      been modified: the original implementation re-sorts the whole table when there are
+      changes on any cell. However, that is not the default behaviour under Java 6; 
+      updating the value of one or more cells -in sequence- in the table does not
+      imply invoking again the sorting or filtering mechanisms. This behaviour is quite 
+      consistent: otherwise, updating a row could imply moving that row -to other position 
+      or outside the view, if is filtered out-.
+    </p>
+
+    <p>
+      Although this library exports the same interface to Java 5 and 6 users, 
+      the internal implementation is quite different; in Java 6, there is one 
+      table model, while in Java 5 users must handle at least 
+      two table models (plus a third one if sorting is also added):
+      <ul>
+        <li>The normal table model associated initially to the table.</li>
+        <li>A model providing the filtering capabilities.</li>
+      </ul>
+    </p>
+
+    <p>
+      This library is distributed with an implementation of the second model, 
+      described below, and it can be setup automatically; note, however, that 
+      the usage of multiple table models makes some operations more 
+      complicated. For example, once that filtering is on place, the row number 
+      in the view does not correspond any more to the row number in the model; the
+      <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTable.html?is-external=true'>JTable</a>
+      provides 
+      <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTable.html#convertColumnIndexToModel(int)'>methods</a> 
+      to enquiry for translations between both views, but in version 5, users 
+      must extract the model and perform these queries against the model.
+    </p>
+    
+    
+    
+    <h2>ITableModelFilter</h2>
+
+      <p>
+        Java 5 users of this library must attach, to the table, a model 
+        implementing the interface
+        <a href='api5/com/byteslooser/filters/artifacts/ITableModelFilter.html'>ITableModelFilter</a>
+      </p>
+
+      <p>
+        If the attached model does not implement this interface, the library 
+        automatically creates one and replaces the current model with it. The 
+        default implementation is called
+        <a href='api5/com/byteslooser/filters/artifacts/TableModelFilter.html'>TableModelFilter</a>.
+      </p>
+
+      <p>
+        This implementation tries to mimic the behaviour found in the Java 6 
+        tables; however, users can definitely provide their own implementation, 
+        for performance or extended interface reasons. The  implementation 
+        provides two specific methods to convert positions between the index 
+        and the model:
+        <ul>
+          <li>
+            <a href='api5/com/byteslooser/filters/artifacts/TableModelFilter.html#convertRowIndexToModel(int)'>convertRowIndexToModel</a>
+            returns the location of index in terms of the underlying model.</li>
+          <li>
+            <a href='api5/com/byteslooser/filters/artifacts/TableModelFilter.html#convertRowIndexToView(int)'>convertRowIndexToView</a>
+            returns the location of index in terms of the view.</li>
+        </ul>
+      </p>
+
+    <h2>Javadoc</h2>
+
+      <p>
+        Most of the generated documentation has the same contents for Java 5 
+        and Java 6, but the links can be quite different. The Java 5 version 
+        is reachable <a href='api5/index.html'>here</a>.
+      </p> 
+
+ 
+</div></body>
+</html>

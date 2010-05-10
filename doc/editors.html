@@ -1,0 +1,191 @@
+<html>
+<head>
+<title>TableFilter - filter editors</title>
+</head>
+<body><div id='content'>
+
+
+  <h1>Filter Editors</h1>
+
+  <p>
+    <span class='mark'>TableFilter</span> provides two types of filters; 
+    based on text parsing or based on single user choices. 
+    Users can create additional filters, based on the interface 
+    <a href='api/com/byteslooser/filters/gui/ITableFilterEditor.html'>ITableFilterEditor</a>.
+  </p>
+
+  <p>
+    All the editors available in the library are placed in the package
+    <a href='api/com/byteslooser/filters/gui/editors/package-summary.html'>com.byteslooser.filters.gui.editors</a>.
+  </p>
+
+  <p>The available editors are:
+  <ul>
+    <li><a href='#TextChoiceFilterEditor'>TextChoiceFilterEditor</a>: 
+      this is the default editor, corresponds to the mode BASIC in the 
+      <span class='mark'>TableFilterHeader</span>.</li>
+      
+    <li><a href='#TextFilterEditor'>TextFilterEditor</a>: 
+      this is an editor equivalent to the previous one, but with smaller size, 
+      corresponds to the mode SLIM in the <span class='mark'>TableFilterHeader</span>.</li>
+      
+    <li><a href='#ChoiceFilterEditor'>ChoiceFilterEditor</a>: 
+      this is an editor where the user can only select an already 
+      provided filter choice; it is not directly available in the 
+      <span class='mark'>TableFilterHeader</span></li>
+      
+    <li><a href='#TableChoiceFilterEditor'>TableChoiceFilterEditor</a>: 
+      this is an editor where the user can only select an already provided 
+      filter choice; it corresponds to the mode CHOICE in the 
+      <span class='mark'>TableFilterHeader</span>.</li>      
+  </ul>
+  </p>
+
+  <p>
+    The normal way to use these editors is under the 
+    <a href='header.hmtl'>TableFilterHeader</a>, but they can be used on their 
+    own as well, as is explained in the 
+    <a href='standalone editors section'</a>.
+  </p>
+
+  <h2><a name='TextChoiceFilterEditor'>TextChoiceFilterEditor</a></h2>
+
+    <p><img src="images/examplefpb.png" class="centered"></p>
+
+    <p>
+      This is the editor that <span class='mark'>TableFilter</span> uses by 
+      default. Its displayed as a 
+      <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JComboBox.html?is-external=true'>JComboBox</a>, 
+      where the user can enter manually the expression to parse.
+    </p>
+
+    <p>
+      The editor is not responsible to perform the parsing, which is delegated to a
+      <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html'>IFilterTextParser</a>
+      instance. Users can define their own parsers, or use the 
+      <a href='parsers.html'>default one</a>.
+    </p>
+
+    <p>
+      The editor places in the combobox the last valid parsed expressions, 
+      facilitating the input of multiple filters. It also supports the concept 
+      of predefined choices, which are shown to the user together with the 
+      last used expressions. When used in a 
+      <span class='mark'>TableFilterHeader</span> component, in table columns 
+      with Boolean or Enumeration types, the different boolean or
+      enumeration values are automatically setup as editor' choices.
+    </p>
+
+    <p>
+      As a parsing editor, it can compose as complex filter expressions as 
+      the associated parser support, but it supports little customization. Its 
+      <a href='api/com/byteslooser/filters/gui/editors/TextChoiceFilterEditor.html'>interface</a> 
+      includes a few methods to handle the historic / choice values:
+      <ul>
+        <li><a href='api/com/byteslooser/filters/gui/editors/TextChoiceFilterEditor.html#setHistoricLength(int)'>setHistoricLength</a> 
+          and 
+          <a href='api/com/byteslooser/filters/gui/editors/TextChoiceFilterEditor.html#addToHistoric(java.lang.String)'>addToHistoric</a>
+          control the historic values.</li>
+        <li>
+          <a href='api/com/byteslooser/filters/gui/editors/TextChoiceFilterEditor.html#suggestChoices(java.lang.String...)'>suggestChoices</a>
+          supports customizing the choices that are always shown to the user.</li>
+      </ul>
+    </p> 
+
+
+  <h2><a name='TextFilterEditor'>TextFilterEditor</a></h2>
+
+    <p><img src="images/examplefp.png" class="centered"></p>
+
+    <p>
+      This editor matches most of the functionality exposed by the 
+      <a href='#TextChoiceFilterEditor'>TextChoiceFilterEditor</a>,
+      but using a 
+      <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTextField.html?is-external=true'>JTextField</a>,
+      which implies an smaller size.
+    </p>
+
+    <p>
+      It is also still able to support historic values, showing them in a contextual menu.
+    </p>
+    
+    <p>
+      Therefore, its
+      <a href='api/com/byteslooser/filters/gui/editors/TextFilterEditor.html'>interface</a> 
+      is very similar; it only lacks the option to provide prefixed choices
+    </p>
+
+    
+
+  <h2><a name='ChoiceFilterEditor'>ChoiceFilterEditor</a></h2>
+
+    <p>
+      This editor is not directly available in the 
+      <span class='mark'>TableFilterHeader</span>, which uses better the 
+      <a href='#TableChoiceFilterEditor'>TableChoiceFilterEditor</a>, 
+      an specialization of the ChoiceFilterEditors which is automatically 
+      prepopulated with the contents of the table's column.
+    </p>
+
+    <p><img src="images/examplefc.png" class="centered"></p>
+
+    <p>
+      In this editor, the user cannot provide an expression, just choosing 
+      among  the provided filters. Its main advantage against the parsing 
+      editors is its support for better customizations. For example, the 
+      figure above has this editor showing the different country flags. 
+      Lacking this visual approach, the user would be forced to use some 
+      string  representation for the icons.
+    </p> 
+
+    <p>
+      This visual customization is directly provided by the 
+      <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JComboBox.html?is-external=true'>JComboBox</a>
+      class, through the 
+      <a href='http://java.sun.com/javase/6/docs/api/javax/swing/ListCellRenderer.html'>ListCellRenderer</a>,
+      although the ChoiceFilterEditor defines the more specific 
+      <a href='api/com/byteslooser/filters/gui/editors/ChoiceFilterEditor.IRenderer.html'>IRenderer</a>
+      interface to do the same.
+    </p>
+
+    <p>
+      This editor is not only interesting when the associated object has 
+      a visual rich representation, like the icons in the previous figure, 
+      but also when the choices are prefixed, like in the image below, where 
+      the user can choose exams whose qualifications match given ranges:
+    </p>
+
+    <p><img src="images/examplefc2.png" class="centered"></p>
+
+    <p>
+      This second customization is provided through the  
+      <a href='api/com/byteslooser/filters/gui/editors/ChoiceFilterEditor.IChoice.html'>IChoice</a> 
+      interface.
+    </p>
+
+    <p>
+      To use this editor directly, the user must provide all the available 
+      choices, using the defined 
+      <a href='api/com/byteslooser/filters/gui/editors/ChoiceFilterEditor.html'>interface</a>. 
+      It supports the concept of <b>other choices</b>, which is simply an 
+      additional choice whose selection  implies the negation of any other 
+      shown choice. In most cases, the user will use the 
+      <a href='#TableChoiceFilterEditor'>TableChoiceFilterEditor</a>,
+      where the choices are automatically extracted from the table's values.
+    </p>
+
+
+  <h2><a name='TableChoiceFilterEditor'>TableChoiceFilterEditor</a></h2>
+
+    <p>
+      The images above, for the 
+      <a href='#ChoiceFilterEditor'>ChoiceFilterEditor</a> describe equally 
+      the  TableChoiceFilterEditor. This is an specialization of the 
+      ChoiceFilterEditor that provides automatically the initial choices, 
+      and with an extended
+      <a href='api/com/byteslooser/filters/gui/editors/TableChoiceFilterEditor.html'>interface</a>, 
+      to define how to extract choices from the table.
+    </p>
+
+</div></body>
+</html>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<jardesc>
+    <jar path="/tmp/TableFilter/tablefilter.zip"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/TableFilter/source.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="true"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <selectedElements exportClassFiles="false" exportJavaFiles="true" exportOutputFolder="false">
+        <file path="/TableFilter/jarDbg.jardesc"/>
+        <file path="/TableFilter/doc/index.html"/>
+        <file path="/TableFilter/doc/index.htm"/>
+        <file path="/TableFilter/doc/header.html"/>
+        <file path="/TableFilter/doc/standalone.html"/>
+        <file path="/TableFilter/doc/editors.html"/>
+        <file path="/TableFilter/source.jardesc"/>
+        <file path="/TableFilter/javadoc.xml"/>
+        <file path="/TableFilter/doc/examples.html"/>
+        <file path="/TableFilter/doc/parsers.html"/>
+        <file path="/TableFilter/MANIFEST.MF"/>
+        <file path="/TableFilter/doc/download.html"/>
+        <file path="/TableFilter/jar.jardesc"/>
+        <file path="/TableFilter/doc/java5.html"/>
+        <folder path="/TableFilter/doc/images"/>
+        <file path="/TableFilter/.classpath"/>
+        <file path="/TableFilter/doc/javadoc.html"/>
+        <file path="/TableFilter/.project"/>
+        <javaElement handleIdentifier="=TableFilter/src"/>
+        <javaElement handleIdentifier="=TableFilter/tests"/>
+    </selectedElements>
+</jardesc>
