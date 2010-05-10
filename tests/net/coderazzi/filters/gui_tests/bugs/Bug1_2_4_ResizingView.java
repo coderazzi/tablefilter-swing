@@ -4,7 +4,7 @@
  * Created on December 14, 2007, 1:48 PM
  */
 
-package com.byteslooser.filters.gui_tests.bugs;
+package net.coderazzi.filters.gui_tests.bugs;
 
 /**
  *
@@ -25,7 +25,7 @@ public class Bug1_2_4_ResizingView extends javax.swing.JPanel
                 splitPane = new javax.swing.JSplitPane();
                 jPanel6 = new javax.swing.JPanel();
                 jPanel9 = new javax.swing.JPanel();
-                tableFilterHeader = new com.byteslooser.filters.gui.TableFilterHeader();
+                tableFilterHeader = new net.coderazzi.filters.gui.TableFilterHeader();
                 jScrollPane12 = new javax.swing.JScrollPane();
                 table = new javax.swing.JTable();
                 jPanel11 = new javax.swing.JPanel();
@@ -75,13 +75,13 @@ public class Bug1_2_4_ResizingView extends javax.swing.JPanel
         private javax.swing.JScrollPane jScrollPane12;
         private javax.swing.JTable table;
         private javax.swing.JSplitPane splitPane;
-        private com.byteslooser.filters.gui.TableFilterHeader tableFilterHeader;
+        private net.coderazzi.filters.gui.TableFilterHeader tableFilterHeader;
 
         public javax.swing.JTable getTable() {
                 return table;
         }
 
-        public com.byteslooser.filters.gui.TableFilterHeader getTableFilterHeader() {
+        public net.coderazzi.filters.gui.TableFilterHeader getTableFilterHeader() {
                 return tableFilterHeader;
         }
 

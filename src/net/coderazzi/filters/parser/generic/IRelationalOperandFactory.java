@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters.parser.generic;
+package net.coderazzi.filters.parser.generic;
 
 import java.util.Comparator;
 
@@ -37,7 +37,7 @@ import java.util.Comparator;
  * <p>By construction, the logical operators are built in in the {@link FilterTextParser}, which
  * relies on this factory to provide information for the relational ones</p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public interface IRelationalOperandFactory {
 

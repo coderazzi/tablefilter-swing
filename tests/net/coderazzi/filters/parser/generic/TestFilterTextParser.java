@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.byteslooser.filters.parser.generic;
+package net.coderazzi.filters.parser.generic;
 
-import com.byteslooser.filters.parser.FilterTextParsingException;
-import com.byteslooser.filters.parser.IFilterTextParser;
-import com.byteslooser.filters.parser.IdentifierInfo;
+import net.coderazzi.filters.parser.FilterTextParsingException;
+import net.coderazzi.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.parser.IdentifierInfo;
 
 import java.util.ArrayList;
 import java.util.List;

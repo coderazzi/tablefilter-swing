@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters.gui.editors;
+package net.coderazzi.filters.gui.editors;
 
 import java.awt.Color;
 import java.awt.event.FocusAdapter;
@@ -37,16 +37,16 @@ import java.util.Set;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 
-import com.byteslooser.filters.IFilterObservable;
-import com.byteslooser.filters.IFilterObserver;
-import com.byteslooser.filters.parser.FilterTextParsingException;
-import com.byteslooser.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.IFilterObservable;
+import net.coderazzi.filters.IFilterObserver;
+import net.coderazzi.filters.parser.FilterTextParsingException;
+import net.coderazzi.filters.parser.IFilterTextParser;
 
 
 /**
  * Class implementing all the filter logic via text parsing to a given JTextField
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 abstract class TextField implements IFilterObservable {
 

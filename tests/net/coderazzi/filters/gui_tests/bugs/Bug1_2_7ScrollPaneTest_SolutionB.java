@@ -1,4 +1,4 @@
-package com.byteslooser.filters.gui_tests.bugs;
+package net.coderazzi.filters.gui_tests.bugs;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import com.byteslooser.filters.gui.TableFilterHeader;
-import com.byteslooser.filters.gui_tests.TestTableModel;
+import net.coderazzi.filters.gui.TableFilterHeader;
+import net.coderazzi.filters.gui_tests.TestTableModel;
 
 /**
  * Solution provided by Eugene Rachitskiy

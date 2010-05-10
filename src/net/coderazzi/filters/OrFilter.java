@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters;
+package net.coderazzi.filters;
 
 import javax.swing.RowFilter;
 
@@ -31,12 +31,12 @@ import javax.swing.RowFilter;
 /**
  * Composed set of filters, added via logical OR
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class OrFilter extends AbstractComposedFilter {
 
     /**
-     * Constructor built up out of none or more {@link com.byteslooser.filters.IFilterObservable}
+     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilterObservable}
      * instances
      */
     public OrFilter(IFilterObservable... observables) {
@@ -46,7 +46,8 @@ public class OrFilter extends AbstractComposedFilter {
     /**
      * @see  RowFilter#include(javax.swing.RowFilter.Entry)
      */
-    @Override public boolean include(RowFilter.Entry rowEntry) {
+    @SuppressWarnings("unchecked")
+	@Override public boolean include(RowFilter.Entry rowEntry) {
         boolean ret = true;
         for (RowFilter filter : filters.values()) {
             if (filter != null) {

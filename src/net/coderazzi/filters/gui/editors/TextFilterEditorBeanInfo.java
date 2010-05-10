@@ -1,4 +1,4 @@
-package com.byteslooser.filters.gui.editors;
+package net.coderazzi.filters.gui.editors;
 
 import java.beans.SimpleBeanInfo;
 
@@ -6,7 +6,7 @@ public class TextFilterEditorBeanInfo extends SimpleBeanInfo{
     
     @Override
 	public java.awt.Image getIcon(int iconKind) {
-        return loadImage("/com/byteslooser/filters/resources/textEditor.png");
+        return loadImage("/net/coderazzi/filters/resources/textEditor.png");
     }
 
 }

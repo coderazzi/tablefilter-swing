@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,9 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters.gui.editors;
+package net.coderazzi.filters.gui.editors;
 
-import com.byteslooser.filters.gui.ITableFilterEditor;
+import net.coderazzi.filters.gui.ITableFilterEditor;
 
 import java.awt.Component;
 
@@ -49,7 +49,7 @@ import javax.swing.table.TableModel;
  * <p>Specialization of the {@link ChoiceFilterEditor} class that extracts the choices from the
  * contents of a table's column</p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class TableChoiceFilterEditor extends ChoiceFilterEditor {
 

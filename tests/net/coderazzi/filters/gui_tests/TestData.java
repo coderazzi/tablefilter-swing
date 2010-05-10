@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.byteslooser.filters.gui_tests;
+package net.coderazzi.filters.gui_tests;
 
 import java.io.ByteArrayOutputStream;
 
@@ -116,7 +116,7 @@ public class TestData {
         try {
             Pattern p = Pattern.compile("gif/(.+)\\.gif");
             ZipInputStream zip = new ZipInputStream(TestData.class.getResourceAsStream(
-                        "/com/byteslooser/filters/gui_tests/resources/famfamfam_flag_icons.zip"));
+                        "/net/coderazzi/filters/gui_tests/resources/famfamfam_flag_icons.zip"));
             ZipEntry entry;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[16384];

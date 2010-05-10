@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters;
+package net.coderazzi.filters;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +38,7 @@ import javax.swing.RowFilter;
  *
  * <p>The exact composition semantics (and / or / not) are not defined.</p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 abstract public class AbstractComposedFilter extends AbstractObservableRowFilter
     implements IFilterObserver {
@@ -49,7 +49,7 @@ abstract public class AbstractComposedFilter extends AbstractObservableRowFilter
 
 
     /**
-     * Constructor built up out of none or more {@link com.byteslooser.filters.IFilterObservable}
+     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilterObservable}
      * instances
      */
     protected AbstractComposedFilter(IFilterObservable... observables) {
@@ -62,7 +62,7 @@ abstract public class AbstractComposedFilter extends AbstractObservableRowFilter
     }
 
     /**
-     * Subscribes one or more {@link com.byteslooser.filters.IFilterObservable} instances to receive
+     * Subscribes one or more {@link net.coderazzi.filters.IFilterObservable} instances to receive
      * filter events from this composition filter.
      */
     public void addFilterObservable(IFilterObservable... observables) {
@@ -75,7 +75,7 @@ abstract public class AbstractComposedFilter extends AbstractObservableRowFilter
     }
 
     /**
-     * Unsubscribes a {@link com.byteslooser.filters.IFilterObservable} that was previously
+     * Unsubscribes a {@link net.coderazzi.filters.IFilterObservable} that was previously
      * subscribed to receibe filter events
      */
     public void removeFilterObservable(IFilterObservable observable) {
@@ -87,7 +87,7 @@ abstract public class AbstractComposedFilter extends AbstractObservableRowFilter
     }
 
     /**
-     * Returns all {@link com.byteslooser.filters.IFilterObservable} instances previously added.
+     * Returns all {@link net.coderazzi.filters.IFilterObservable} instances previously added.
      */
     public Set<IFilterObservable> getFilterObservables() {
         return new HashSet<IFilterObservable>(filters.keySet());

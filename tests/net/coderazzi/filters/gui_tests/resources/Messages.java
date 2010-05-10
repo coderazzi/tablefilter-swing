@@ -1,4 +1,4 @@
-package com.byteslooser.filters.gui_tests.resources;
+package net.coderazzi.filters.gui_tests.resources;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 
 public class Messages {
     private static final String BUNDLE_NAME =
-        "com.byteslooser.filters.gui_tests.resources.messages"; //$NON-NLS-1$
+        "net.coderazzi.filters.gui_tests.resources.messages"; //$NON-NLS-1$
 
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 

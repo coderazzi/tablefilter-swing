@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters.parser;
+package net.coderazzi.filters.parser;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ import javax.swing.RowFilter;
  * which can be used to request the value of the variable to a {@link javax.swing.RowFilter.Entry}
  * (in this class, the notation calls it 'index')</p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public interface IFilterTextParser {
 

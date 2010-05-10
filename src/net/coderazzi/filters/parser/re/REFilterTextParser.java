@@ -1,8 +1,8 @@
-package com.byteslooser.filters.parser.re;
+package net.coderazzi.filters.parser.re;
 
-import com.byteslooser.filters.parser.FilterTextParsingException;
-import com.byteslooser.filters.parser.IFilterTextParser;
-import com.byteslooser.filters.parser.IdentifierInfo;
+import net.coderazzi.filters.parser.FilterTextParsingException;
+import net.coderazzi.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.parser.IdentifierInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import javax.swing.RowFilter;
 
 
 /**
- * <p>Specific implementation of the {@link com.byteslooser.filters.parser.IFilterTextParser}
+ * <p>Specific implementation of the {@link net.coderazzi.filters.parser.IFilterTextParser}
  * interface, simply providing regular expressions.</p>
  *
  * <p>It does not define any grammar, it depends on the java implementation of regular
@@ -22,7 +22,7 @@ import javax.swing.RowFilter;
  * <p>It does not accept the usage of identifiers in the expression: the whole expression is
  * evaluated as a java regular expression.</p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class REFilterTextParser extends RowFilter implements IFilterTextParser {
 

@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.byteslooser.filters.gui_tests;
+package net.coderazzi.filters.gui_tests;
 
 import java.awt.BorderLayout;
 
@@ -34,16 +34,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 
-import com.byteslooser.filters.AndFilter;
-import com.byteslooser.filters.NotFilter;
-import com.byteslooser.filters.OrFilter;
-import com.byteslooser.filters.TableFilter;
-import com.byteslooser.filters.gui.editors.TableChoiceFilterEditor;
-import com.byteslooser.filters.gui.editors.TextChoiceFilterEditor;
-import com.byteslooser.filters.gui.editors.TextFilterEditor;
-import com.byteslooser.filters.gui_tests.resources.Messages;
-import com.byteslooser.filters.parser.generic.FilterTextParser;
-import com.byteslooser.filters.parser.generic.TableFilterHelper;
+import net.coderazzi.filters.AndFilter;
+import net.coderazzi.filters.NotFilter;
+import net.coderazzi.filters.OrFilter;
+import net.coderazzi.filters.TableFilter;
+import net.coderazzi.filters.gui.editors.TableChoiceFilterEditor;
+import net.coderazzi.filters.gui.editors.TextChoiceFilterEditor;
+import net.coderazzi.filters.gui.editors.TextFilterEditor;
+import net.coderazzi.filters.gui_tests.resources.Messages;
+import net.coderazzi.filters.parser.generic.FilterTextParser;
+import net.coderazzi.filters.parser.generic.TableFilterHelper;
 
 
 public class AppTestWithSeparateComponents extends JFrame {

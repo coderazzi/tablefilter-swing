@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters.gui.editors;
+package net.coderazzi.filters.gui.editors;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -37,17 +37,17 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 
-import com.byteslooser.filters.IFilterObservable;
-import com.byteslooser.filters.gui.ITableFilterEditor;
-import com.byteslooser.filters.gui.ITableFilterTextBasedEditor;
-import com.byteslooser.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.IFilterObservable;
+import net.coderazzi.filters.gui.ITableFilterEditor;
+import net.coderazzi.filters.gui.ITableFilterTextBasedEditor;
+import net.coderazzi.filters.parser.IFilterTextParser;
 
 
 /**
  * Table filter editor based on text parsing, represented by a {@link javax.swing.JTextField} with a
  * contextual menu to hold previous parsing expressions.
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class TextFilterEditor extends JTextField implements ITableFilterTextBasedEditor {
 

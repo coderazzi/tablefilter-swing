@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,13 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters.parser.generic;
+package net.coderazzi.filters.parser.generic;
 
-import com.byteslooser.filters.parser.FilterTextParsingException;
-import com.byteslooser.filters.parser.IFilterTextParser;
-import com.byteslooser.filters.parser.ITypeBuilder;
-import com.byteslooser.filters.parser.IdentifierInfo;
-import com.byteslooser.filters.resources.Messages;
+import net.coderazzi.filters.parser.FilterTextParsingException;
+import net.coderazzi.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.parser.ITypeBuilder;
+import net.coderazzi.filters.parser.IdentifierInfo;
+import net.coderazzi.filters.resources.Messages;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ import javax.swing.RowFilter;
 
 
 /**
- * <p>Specific implementation of the {@link com.byteslooser.filters.parser.IFilterTextParser}
+ * <p>Specific implementation of the {@link net.coderazzi.filters.parser.IFilterTextParser}
  * interface.</p>
  *
  * <p>Own features of this implementation includes:
@@ -76,7 +76,7 @@ import javax.swing.RowFilter;
  * </ul>
  * </p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class FilterTextParser implements IFilterTextParser {
 
@@ -634,7 +634,8 @@ public class FilterTextParser implements IFilterTextParser {
             this.info = info;
         }
 
-        @Override public boolean include(RowFilter.Entry rowEntry) {
+        @SuppressWarnings("unchecked")
+		@Override public boolean include(RowFilter.Entry rowEntry) {
 
             if (info != null)
                 return info.include(rowEntry);

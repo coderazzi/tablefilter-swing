@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.byteslooser.filters.gui_tests;
+package net.coderazzi.filters.gui_tests;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -45,19 +45,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import com.byteslooser.filters.gui.ITableFilterEditor;
-import com.byteslooser.filters.gui.ITableFilterTextBasedEditor;
-import com.byteslooser.filters.gui.TableFilterHeader;
-import com.byteslooser.filters.gui.TableFilterHeader.EditorMode;
-import com.byteslooser.filters.gui.editors.ChoiceFilterEditor;
-import com.byteslooser.filters.gui.editors.TableChoiceFilterEditor;
-import com.byteslooser.filters.gui_tests.TestData.ExamInformation;
-import com.byteslooser.filters.gui_tests.resources.Messages;
-import com.byteslooser.filters.parser.FilterTextParsingException;
-import com.byteslooser.filters.parser.IFilterTextParser;
-import com.byteslooser.filters.parser.ITypeBuilder;
-import com.byteslooser.filters.parser.generic.FilterTextParser;
-import com.byteslooser.filters.parser.re.REFilterTextParser;
+import net.coderazzi.filters.gui.ITableFilterEditor;
+import net.coderazzi.filters.gui.ITableFilterTextBasedEditor;
+import net.coderazzi.filters.gui.TableFilterHeader;
+import net.coderazzi.filters.gui.TableFilterHeader.EditorMode;
+import net.coderazzi.filters.gui.editors.ChoiceFilterEditor;
+import net.coderazzi.filters.gui.editors.TableChoiceFilterEditor;
+import net.coderazzi.filters.gui_tests.TestData.ExamInformation;
+import net.coderazzi.filters.gui_tests.resources.Messages;
+import net.coderazzi.filters.parser.FilterTextParsingException;
+import net.coderazzi.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.parser.ITypeBuilder;
+import net.coderazzi.filters.parser.generic.FilterTextParser;
+import net.coderazzi.filters.parser.re.REFilterTextParser;
 
 
 public class AppTestMain extends JFrame {

@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,11 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters.parser.generic;
+package net.coderazzi.filters.parser.generic;
 
-import com.byteslooser.filters.parser.FilterTextParsingException;
-import com.byteslooser.filters.parser.ITypeBuilder;
-import com.byteslooser.filters.resources.Messages;
+import net.coderazzi.filters.parser.FilterTextParsingException;
+import net.coderazzi.filters.parser.ITypeBuilder;
+import net.coderazzi.filters.resources.Messages;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * <p>Default {@link ITypesFactory}, supporting all the basic java types and enumerations</p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class TypesFactory implements ITypesFactory {
 
@@ -70,7 +70,8 @@ public class TypesFactory implements ITypesFactory {
     /**
      * @see  ITypesFactory#buildObject(java.lang.Class, java.lang.String)
      */
-    public Object buildObject(Class c, String s) throws FilterTextParsingException {
+    @SuppressWarnings("unchecked")
+	public Object buildObject(Class c, String s) throws FilterTextParsingException {
         ITypeBuilder factory = factories.get(c);
         if (factory != null)
             return factory.parse(s);
@@ -91,7 +92,7 @@ public class TypesFactory implements ITypesFactory {
     }
 
     /**
-     * @see  ITypesFactory#setFactory(java.lang.Class, com.byteslooser.filters.parser.ITypeBuilder)
+     * @see  ITypesFactory#setFactory(java.lang.Class, net.coderazzi.filters.parser.ITypeBuilder)
      */
     public void setFactory(Class<?> c, ITypeBuilder factory) {
         factories.put(c, factory);

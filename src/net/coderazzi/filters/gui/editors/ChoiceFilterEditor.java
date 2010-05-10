@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of e, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,12 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters.gui.editors;
+package net.coderazzi.filters.gui.editors;
 
-import com.byteslooser.filters.AbstractObservableRowFilter;
-import com.byteslooser.filters.IFilterObservable;
-import com.byteslooser.filters.gui.ITableFilterEditor;
-import com.byteslooser.filters.resources.Messages;
+import net.coderazzi.filters.AbstractObservableRowFilter;
+import net.coderazzi.filters.IFilterObservable;
+import net.coderazzi.filters.gui.ITableFilterEditor;
+import net.coderazzi.filters.resources.Messages;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -62,7 +62,7 @@ import javax.swing.RowFilter;
  * <p>An example of this second customization would be, in a column displaying people's ages, to
  * setup several age ranges as choices, like 'ages below 25', '25 to 35', 'over 35'</p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor {
 
@@ -289,7 +289,7 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      *
      * <p>It must take special care of the object {@link ChoiceFilterEditor#NO_FILTER}</p>
      *
-     * @author  Luis M Pena - byteslooser@gmail.com
+     * @author  Luis M Pena - dr.lu@coderazzi.net
      */
     public interface IRenderer {
         Component getChoiceComponent(Object value, boolean selected, boolean hasFocus);
@@ -306,7 +306,7 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      * <p>Note that the list renderer -if any- must know how to display the IChoice objects. The the
      * default Renderer will display them as the string returned by their toString method</p>
      *
-     * @author  Luis M Pena - byteslooser@gmail.com
+     * @author  Luis M Pena - dr.lu@coderazzi.net
      */
     public interface IChoice {
         boolean matches(Object value);
@@ -316,7 +316,7 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
     /**
      * <p>Implementation of a RowFilter for the ChoiceFilterEditor</p>
      *
-     * @author  Luis M Pena - byteslooser@gmail.com
+     * @author  Luis M Pena - dr.lu@coderazzi.net
      */
     protected class Filter extends AbstractObservableRowFilter {
 

@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,19 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters.gui;
+package net.coderazzi.filters.gui;
 
-import com.byteslooser.filters.IFilterObservable;
-import com.byteslooser.filters.IFilterObserver;
-import com.byteslooser.filters.TableFilter;
-import com.byteslooser.filters.gui.editors.TableChoiceFilterEditor;
-import com.byteslooser.filters.gui.editors.TextChoiceFilterEditor;
-import com.byteslooser.filters.gui.editors.TextFilterEditor;
-import com.byteslooser.filters.parser.IFilterTextParser;
-import com.byteslooser.filters.parser.IdentifierInfo;
-import com.byteslooser.filters.parser.generic.FilterTextParser;
-import com.byteslooser.filters.parser.generic.TableFilterHelper;
-import com.byteslooser.filters.resources.Messages;
+import net.coderazzi.filters.IFilterObservable;
+import net.coderazzi.filters.IFilterObserver;
+import net.coderazzi.filters.TableFilter;
+import net.coderazzi.filters.gui.editors.TableChoiceFilterEditor;
+import net.coderazzi.filters.gui.editors.TextChoiceFilterEditor;
+import net.coderazzi.filters.gui.editors.TextFilterEditor;
+import net.coderazzi.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.parser.IdentifierInfo;
+import net.coderazzi.filters.parser.generic.FilterTextParser;
+import net.coderazzi.filters.parser.generic.TableFilterHelper;
+import net.coderazzi.filters.resources.Messages;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -80,7 +80,7 @@ import javax.swing.table.TableColumnModel;
  * <ul>
  * <li>BASIC editor: editor with {@link javax.swing.JComboBox} appearance. The user can enter free
  * text format, which is parsed using a given {@link
- * com.byteslooser.filters.parser.IFilterTextParser}. The combobox keeps track of the last used
+ * net.coderazzi.filters.parser.IFilterTextParser}. The combobox keeps track of the last used
  * entries, and, in case of columns with enumeration or boolean types, it is prepopulated with the
  * possible values.</li>
  * <li>SLIM editor: editor with {@link javax.swing.JTextField} appearance. It behaves as the BASIC
@@ -96,11 +96,11 @@ import javax.swing.table.TableColumnModel;
  * <p>Users can also provide customized editors, or modify the behaviour or appearance of the
  * created ones</p>
  *
- * <p>The implementation relies on the {@link com.byteslooser.filters.TableFilter} class, please
+ * <p>The implementation relies on the {@link net.coderazzi.filters.TableFilter} class, please
  * read its documentation to understand the requirements on the table and its model, and how it is
  * affected by this filter</p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class TableFilterHeader extends JPanel {
 
@@ -121,7 +121,7 @@ public class TableFilterHeader extends JPanel {
      * <li>CHOICE: combobox where user can only select one of the provided expressions.</li>
      * </ul>
      *
-     * @author  Luis M Pena - byteslooser@gmail.com
+     * @author  Luis M Pena - dr.lu@coderazzi.net
      */
     public enum EditorMode {
         NULL, SLIM, BASIC, CHOICE
@@ -136,7 +136,7 @@ public class TableFilterHeader extends JPanel {
      * <li>INLINE: the filter is placed below the table header, above the table's content.</li>
      * </ul>
      *
-     * @author  Luis M Pena - byteslooser@gmail.com
+     * @author  Luis M Pena - dr.lu@coderazzi.net
      * @since 1.3
      */
     public enum Position {
@@ -216,8 +216,8 @@ public class TableFilterHeader extends JPanel {
     /**
      * Constructor, using the default inline location
      *
-     * @see  TableFilterHeader#setMode(com.byteslooser.filters.gui.TableFilterHeader.EditorMode)
-     * @see  TableFilterHeader#setPosition(com.byteslooser.filters.gui.TableFilterHeader.Position)
+     * @see  TableFilterHeader#setMode(net.coderazzi.filters.gui.TableFilterHeader.EditorMode)
+     * @see  TableFilterHeader#setPosition(net.coderazzi.filters.gui.TableFilterHeader.Position)
      * 
      * @since 1.3
      */
@@ -229,8 +229,8 @@ public class TableFilterHeader extends JPanel {
      * Full constructor
      *
      * @see  TableFilterHeader#setTable(JTable)
-     * @see  TableFilterHeader#setMode(com.byteslooser.filters.gui.TableFilterHeader.EditorMode)
-     * @see  TableFilterHeader#setPosition(com.byteslooser.filters.gui.TableFilterHeader.Position)
+     * @see  TableFilterHeader#setMode(net.coderazzi.filters.gui.TableFilterHeader.EditorMode)
+     * @see  TableFilterHeader#setPosition(net.coderazzi.filters.gui.TableFilterHeader.Position)
      * 
      * @since 1.3
      */
@@ -321,7 +321,7 @@ public class TableFilterHeader extends JPanel {
      * <p>If the filter editors have been already created, they are not removed, the mode will only
      * be used on newly created editors (like when adding columns to the table)</p>
      *
-     * @see  TableFilterHeader#resetMode(com.byteslooser.filters.gui.TableFilterHeader.EditorMode)
+     * @see  TableFilterHeader#resetMode(net.coderazzi.filters.gui.TableFilterHeader.EditorMode)
      */
     public void setMode(EditorMode mode) {
         this.mode = mode;
@@ -339,7 +339,7 @@ public class TableFilterHeader extends JPanel {
      * Defines the type of filter editors associated by default to the columns, and recreates all
      * the editors with the given type
      *
-     * @see  TableFilterHeader#setMode(com.byteslooser.filters.gui.TableFilterHeader.EditorMode)
+     * @see  TableFilterHeader#setMode(net.coderazzi.filters.gui.TableFilterHeader.EditorMode)
      */
     public void resetMode(EditorMode mode) {
         this.mode = mode;
@@ -661,7 +661,7 @@ public class TableFilterHeader extends JPanel {
      * <p>Returns the filter editor for the given column.</p>
      *
      * <p>By default, all FilterEditors are instances of {@link
-     * com.byteslooser.filters.gui.editors.TextChoiceFilterEditor}</p>
+     * net.coderazzi.filters.gui.editors.TextChoiceFilterEditor}</p>
      *
      * @param  modelColumn  The column number in the table model
      */
@@ -687,7 +687,7 @@ public class TableFilterHeader extends JPanel {
 
     /**
      * <p>Sets a filter editor of type {@link
-     * com.byteslooser.filters.gui.editors.TableChoiceFilterEditor} on the given column; this editor
+     * net.coderazzi.filters.gui.editors.TableChoiceFilterEditor} on the given column; this editor
      * is a {@link javax.swing.JComboBox} which only allows the user to enter predefined options.
      * The initial options are the values in the table model for the given column.</p>
      *
@@ -696,7 +696,7 @@ public class TableFilterHeader extends JPanel {
      *
      * @param   modelColumn  The column number in the table model
      *
-     * @return  the created {@link com.byteslooser.filters.gui.editors.TableChoiceFilterEditor}
+     * @return  the created {@link net.coderazzi.filters.gui.editors.TableChoiceFilterEditor}
      *          editor, which can be then directly manipulated by the user
      */
     public TableChoiceFilterEditor setChoiceFilterEditor(int modelColumn) {
@@ -709,7 +709,7 @@ public class TableFilterHeader extends JPanel {
 
 
     /**
-     * <p>Sets a filter editor of type {@link com.byteslooser.filters.gui.editors.TextFilterEditor}
+     * <p>Sets a filter editor of type {@link net.coderazzi.filters.gui.editors.TextFilterEditor}
      * on the given column; this editor is a {@link javax.swing.JTextField} which allows the user to
      * enter complex filter expressions, and includes a contextual menu to facilitate the input of
      * older entries</p>
@@ -719,7 +719,7 @@ public class TableFilterHeader extends JPanel {
      *
      * @param   modelColumn  The column number in the table model
      *
-     * @return  the created {@link com.byteslooser.filters.gui.editors.TextFilterEditor} editor,
+     * @return  the created {@link net.coderazzi.filters.gui.editors.TextFilterEditor} editor,
      *          which can be then directly manipulated by the user
      */
     public TextFilterEditor setSlimFilterEditor(int modelColumn) {
@@ -732,7 +732,7 @@ public class TableFilterHeader extends JPanel {
 
     /**
      * <p>Sets a filter editor of type {@link
-     * com.byteslooser.filters.gui.editors.TextChoiceFilterEditor} on the given column; this editor
+     * net.coderazzi.filters.gui.editors.TextChoiceFilterEditor} on the given column; this editor
      * is a {@link javax.swing.JComboBox} which allows the user to enter complex filter expressions,
      * with a historic of the last entries</p>
      *
@@ -741,7 +741,7 @@ public class TableFilterHeader extends JPanel {
      *
      * @param   modelColumn  The column number in the table model
      *
-     * @return  the created {@link com.byteslooser.filters.gui.editors.TextChoiceFilterEditor}
+     * @return  the created {@link net.coderazzi.filters.gui.editors.TextChoiceFilterEditor}
      *          editor, which can be then directly manipulated by the user
      */
     public TextChoiceFilterEditor setBasicFilterEditor(int modelColumn) {
@@ -773,7 +773,7 @@ public class TableFilterHeader extends JPanel {
      * <p>Returns the parser used on plain text filters.</p>
      *
      * <p>By default, it is an instance of {@link
-     * com.byteslooser.filters.parser.generic.FilterTextParser}</p>
+     * net.coderazzi.filters.parser.generic.FilterTextParser}</p>
      *
      * <p>Each column can have its own Parser, if setTextParser is used on the associated filter. In
      * that case, it is needed to access each filter to obtain the used parser.</p>

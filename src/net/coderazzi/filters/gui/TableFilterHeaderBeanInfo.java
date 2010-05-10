@@ -1,4 +1,4 @@
-package com.byteslooser.filters.gui;
+package net.coderazzi.filters.gui;
 
 import java.beans.BeanDescriptor;
 import java.beans.SimpleBeanInfo;
@@ -14,7 +14,7 @@ public class TableFilterHeaderBeanInfo extends SimpleBeanInfo{
     
     @Override
 	public java.awt.Image getIcon(int iconKind) {
-        return loadImage("/com/byteslooser/filters/resources/tableFilterHeader.png");
+        return loadImage("/net/coderazzi/filters/resources/tableFilterHeader.png");
     }
 
 }

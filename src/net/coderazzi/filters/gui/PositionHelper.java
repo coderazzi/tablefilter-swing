@@ -1,4 +1,4 @@
-package com.byteslooser.filters.gui;
+package net.coderazzi.filters.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -11,12 +11,12 @@ import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.table.JTableHeader;
 
-import com.byteslooser.filters.gui.TableFilterHeader.Position;
+import net.coderazzi.filters.gui.TableFilterHeader.Position;
 
 /**
  * <p>Helper class to locate the filter header on the expected place by the table header</p>
  * 
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 class PositionHelper implements PropertyChangeListener{
 

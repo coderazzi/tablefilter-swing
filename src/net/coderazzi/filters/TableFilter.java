@@ -1,8 +1,8 @@
 /**
- * Author:  Luis M Pena  ( byteslooser@gmail.com )
+ * Author:  Luis M Pena  ( dr.lu@coderazzi.net )
  * License: MIT License
  *
- * Copyright (c) 2007 Luis M. Pena  -  byteslooser@gmail.com
+ * Copyright (c) 2007 Luis M. Pena  -  dr.lu@coderazzi.net
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.byteslooser.filters;
+package net.coderazzi.filters;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JTable;
@@ -38,7 +38,7 @@ import javax.swing.RowSorter;
  * composed sub filters.</p>
  *
  * <p>Users require instancing TableFilter instances only when managing their own filter editors.
- * Note that the {@link com.byteslooser.filters.gui.TableFilterHeader} already handles its own
+ * Note that the {@link net.coderazzi.filters.gui.TableFilterHeader} already handles its own
  * TableFilter, and keeps track of any table changes, updating automatically the editors.</p>
  * </p>
  *
@@ -56,7 +56,7 @@ import javax.swing.RowSorter;
  * sorter that does not subclass the {@link javax.swing.DefaultRowSorter} class, the TableFilter
  * will perform <b>no filtering at all</b>.</p>
  *
- * @author  Luis M Pena - byteslooser@gmail.com
+ * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class TableFilter extends AndFilter {
 
@@ -167,7 +167,8 @@ public class TableFilter extends AndFilter {
     /**
      * Internal method to send without further checks a notification to the observers.
      */
-    private boolean sendFilterUpdateNotification() {
+    @SuppressWarnings("unchecked")
+	private boolean sendFilterUpdateNotification() {
         RowSorter<?> sorter = getRowSorter();
         if (sorter instanceof DefaultRowSorter) {
             ((DefaultRowSorter<?, ?>) sorter).setRowFilter(this);
