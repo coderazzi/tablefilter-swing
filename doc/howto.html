@@ -1,0 +1,108 @@
+<html>
+<head>
+<title>TableFilter - How to / Frequently asked questins</title>
+<link rel="stylesheet" type="text/css" href="tablefilter.css">
+</head>
+<body><div id='content'>
+
+  <h1>How to ... / FAQs</h1>
+
+  <ul>
+    <li><a href='#briefstart'>How to create a table filter</a></li>
+    <li><a href='#sortingevents'>Listening for sorting events</a></li>
+    <li><a href='#userfilters'>Create additional user filters</a></li>
+    <li><a href='#inout'>Avoiding sudden row vanishing while editing</a></li>
+  </ul>
+
+<div class="hr">&nbsp;</div>
+
+  <ul>
+    <li><a name='briefstart'><span class='mark'>How to create a table filter</span></a>
+    
+    <p>The <a href='header.html'>header</a> section describes the usage of the
+    <span class='mark'>TableFilterHeader</span> class, that defines the filter header associated to tables.</p>
+    <p>As summary: create first the <span class='mark'>JTable</span>, that should be included in
+    a <span class='mark'>JScrollPane</span>, as it is usual.
+    Then, just create the <span class='mark'>TableFilterHeader</span> with the table as
+    single parameter -other constructors can be invoked to modify the default behaviour-.
+    </p>
+    <pre>JTable table = new JTable();
+/* ... JScrollPane scrollPane = new JScrollPane(table);   ...*/
+TableFilterHeader filter = new TableFilterHeader(table);</pre>
+
+	<p>This code is enough to start using the table filter. Check then its 
+	<a href='api/net/coderazzi/filters/gui/TableFilterHeader.html'>javadoc</a> to customize it,
+	or check the examples, whose code is available in the <a href='download.html'>download</a> section -
+	use the source distribution file-
+    </li>
+
+	<div class="hr">&nbsp;</div>
+
+    <li><a name='sortingevents'><span class='mark'>Listening for sorting events</span></a>
+    <p>Listening for sorting events require adding a listener to the 
+    table itself. For example, it is possible to add a tooltip that shows
+    the current number of rows -or how many have been filtered out-:
+    </p>
+    <pre>header.getTable().getRowSorter().addRowSorterListener(new RowSorterListener() {
+            @Override
+            public void sorterChanged(RowSorterEvent e) {
+                System.out.println(e.getPreviousRowCount());
+            }
+         });</pre>
+    </li>
+
+	<div class="hr">&nbsp;</div>
+
+    <li><a name='userfilters'><span class='mark'>Create additional user filters</span></a>
+    <p>
+      It is easy to define additional filters outside the header filter, using the 
+      href='api/net/coderazzi/filters/UserFilter.html'>UserFilter</a> class,
+      for example:
+    </p>
+
+	<pre>    
+final UserFilter userFilter = new UserFilter(filterHeader){
+	@Override
+	public boolean include(Entry entry) {
+		return -1!=entry.getStringValue(nameColumn).indexOf('e');
+	}
+};
+JCheckBox check = new JCheckBox("Filter out any row where the "+
+                                "name does not contain a lower case 'e'");		
+check.addItemListener(new ItemListener() {			
+	@Override
+	public void itemStateChanged(ItemEvent e) {				
+		userFilter.setEnabled(e.getStateChange()==ItemEvent.SELECTED);
+	}
+});
+    </pre>
+    
+    </li>
+
+	<div class="hr">&nbsp;</div>
+
+
+    <li><a name='inout'><span class='mark'>Avoiding sudden row vanishing while editing</span></a>
+    
+    <p>When a user edits a given table's row, it could happen that the row does not match anymore the filters that the user specified.
+    Being this the case, the row should dissapear from the current view, but this can be, at the very least, quite confusing for the user: modifying
+    a column makes the row vanish!</p>
+    
+    <p>The solution -if needed-, is quite straightforward: modify the applying filter so that the updated rows are not filtered out.
+    
+    <pre>headerFilter.setTableFilter(
+           new TableFilter() {
+               @Override
+               public boolean include(Entry rowEntry) {
+                   return isModelRowChanged((Integer) rowEntry.getIdentifier())
+                       || super.include(rowEntry);
+               }
+}); </pre></p>
+
+	<p>It is needed here to program the <span class='code'>isModelRowChanged</span> method, returning true when the associated (model) row is changed.</p>    
+    </li>
+   </ul>
+
+
+</div></body>
+</html>

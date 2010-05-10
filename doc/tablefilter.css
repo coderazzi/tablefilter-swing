@@ -1,0 +1,138 @@
+body  
+{
+	background-color: #eee;
+	padding: 0px;
+	margin: 0px; 
+}
+ 
+h1 
+{ 
+	color: #b95959;
+	font-size: 40px;
+	font-family: courier, monospace;
+	line-height: 1;
+}
+ 
+h2 
+{	
+	font-size: 32px;
+	font-family: courier, monospace;
+	color: #5959b9;
+}
+ 
+table 
+{
+	width: 90%; 
+	border-collapse: collapse; 
+	font-size: 0.95em;
+}
+
+th 
+{
+	padding: 4px; 
+	border: 3px solid #bbbbff; 
+	background-color: #e0e0ff;
+	color: #5555ff
+}
+
+td 
+{
+	padding: 4px; 
+	border: 2px solid #bbbbff;
+	color: #696969;
+}
+
+.itable 
+{
+	width: 100%; 
+	font-size: 0.95em; 
+	margin: 0.6em 0 0.6em 0;
+}
+
+.itable th 
+{
+	padding: 4px; 
+	border: 2px solid #bbbbff; 
+	background-color: #f0f0ff;
+}
+
+p{padding-left: 10px;}
+ 
+pre 
+{
+	padding: 10px;
+	background-color: #eee;
+}
+
+img{ border: none;}
+
+
+img.right { float: right; margin-left: 20px; margin-bottom: 10px;}
+
+img.border { border: 1px solid black;}
+
+img.left { float: left; margin-right: 20px; margin-bottom: 10px;}
+
+img.centered 
+{
+	margin-top: 32px;
+	margin-bottom: 32px;
+}
+ 
+.centered
+{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+.hr 
+{
+	margin-top: 30px;
+	margin-bottom: 10px;
+	border-top: 1px solid #ddd;
+}
+
+.mark 
+{
+	color: #494949;
+	font-style: italic;
+}
+
+
+.scode 
+{
+	display: inline; 
+	font-family: monospace;
+}
+
+.note
+{
+    font-style: italic;
+    margin-left: 40px;
+    font-size: 80%;
+}
+
+#body
+{
+	max-width:800px;
+
+	padding: 10px;
+	color: #696969;
+	background-color: white;
+
+	font-size: 14px;
+	font-family: "Trebuchet MS", "lucida grande", verdana, sans-serif;
+	line-height: 1.6em;
+	
+	margin-bottom: 120px;
+}
+
+#content 
+{
+	font-size: 14px;
+	font-family: "Trebuchet MS", "lucida grande", verdana, sans-serif;
+	line-height: 1.6em;
+}
+
