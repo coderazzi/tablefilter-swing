@@ -36,7 +36,7 @@
           In Java 6, this behaviour is defined in the 
           <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTable.html?is-external=true'>JTable</a>
           implementation, while in Java 5 has been included in the 
-          <a href='api5/com/byteslooser/filters/artifacts/TableModelFilter.html'>TableModelFilter</a>.
+          <a href='api5/net/coderazzi/filters/artifacts/TableModelFilter.html'>TableModelFilter</a>.
           In special, note that inserts and removes imply the immediate 
           appliance of the filter on all the rows, while updating data does not; 
           this can be useful while updating rows (like the male state in the 
@@ -46,18 +46,18 @@
           in the model. It shows the behaviour of the library in this event.</li>
         <li><b>Reset model</b> sets a new model to the table.</li>
         <li><b>Reset filter</b> shows the effect of executing
-          <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#resetFilters()'>resetFilters</a>
+          <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#resetFilters()'>resetFilters</a>
           on the
-          <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html'>TableFilterHeader</a>.</li>
+          <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html'>TableFilterHeader</a>.</li>
       </ul>
       </p>
 
       <p>
         When the expanded table is shown, with all the columns, the <b>name</b> 
         column includes, if the editor is in parsing text mode, a 
-        <a href='api/com/byteslooser/filters/parser/re/REFilterTextParser.html'>regular expression</a>
+        <a href='api/net/coderazzi/filters/parser/re/REFilterTextParser.html'>regular expression</a>
         parser (all the other columns include the 
-        <a href='api/com/byteslooser/filters/parser/generic/FilterTextParser.html'>default parser</a>).
+        <a href='api/net/coderazzi/filters/parser/generic/FilterTextParser.html'>default parser</a>).
       </p> 
 
 
@@ -91,9 +91,9 @@
       implementing an extended <span class='mark'>TableModel</span> which has only the initial
       5 columns visible, but provides information on additional fields for each row. The other
       way to implement this feature is by setting a specialized 
-      <a href='api/com/byteslooser/filters/TableFilter.html'>TableFilter</a> that
+      <a href='api/net/coderazzi/filters/TableFilter.html'>TableFilter</a> that
       overrides the 
-      <a href='api/com/byteslooser/filters/AndFilter.html#include(javax.swing.RowFilter.Entry)'>include</a>
+      <a href='api/net/coderazzi/filters/AndFilter.html#include(javax.swing.RowFilter.Entry)'>include</a>
       method to pass a different 
       <a hhref='http://java.sun.com/javase/6/docs/api/javax/swing/RowFilter.Entry.html?is-external=true'>RowFilter.Entry</a>
       instance to the filters, implementing an extending dictionary.

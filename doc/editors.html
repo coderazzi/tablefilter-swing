@@ -11,12 +11,12 @@
     <span class='mark'>TableFilter</span> provides two types of filters; 
     based on text parsing or based on single user choices. 
     Users can create additional filters, based on the interface 
-    <a href='api/com/byteslooser/filters/gui/ITableFilterEditor.html'>ITableFilterEditor</a>.
+    <a href='api/net/coderazzi/filters/gui/ITableFilterEditor.html'>ITableFilterEditor</a>.
   </p>
 
   <p>
     All the editors available in the library are placed in the package
-    <a href='api/com/byteslooser/filters/gui/editors/package-summary.html'>com.byteslooser.filters.gui.editors</a>.
+    <a href='api/net/coderazzi/filters/gui/editors/package-summary.html'>net.coderazzi.filters.gui.editors</a>.
   </p>
 
   <p>The available editors are:
@@ -61,7 +61,7 @@
 
     <p>
       The editor is not responsible to perform the parsing, which is delegated to a
-      <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html'>IFilterTextParser</a>
+      <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html'>IFilterTextParser</a>
       instance. Users can define their own parsers, or use the 
       <a href='parsers.html'>default one</a>.
     </p>
@@ -79,15 +79,15 @@
     <p>
       As a parsing editor, it can compose as complex filter expressions as 
       the associated parser support, but it supports little customization. Its 
-      <a href='api/com/byteslooser/filters/gui/editors/TextChoiceFilterEditor.html'>interface</a> 
+      <a href='api/net/coderazzi/filters/gui/editors/TextChoiceFilterEditor.html'>interface</a> 
       includes a few methods to handle the historic / choice values:
       <ul>
-        <li><a href='api/com/byteslooser/filters/gui/editors/TextChoiceFilterEditor.html#setHistoricLength(int)'>setHistoricLength</a> 
+        <li><a href='api/net/coderazzi/filters/gui/editors/TextChoiceFilterEditor.html#setHistoricLength(int)'>setHistoricLength</a> 
           and 
-          <a href='api/com/byteslooser/filters/gui/editors/TextChoiceFilterEditor.html#addToHistoric(java.lang.String)'>addToHistoric</a>
+          <a href='api/net/coderazzi/filters/gui/editors/TextChoiceFilterEditor.html#addToHistoric(java.lang.String)'>addToHistoric</a>
           control the historic values.</li>
         <li>
-          <a href='api/com/byteslooser/filters/gui/editors/TextChoiceFilterEditor.html#suggestChoices(java.lang.String...)'>suggestChoices</a>
+          <a href='api/net/coderazzi/filters/gui/editors/TextChoiceFilterEditor.html#suggestChoices(java.lang.String...)'>suggestChoices</a>
           supports customizing the choices that are always shown to the user.</li>
       </ul>
     </p> 
@@ -111,7 +111,7 @@
     
     <p>
       Therefore, its
-      <a href='api/com/byteslooser/filters/gui/editors/TextFilterEditor.html'>interface</a> 
+      <a href='api/net/coderazzi/filters/gui/editors/TextFilterEditor.html'>interface</a> 
       is very similar; it only lacks the option to provide prefixed choices
     </p>
 
@@ -144,7 +144,7 @@
       class, through the 
       <a href='http://java.sun.com/javase/6/docs/api/javax/swing/ListCellRenderer.html'>ListCellRenderer</a>,
       although the ChoiceFilterEditor defines the more specific 
-      <a href='api/com/byteslooser/filters/gui/editors/ChoiceFilterEditor.IRenderer.html'>IRenderer</a>
+      <a href='api/net/coderazzi/filters/gui/editors/ChoiceFilterEditor.IRenderer.html'>IRenderer</a>
       interface to do the same.
     </p>
 
@@ -159,14 +159,14 @@
 
     <p>
       This second customization is provided through the  
-      <a href='api/com/byteslooser/filters/gui/editors/ChoiceFilterEditor.IChoice.html'>IChoice</a> 
+      <a href='api/net/coderazzi/filters/gui/editors/ChoiceFilterEditor.IChoice.html'>IChoice</a> 
       interface.
     </p>
 
     <p>
       To use this editor directly, the user must provide all the available 
       choices, using the defined 
-      <a href='api/com/byteslooser/filters/gui/editors/ChoiceFilterEditor.html'>interface</a>. 
+      <a href='api/net/coderazzi/filters/gui/editors/ChoiceFilterEditor.html'>interface</a>. 
       It supports the concept of <b>other choices</b>, which is simply an 
       additional choice whose selection  implies the negation of any other 
       shown choice. In most cases, the user will use the 
@@ -183,7 +183,7 @@
       the  TableChoiceFilterEditor. This is an specialization of the 
       ChoiceFilterEditor that provides automatically the initial choices, 
       and with an extended
-      <a href='api/com/byteslooser/filters/gui/editors/TableChoiceFilterEditor.html'>interface</a>, 
+      <a href='api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html'>interface</a>, 
       to define how to extract choices from the table.
     </p>
 

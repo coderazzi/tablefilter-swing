@@ -60,7 +60,7 @@
       <p>
         The <span class='mark'>TableFilterHeader</span> class is placed in the 
         package 
-        <a href='api/com/byteslooser/filters/gui/package-summary.html'>com.byteslooser.filters.gui</a>
+        <a href='api/net/coderazzi/filters/gui/package-summary.html'>net.coderazzi.filters.gui</a>
       </p>
 
       <p>
@@ -71,9 +71,9 @@
 
       <p>
         Writing the previous code will use the default editor; the 
-        <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html'>TableFilterHeader</a> 
+        <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html'>TableFilterHeader</a> 
         allows setting up its 
-        <a href='api/com/byteslooser/filters/gui/TableFilterHeader.EditorMode.html'>mode</a>,
+        <a href='api/net/coderazzi/filters/gui/TableFilterHeader.EditorMode.html'>mode</a>,
         which can be one of:
         <ul>
           <li><b>NONE</b>: no editor at all.</li>
@@ -172,7 +172,7 @@ pane.add(filterHeader, BorderLayout.SOUTH);</pre>
       <p>
         The component is quite simple, its interface just tries to simplify 
         the controlling of all the filter editors behind. The 
-        <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html'>api documentation</a> 
+        <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html'>api documentation</a> 
         for this component describes its functionality.
       </p>
 
@@ -183,21 +183,21 @@ pane.add(filterHeader, BorderLayout.SOUTH);</pre>
         to create the library-defined editors:
         <ul>
           <li>
-            <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#setSlimFilterEditor(int)'>setSlimFilterEditor</a>
+            <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setSlimFilterEditor(int)'>setSlimFilterEditor</a>
             Creates, on the passed column, an editor of type 
             <a href='editors.html#TextFilterEditor'>SLIM</a>
             , a text parsing filter based on 
             <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTextField.html?is-external=true'>JTextField</a>.
           </li>
           <li>
-            <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#setBasicFilterEditor(int)'>setBasicFilterEditor</a>
+            <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setBasicFilterEditor(int)'>setBasicFilterEditor</a>
             Creates, on the passed column, an editor of type 
             <a href='editors.html#TextChoiceFilterEditor'>BASIC</a>
             , a text parsing filter based on 
             <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JComboBox.html?is-external=true'>JComboBox</a>.
           </li>
           <li>
-            <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#setChoiceFilterEditor(int)'>setChoiceFilterEditor</a>
+            <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setChoiceFilterEditor(int)'>setChoiceFilterEditor</a>
             Creates, on the passed column, an editor of type 
             <a href='editors.html#ChoiceFilterEditor'>CHOICE</a> 
             ,a fixed-choice filter based on 
@@ -210,9 +210,9 @@ pane.add(filterHeader, BorderLayout.SOUTH);</pre>
       
       <p>
         It is also possible to create custom filter editors, setting them via the method
-        <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html#setFilterEditor(int,%20com.byteslooser.filters.gui.ITableFilterEditor)'>setFilterEditor</a>.
+        <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setFilterEditor(int,%20net.coderazzi.filters.gui.ITableFilterEditor)'>setFilterEditor</a>.
         In this case, the editor must implement the interface
-        <a href='api/com/byteslooser/filters/gui/ITableFilterEditor.html'>ITableFilterEditor</a>
+        <a href='api/net/coderazzi/filters/gui/ITableFilterEditor.html'>ITableFilterEditor</a>
       </p>
       <p>
         The figure below shows a test, supplied with source distribution of this library, showing all the included editors:

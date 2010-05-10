@@ -15,16 +15,16 @@
 
     <p>
       All the filter editors implement the 
-      <a href='api/com/byteslooser/filters/gui/ITableFilterEditor.html'>ITableFilterEditor</a>
+      <a href='api/net/coderazzi/filters/gui/ITableFilterEditor.html'>ITableFilterEditor</a>
       interface, so they can provide 
-      <a href='api/com/byteslooser/filters/IFilterObservable.html'>IFilterObservable</a> 
+      <a href='api/net/coderazzi/filters/IFilterObservable.html'>IFilterObservable</a> 
       instances. Attaching a 
-      <a href='api/com/byteslooser/filters/IFilterObserver.html'>IFilterObserver</a> 
+      <a href='api/net/coderazzi/filters/IFilterObserver.html'>IFilterObserver</a> 
       to it, it is possible to obtain the filter provided by that editor.
     </p>
 
     <p>
-      The <a href='api/com/byteslooser/filters/TableFilter.html'>TableFilter</a> 
+      The <a href='api/net/coderazzi/filters/TableFilter.html'>TableFilter</a> 
       class can simplify this process; it supports the adding of one or more 
       filter editors, and it is intended to be associated to a table. When the 
       user modifies those editors, the resulting filter is automatically 
@@ -46,9 +46,9 @@
     <p>
       However, it is possible to link the filter editors in 
       different compositions. The classes
-      <a href='api/com/byteslooser/filters/AndFilter.html'>AndFilter</a>,
-      <a href='api/com/byteslooser/filters/OrFilter.html'>OrFilter</a> and 
-      <a href='api/com/byteslooser/filters/NotFilter.html'>NotFilter</a> 
+      <a href='api/net/coderazzi/filters/AndFilter.html'>AndFilter</a>,
+      <a href='api/net/coderazzi/filters/OrFilter.html'>OrFilter</a> and 
+      <a href='api/net/coderazzi/filters/NotFilter.html'>NotFilter</a> 
       permit creating different logical results. The
       <span class='mark'>TableFilter</span>, is, in fact, an specialization 
       of the AndFilter.
@@ -88,7 +88,7 @@ tableFilter.addFilterObservable(
       their updates if the table changes. In special:
       <ul>
         <li>In case of parsing editors, it is needed to create and associate a 
-          <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html'>IFilterTextParser</a> 
+          <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html'>IFilterTextParser</a> 
           instance.</li>
         <li>In case that the table's structure can change, any update should 
           be propagated to the editors and to the used parser.</li>
@@ -97,7 +97,7 @@ tableFilter.addFilterObservable(
 
     <p>
       The initialization of editors and the 
-      <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html'>IFilterTextParser</a>
+      <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html'>IFilterTextParser</a>
       requires the handling two concepts:
       <ul>
         <li><b>Identifiers</b>: these are the <i>variables</i> handled by the 
@@ -114,7 +114,7 @@ tableFilter.addFilterObservable(
 
     <p>
       The helper class 
-      <a href='api/com/byteslooser/filters/parser/generic/TableFilterHelper.html'>TableFilterHelper</a> 
+      <a href='api/net/coderazzi/filters/parser/generic/TableFilterHelper.html'>TableFilterHelper</a> 
       can be used to create the identifiers of a table, or to create directly
       a parser already initialized. It reads the headers of the table, and 
       their associated types, to extract the table's identifiers, in the same 

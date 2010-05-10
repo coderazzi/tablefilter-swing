@@ -19,7 +19,7 @@
     <ul>
       <li>
         A parser that handles java regular expressions:  
-        <a href='api/com/byteslooser/filters/parser/re/REFilterTextParser.html'>REFilterTextParser</a>,
+        <a href='api/net/coderazzi/filters/parser/re/REFilterTextParser.html'>REFilterTextParser</a>,
         which is a simple wrapper around the java regular expression functionality.
       </li>
       <li>
@@ -32,13 +32,13 @@
     <p>
       The library also supports customized parsers, which must implement a 
       quite simple
-      <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html'>interface</a>.
+      <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html'>interface</a>.
       The default parser implementation is called 
-      <a href='api/com/byteslooser/filters/parser/generic/FilterTextParser.html'>FilterTextParser</a>, 
+      <a href='api/net/coderazzi/filters/parser/generic/FilterTextParser.html'>FilterTextParser</a>, 
       in the package
-      <a href='api/com/byteslooser/filters/parser/generic/package-summary.html'>com.byteslooser.filters.parser.generic</a>, 
+      <a href='api/net/coderazzi/filters/parser/generic/package-summary.html'>net.coderazzi.filters.parser.generic</a>, 
       while the generic interfaces are defined in the
-      <a href='api/com/byteslooser/filters/parser/package-summary.html'>com.byteslooser.filters.parser</a>. 
+      <a href='api/net/coderazzi/filters/parser/package-summary.html'>net.coderazzi.filters.parser</a>. 
     </p> 
 
     <h2>Default filter text parser</h2>
@@ -174,7 +174,7 @@
       <p>
         The default value associated to null is the string <b>null</b>, 
         although using the method
-        <a href='api/com/byteslooser/filters/parser/generic/FilterTextParser.html#setNullString(java.lang.String)'>setNullString</a> 
+        <a href='api/net/coderazzi/filters/parser/generic/FilterTextParser.html#setNullString(java.lang.String)'>setNullString</a> 
         in the filter parser, other representations could be provided.
       </p>
 
@@ -193,11 +193,11 @@
 
       <p>
         This can be avoided by using the interface 
-        <a href='api/com/byteslooser/filters/parser/ITypeBuilder.html'>ITypeBuilder</a>, 
+        <a href='api/net/coderazzi/filters/parser/ITypeBuilder.html'>ITypeBuilder</a>, 
         which specifies how to build and object using its string representation. The 
-        <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html'>IFilterTextParser</a> 
+        <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html'>IFilterTextParser</a> 
         interface supports for this purpose the method 
-        <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html#setTypeBuilder(java.lang.Class, com.byteslooser.filters.parser.ITypeBuilder)'>setTypeBuilder</a>.
+        <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html#setTypeBuilder(java.lang.Class, net.coderazzi.filters.parser.ITypeBuilder)'>setTypeBuilder</a>.
       </p>
 
 
@@ -206,7 +206,7 @@
         <a href='http://java.sun.com/javase/6/docs/api/java/lang/Comparable.html?is-external=true'>Comparable</a>,
         in order to use most of the comparison operands. Alternatively, the 
         IFilterTextParser interface supports the method
-        <a href='api/com/byteslooser/filters/parser/IFilterTextParser.html#setComparator(java.lang.Class, java.util.Comparator)'>setComparator</a>
+        <a href='api/net/coderazzi/filters/parser/IFilterTextParser.html#setComparator(java.lang.Class, java.util.Comparator)'>setComparator</a>
         , requiring a valid 
         <a href='http://java.sun.com/javase/6/docs/api/java/util/Comparator.html?is-external=true'>Comparator</a>
         instance for its associated type.
@@ -216,15 +216,15 @@
 
       <p>
         It is possible to create the 
-        <a href='api/com/byteslooser/filters/parser/generic/FilterTextParser.html'>FilterTextParser</a>,
+        <a href='api/net/coderazzi/filters/parser/generic/FilterTextParser.html'>FilterTextParser</a>,
         with a different set of operands and / or supported types.
       </p> 
 
       <p>
         Implementing the interface 
-        <a href='api/com/byteslooser/filters/parser/generic/IRelationalOperandFactory.html'>IRelationalOperandFactory</a>,
+        <a href='api/net/coderazzi/filters/parser/generic/IRelationalOperandFactory.html'>IRelationalOperandFactory</a>,
         or inheriting the default implementation 
-        <a href='api/com/byteslooser/filters/parser/generic/OperandFactory.html'>OperandFactory</a>, 
+        <a href='api/net/coderazzi/filters/parser/generic/OperandFactory.html'>OperandFactory</a>, 
         is the minimum requirement to modify the supported operators, but such 
         operation is not described here. If this is needed, please
         study the source code or contact me for additional support.

@@ -13,7 +13,7 @@
       stay, I decided to retrofit the new implementation into the Java 5 ' 
       library, adding some classes that only exist on the Java 6 standard 
       library. These added classes are placed in the 
-      <a href='api5/com/byteslooser/filters/artifacts/package-summary.html'>com.byteslooser.filters.artifacts</a>
+      <a href='api5/net/coderazzi/filters/artifacts/package-summary.html'>net.coderazzi.filters.artifacts</a>
       package (only for the Java 5 implementation).
     </p>
 
@@ -78,14 +78,14 @@
       <p>
         Java 5 users of this library must attach, to the table, a model 
         implementing the interface
-        <a href='api5/com/byteslooser/filters/artifacts/ITableModelFilter.html'>ITableModelFilter</a>
+        <a href='api5/net/coderazzi/filters/artifacts/ITableModelFilter.html'>ITableModelFilter</a>
       </p>
 
       <p>
         If the attached model does not implement this interface, the library 
         automatically creates one and replaces the current model with it. The 
         default implementation is called
-        <a href='api5/com/byteslooser/filters/artifacts/TableModelFilter.html'>TableModelFilter</a>.
+        <a href='api5/net/coderazzi/filters/artifacts/TableModelFilter.html'>TableModelFilter</a>.
       </p>
 
       <p>
@@ -96,10 +96,10 @@
         and the model:
         <ul>
           <li>
-            <a href='api5/com/byteslooser/filters/artifacts/TableModelFilter.html#convertRowIndexToModel(int)'>convertRowIndexToModel</a>
+            <a href='api5/net/coderazzi/filters/artifacts/TableModelFilter.html#convertRowIndexToModel(int)'>convertRowIndexToModel</a>
             returns the location of index in terms of the underlying model.</li>
           <li>
-            <a href='api5/com/byteslooser/filters/artifacts/TableModelFilter.html#convertRowIndexToView(int)'>convertRowIndexToView</a>
+            <a href='api5/net/coderazzi/filters/artifacts/TableModelFilter.html#convertRowIndexToView(int)'>convertRowIndexToView</a>
             returns the location of index in terms of the view.</li>
         </ul>
       </p>
