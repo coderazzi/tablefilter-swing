@@ -17,6 +17,8 @@ import net.coderazzi.filters.gui_tests.TestTableModel;
  */
 public class Bug1_2_7ScrollPaneTest extends JPanel {
 
+	private static final long serialVersionUID = 6972235591910259837L;
+
 	public Bug1_2_7ScrollPaneTest() {
 		super(new BorderLayout());
 		JTable table = new JTable(TestTableModel.createLargeTestTableModel(100));

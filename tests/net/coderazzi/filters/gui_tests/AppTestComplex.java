@@ -69,7 +69,9 @@ import net.coderazzi.filters.parser.re.REFilterTextParser;
 
 public class AppTestComplex extends JFrame implements ListSelectionListener {
 
-    static ExamenChoice[] ALL_EXAM_CHOICES = {
+	private static final long serialVersionUID = -6730017201685165179L;
+
+	static ExamenChoice[] ALL_EXAM_CHOICES = {
             new ExamenChoice(ExamenChoice.Fraction.ONE_FIFTH),
             new ExamenChoice(ExamenChoice.Fraction.TWO_FIFTH),
             new ExamenChoice(ExamenChoice.Fraction.THREE_FIFTH),

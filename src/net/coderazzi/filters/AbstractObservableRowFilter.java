@@ -55,6 +55,7 @@ abstract public class AbstractObservableRowFilter extends RowFilter implements I
      */
     public void addFilterObserver(IFilterObserver observer) {
         filterObservers.add(observer);
+        reportFilterUpdatedToObservers();
     }
 
     /**

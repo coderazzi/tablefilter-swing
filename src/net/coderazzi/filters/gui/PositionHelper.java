@@ -30,6 +30,11 @@ class PositionHelper implements PropertyChangeListener{
     JViewport headerViewport;
     
     /**
+     * The previous viewport of the associated table
+     */
+    Component previousTableViewport;
+    
+    /**
      * The handled filter header
      */
     TableFilterHeader filterHeader;
@@ -65,9 +70,7 @@ class PositionHelper implements PropertyChangeListener{
     	cleanUp();
     	if (newTable!=null){
     		newTable.addPropertyChangeListener("ancestor", this);
-    		if (newTable.isValid()){
-    			trySetUp(newTable);
-    		}
+   			trySetUp(newTable);
     	}
     }
 
@@ -84,9 +87,13 @@ class PositionHelper implements PropertyChangeListener{
      * PropertyChangeListener interface
      */
 	public void propertyChange(PropertyChangeEvent evt) {
-		//the table has changed containement. clean up status and prepare again, if possible
-		cleanUp();
-		trySetUp(filterHeader.getTable());
+		//the table has changed containment. clean up status and prepare again, if possible
+		//However, do nothing if the current setup is fine
+		if (previousTableViewport!=evt.getNewValue() || evt.getSource()!=filterHeader.getTable()){
+			previousTableViewport=null;
+			cleanUp();
+			trySetUp(filterHeader.getTable());
+		}
 	}
 
     /**
@@ -112,6 +119,7 @@ class PositionHelper implements PropertyChangeListener{
 	                JViewport viewport = scrollPane.getViewport();
 	                if (viewport != null && viewport.getView() == table) {
 	                	setUp(scrollPane);
+	                	previousTableViewport=p;
 	                }
 	            }
 	        }
@@ -123,7 +131,10 @@ class PositionHelper implements PropertyChangeListener{
      */
     private void setUp(JScrollPane scrollPane){
         headerViewport=new JViewport(){
-        	@Override
+
+        	private static final long serialVersionUID = 7109623726722227105L;
+
+			@Override
         	public void setView(Component view) {
         		if (view instanceof JTableHeader){
         			//if the view is not a table header, somebody is doing

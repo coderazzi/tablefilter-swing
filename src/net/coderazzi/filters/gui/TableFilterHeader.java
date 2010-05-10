@@ -25,18 +25,6 @@
 
 package net.coderazzi.filters.gui;
 
-import net.coderazzi.filters.IFilterObservable;
-import net.coderazzi.filters.IFilterObserver;
-import net.coderazzi.filters.TableFilter;
-import net.coderazzi.filters.gui.editors.TableChoiceFilterEditor;
-import net.coderazzi.filters.gui.editors.TextChoiceFilterEditor;
-import net.coderazzi.filters.gui.editors.TextFilterEditor;
-import net.coderazzi.filters.parser.IFilterTextParser;
-import net.coderazzi.filters.parser.IdentifierInfo;
-import net.coderazzi.filters.parser.generic.FilterTextParser;
-import net.coderazzi.filters.parser.generic.TableFilterHelper;
-import net.coderazzi.filters.resources.Messages;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -53,7 +41,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -62,6 +49,18 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+
+import net.coderazzi.filters.IFilterObservable;
+import net.coderazzi.filters.IFilterObserver;
+import net.coderazzi.filters.TableFilter;
+import net.coderazzi.filters.gui.editors.TableChoiceFilterEditor;
+import net.coderazzi.filters.gui.editors.TextChoiceFilterEditor;
+import net.coderazzi.filters.gui.editors.TextFilterEditor;
+import net.coderazzi.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.parser.IdentifierInfo;
+import net.coderazzi.filters.parser.generic.FilterTextParser;
+import net.coderazzi.filters.parser.generic.TableFilterHelper;
+import net.coderazzi.filters.resources.Messages;
 
 
 /**
@@ -104,7 +103,9 @@ import javax.swing.table.TableColumnModel;
  */
 public class TableFilterHeader extends JPanel {
 
-    /** Default proportion size related to 'normal' cell fonts. */
+	private static final long serialVersionUID = 5217701111228491294L;
+
+	/** Default proportion size related to 'normal' cell fonts. */
     public static final float DEFAULT_FONT_PROPORTION = .9f; //in comparison to normal font
 
     private final static String[] BOOLEAN_CHOICES = {
@@ -831,7 +832,9 @@ public class TableFilterHeader extends JPanel {
     private class FilterColumnsControllerPanel extends JPanel implements TableColumnModelListener,
         Runnable {
 
-        /** The list of columns, sorted in the view way */
+		private static final long serialVersionUID = -5183169239497633085L;
+
+		/** The list of columns, sorted in the view way */
         private List<FilterColumnPanel> columns;
 
         /** Preferred size of the component */
@@ -1160,14 +1163,13 @@ public class TableFilterHeader extends JPanel {
          */
         private class FilterColumnPanel extends JPanel implements PropertyChangeListener {
 
-            /** The associated editor */
+			private static final long serialVersionUID = 6858728575542289815L;
+
+			/** The associated editor */
             ITableFilterEditor editor;
 
             /** Dimensions of the component */
             int w, h;
-
-            /** The filter provided by the editor */
-            RowFilter filter;
 
             /**
              * The TableColumn object, to which is registered to get property changes, in order to
@@ -1242,14 +1244,11 @@ public class TableFilterHeader extends JPanel {
      */
     private static class NullFilterEditor extends JPanel implements ITableFilterEditor,
         IFilterObservable {
-        String id;
 
-        public NullFilterEditor() {
+		private static final long serialVersionUID = 1802486919152113003L;
+
+		public NullFilterEditor() {
             setBorder(BorderFactory.createEtchedBorder());
-        }
-
-        public String getIdentifier() {
-            return id;
         }
 
         public void addFilterObserver(IFilterObserver listener) {
@@ -1270,9 +1269,6 @@ public class TableFilterHeader extends JPanel {
         }
 
         public void removeFilterObserver(IFilterObserver listener) {
-        }
-
-        public void setFilterPosition(int pos) {
         }
 
         @Override public void setEnabled(boolean enabled) {

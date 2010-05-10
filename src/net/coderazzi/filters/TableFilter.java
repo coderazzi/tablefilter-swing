@@ -105,7 +105,7 @@ public class TableFilter extends AndFilter {
     public void setTable(JTable table) {
     	if (this.table!=null){
             RowSorter<?> sorter = getRowSorter();
-            if (sorter instanceof DefaultRowSorter) {
+            if (sorter instanceof DefaultRowSorter<?, ?>) {
                 ((DefaultRowSorter<?, ?>) sorter).setRowFilter(null);
             }
     	}

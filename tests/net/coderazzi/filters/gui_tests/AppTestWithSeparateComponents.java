@@ -48,7 +48,9 @@ import net.coderazzi.filters.parser.generic.TableFilterHelper;
 
 public class AppTestWithSeparateComponents extends JFrame {
 
-    private JTable table;
+	private static final long serialVersionUID = -6619591681257998735L;
+
+	private JTable table;
     private TestTableModel tableModel;
     private TableFilter tableFilter;
     private TextFilterEditor freeFilterBottom;

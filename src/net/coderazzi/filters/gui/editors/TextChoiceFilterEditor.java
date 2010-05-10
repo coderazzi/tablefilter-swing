@@ -53,7 +53,9 @@ import javax.swing.JTextField;
  */
 public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTextBasedEditor {
 
-    /**
+	private static final long serialVersionUID = 6599798587104542637L;
+
+	/**
      * Default number of elements to keep on the contextual menu holding previous correctly parsed
      * entries.
      */

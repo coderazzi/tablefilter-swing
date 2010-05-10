@@ -32,7 +32,10 @@ package net.coderazzi.filters.parser;
  * @author  Luis M Pena - dr.lu@coderazzi.net
  */
 public class FilterTextParsingException extends Exception {
-    private int position;
+
+	private static final long serialVersionUID = -1854149011685993092L;
+	
+	private int position;
 
     /**
      * Full constructor

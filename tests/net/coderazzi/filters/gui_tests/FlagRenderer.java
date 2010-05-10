@@ -34,7 +34,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 
 public class FlagRenderer extends DefaultTableCellRenderer {
-    @Override public Component getTableCellRendererComponent(JTable table, Object value,
+
+	private static final long serialVersionUID = -6640707874060161068L;
+
+	@Override public Component getTableCellRendererComponent(JTable table, Object value,
         boolean isSelected, boolean hasFocus, int row, int column) {
         JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected,
                 hasFocus, row, column);

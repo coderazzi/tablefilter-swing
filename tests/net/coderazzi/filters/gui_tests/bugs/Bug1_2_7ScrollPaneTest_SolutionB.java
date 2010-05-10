@@ -16,6 +16,8 @@ import net.coderazzi.filters.gui_tests.TestTableModel;
  */
 public class Bug1_2_7ScrollPaneTest_SolutionB extends JPanel {
 
+	private static final long serialVersionUID = 8840431660259843571L;
+
 	public Bug1_2_7ScrollPaneTest_SolutionB() {
 		super(new BorderLayout());
 		JTable table = new JTable(TestTableModel.createLargeTestTableModel(100));
@@ -23,6 +25,11 @@ public class Bug1_2_7ScrollPaneTest_SolutionB extends JPanel {
 		TableFilterHeader filterHeader = new TableFilterHeader();
 		filterHeader.setTable(table);
 		JScrollPane scrollPane = new JScrollPane(table) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1014112188208377416L;
+
 			@Override
 			public void setColumnHeaderView(Component view) {
 				if (getColumnHeader() == null) {

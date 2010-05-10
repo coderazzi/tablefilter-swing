@@ -66,7 +66,10 @@ import javax.swing.RowFilter;
  */
 public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor {
 
-    /**
+	private static final long serialVersionUID = -2349738717842317245L;
+
+
+	/**
      * The object representing 'no filter', that is, it is the option to be selected for this editor
      * to perform no filtering.
      */
@@ -134,7 +137,9 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
                 }
             });
         setRenderer(new DefaultListCellRenderer() {
-                final String EMPTY_VALUE = new String(
+        		private static final long serialVersionUID = -2719110504839992214L;
+				
+        		final String EMPTY_VALUE = new String(
                         Messages.getString("ChoiceFilterEditor.EmptyValue"));
                 final String NULL_VALUE = new String(
                         Messages.getString("ChoiceFilterEditor.NullValue"));

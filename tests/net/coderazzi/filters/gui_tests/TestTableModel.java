@@ -36,7 +36,10 @@ import javax.swing.table.AbstractTableModel;
 
 
 public class TestTableModel extends AbstractTableModel {
-    public final static String NAME = Messages.getString("TestTableModel.Name");
+
+	private static final long serialVersionUID = -5453866058915361214L;
+
+	public final static String NAME = Messages.getString("TestTableModel.Name");
     public final static String TUTOR = Messages.getString("TestTableModel.Tutor");
     public final static String MALE = Messages.getString("TestTableModel.Male");
     public final static String COUNTRY = Messages.getString("TestTableModel.Flag");

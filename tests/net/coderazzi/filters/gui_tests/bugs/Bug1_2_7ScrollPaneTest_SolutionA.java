@@ -18,6 +18,8 @@ import net.coderazzi.filters.gui_tests.TestTableModel;
  */
 public class Bug1_2_7ScrollPaneTest_SolutionA extends JPanel {
 
+	private static final long serialVersionUID = -5733857124817243985L;
+
 	public Bug1_2_7ScrollPaneTest_SolutionA() {
 		super(new BorderLayout());
 		JTable table = new JTable(TestTableModel.createLargeTestTableModel(100));
@@ -49,6 +51,9 @@ public class Bug1_2_7ScrollPaneTest_SolutionA extends JPanel {
 		// the overrides are to prevent the column header from being reset by
 		// JTable::configureEnclosingScrollPane()
 		JScrollPane scrollPane = new JScrollPane(table) {
+
+			private static final long serialVersionUID = -3629676577469115439L;
+
 			/*
 			 * (non-Javadoc)
 			 * 

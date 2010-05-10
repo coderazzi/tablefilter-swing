@@ -18,6 +18,8 @@ import net.coderazzi.filters.gui_tests.TestTableModel;
 
 public class Bug1_2_7Solution extends JPanel{
 	
+	private static final long serialVersionUID = -22834158973030319L;
+	
 	private final static String NONE="  - - - - ";
 	private final static String INLINE="INLINE";
 	private final static String TOP=" TOP";

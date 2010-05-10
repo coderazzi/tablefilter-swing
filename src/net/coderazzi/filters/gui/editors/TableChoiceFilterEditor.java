@@ -53,7 +53,9 @@ import javax.swing.table.TableModel;
  */
 public class TableChoiceFilterEditor extends ChoiceFilterEditor {
 
-    /** Comparator of integers where higher numbers are selected first */
+	private static final long serialVersionUID = -7535026954584041799L;
+
+	/** Comparator of integers where higher numbers are selected first */
     private final static Comparator<Integer> inverseComparator = new Comparator<Integer>() {
             public int compare(Integer o1, Integer o2) {
                 return o2.compareTo(o1);
@@ -152,7 +154,10 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
      */
     public void setChoiceRenderer(final TableCellRenderer renderer) {
         setRenderer(new DefaultListCellRenderer() {
-                @Override public Component getListCellRendererComponent(JList list, Object value,
+
+        		private static final long serialVersionUID = -5990815893475331934L;
+
+				@Override public Component getListCellRendererComponent(JList list, Object value,
                     int index, boolean isSelected, boolean cellHasFocus) {
 
                     if (value == NO_FILTER)

@@ -62,7 +62,9 @@ import net.coderazzi.filters.parser.re.REFilterTextParser;
 
 public class AppTestMain extends JFrame {
 
-    static ExamenChoice[] ALL_EXAM_CHOICES = {
+	private static final long serialVersionUID = 4521016104474569405L;
+
+	static ExamenChoice[] ALL_EXAM_CHOICES = {
             new ExamenChoice(ExamenChoice.Fraction.ONE_FIFTH),
             new ExamenChoice(ExamenChoice.Fraction.TWO_FIFTH),
             new ExamenChoice(ExamenChoice.Fraction.THREE_FIFTH),

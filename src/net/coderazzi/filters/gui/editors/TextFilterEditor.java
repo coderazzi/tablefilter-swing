@@ -51,7 +51,9 @@ import net.coderazzi.filters.parser.IFilterTextParser;
  */
 public class TextFilterEditor extends JTextField implements ITableFilterTextBasedEditor {
 
-    /**
+	private static final long serialVersionUID = 7534430071695881961L;
+
+	/**
      * Default number of elements to keep on the contextual menu holding previous correctly parsed
      * entries.
      */
@@ -340,7 +342,10 @@ public class TextFilterEditor extends JTextField implements ITableFilterTextBase
      * Class to represent each MenuItem
      */
     private final class MenuItem extends JMenuItem {
-        MenuItem(String text) {
+
+    	private static final long serialVersionUID = -3094314030054126331L;
+
+		MenuItem(String text) {
             super(text);
             setFont(getFont().deriveFont(Font.ITALIC));
             addActionListener(new ActionListener() {
