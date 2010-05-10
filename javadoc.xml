@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="javadoc">
-    <target name="javadoc">
-        <javadoc access="protected" author="true" classpath="." destdir="doc/api" doctitle="TableFilter" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="net.coderazzi.filters.gui,net.coderazzi.filters.parser,net.coderazzi.filters.gui.editor" source="1.6" sourcefiles="src/net/coderazzi/filters/IFilterObserver.java,src/net/coderazzi/filters/NotFilter.java,src/net/coderazzi/filters/ComposedFilter.java,src/net/coderazzi/filters/AndFilter.java,src/net/coderazzi/filters/IFilter.java,src/net/coderazzi/filters/BaseFilter.java,src/net/coderazzi/filters/IFilterTextParser.java,src/net/coderazzi/filters/TableFilter.java,src/net/coderazzi/filters/OrFilter.java,src/net/coderazzi/filters/UserFilter.java" sourcepath="examples;src" splitindex="true" use="true" version="true">
-            <link href="http://java.sun.com/javase/6/docs/api/"/>
-        </javadoc>
-    </target>
-</project>

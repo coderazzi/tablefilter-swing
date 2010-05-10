@@ -1,14 +1,11 @@
 package net.coderazzi.filters.parser;
 
-import net.coderazzi.filters.IFilterTextParser;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
 import java.text.Format;
 import java.text.ParseException;
-
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -17,6 +14,8 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
+
+import net.coderazzi.filters.IFilterTextParser;
 
 
 /**
@@ -145,10 +144,22 @@ public class FilterTextParser implements IFilterTextParser {
         return formatters.get(c);
     }
 
+    /**
+     * Sets the {@link Format} for the given Class. If the class belongs to
+     * the {@link Date} hierarchy, it creates automatically a {@link Comparator}
+     * for it, based on the {@link DateComparator} class, unless one
+     * comparator has been already set.
+     */
     @Override public void setFormat(Class<?> c,
                           Format format) {
         Format old = formatters.put(c, format);
         propertiesHandler.firePropertyChange("format", old, format);
+        if (Date.class.isAssignableFrom(c) && (format != null)) {
+            Comparator<?> comparator = getComparator(c);
+            if ((comparator == null) || (comparator instanceof DateComparator)) {
+                setComparator(c, DateComparator.getDateComparator(format));
+            }
+        }
     }
 
     @Override public void setComparator(Class<?> c,

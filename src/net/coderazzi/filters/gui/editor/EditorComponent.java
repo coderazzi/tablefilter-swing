@@ -82,7 +82,7 @@ interface EditorComponent {
      * Informs that the editor has received the focus.
      * @return true if the associated popup should be shown 
      */
-    public boolean focusGained();
+    public boolean focusGained(boolean gained);
     
     /** Enables/disables the editor */
     public void setEnabled(boolean enabled);
@@ -180,7 +180,11 @@ interface EditorComponent {
             return cachedFilter;
         }
 
-        @Override public boolean focusGained() {
+        @Override public boolean focusGained(boolean gained) {
+    		textField.setCaretPosition(0);
+        	if (gained){
+        		textField.moveCaretPosition(textField.getText().length());
+        	}
             return !editable;
         }
 
@@ -471,7 +475,7 @@ interface EditorComponent {
             return filter;
         }
 
-        @Override public boolean focusGained() {
+        @Override public boolean focusGained(boolean gained) {
             return true;
         }
 

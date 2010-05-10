@@ -55,10 +55,10 @@ import net.coderazzi.filters.examples.utils.EventsWindow;
 import net.coderazzi.filters.examples.utils.FlagRenderer;
 import net.coderazzi.filters.examples.utils.TestData;
 import net.coderazzi.filters.examples.utils.TestTableModel;
+import net.coderazzi.filters.gui.FilterSettings;
 import net.coderazzi.filters.gui.TableFilterHeader;
 import net.coderazzi.filters.gui.TableFilterHeader.Position;
 import net.coderazzi.filters.gui.editor.FilterEditor;
-import net.coderazzi.filters.parser.Types;
 
 
 @SuppressWarnings("serial")
@@ -450,8 +450,7 @@ public class TableFilterExample extends JFrame {
             		new DefaultTableCellRenderer(){
 
             			private static final long serialVersionUID = 8042527267257156699L;
-            			//DateFormat parser = DateFormat.getDateInstance(DateFormat.SHORT);
-            			Format parser = Types.getFormat(Date.class);
+            			Format parser = FilterSettings.types.getFormat(Date.class);
 
             			@Override
             			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

@@ -54,10 +54,10 @@ import net.coderazzi.filters.gui.TableFilterHeader;
  */
 public class Types{
 
-    static Map<Class<?>, Format> formatters = new HashMap<Class<?>, Format>();
-    static Map<Class<?>, Comparator<?>> comparators = new HashMap<Class<?>, Comparator<?>>();
+    Map<Class<?>, Format> formatters = new HashMap<Class<?>, Format>();
+    Map<Class<?>, Comparator<?>> comparators = new HashMap<Class<?>, Comparator<?>>();
 
-    static {
+    public Types() {
     	setFormat(String.class, new StringTypeFormat());
     	setFormat(Boolean.class, new BooleanTypeFormat());
     	setFormat(Integer.class, new IntegerTypeFormat());
@@ -71,28 +71,22 @@ public class Types{
     }
     
     /** Returns the {@link Format} for the given class */
-    public static Format getFormat(Class<?> c){
+    public Format getFormat(Class<?> c){
     	return formatters.get(c);
     }
 
     /** Defines the {@link Format} for the given class */
-    public static void setFormat(Class<?> c, Format format){
+    public void setFormat(Class<?> c, Format format){
     	formatters.put(c, format);
-    	if (Date.class.isAssignableFrom(c) && format!=null){
-    		Comparator<?> comparator = getComparator(c);
-    		if (comparator==null || (comparator instanceof DateComparator)){
-    			setComparator(c, DateComparator.getDateComparator(format));
-    		}
-    	}
     }
     
     /** Returns the {@link Comparator} for the given class */
-    public static Comparator<?> getComparator(Class<?> c){
+    public Comparator<?> getComparator(Class<?> c){
     	return comparators.get(c);
     }
 
     /** Defines the {@link Comparator} for the given class */
-    public static void setComparator(Class<?> c, Comparator<?> format){
+    public void setComparator(Class<?> c, Comparator<?> format){
     	comparators.put(c, format);
     }
     
@@ -100,7 +94,7 @@ public class Types{
      * Configures the passed {@link IFilterTextParser} to use the given 
      * {@link Comparator} and {@link Format} definitions
      */
-    public static void configure(IFilterTextParser textParser){
+    public void configure(IFilterTextParser textParser){
     	for (Entry<Class<?>, Format> entry : formatters.entrySet()){
     		textParser.setFormat(entry.getKey(), entry.getValue());
     	}
@@ -109,7 +103,7 @@ public class Types{
     	}
     }
 
-	private static DateFormat getDefaultDateFormat(){
+	private DateFormat getDefaultDateFormat(){
 		String definition = FilterSettings.dateFormat;
 		if (definition!=null){
 			try{

@@ -57,7 +57,6 @@ import net.coderazzi.filters.IFilterObserver;
 import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.TableFilter;
 import net.coderazzi.filters.gui.editor.FilterEditor;
-import net.coderazzi.filters.parser.Types;
 
 
 /**
@@ -204,11 +203,15 @@ public class TableFilterHeader extends JPanel {
         }
         else{
             if (!backgroundSet){
-            	setBackground(table.getTableHeader().getBackground());
+            	setBackground(suggestBackground());
             	backgroundSet=false;
             }
             if (!foregroundSet){
-            	setForeground(table.getTableHeader().getForeground());
+            	Color foreground = FilterSettings.headerForeground;
+            	if (foreground==null){
+            		foreground =table.getTableHeader().getForeground(); 
+            	}
+            	setForeground(foreground);
             	foregroundSet=false;
             }
             if (!disabledSet){
@@ -228,6 +231,19 @@ public class TableFilterHeader extends JPanel {
             this.table.addComponentListener(resizer);
             getTextParser().setTableModel(table.getModel());
         }
+    }
+    
+    /** Suggests a background color, unless there is already one defined **/
+    private Color suggestBackground(){
+    	Color background = FilterSettings.headerBackground;
+    	if (background==null){
+    		Color header = table.getTableHeader().getBackground();
+    		Color cells = table.getBackground();
+    		background = new Color((header.getRed() + cells.getRed())/2,
+    				(header.getGreen() + cells.getGreen())/2,
+    				(header.getBlue() + cells.getBlue())/2);
+    	}
+    	return background;
     }
 
     /** Returns the table currently attached */
@@ -400,7 +416,7 @@ public class TableFilterHeader extends JPanel {
     /** Creates an editor for the given column, customized to the associated type */
     FilterEditor createEditor(int modelColumn) {
         
-        FilterEditor ret =  new FilterEditor();
+        FilterEditor ret =  FilterSettings.newFilterEditor();
         ret.setFormat(getTextParser().getFormat(table.getModel().getColumnClass(modelColumn)));
         ret.setTextParser(getTextParser());
         ret.setFilterPosition(modelColumn);
@@ -515,7 +531,6 @@ public class TableFilterHeader extends JPanel {
     public IFilterTextParser getTextParser() {
         if (filterTextParser == null) {
             filterTextParser = FilterSettings.newTextParser();
-    		Types.configure(filterTextParser);
             if (table != null){
                 filterTextParser.setTableModel(table.getModel());
             }

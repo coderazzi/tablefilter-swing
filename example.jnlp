@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec='1.0+'>
+<information>
+  <title>Table Filter example</title>
+  <vendor>coderazzi.net</vendor>
+  <homepage href="http://coderazzi.net/tablefilter" />
+  <description>Demonstration of the Table Filter library</description>
+</information>
+<offline-allowed/>
+<security>
+  <j2ee-application-client-permissions/>
+</security>
+<resources>
+  <j2se version="1.6+" />
+  <jar href="example6.jar"/>
+</resources>
+<application-desc main-class="net.coderazzi.filters.examples.TableFilterExample" />
+</jnlp>

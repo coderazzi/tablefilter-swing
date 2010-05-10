@@ -40,14 +40,14 @@
 			<th>Source (inc. tests)</th>
 		</tr>			
     	<tr>
-			<td>3.0.0</td>
-			<td>28th April 2010</td>
-			<td><a href="download/tablefilter-v3.0.0.jar">tablefilter-v3.0.0.jar</a></td>
-			<td><a href="download/tablefilterDbg-v3.0.0.jar">tablefilterDbg-v3.0.0.jar</a></td>
-			<td><a href="download/tablefilter-v3.0.0.zip">tablefilter-v3.0.0.zip</a></td>
-			<td><a href="download/tablefilter5-v3.0.0.jar">tablefilter5-v3.0.0.jar</a></td>
-			<td><a href="download/tablefilterDbg5-v3.0.0.jar">tablefilterDbg5-v3.0.0.jar</a></td>
-			<td><a href="download/tablefilter5-v3.0.0.zip">tablefilter5-v3.0.0.zip</a></td>
+			<td>3.0.1</td>
+			<td>5th May 2010</td>
+			<td><a href="download/tablefilter-v3.0.1.jar">tablefilter-v3.0.1.jar</a></td>
+			<td><a href="download/tablefilterDbg-v3.0.1.jar">tablefilterDbg-v3.0.1.jar</a></td>
+			<td><a href="download/tablefilter-v3.0.1.zip">tablefilter-v3.0.1.zip</a></td>
+			<td><a href="download/tablefilter5-v3.0.1.jar">tablefilter5-v3.0.1.jar</a></td>
+			<td><a href="download/tablefilterDbg5-v3.0.1.jar">tablefilterDbg5-v3.0.1.jar</a></td>
+			<td><a href="download/tablefilter5-v3.0.1.zip">tablefilter5-v3.0.1.zip</a></td>
 		</tr>			
     	<tr>
 			<td>2.2.0</td>
@@ -116,10 +116,44 @@ THE SOFTWARE.</pre>
     </p>
 
   <h2><a name="history">History</a></h2>
+    <h3>Version 3.0.1 ( 5th May 2010 ) </h3>
+    	<ul>
+    		<li>
+    			The filter's background and foreground colors can be defined directly in
+    			the <a href="api/net/coderazzi/filters/gui/FilterSettings.html">FilterSettings</a> 
+    			class.    			
+    		</li>
+    		<li>
+    			The header's background color is not defined anymore as the table's header, but
+    		    averaged with the table's background. In some platforms, the look is much nicer.
+    		</li>
+    		<li>
+    		    The arrow to show the popup looks now the same if the filter is disabled or
+    		    if the popup cannot be shown -because there is no entries to show-.    		    
+    		</li>
+    		<li>
+    		    The arrow to show the popup is now placed shifted to the bottom.   		    
+    		</li>
+    		<li>
+    			Integrated <a href="api/net/coderazzi/filters/parser/Types.html">Types</a>'s parser 
+    			into the <a href="api/net/coderazzi/filters/gui/FilterSettings.html#types">FilterSettings</a>
+    			class.    			
+    		</li>
+    		<li>
+    		    Solved error comparing dates.   		    
+    		</li>
+    		<li>
+    		    Solved error where the focus would remain on the editor, even if disabled.   		    
+    		</li>
+    		<li>
+    		    Whole build process has moved to <a href='http://ant.apache.org/'>ant</a> 		    
+    		</li>
+		</ul>
+
     <h3>Version 3.0.0 ( 28th April 2010 ) </h3>
     	<ul>
     		<li>
-    			Version 3.0 is a major rewriting of the library. It is mostly focused to the Gui, 
+    			Version 3.0.0 is a major rewriting of the library. It is mostly focused to the Gui, 
     			but it affects to many internal aspects. In general, it should be much simpler 
     			using the library, for the programmer and for the user. The major changes are 
     			listed below.
@@ -204,6 +238,7 @@ THE SOFTWARE.</pre>
 			   changed.
        		</li>
     	</ul>
+
     <h3>Version 2.2.0 ( 12th April 2010 ) </h3>
       <ul>
        <li>

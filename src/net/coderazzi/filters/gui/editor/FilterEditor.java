@@ -137,7 +137,7 @@ public class FilterEditor extends JComponent{
 	/**
 	 * Limits the history size. <br>
 	 * This limit is only used when the popup contains also options. Otherwise, the
-	 * maximum history size corresponds to the maximum number of visible rows ({@link PopupComponent#setMaxVisibleRows(int)}<br>
+	 * maximum history size corresponds to the maximum number of visible rows<br>
 	 */
 	public void setMaxHistory(int size) {
 		popup.setMaxHistory(size);
@@ -440,12 +440,13 @@ public class FilterEditor extends JComponent{
 		component.addFocusListener(new FocusListener() {
 
 			public void focusLost(FocusEvent e) {
+				editor.focusGained(false);
 				popup.hide();
 				filter.checkChanges();
 			}
 
 			public void focusGained(FocusEvent e) {
-				if (isEnabled() && editor.focusGained()){
+				if (isEnabled() && editor.focusGained(true)){
 					showOptions();
 					popup.setPopupFocused(true);
 				}
@@ -797,10 +798,8 @@ public class FilterEditor extends JComponent{
 		private static final long serialVersionUID = -777416843479142582L;
 		private final static int FILL_X[] = { 0, 3, 6 };
 		private final static int FILL_Y[] = { 0, 5, 0 };
-		private final static int DRAW_X[] = { 0, 3, 6 };
-		private final static int DRAW_Y[] = { 0, 4, 0 };
 		private final static int MIN_X = 6;
-		private final static int MIN_Y = 9;
+		private final static int MIN_Y = 6;
 		
 		private boolean canPopup=true;
 		private boolean enabled=true;
@@ -836,23 +835,19 @@ public class FilterEditor extends JComponent{
 			width = (width - MIN_X) / 2;
 			height = Math.min(height / 2, height - MIN_Y);
 			g.translate(width, height);
-			if (enabled){
+			if (enabled && canPopup){
 				g.setColor(getForeground());
 			} else {
 				g.setColor(disabledColor);
 			}
-			if (canPopup || !enabled){
-				g.fillPolygon(FILL_X, FILL_Y, FILL_X.length);
-			} else {
-				g.drawPolygon(DRAW_X, DRAW_Y, FILL_X.length);
-			}
+			g.fillPolygon(FILL_X, FILL_Y, FILL_X.length);
 		}
 
 		@Override protected void paintBorder(Graphics g) {
 			super.paintBorder(g);
 		}
 
-		@Override public boolean isFocusTraversable() {
+		@Override public boolean isFocusable() {
 			return false;
 		}
 
@@ -961,6 +956,8 @@ public class FilterEditor extends JComponent{
 	    private void extendFilterContentsFromModel(int firstRow, int lastRow){
 	    	List<Object> all = new ArrayList<Object>();
             int column = getFilterPosition();
+            
+            lastRow = Math.min(tableModel.getRowCount() - 1, lastRow);
 
             while (lastRow >= firstRow) {
                 all.add(tableModel.getValueAt(firstRow++, column));
