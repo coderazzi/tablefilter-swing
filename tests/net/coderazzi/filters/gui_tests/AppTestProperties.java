@@ -173,7 +173,7 @@ public class AppTestProperties extends JFrame {
 
     private void initGui() {
 
-        FilterTextParser parser = (FilterTextParser) filterHeader.getTextParser();
+		IFilterTextParser parser = (IFilterTextParser) filterHeader.getTextParser();
 
         parser.setTypeBuilder(TestData.ExamInformation.class, new ITypeBuilder() {
                 Pattern p = Pattern.compile("\\s*(\\d+)\\s*/\\s*(\\d+)\\s*");
@@ -321,6 +321,8 @@ public class AppTestProperties extends JFrame {
     	"TextParser.IgnoreCase",
         "TextParser.DateFormat",
     	"TextParser.CompareDatesAsRendered",
+    	"TextParser.class",
+    	"TableFilter.AutoSelection",
         "Header.Mode",
         "Header.Position",
         "ChoiceFilterEditor.EmptyValue",

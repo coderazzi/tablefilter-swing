@@ -60,7 +60,6 @@ import net.coderazzi.filters.gui.editors.TextChoiceFilterEditor;
 import net.coderazzi.filters.gui.editors.TextFilterEditor;
 import net.coderazzi.filters.parser.IFilterTextParser;
 import net.coderazzi.filters.parser.IdentifierInfo;
-import net.coderazzi.filters.parser.generic.FilterTextParser;
 import net.coderazzi.filters.parser.generic.TableFilterHelper;
 import net.coderazzi.filters.resources.Messages;
 
@@ -137,17 +136,21 @@ public class TableFilterHeader extends JPanel {
      * <ul>
      * <li>TOP: the filter is placed automatically above the table header.</li>
      * <li>INLINE: the filter is placed below the table header, above the table's content.</li>
+     * <li>NONE: the filter is not automatically placed. @since 2.1.2</li>
      * </ul>
      *
      * @author  Luis M Pena - lu@coderazzi.net
      * @since 1.3
      */
     public enum Position {
-    	TOP, INLINE
+    	TOP, INLINE, NONE
     }
 
     /** Colors for the filters */
     private Color fg, bg, errorFg, errorBg;
+    
+    /** Whether the component is enabled (cannot be delegated to the parent **/
+    private boolean enabled=true;
 
     /**
      * The columnsController is a glue component, controlling the filters associated to each column
@@ -207,7 +210,7 @@ public class TableFilterHeader extends JPanel {
      * @since 1.3
      */
     public TableFilterHeader(JTable table) {
-        this(table, getDefaultHeaderMode());
+        this(table, TableFilter.Settings.headerMode);
     }
 
     /**
@@ -229,7 +232,7 @@ public class TableFilterHeader extends JPanel {
      * @since 1.3
      */
     public TableFilterHeader(JTable table, EditorMode mode) {
-    	this(table, mode, getDefaultHeaderPosition());
+    	this(table, mode, TableFilter.Settings.headerPosition);
     }
 
     /**
@@ -243,7 +246,7 @@ public class TableFilterHeader extends JPanel {
      */
     public TableFilterHeader(JTable table, EditorMode mode, Position location) {
         super(new BorderLayout());
-
+        
         Font italicFont = UIManager.getFont("TableHeader.font").deriveFont(Font.ITALIC);
         setFont(italicFont.deriveFont(italicFont.getSize2D() * DEFAULT_FONT_PROPORTION));
         setMode(mode);
@@ -368,8 +371,9 @@ public class TableFilterHeader extends JPanel {
      * <p>Note that the exact semantics depend on the exact editor type.</p>
      *
      * @see  ITableFilterEditor#resetFilter()
+     * @since 2.1 -before it was called resetFilters-
      */
-    public void resetFilters() {
+    public void resetFilter() {
 
         if (columnsController != null) {
             filtersHandler.enableNotifications(false);
@@ -564,21 +568,24 @@ public class TableFilterHeader extends JPanel {
         if (old instanceof TextChoiceFilterEditor)
             return old;
 
+        TextChoiceFilterEditor ret = new TextChoiceFilterEditor(getTextParser());
+        ret.setFilterPosition(modelColumn);
+
         Class<?> c = table.getModel().getColumnClass(modelColumn);
-        String[] choices = null;
 
         //prepopulate values for Boolean and Enumeration types
         if (c == Boolean.class) {
-            choices = BOOLEAN_CHOICES;
+        	ret.suggestChoices(BOOLEAN_CHOICES);
         } else if (c.isEnum()) {
             Object[] values = c.getEnumConstants();
-            choices = new String[values.length];
+            String[] choices = new String[values.length];
 
-            for (int i = 0; i < values.length; i++)
+            for (int i = 0; i < values.length; i++){
                 choices[i] = values[i].toString();
+            }
+        	ret.suggestChoices(choices);
         }
 
-        ITableFilterEditor ret = new TextChoiceFilterEditor(getTextParser(), modelColumn, choices);
         formatEditor(ret);
 
         return ret;
@@ -593,7 +600,8 @@ public class TableFilterHeader extends JPanel {
         if (old instanceof TextFilterEditor)
             return old;
 
-        ITableFilterEditor ret = new TextFilterEditor(getTextParser(), modelColumn);
+        ITableFilterEditor ret = new TextFilterEditor(getTextParser());
+        ret.setFilterPosition(modelColumn);
         formatEditor(ret);
 
         return ret;
@@ -610,14 +618,16 @@ public class TableFilterHeader extends JPanel {
         }
 
         Class<?> c = table.getModel().getColumnClass(modelColumn);
-        ITableFilterEditor ret;
+        TableChoiceFilterEditor ret;
 
-        //for boolean and enumerations, the created type should be, in fact, a ChoiceFilterEditor,
-        //but creating TableChoiceFilterEditor instances simplify the interface
+        // for boolean and enumerations, the created type should be, in fact, a ChoiceFilterEditor,
+        // but creating TableChoiceFilterEditor instances simplify the interface
         if (c == Boolean.class) {
-            ret = new TableChoiceFilterEditor(modelColumn, true, false);
+            ret = new TableChoiceFilterEditor(true, false);
+            ret.setFilterPosition(modelColumn);
         } else if (c.isEnum()) {
-            ret = new TableChoiceFilterEditor(modelColumn, c.getEnumConstants());
+            ret = new TableChoiceFilterEditor(c.getEnumConstants());
+            ret.setFilterPosition(modelColumn);
         } else {
             ret = new TableChoiceFilterEditor(table, modelColumn);
         }
@@ -679,15 +689,27 @@ public class TableFilterHeader extends JPanel {
 
 
     /**
-     * Sets a specific filter editor for a given column.
+     * Sets a specific filter editor for a given column.</p>
+     * The editor receives the associated filter position, and, if it is
+     * text based and has no associated text parser, the current filter text
+     * parser.</p>
      *
      * @param  modelColumn  The column number in the table model
      * @param  editor       The filter editor, which can be null to place a {@link EditorMode} NULL
      *                      editor.
      */
     public void setFilterEditor(int modelColumn, ITableFilterEditor editor) {
-        if (editor == null)
+        if (editor == null) {
             editor = createEditor(EditorMode.NULL, modelColumn);
+        } else {
+        	editor.setFilterPosition(modelColumn);
+        	if (editor instanceof ITableFilterTextBasedEditor){
+        		ITableFilterTextBasedEditor textEditor = (ITableFilterTextBasedEditor) editor;
+        		if (textEditor.getTextParser()==null){
+        			textEditor.setTextParser(getTextParser());
+        		}
+        	}
+        }
         columnsController.setFilterEditor(table.convertColumnIndexToView(modelColumn), editor);
     }
 
@@ -789,29 +811,46 @@ public class TableFilterHeader extends JPanel {
      */
     public IFilterTextParser getTextParser() {
         if (filterTextParser == null) {
-            filterTextParser = new FilterTextParser();
-            if (table != null)
+            filterTextParser = TableFilter.Settings.newTextParser();
+            if (table != null){
                 filterTextParser.setIdentifiers(
                     TableFilterHelper.extractIdentifiersFromTableColumnNames(table.getModel()));
+            }
         }
 
         return filterTextParser;
     }
 
 
+	@Override public void setVisible(boolean flag) {
+    	if (isVisible()!=flag){
+    		positionHelper.headerVisibilityChanged(flag);
+    	}
+    	super.setVisible(flag);
+		positionHelper.headerVisibilityChanged(flag);
+	}
+	
     /**
      * Enables/Disables programatically the filters
      *
      * @see  JComponent#setEnabled(boolean)
      */
     @Override public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
+    	//it is not possible to call to super.setEnabled(enabled);
+    	//the filter header can embed the the header of the table, which would then
+    	//become also disabled.
+    	this.enabled=enabled;
 
         if (columnsController != null) {
             filtersHandler.enableNotifications(false);
             columnsController.setEnabled(enabled);
             filtersHandler.enableNotifications(true);
         }
+    }
+    
+    @Override
+    public boolean isEnabled() {
+    	return enabled;
     }
 
     /**
@@ -827,7 +866,7 @@ public class TableFilterHeader extends JPanel {
             revalidate();
         }
     }
-
+    
     /**
      * Adds a new observer to the header
      * @param observer
@@ -846,24 +885,6 @@ public class TableFilterHeader extends JPanel {
     	observers.remove(observer);
     }
     
-    /**
-     * Returns the default editor mode, as provided in the property
-     * net.coderazzi.filters.Header.Mode
-     * @since version 2.0.1
-     */
-    static public EditorMode getDefaultHeaderMode(){
-		return EditorMode.valueOf(Messages.getString("Header.Mode", "BASIC"));
-    }
-
-    /**
-     * Returns the default header position, as provided in the property
-     * net.coderazzi.filters.Header.Position
-     * @since version 2.0.1
-     */
-    static public Position getDefaultHeaderPosition(){
-		return Position.valueOf(Messages.getString("Header.Position", "INLINE"));
-    }
-
     /**
      * Class setting up together all the column filters Note that, while the TableFilterHeader
      * handles columns using their model numbering, the FilterColumnsControllerPanel manages the
@@ -1017,7 +1038,7 @@ public class TableFilterHeader extends JPanel {
         }
 
         /**
-         * Updates the identifier information, on the current text parse, if any, and on all the
+         * Updates the identifier information, on the current text parser, if any, and on all the
          * ITableFilterTextBasedEditor editors
          */
         public void updateIdentifiers() {
@@ -1259,6 +1280,7 @@ public class TableFilterHeader extends JPanel {
             
             private void removeEditor(ITableFilterEditor editor){
                 remove(this.editor.getComponent());
+                editor.detach();
             	editor.removeTableFilterObserver(this);
                 for (ITableFilterHeaderObserver observer : observers){
                 	observer.tableFilterEditorExcluded(TableFilterHeader.this, editor);
@@ -1313,6 +1335,10 @@ public class TableFilterHeader extends JPanel {
 		public int getFilterPosition() {
 			return modelColumn;
 		}
+		
+		public void setFilterPosition(int filterPosition) {
+			modelColumn = filterPosition;
+		}
 
         public void addFilterObserver(IFilterObserver listener) {
         }
@@ -1348,6 +1374,9 @@ public class TableFilterHeader extends JPanel {
         }
         
         public void removeTableFilterObserver(ITableFilterEditorObserver observer) {
+        }
+        
+        @Override public void detach() {
         }
     }
 }

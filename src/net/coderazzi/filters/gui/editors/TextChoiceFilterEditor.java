@@ -118,7 +118,8 @@ public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTex
      * @see  TextChoiceFilterEditor#TextChoiceFilterEditor(IFilterTextParser, int)
      */
     public TextChoiceFilterEditor(IFilterTextParser parser) {
-        this(parser, IFilterTextParser.NO_FILTER_POSITION, null);
+        this();
+        setTextParser(parser);
     }
 
     /**
@@ -126,6 +127,9 @@ public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTex
      * IFilterTextParser#NO_FILTER_POSITION}, if no identifier is to be assumed
      *
      * @see  TextChoiceFilterEditor#setFilterPosition(int)
+     * @deprecated since 2.1. Use the default constructor plus 
+     *  {@link TextChoiceFilterEditor#setTextParser(IFilterTextParser)} and
+     *  {@link TextChoiceFilterEditor#setFilterPosition(int)}
      */
     public TextChoiceFilterEditor(IFilterTextParser parser, int filterPosition) {
         this(parser, filterPosition, null);
@@ -139,10 +143,13 @@ public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTex
      *
      * @see    TextChoiceFilterEditor#TextChoiceFilterEditor(IFilterTextParser, int)
      * @see    TextChoiceFilterEditor#suggestChoices(String[])
+     * @deprecated since 2.1. Use the default constructor plus 
+     *  {@link TextChoiceFilterEditor#setTextParser(IFilterTextParser)} and
+     *  {@link TextChoiceFilterEditor#setFilterPosition(int)} and
+     *  {@link TextChoiceFilterEditor#suggestChoices(String...)}
      */
     public TextChoiceFilterEditor(IFilterTextParser parser, int filterPosition, String[] choices) {
-        this();
-        setTextParser(parser);
+        this(parser);
         setFilterPosition(filterPosition);
 
         if (choices != null)
@@ -399,4 +406,9 @@ public class TextChoiceFilterEditor extends JComboBox implements ITableFilterTex
     	observerHelper.removeTableFilterObserver(observer);
     }
 
+    /**
+     * @see ITableFilterEditor#detach()
+     */
+    @Override public void detach() {
+    }
 }

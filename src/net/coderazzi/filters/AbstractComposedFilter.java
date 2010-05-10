@@ -47,7 +47,6 @@ abstract public class AbstractComposedFilter extends AbstractObservableRowFilter
     protected Map<IFilterObservable, RowFilter> filters =
         new HashMap<IFilterObservable, RowFilter>();
 
-
     /**
      * Constructor built up out of none or more {@link net.coderazzi.filters.IFilterObservable}
      * instances
@@ -56,6 +55,9 @@ abstract public class AbstractComposedFilter extends AbstractObservableRowFilter
         addFilterObservable(observables);
     }
 
+    /**
+     * Detaches the instance from any observer/observable
+     */
     @Override public void detach() {
         super.detach();
         filters.clear();

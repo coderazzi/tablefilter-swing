@@ -343,7 +343,7 @@ public class AppTestComplex2 extends JFrame implements ListSelectionListener {
 
         resetFilterButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    filterHeader.resetFilters();
+                    filterHeader.resetFilter();
                 }
             });
 

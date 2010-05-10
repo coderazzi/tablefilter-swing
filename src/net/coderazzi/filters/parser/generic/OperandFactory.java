@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.coderazzi.filters.TableFilter;
+import net.coderazzi.filters.TableFilter.Settings;
 import net.coderazzi.filters.resources.Messages;
 
 
@@ -202,13 +204,13 @@ public class OperandFactory implements IRelationalOperandFactory {
      * It sets the DateBuilder as default comparator, if
      * net.coderazzi.filters.TextParser.CompareDatesAsRendered is defined as true
      * In the same mode, it will be case insensitive if 
-     * net.coderazzi.filters.TextParser.IgnoreCase is defined as true
+     * {@link TableFilter#Settings} defines ignoreCase as true
      */
     public OperandFactory() {
     	if (Boolean.parseBoolean(Messages.getString("TextParser.CompareDatesAsRendered", ""))){
         	setComparator(Date.class, DateHandler.getDefault());    		
     	}
-    	ignoreCase=Boolean.parseBoolean(Messages.getString("TextParser.IgnoreCase", ""));
+    	ignoreCase=TableFilter.Settings.ignoreCase;
 	}
 
     /**
@@ -279,14 +281,17 @@ public class OperandFactory implements IRelationalOperandFactory {
 
     /**
      * The default implementation returns the EQUAL THAN operand for all types except String, and
-     * the regular expression based EQUAL THAN for strings.
+     * the regular expression based EQUAL THAN for strings. If the system defines
+     * the property TextParser.Wildcards, it will return the regular expression
+     * based EQUAL THAN for all types.
      *
      * @see  IRelationalOperandFactory#getDefaultOperand(Class, boolean, boolean)
      */
     public IRelationalOperand getDefaultOperand(Class<?> c, boolean nullOp, boolean rightId) {
 
-        if (nullOp || rightId || (c != String.class))
+        if (nullOp || rightId){
             return equalOperand;
+        }
 
         return ignoreCase ? equalICaseREOperand : equalREOperand;
     }

@@ -92,7 +92,7 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
 				if (c == TableModelEvent.ALL_COLUMNS || c == filterPosition){
 					
 					int last = e.getLastRow();
-					if (r==0 && last >= table.getRowCount()){
+					if (r==0 && last >= tableModel.getRowCount()){
 						extractFilterContentsFromModel(getSelectedItem());
 					} else {
 						extendFilterContentsFromModel(r, last);
@@ -118,8 +118,8 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
     /** The elements shown in the filter */
     private Set<Object> filterOptions;
 
-    /** The associated table */
-    JTable table;
+    /** The associated table model*/
+    TableModel tableModel;
 
     /**
      * Default constructor
@@ -133,9 +133,24 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
      *
      * <p>As a rule of thump, better use the {@link ChoiceFilterEditor} class than this class when
      * this constructor is invoked</p>
+     * 
+     * @deprecated since 2.1, the filterPosition should not be provided anymore
      */
     public TableChoiceFilterEditor(int filterPosition, Object... choices) {
         super(filterPosition, null, choices);
+    }
+
+    /**
+     * <p>Special constructor that provides no additional capabilities than a simpler {@link
+     * ChoiceFilterEditor}, as the choices are prefixed and not obtained from the model.</p>
+     *
+     * <p>As a rule of thump, better use the {@link ChoiceFilterEditor} class than this class when
+     * this constructor is invoked</p>
+     * 
+     * @since 2.1
+     */
+    public TableChoiceFilterEditor(Object... choices) {
+        super(null, choices);
     }
 
     /**
@@ -160,7 +175,7 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
      * @see  ITableFilterEditor#updateFilter()
      */
     @Override public void updateFilter() {
-        if (this.table != null) {
+        if (this.tableModel != null) {
         	extractFilterContentsFromModel(getSelectedItem());
         }
         super.updateFilter();
@@ -175,7 +190,7 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
      */
     @Override public void resetFilter() {
 
-        if (this.table == null) {
+        if (this.tableModel == null) {
             getModel().setSelectedItem(NO_FILTER);
         } else {
             extractFilterContentsFromModel(NO_FILTER);
@@ -229,16 +244,27 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
      */
     public void setTable(JTable table, int modelColumn) {
 
-    	if (this.table!=null){
-    		this.table.getModel().removeTableModelListener(tableModelListener);
+    	if (this.tableModel!=null){
+    		this.tableModel.removeTableModelListener(tableModelListener);
     	}
-        this.table = table;
+        this.tableModel = table.getModel();
         setFilterPosition(modelColumn);
         filterOptions = null;
         extractFilterContentsFromModel(NO_FILTER);
-        this.table.getModel().addTableModelListener(tableModelListener);
+        this.tableModel.addTableModelListener(tableModelListener);
     }
     
+    /**
+     * @see ITableFilterEditor#detach()
+     */
+    public void detach() {
+    	super.detach();
+    	if (this.tableModel!=null){
+    		tableModel.removeTableModelListener(tableModelListener);
+    	}
+    }
+
+
     /**
      * <p>Sets the default choice mode, that shows each different value in the table's column as a
      * choice</p>
@@ -282,9 +308,9 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
      * TableChoiceFilterEditor#setFixedChoiceMode(Object, Object[])}
      */
     @Override public void setChoices(Object labelForOtherChoices, Object... choices) {
-    	if (table != null){
-    		table.getModel().removeTableModelListener(tableModelListener);
-    		table = null;
+    	if (tableModel != null){
+    		tableModel.removeTableModelListener(tableModelListener);
+    		tableModel = null;
     	}
         setFixedChoiceMode(labelForOtherChoices, choices);
     }
@@ -295,13 +321,11 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
     void extractFilterContentsFromModel(Object selected) {
         Map<Object, Integer> columnContents = new HashMap<Object, Integer>();
 
-        TableModel model = table.getModel();
-
-        if (model != null) {
+        if (tableModel != null) {
         	
         	if (filterOptions == null){
-        		if ((model.getColumnCount() > filterPosition) &&
-        				Comparable.class.isAssignableFrom(model.getColumnClass(filterPosition))){
+        		if ((tableModel.getColumnCount() > filterPosition) &&
+        				Comparable.class.isAssignableFrom(tableModel.getColumnClass(filterPosition))){
         			filterOptions = new TreeSet<Object>();
         		}
         		else {
@@ -309,11 +333,11 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
         		}
         	}
 
-    		if (model.getColumnCount() > filterPosition) {
-                int row = model.getRowCount();
+    		if (tableModel.getColumnCount() > filterPosition) {
+                int row = tableModel.getRowCount();
 
                 while (row-- > 0) {
-                    Object s = model.getValueAt(row, filterPosition);
+                    Object s = tableModel.getValueAt(row, filterPosition);
                     Integer i = columnContents.get(s);
 
                     if (i == null)
@@ -356,8 +380,6 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
     	
         Set<Object> previousContents = new HashSet<Object>(filterOptions);
 
-        TableModel tableModel = table.getModel();
-
         while (lastRow >= firstRow) {
         	filterOptions.add(tableModel.getValueAt(lastRow--, filterPosition));
         }
@@ -382,8 +404,9 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
     	super.setModel(aModel);
     	//if the user sets a model, no reason to continue listening for events
     	//note that this happens also if the user provides a list of choices
-    	if (this.table!=null && !(aModel instanceof SpecificDefaultComboBoxModel)){
-    		this.table.getModel().removeTableModelListener(tableModelListener);
+    	if (this.tableModel!=null && !(aModel instanceof SpecificDefaultComboBoxModel)){
+    		tableModel.removeTableModelListener(tableModelListener);
+    		tableModel=null;
     	}
     }
 

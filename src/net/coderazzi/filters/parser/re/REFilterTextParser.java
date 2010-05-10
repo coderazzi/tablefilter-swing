@@ -1,11 +1,5 @@
 package net.coderazzi.filters.parser.re;
 
-import net.coderazzi.filters.parser.FilterTextParsingException;
-import net.coderazzi.filters.parser.IFilterTextParser;
-import net.coderazzi.filters.parser.ITypeBuilder;
-import net.coderazzi.filters.parser.IdentifierInfo;
-import net.coderazzi.filters.resources.Messages;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,6 +7,12 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javax.swing.RowFilter;
+
+import net.coderazzi.filters.TableFilter;
+import net.coderazzi.filters.parser.FilterTextParsingException;
+import net.coderazzi.filters.parser.IFilterTextParser;
+import net.coderazzi.filters.parser.ITypeBuilder;
+import net.coderazzi.filters.parser.IdentifierInfo;
 
 
 /**
@@ -35,7 +35,7 @@ public class REFilterTextParser extends RowFilter implements IFilterTextParser {
     List<IdentifierInfo> validIdentifiers;
     
     public REFilterTextParser() {
-    	ignoreCase=Boolean.parseBoolean(Messages.getString("TextParser.IgnoreCase", ""));
+    	ignoreCase=TableFilter.Settings.ignoreCase;
 	}
 
     @Override public boolean include(RowFilter.Entry entry) {

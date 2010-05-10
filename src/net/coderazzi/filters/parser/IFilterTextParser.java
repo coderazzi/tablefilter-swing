@@ -61,7 +61,7 @@ public interface IFilterTextParser {
      * must provide them specifically</p>
      *
      * <p>A filter supporting the interface {@link javax.swing.RowFilter} receives an instance of
-     * type {@link javax.swing.RowFilter.Entry} that can enquiry to obtain the value at a specified
+     * type {@link javax.swing.RowFilter.Entry} that can enquire to obtain the value at a specified
      * index; the filter position is that given index, and corresponds, in the case of a table, to
      * the column to which this editor is associated.</p>
      */

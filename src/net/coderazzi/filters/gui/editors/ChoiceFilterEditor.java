@@ -122,7 +122,7 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      * Default constructor. It is yet needed to set, at least, the choices to show to the user
      */
     public ChoiceFilterEditor() {
-        this(-1, null);
+        this(null);
     }
 
 
@@ -140,12 +140,29 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      *
      * @see    ChoiceFilterEditor#setFilterPosition(int)
      * @see    ChoiceFilterEditor#setChoices(Object, Object[])
+     * @deprecated The filterPosition should not be provided since version 2.1
      */
     public ChoiceFilterEditor(int filterPosition, Object labelForOtherChoices, Object... choices) {
+    	this(labelForOtherChoices, choices);
+        setFilterPosition(filterPosition);
+    }
+    /**
+     * Full constructor
+     *
+     * @param  labelForOtherChoices  The object representing the notion of 'other choices'. This is
+     *                               a special choice: selecting is equivalent to select any value
+     *                               not covered in the current choices. It can be null, if the
+     *                               concept is not applicable.
+     * @param  choices               The choices to present to the user
+     *
+     * @see    ChoiceFilterEditor#setFilterPosition(int)
+     * @see    ChoiceFilterEditor#setChoices(Object, Object[])
+     * @since  2.1
+     */
+    public ChoiceFilterEditor(Object labelForOtherChoices, Object... choices) {
         filter = new Filter();
         observerHelper = new ObserverHelper(this);        
         setChoices(otherChoices, choices);
-        setFilterPosition(filterPosition);
         addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     filter.propagateFilterChange(false);
@@ -337,6 +354,12 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      */
     @Override public void removeTableFilterObserver(ITableFilterEditorObserver observer) {
     	observerHelper.removeTableFilterObserver(observer);
+    }
+
+    /**
+     * @see ITableFilterEditor#detach()
+     */
+    @Override public void detach() {
     }
 
     /**

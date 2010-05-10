@@ -49,6 +49,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
+import net.coderazzi.filters.TableFilter;
 import net.coderazzi.filters.gui.ITableFilterEditor;
 import net.coderazzi.filters.gui.ITableFilterHeaderObserver;
 import net.coderazzi.filters.gui.ITableFilterTextBasedEditor;
@@ -78,6 +79,7 @@ public class AppTestMain extends JFrame {
     JCheckBox filterEnabler;
     JCheckBox caseIgnorer;
     JCheckBox exactDateChecker;
+    JCheckBox autoSelection;
     JButton changeTableButton;
     JButton resetFilterButton;
     JButton resetModelButton;
@@ -94,13 +96,23 @@ public class AppTestMain extends JFrame {
         setTableRenderers();
         setupListeners();
         modeComboBox.setSelectedItem(EditorMode.CHOICE);
+//        ListSelectionListener lsl = new ListSelectionListener(){
+//        	@Override
+//        	public void valueChanged(ListSelectionEvent e) {
+//        		if (!e.getValueIsAdjusting()){
+//        			System.out.println("Currently selected: "+table.getSelectedRowCount());
+//        		}
+//        	}
+//        };
+//        table.getSelectionModel().addListSelectionListener(lsl);
+//        table.getColumnModel().getSelectionModel().addListSelectionListener(lsl);
     }
 
     private void createGui() {
         JPanel main = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane();
         JPanel south = new JPanel(new BorderLayout(16, 16));
-        JPanel configPanel = new JPanel(new GridLayout(5, 2, 0, 0));
+        JPanel configPanel = new JPanel(new GridLayout(6, 2, 0, 0));
         JPanel controlPanel = new JPanel(new BorderLayout());
         JPanel buttonsPanel = new JPanel(new GridLayout(2, 3, 20, 16));
         JPanel statusPanel = new JPanel(new BorderLayout());
@@ -119,8 +131,9 @@ public class AppTestMain extends JFrame {
         modeComboBox = new JComboBox();
         positionComboBox = new JComboBox();
         filterEnabler = new JCheckBox(Messages.getString("Tests.Enable"), true);
-        caseIgnorer = new JCheckBox(Messages.getString("Tests.IgnoreCase"), false);
+        caseIgnorer = new JCheckBox(Messages.getString("Tests.IgnoreCase"), TableFilter.Settings.ignoreCase);
         exactDateChecker = new JCheckBox(Messages.getString("Tests.UseExactDate"), true);
+        autoSelection = new JCheckBox(Messages.getString("Tests.AutoSelection"), filterHeader.getTableFilter().isAutoSelection());
         changeTableButton = new JButton(Messages.getString("Tests.ChangeTable"));
         resetFilterButton = new JButton(Messages.getString("Tests.ResetFilter"));
         resetModelButton = new JButton(Messages.getString("Tests.ResetModel"));
@@ -143,6 +156,8 @@ public class AppTestMain extends JFrame {
         configPanel.add(caseIgnorer);
         configPanel.add(new JLabel());
         configPanel.add(exactDateChecker);
+        configPanel.add(new JLabel());
+        configPanel.add(autoSelection);
 
         JScrollPane eventsLogPane = new JScrollPane(eventsLog);
         eventsLogPane.setPreferredSize(new Dimension(0, 0));
@@ -366,7 +381,7 @@ public class AppTestMain extends JFrame {
 
         resetFilterButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    filterHeader.resetFilters();
+                    filterHeader.resetFilter();
                 }
             });
 
@@ -391,6 +406,12 @@ public class AppTestMain extends JFrame {
                 filterHeader.getTextParser().setComparator(Date.class,
                 		exactDateChecker.isSelected()? null : DateHandler.getDefault());
                 filterHeader.updateFilter();
+            }
+        });
+
+        autoSelection.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                filterHeader.getTableFilter().setAutoSelection(autoSelection.isSelected());
             }
         });
 

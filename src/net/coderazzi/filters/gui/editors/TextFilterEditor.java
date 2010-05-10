@@ -93,7 +93,8 @@ public class TextFilterEditor extends JTextField implements ITableFilterTextBase
      * @see  TextFilterEditor#TextFilterEditor(IFilterTextParser, int)
      */
     public TextFilterEditor(IFilterTextParser parser) {
-        this(parser, IFilterTextParser.NO_FILTER_POSITION);
+        this();
+        setTextParser(parser);
     }
 
     /**
@@ -101,10 +102,11 @@ public class TextFilterEditor extends JTextField implements ITableFilterTextBase
      * IFilterTextParser#NO_FILTER_POSITION}, if no identifier is to be assumed
      *
      * @see  TextFilterEditor#setFilterPosition(int)
+     * @deprecated since 2.1, use {@link TextFilterEditor#setFilterPosition(int)}
+     *  separately
      */
     public TextFilterEditor(IFilterTextParser parser, int filterPosition) {
-        this();
-        setTextParser(parser);
+        this(parser);
         setFilterPosition(filterPosition);
     }
 
@@ -373,6 +375,12 @@ public class TextFilterEditor extends JTextField implements ITableFilterTextBase
     @Override
     public void removeTableFilterObserver(ITableFilterEditorObserver observer) {
     	observerHelper.removeTableFilterObserver(observer);
+    }
+
+    /**
+     * @see ITableFilterEditor#detach()
+     */
+    @Override public void detach() {
     }
 
     /**

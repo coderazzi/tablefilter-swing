@@ -104,7 +104,7 @@ public class FilterTextParser implements IFilterTextParser {
     /** Set of defined identifiers, indexed by name */
     private Map<String, IdentifierInfo> identifiers;
 
-    /** The factory to hadle relational operands */
+    /** The factory to handle relational operands */
     IRelationalOperandFactory operandFactory;
 
     /** The factory to build any type (even basic ones) */

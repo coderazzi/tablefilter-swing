@@ -49,7 +49,7 @@ class PositionHelper implements PropertyChangeListener{
      */
     public void setPosition(Position location) {
         this.location = location;
-    	placeTableHeader(removeTableHeader());
+        changeTable(filterHeader.table, filterHeader.table);
     }
 
 
@@ -60,6 +60,17 @@ class PositionHelper implements PropertyChangeListener{
         return location;
     }
 
+    /**
+     * The associated TableFilterHeader reports a change on its visibility
+     */
+    public void headerVisibilityChanged(boolean visible){
+		changeTable(filterHeader.table, null);
+    	if (visible && filterHeader.table!=null){
+    		changeTable(null, filterHeader.table);
+    	} 
+    }
+    
+    
     /**
      * The filter header reports that the table being handled is going to change
      */
@@ -101,6 +112,7 @@ class PositionHelper implements PropertyChangeListener{
      * @return false if the component has been explicitly included in a container
      */
     private boolean canHeaderLocationBeManaged(){
+    	if (location==Position.NONE) return false;
     	Container parent = filterHeader.getParent();
     	return parent==null || parent==headerViewport;
     }
@@ -110,7 +122,7 @@ class PositionHelper implements PropertyChangeListener{
      * Tries to setup the filter header automatically for the given table
      */
     private void trySetUp(JTable table){
-    	if (table!=null && canHeaderLocationBeManaged()){
+    	if (table!=null && table.isVisible() && canHeaderLocationBeManaged() && filterHeader.isVisible() ){
 	        Container p = table.getParent();
 	        if (p instanceof JViewport) {
 	            Container gp = p.getParent();

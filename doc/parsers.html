@@ -55,7 +55,7 @@
       </p>
 
       <p>
-        The minimum filter has the syntax: 
+        The minimum filter expression has the syntax: 
         <b> [ [ identifier ] operand ]  constant | identifier </b>
       </p>
 
@@ -67,9 +67,12 @@
         <li><b>startDate &lt; endDate</b> : 
           the column <i>startDate</i> should contain a value lower
           than the value in the column <i>endDate</i>.</li>
-        <li><b>~ A*b</b>: 
+        <li><b>A*b</b>: 
           the current column value must start with uppercase a and 
           end with lowercase b</li>
+        <li><b>= A*b</b>: 
+          the current column value must be, exactly, A*b (no wildcard
+          substitution here)</li>
         <li><b>45</b>: 
           the current column must have the value 45.</li>
       </ul>
@@ -107,7 +110,7 @@
         identifiers; these restrictions are intended to keep simple the 
         grammar of the parser:
         <ul>
-          <li>The types of both identifiers must be identical.</li>
+          <li>The types associated to both identifiers must be identical.</li>
           <li>This type cannot be the string class (or handled as a string).</li>
         </ul>
       </p>
@@ -146,7 +149,7 @@
           </ul>
         </li>
 
-        <li>Wilcard operators, supporting expressions that can contain the 
+        <li>Wildcard operators, supporting expressions that can contain the 
           wildcard characters <b>*</b>, which match zero or more characters, 
           and <b>?</b>, which match exactly one any character:
           <ul>
@@ -163,6 +166,21 @@
       with the types themselves, not with their string representation. Note 
       that the number <b>2</b> is, as a string, higher than
       the number <b>12</b>, so this distinction is quite important.</p>
+      
+      <h3>Default relational operand</h3>
+      
+      <p>If the user specifies no operand, the default one is '~'. That is,
+      the filter will work using limited wildcard expressions. For example,
+      if a column has type Integer, the user can enter 
+      <span class='code'>1*</span> to filter out all the rows not containing
+      an integer starting with 1, on this specific column.</p>
+      
+      <p>This behavior is new from version 2.1; on previous versions, the
+      default operator was '=' when the associated type was not a string. It is
+      possible to revert to the original behaviour, but only by subclassing the
+      <a href='api/net/coderazzi/filters/parser/generic/OperandFactory.html'>OperandFactory</a> 
+      class, redefining the 
+      <a href='api/net/coderazzi/filters/parser/generic/OperandFactory.html#getDefaultOperand(java.lang.Class,%20boolean,%20boolean)'>getDefaultOperand</a> method.</p>
 
     <h2>&quot;null&quot;</h2>
 
@@ -175,7 +193,7 @@
         The default value associated to null is the string <b>null</b>, 
         although using the method
         <a href='api/net/coderazzi/filters/parser/generic/FilterTextParser.html#setNullString(java.lang.String)'>setNullString</a> 
-        in the filter parser, other representations could be provided. In special
+        in the filter parser, other representations could be provided. In special,
         pay attention to the <a href='properties.html'>system properties</a>
         way to alter this library behaviour.
       </p>
@@ -197,7 +215,7 @@
         It is possible to create the 
         <a href='api/net/coderazzi/filters/parser/generic/FilterTextParser.html'>FilterTextParser</a>,
         with a different set of operands and / or supported types.
-      </p> 
+      </p>            
 
       <p>
         Implementing the interface 
@@ -208,6 +226,10 @@
         operation is not described here. If this is needed, please
         study the source code or contact me for additional support.
       </p>
+      
+      <p>The easiest way to define the text parser to be used by default is to override the
+      system property &quot;net.coderazzi.filters.TextParser.class&quot; or, more easily, to
+      redefine the value <span class='mark'>TableFilter.Settings.filterTextParserClass</span></p>
 
 </div></body>
 </html>

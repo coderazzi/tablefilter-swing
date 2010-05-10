@@ -83,6 +83,11 @@ public interface ITableFilterEditor {
     public int getFilterPosition();
     
     /**
+     * Sets the associated column in the table
+     */
+    public void setFilterPosition(int filterPosition);
+    
+    /**
      * Adds a new observer to the editor
      * @since version 2.0
      */
@@ -94,4 +99,10 @@ public interface ITableFilterEditor {
      */
     public void removeTableFilterObserver(ITableFilterEditorObserver observer);
 
+    /**
+     * <p>Detaches the editor from the header</p>
+     * @since version 2.2
+     */
+    public void detach();
+    
 }
