@@ -4,7 +4,7 @@
  * Created on December 14, 2007, 1:48 PM
  */
 
-package net.coderazzi.filters.gui_tests.bugs;
+package net.coderazzi.filters.examples.bugs;
 
 /**
  *

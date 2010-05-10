@@ -25,12 +25,9 @@
 
 package net.coderazzi.filters;
 
-import javax.swing.RowFilter;
-
-
 /**
  * <p>A IFilterObserver instance receives notifications when the associated {@link
- * net.coderazzi.filters.IFilterObservable} instance updates the held filter.</p>
+ * net.coderazzi.filters.IFilter} instance updates the held filter.</p>
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
@@ -38,7 +35,7 @@ public interface IFilterObserver {
 
     /**
      * <p>Notification made by the observer when the associated {@link
-     * net.coderazzi.filters.IFilterObservable} instance updates the held filter.</p>
+     * net.coderazzi.filters.IFilter} instance updates the held filter.</p>
      */
-    public void filterUpdated(IFilterObservable obs, RowFilter newValue);
+    public void filterUpdated(IFilter obs);
 }

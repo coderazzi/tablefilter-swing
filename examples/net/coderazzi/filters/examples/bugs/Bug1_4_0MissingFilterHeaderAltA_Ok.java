@@ -1,4 +1,4 @@
-package net.coderazzi.filters.gui_tests.bugs;
+package net.coderazzi.filters.examples.bugs;
 
 import java.awt.BorderLayout;
 
@@ -8,8 +8,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 
+import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.TableFilterHeader;
-import net.coderazzi.filters.gui_tests.TestTableModel;
 
 /**
  * Variation of Bug1_4_0MissingFilterHeader. 
@@ -20,7 +20,7 @@ public class Bug1_4_0MissingFilterHeaderAltA_Ok extends JPanel{
 	
 	private static final long serialVersionUID = -22834158973030319L;
 
-	private JTable table;
+	JTable table;
 	
 	public Bug1_4_0MissingFilterHeaderAltA_Ok() {
 		super(new BorderLayout());

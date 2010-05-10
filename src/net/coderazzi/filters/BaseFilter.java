@@ -33,25 +33,25 @@ import javax.swing.RowFilter;
 
 
 /**
- * Commodity class implementing the interface {@link net.coderazzi.filters.IFilterObservable} on a
- * {@link javax.swing.RowFilter}
+ * Commodity class implementing the interface {@link net.coderazzi.filters.IFilter} on a
+ * {@link RowFilter}
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
-abstract public class AbstractObservableRowFilter extends RowFilter implements IFilterObservable {
+abstract public class BaseFilter extends RowFilter implements IFilter {
 
     /** The set of currently subscribed observers */
     protected Set<IFilterObserver> filterObservers = new HashSet<IFilterObserver>();
 
     /**
-     * Detaches the instance from any observer/observable
+     * Detaches the instance from any observer
      */
     public void detach() {
         filterObservers.clear();
     }
 
     /**
-     * @see  IFilterObservable#addFilterObserver(IFilterObserver)
+     * @see  IFilter#addFilterObserver(IFilterObserver)
      */
     public void addFilterObserver(IFilterObserver observer) {
         filterObservers.add(observer);
@@ -59,7 +59,7 @@ abstract public class AbstractObservableRowFilter extends RowFilter implements I
     }
 
     /**
-     * @see  IFilterObservable#removeFilterObserver(IFilterObserver)
+     * @see  IFilter#removeFilterObserver(IFilterObserver)
      */
     public void removeFilterObserver(IFilterObserver observer) {
         filterObservers.remove(observer);
@@ -77,6 +77,6 @@ abstract public class AbstractObservableRowFilter extends RowFilter implements I
      */
     protected void reportFilterUpdatedToObservers() {
         for (IFilterObserver obs : new ArrayList<IFilterObserver>(filterObservers))
-            obs.filterUpdated(this, this);
+            obs.filterUpdated(this);
     }
 }

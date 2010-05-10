@@ -22,9 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.coderazzi.filters.gui_tests;
-
-import net.coderazzi.filters.gui_tests.resources.Messages;
+package net.coderazzi.filters.examples.utils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,25 +36,23 @@ import javax.swing.table.AbstractTableModel;
 
 public class TestTableModel extends AbstractTableModel {
 
-	private static final long serialVersionUID = -5453866058915361214L;
+    private static final long serialVersionUID = -5453866058915361214L;
 
-	public final static String NAME = Messages.getString("TestTableModel.Name");
-    public final static String TUTOR = Messages.getString("TestTableModel.Tutor");
-    public final static String MALE = Messages.getString("TestTableModel.Male");
-    public final static String COUNTRY = Messages.getString("TestTableModel.Flag");
-    public final static String EXAMENS = Messages.getString("TestTableModel.ExamensSc");
-    public final static String EXAMENSH = Messages.getString("TestTableModel.ExamensH");
-    public final static String AGE = Messages.getString("TestTableModel.Age");
-    public final static String CLUB = Messages.getString("TestTableModel.Club");
-    public final static String LCNAME = Messages.getString("TestTableModel.NameLittle");
-    public final static String DATE = Messages.getString("TestTableModel.Date");
+    public static final String NAME = "Name";
+    public static final String TUTOR = "Tutor";
+    public static final String MALE = "Male";
+    public static final String COUNTRY = "Country";
+    public static final String AGE = "Age";
+    public static final String CLUB = "Club";
+    public static final String LCNAME = "Kickname";
+    public static final String DATE = "Date";
 
     private static String[] columnNames = {
-            NAME, AGE, MALE, TUTOR, COUNTRY, EXAMENS, EXAMENSH, CLUB, LCNAME, DATE
+            NAME, AGE, MALE, TUTOR, COUNTRY, CLUB, LCNAME, DATE
         };
-    private final static Class<?>[] columnTypes = {
+    private static final Class<?>[] columnTypes = {
             String.class, Integer.class, Boolean.class, String.class, Icon.class,
-            TestData.ExamInformation.class, TestData.ExamInformation.class, TestData.Club.class,
+            TestData.Club.class,
             String.class, Date.class
         };
 
@@ -64,15 +60,13 @@ public class TestTableModel extends AbstractTableModel {
     private static boolean changedModel;
     private List<TestData> data;
     private int[] columnsOrder;
-    
-    
-    public static TestTableModel createTestTableModel()
-    {
-    	return createTestTableModel(1000);	
+
+
+    public static TestTableModel createTestTableModel() {
+        return createTestTableModel(1000);
     }
-    
-    public static TestTableModel createTestTableModel(int elements)
-    {
+
+    public static TestTableModel createTestTableModel(int elements) {
         TestData.resetRandomness();
 
         List<TestData> ltd = new ArrayList<TestData>();
@@ -81,17 +75,14 @@ public class TestTableModel extends AbstractTableModel {
             ltd.add(new TestData());
 
         return new TestTableModel(ltd);
-    	
+
     }
 
 
-
-    public static TestTableModel createLargeTestTableModel(int elements)
-    {
-        changedModel=true;
-        return createTestTableModel(elements);    	
+    public static TestTableModel createLargeTestTableModel(int elements) {
+        changedModel = true;
+        return createTestTableModel(elements);
     }
-
 
 
     public TestTableModel(List<TestData> data) {
@@ -116,9 +107,10 @@ public class TestTableModel extends AbstractTableModel {
         int[] n = new int[columnNames.length];
         List<Integer> l = new ArrayList<Integer>();
         int prior = getColumnCount();
-        for (int i = 0; i < prior; i++)
+        n[0]=0; //keep always first column as the name
+        for (int i = 1; i < prior; i++)
             l.add(new Integer(i));
-        for (int i = 0; i < prior; i++)
+        for (int i = 1; i < prior; i++)
             n[i] = l.remove(random.nextInt(l.size())).intValue();
         for (int i = prior; i < columnNames.length; i++)
             l.add(new Integer(i));
@@ -130,7 +122,7 @@ public class TestTableModel extends AbstractTableModel {
 
     public void changeModel(JTable table) {
 
-        //we keep the same order
+        // we keep the same order
         int[] newColumnsOrder = columnsOrder.clone();
         for (int i = 0; i < table.getColumnCount(); i++) {
             newColumnsOrder[i] = columnsOrder[table.convertColumnIndexToModel(i)];
@@ -164,60 +156,62 @@ public class TestTableModel extends AbstractTableModel {
         return data.size();
     }
 
-    public Object getValueAt(int rowIndex, int columnIndex) {
+    public Object getValueAt(int rowIndex,
+                             int columnIndex) {
         TestData td = data.get(rowIndex);
 
         switch (columnsOrder[columnIndex]) {
 
-        case 0:
-            return td.name;
+            case 0:
+                return td.name;
 
-        case 1:
-            return td.age;
+            case 1:
+                return td.age;
 
-        case 2:
-            return td.male;
+            case 2:
+                return td.male;
 
-        case 3:
-            return td.tutor;
+            case 3:
+                return td.tutor;
 
-        case 4:
-            return td.flag;
+            case 4:
+                return td.flag;
 
-        case 5:
-            return td.examensSciences;
+            case 5:
+                return td.club;
 
-        case 6:
-            return td.examensHumanities;
+            case 6:
+                return td.firstName;
 
-        case 7:
-            return td.club;
-
-        case 8:
-            return td.firstName;
-
-        case 9:
-            return td.date;
+            case 7:
+                return td.date;
         }
 
         return null;
     }
 
-    @Override public boolean isCellEditable(int rowIndex, int columnIndex) {
+    @Override
+    public boolean isCellEditable(int rowIndex,
+                                  int columnIndex) {
         return columnsOrder[columnIndex] == 2;
     }
 
-    @Override public void setValueAt(Object value, int rowIndex, int columnIndex) {
+    @Override
+    public void setValueAt(Object value,
+                           int rowIndex,
+                           int columnIndex) {
 
         data.get(rowIndex).male = (Boolean) value;
         fireTableRowsUpdated(rowIndex, rowIndex);
     }
 
-    @Override public Class<?> getColumnClass(int columnIndex) {
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
         return columnTypes[columnsOrder[columnIndex]];
     }
 
-    @Override public String getColumnName(int column) {
+    @Override
+    public String getColumnName(int column) {
         return columnNames[columnsOrder[column]];
     }
 

@@ -1,4 +1,4 @@
-package net.coderazzi.filters.gui_tests.bugs;
+package net.coderazzi.filters.examples.bugs;
 
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
@@ -10,9 +10,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import net.coderazzi.filters.AbstractObservableRowFilter;
+import net.coderazzi.filters.BaseFilter;
+import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.TableFilterHeader;
-import net.coderazzi.filters.gui_tests.TestTableModel;
 
 /**
  * Adding new filters outside the TableHeader does not work (on release 1.4.0)
@@ -21,7 +21,7 @@ public class Bug1_4_0AddingExternalFilter extends JPanel{
 	
 	private static final long serialVersionUID = 9084957648913273935L;
 	TestTableModel model = TestTableModel.createTestTableModel();
-	AbstractObservableRowFilter addedFilter = new AbstractObservableRowFilter(){
+	BaseFilter addedFilter = new BaseFilter(){
 		@Override
 		public boolean include(Entry entry) {
 			return -1!=entry.getStringValue(model.getColumn(TestTableModel.NAME)).indexOf('e');
@@ -41,9 +41,9 @@ public class Bug1_4_0AddingExternalFilter extends JPanel{
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				filterHeader.getTableFilter().removeFilterObservable(addedFilter);					
+				filterHeader.getTableFilter().removeFilter(addedFilter);					
 				if (e.getStateChange()==ItemEvent.SELECTED){
-					filterHeader.getTableFilter().addFilterObservable(addedFilter);
+					filterHeader.getTableFilter().addFilter(addedFilter);
 				} 
 			}
 		});

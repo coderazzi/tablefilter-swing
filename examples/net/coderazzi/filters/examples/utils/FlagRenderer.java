@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.coderazzi.filters.gui_tests;
+package net.coderazzi.filters.examples.utils;
 
 import java.awt.Component;
 

@@ -1,4 +1,4 @@
-package net.coderazzi.filters.gui_tests.bugs;
+package net.coderazzi.filters.examples.bugs;
 
 import java.awt.BorderLayout;
 
@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.UIManager;
 
-import net.coderazzi.filters.gui_tests.TestTableModel;
+import net.coderazzi.filters.examples.utils.TestTableModel;
 
 /**
  * Test to verify some resizing problems happening on version 1.2.4

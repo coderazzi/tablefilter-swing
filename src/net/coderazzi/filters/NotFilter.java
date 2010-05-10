@@ -36,17 +36,17 @@ import javax.swing.RowFilter;
 public class NotFilter extends AndFilter {
 
     /**
-     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilterObservable}
+     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilter}
      * instances
      */
-    public NotFilter(IFilterObservable... observables) {
+    public NotFilter(IFilter... observables) {
         super(observables);
     }
 
     /**
-     * @see  RowFilter#include(javax.swing.RowFilter.Entry)
+     * @see  IFilter#include(RowFilter.Entry)
      */
-    @Override public boolean include(RowFilter.Entry rowEntry) {
+	@Override public boolean include(RowFilter.Entry rowEntry) {
         return !super.include(rowEntry);
     }
 }

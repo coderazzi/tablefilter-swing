@@ -33,23 +33,22 @@ import javax.swing.RowFilter;
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
-public class AndFilter extends AbstractComposedFilter {
+public class AndFilter extends ComposedFilter {
 
     /**
-     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilterObservable}
+     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilter}
      * instances
      */
-    public AndFilter(IFilterObservable... observables) {
+    public AndFilter(IFilter... observables) {
         super(observables);
     }
 
     /**
-     * @see  RowFilter#include(javax.swing.RowFilter.Entry)
+     * @see  IFilter#include(RowFilter.Entry)
      */
-    @SuppressWarnings("unchecked")
 	@Override public boolean include(RowFilter.Entry rowEntry) {
-        for (RowFilter filter : filters.values())
-            if ((filter != null) && !filter.include(rowEntry))
+        for (IFilter filter : filters)
+            if (!filter.include(rowEntry))
                 return false;
 
         return true;

@@ -30,16 +30,10 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JTable;
-import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 
-import net.coderazzi.filters.gui.TableFilterHeader.EditorMode;
-import net.coderazzi.filters.gui.TableFilterHeader.Position;
-import net.coderazzi.filters.parser.IFilterTextParser;
-import net.coderazzi.filters.parser.generic.FilterTextParser;
-import net.coderazzi.filters.resources.Messages;
 
 
 /**
@@ -76,7 +70,7 @@ public class TableFilter extends AndFilter {
      * the filter observers. Notifications are only sent to the observers when this variable is non
      * negative.
      */
-    private int sendNotifications = 0;
+    int sendNotifications = 0;
 
     /**
      * pendingNotifications keeps track of notifications to be sent to the observers, but were
@@ -85,12 +79,10 @@ public class TableFilter extends AndFilter {
     private boolean pendingNotifications;
 
     /** The class performing the autoselection, and following sorter changes * */
-    private SorterHelper helper = new SorterHelper();
+    private AutoSelector autoSelector = new AutoSelector();
 
     /** The associated table, if any. */
-    private JTable table;
-
-    public static Settings Settings = new Settings();
+    JTable table;
 
     /**
      * Default constructor
@@ -100,8 +92,7 @@ public class TableFilter extends AndFilter {
         // create an observer instance to notify the associated table when there
         // are filter changes.
         addFilterObserver(new IFilterObserver() {
-                public void filterUpdated(IFilterObservable obs,
-                                          RowFilter newValue) {
+                public void filterUpdated(IFilter obs) {
                     notifyUpdatedFilter(false);
                 }
             });
@@ -122,7 +113,7 @@ public class TableFilter extends AndFilter {
     public void setTable(JTable table) {
         JTable oldTable = this.table;
         this.table = table;
-        helper.replacedTable(oldTable, table);
+        autoSelector.replacedTable(oldTable, table);
     }
 
     /**
@@ -168,21 +159,18 @@ public class TableFilter extends AndFilter {
      *
      * <p>if autoSelection is true, if there is only one possible row to select on the table, it
      * will be selected.
-     *
-     * @since  2.1
      */
     public void setAutoSelection(boolean enable) {
-        helper.setAutoSelection(enable);
+        autoSelector.setAutoSelection(enable);
     }
 
     /**
      * Returns the autoselection mode
      *
      * @see    TableFilter#setAutoSelection(boolean)
-     * @since  2.1
      */
     public boolean isAutoSelection() {
-        return helper.autoSelection;
+        return autoSelector.autoSelection;
     }
 
     /**
@@ -203,30 +191,28 @@ public class TableFilter extends AndFilter {
      * the filtering, it is enough to invoke again setRowFilter. Alternatively, it could just be
      * invoked sort()
      */
-    @SuppressWarnings("unchecked")
     private boolean sendFilterUpdateNotification() {
-        if (helper.sorter == null) {
+        if (autoSelector.sorter == null) {
             return true;
         }
-        helper.sorter.setRowFilter(this);
+        autoSelector.sorter.setRowFilter(this);
         return false;
     }
-
-
+    
     /**
      * Class performing the auto selection. Note that it depends only on the model, and not on the
      * filters. If the model contains one single row, it will be automatically selected, even if the
      * filters are empty.
      */
-    private class SorterHelper implements RowSorterListener, Runnable, PropertyChangeListener {
+    class AutoSelector implements RowSorterListener, Runnable, PropertyChangeListener {
 
         /** The associated sorter, if any. */
         DefaultRowSorter<?, ?> sorter;
         /** Autoselection mode * */
-        boolean autoSelection = Settings.autoSelection;
+        boolean autoSelection = true;
 
 
-        public void replacedTable(JTable oldTable,
+		public void replacedTable(JTable oldTable,
                                   JTable newTable) {
             if (oldTable != null) {
                 oldTable.removePropertyChangeListener("rowSorter", this);
@@ -292,71 +278,6 @@ public class TableFilter extends AndFilter {
             if ((e.getType() == RowSorterEvent.Type.SORTED) && (e.getSource().getViewRowCount() == 1)) {
                 SwingUtilities.invokeLater(this);
             }
-        }
-    }
-
-
-    /**
-     * Class to define some common settings to the TableFilter library. It is just a sugar
-     * replacement to using directly system properties
-     *
-     * @since  2.1
-     */
-    public static class Settings {
-        /**
-         * Set to true to perform automatically the selection of a row that is uniquely identified
-         * by the existing filter. It is true by default.
-         */
-        public boolean autoSelection = Boolean.parseBoolean(
-                Messages.getString("TableFilter.AutoSelection", "true"));
-
-        /** The header editor mode, {@link EditorMode#BASIC} by default. */
-        public EditorMode headerMode = EditorMode.valueOf(
-                Messages.getString("Header.Mode", "BASIC"));
-
-        /** The header position, {@link Position#INLINE} by default. */
-        public Position headerPosition = Position.valueOf(
-                Messages.getString("Header.Position", "INLINE"));
-
-        /**
-         * Whether the text parsers should ignore case or not. It is false by default (so filtering
-         * is case sensitive)
-         */
-        public boolean ignoreCase = Boolean.parseBoolean(
-                Messages.getString("TextParser.IgnoreCase", "false"));
-        
-        /** 
-         * The class to handle the text parsing by default. It must have a default constructor.
-         * It corresponds to the property TextParser.class
-         */
-        public Class<? extends IFilterTextParser> filterTextParserClass;
-                
-        
-        /** Creates a TextParser as defined by default */
-        public IFilterTextParser newTextParser(){
-        	try{
-        		IFilterTextParser ret =  filterTextParserClass.newInstance();
-        		ret.setIgnoreCase(ignoreCase);
-        		return ret;
-        	} catch(Exception ex){
-        		throw new RuntimeException("Error creating filter text parser of type "
-        				+ filterTextParserClass, ex);
-        	}
-        }
-        
-        {
-        	filterTextParserClass = FilterTextParser.class;
-        	String cl = Messages.getString("TextParser.class", null);
-        	if (cl!=null){
-        		try {
-        			filterTextParserClass = (Class<? extends IFilterTextParser>)Class.forName(cl);
-        		} catch (ClassNotFoundException cne){
-            		throw new RuntimeException("Error finding filter text parser of class " +cl, cne);
-        		} catch (ClassCastException cce){
-            		throw new RuntimeException("Filter text parser of class " +cl +
-            				" is not a valid IFilterTextParser class");        			
-        		}
-        	}
         }
     }
 

@@ -3,18 +3,19 @@ package net.coderazzi.filters;
 import net.coderazzi.filters.gui.TableFilterHeader;
 
 /**
- * Commodity class to implement an added user filter. 
+ * Commodity class to implement a custom user filter. 
  * @author  Luis M Pena - lu@coderazzi.net
- * @since version 1.5.0
  */
-public abstract class UserFilter extends AbstractObservableRowFilter{
+public abstract class UserFilter extends BaseFilter{
 	
 	private TableFilter filter;
-	
+
+	/** A UserFilter is expected to be associated to a {@link TableFilter}*/
 	public UserFilter(TableFilterHeader filterHeader){
 		setTableFilter(filterHeader);
 	}
 	
+	/** A UserFilter is expected to be associated to a {@link TableFilter}*/
 	public UserFilter(TableFilter filter){
 		setTableFilter(filter);
 	}
@@ -40,9 +41,9 @@ public abstract class UserFilter extends AbstractObservableRowFilter{
 	 */
 	public void setEnabled(boolean enable){
 		if (filter!=null){
-			filter.removeFilterObservable(this);
+			filter.removeFilter(this);
 			if (enable){
-				filter.addFilterObservable(this);			
+				filter.addFilter(this);			
 			}
 		}
 	}

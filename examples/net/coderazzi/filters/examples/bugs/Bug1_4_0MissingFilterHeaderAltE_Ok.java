@@ -1,4 +1,4 @@
-package net.coderazzi.filters.gui_tests.bugs;
+package net.coderazzi.filters.examples.bugs;
 
 import java.awt.BorderLayout;
 
@@ -7,8 +7,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.TableFilterHeader;
-import net.coderazzi.filters.gui_tests.TestTableModel;
 
 /**
  * Variation of Bug1_4_0MissingFilterHeaderAltC_Ok. 

@@ -23,37 +23,32 @@
  * THE SOFTWARE.
  */
 
-package net.coderazzi.filters.parser;
+package net.coderazzi.filters;
+
+import javax.swing.RowFilter;
 
 /**
- * <p>Class holding specific information for a given identifier.</p>
+ * <p>Interface to be implemented by any instance holding a filter than can be updated
+ * dynamically.</p>
  *
- * <p>A generic parse handles filter expressions handled as composition of subexpressions concerning
- * an indentifier, an operand, an a value. An identifier in such expressions is defined through this
- * class, as a name, a class, and its filter position.</p>
- *
- * <p>The filter position corresponds, in the case of a table, to the column to which this editor is
- * associated.</p>
+ * <p>Ant change on the filter is propagated to the observers, in no prefixed order.</p>
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
-public class IdentifierInfo {
-
-    /** The identifier name */
-    public String name;
-
-    /** Its class */
-    public Class<?> associatedClass;
-
-    /** Filter position, as associated to the {@link javax.swing.RowFilter.Entry} index */
-    public int filterPosition;
+public interface IFilter {
 
     /**
-     * Unique constructor, providing the full identifier contents
+     * Adds an observer to receive filter change notifications.
      */
-    public IdentifierInfo(String identifier, Class<?> associatedClass, int filterPosition) {
-        this.name = identifier;
-        this.associatedClass = associatedClass;
-        this.filterPosition = filterPosition;
-    }
+    public void addFilterObserver(IFilterObserver observer);
+
+    /**
+     * Unregisters an observer, that will not receive no further filter update notifications.
+     */
+    public void removeFilterObserver(IFilterObserver observer);
+
+    /**
+     * RowFilter interface
+     */
+	public boolean include(RowFilter.Entry rowEntry);
 }

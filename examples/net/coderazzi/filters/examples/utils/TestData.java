@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.coderazzi.filters.gui_tests;
+package net.coderazzi.filters.examples.utils;
 
 import java.io.ByteArrayOutputStream;
 
@@ -45,7 +45,7 @@ public class TestData {
 
     private static Random random = new Random();
 
-    final static String[] maleNames = {
+    static final String[] maleNames = {
             "Alfred", "Alvin", "Blake", "Bob", "Brandon", "Bud", "Burton", "Charles", "Clark",
             "Dale", "Damon", "Darren", "Dustin", "Edward", "Elton", "Fletcher", "Forrester", "Gary",
             "Harley", "Harold", "Hugh", "James", "Keane", "Kenneth", "Landon", "Lee", "Lincoln",
@@ -54,7 +54,7 @@ public class TestData {
             "Thorne", "Truman", "Tyler", "Wallace",
         };
 
-    final static String[] femaleNames = {
+    static final String[] femaleNames = {
             "Aida", "Ashley", "Audrey", "Beverly", "Brenda", "Brook", "Cameron", "Carling",
             "Chelsea", "Dale", "Dawn", "Devon", "Dustin", "Erika", "Farrah", "Harmony", "Hazel",
             "Heather", "Holly", "Jamie", "Joyce", "Joy", "Kim", "Kirsten", "Kyla", "Lark", "Lee",
@@ -63,8 +63,8 @@ public class TestData {
             "Verity", "Wendy", "Whitney", "Wilona"
         };
 
-    //source: http://en.wikipedia.org/wiki/List_of_most_common_surnames#United_States
-    final static String[] familyNames = {
+    // source: http://en.wikipedia.org/wiki/List_of_most_common_surnames#United_States
+    static final String[] familyNames = {
             "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore",
             "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson",
             "Garcia", "Martinez", "Robinson", "Clark", "Rodriguez", "Lewis", "Lee", "Walker",
@@ -78,7 +78,7 @@ public class TestData {
             "Powell", "Long", "Patterson", "Hughes", "Flores", "Washington", "Butler", "Simmons",
             "Foster", "Gonzales", "Bryant", "Alexander", "Russell", "Griffin", "Diaz", "Hayes"
         };
-    
+
     static List<Icon> served = new ArrayList<Icon>(), allIcons;
 
     static {
@@ -86,7 +86,11 @@ public class TestData {
     }
 
     public static enum Club {
-        Alpha, Geeks, Kappa, Lions, Phi
+        Alpha,
+        Geeks,
+        Kappa,
+        Lions,
+        Phi
     }
 
     public String name, firstName;
@@ -94,8 +98,6 @@ public class TestData {
     public Boolean male;
     public String tutor;
     public Icon flag;
-    public ExamInformation examensSciences;
-    public ExamInformation examensHumanities;
     public Club club;
     public Date date;
 
@@ -105,15 +107,12 @@ public class TestData {
         firstName = getFirstName(male);
         name = getName(firstName);
         while ((tutor == null) || tutor.equals(name)) {
-            tutor = (random.nextBoolean() || random.nextBoolean() || random.nextBoolean())
-                ? getName(random.nextBoolean()) : "";
+            tutor = (random.nextBoolean() || random.nextBoolean() || random.nextBoolean()) ? getName(random.nextBoolean()) : "";
         }
         flag = getFlag();
-        examensSciences = getExamInformation();
-        examensHumanities = getExamInformation();
         club = getClub();
-        //date is not exact (not everybody can be born at 00:00!)
-        date = new GregorianCalendar(random.nextInt(50)+1940,random.nextInt(12), random.nextInt(28), 1, 1).getTime();
+        // date is not exact (not everybody can be born at 00:00!)
+        date = new GregorianCalendar(random.nextInt(50) + 1940, random.nextInt(12), random.nextInt(28), 1, 1).getTime();
     }
 
     static void getAllIcons() {
@@ -121,7 +120,7 @@ public class TestData {
         try {
             Pattern p = Pattern.compile("gif/(.+)\\.gif");
             ZipInputStream zip = new ZipInputStream(TestData.class.getResourceAsStream(
-                        "/net/coderazzi/filters/gui_tests/resources/famfamfam_flag_icons.zip"));
+                        "/net/coderazzi/filters/examples/utils/famfamfam_flag_icons.zip"));
             ZipEntry entry;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[16384];
@@ -151,17 +150,6 @@ public class TestData {
         }
     }
 
-    private ExamInformation getExamInformation() {
-        ExamInformation ret = null;
-        if (random.nextBoolean() || random.nextBoolean()) {
-            ret = new ExamInformation();
-            ret.testsDone = random.nextInt(100);
-            ret.testsPassed = random.nextInt(ret.testsDone + 1);
-        }
-
-        return ret;
-    }
-
     public static void resetRandomness() {
         random = new Random();
         served.clear();
@@ -181,8 +169,8 @@ public class TestData {
     private String getName(boolean male) {
         String[] source = male ? maleNames : femaleNames;
 
-        return source[random.nextInt(source.length - 1)] + " " +
-            familyNames[random.nextInt(familyNames.length - 1)];
+        return source[random.nextInt(source.length - 1)] + " "
+            + familyNames[random.nextInt(familyNames.length - 1)];
     }
 
     private Club getClub() {
@@ -213,12 +201,4 @@ public class TestData {
         return null;
     }
 
-    public static class ExamInformation {
-        public int testsPassed;
-        public int testsDone;
-
-        @Override public String toString() {
-            return String.format("%02d/%02d", testsPassed, testsDone);
-        }
-    }
 }

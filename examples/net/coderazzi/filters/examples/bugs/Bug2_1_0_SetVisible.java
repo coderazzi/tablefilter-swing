@@ -22,9 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.coderazzi.filters.gui_tests.bugs;
+package net.coderazzi.filters.examples.bugs;
 
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -39,39 +40,41 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
+import net.coderazzi.filters.examples.utils.CenteredRenderer;
+import net.coderazzi.filters.examples.utils.FlagRenderer;
+import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.TableFilterHeader;
-import net.coderazzi.filters.gui.TableFilterHeader.EditorMode;
 import net.coderazzi.filters.gui.TableFilterHeader.Position;
-import net.coderazzi.filters.gui.editors.TableChoiceFilterEditor;
-import net.coderazzi.filters.gui_tests.CenteredRenderer;
-import net.coderazzi.filters.gui_tests.FlagRenderer;
-import net.coderazzi.filters.gui_tests.TestTableModel;
+
 
 /**
- * Previously to release 2.1.1, setting the header as non visible,
- * would normally hide as well the header of the table (if autoplace was
- * in order). Disabling it would also disable the header of the table (this
- * had not so much impact, but it was not properly done, anyway).
+ * Previously to release 2.1.1, setting the header as non visible, would normally hide as well the
+ * header of the table (if autoplace was in order). Disabling it would also disable the header of
+ * the table (this had not so much impact, but it was not properly done, anyway).
  */
+@SuppressWarnings({ "serial" })
 public class Bug2_1_0_SetVisible extends JFrame {
 
-	private static final long serialVersionUID = 4521016108974569405L;
+    private static final long serialVersionUID = 4521016108974569405L;
 
     JTable table;
     TestTableModel tableModel;
     TableFilterHeader filterHeader;
 
-	private JPanel mainPanel;
+    JPanel mainPanel;
 
-    public Bug2_1_0_SetVisible(Position position, boolean visible, boolean enabled) {
+    public Bug2_1_0_SetVisible(Position position,
+                               boolean visible,
+                               boolean enabled) {
         super("Bug2_1_0_SetVisible");
         tableModel = TestTableModel.createTestTableModel(20);
         createGui(position, visible, enabled);
-        setTableRenderers();
-        setChoiceRenderers();
+        customizeTable();
     }
 
-    private void createGui(Position position, boolean visible, boolean enabled) {
+    private void createGui(Position position,
+                           boolean visible,
+                           boolean enabled) {
         mainPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane();
         ButtonsPanel actions = new ButtonsPanel();
@@ -81,104 +84,99 @@ public class Bug2_1_0_SetVisible extends JFrame {
 
         table = new JTable(tableModel);
         scrollPane.setViewportView(table);
-        filterHeader = new TableFilterHeader(table, EditorMode.CHOICE, position);
-    	filterHeader.setVisible(visible);
-    	filterHeader.setEnabled(enabled);
-        if (position==Position.NONE){
-        	mainPanel.add(filterHeader, BorderLayout.SOUTH);
+        filterHeader = new TableFilterHeader(table, position);
+        filterHeader.setVisible(visible);
+        filterHeader.setEnabled(enabled);
+        if (position == Position.NONE) {
+            mainPanel.add(filterHeader, BorderLayout.SOUTH);
         }
 
         actions.positionComboBox.setSelectedItem(position);
         actions.visibleCheckBox.setSelected(visible);
         actions.enabledCheckBox.setSelected(enabled);
-        
-        actions.positionComboBox.addItemListener(new ItemListener() {
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange()==ItemEvent.SELECTED){
-					Position position = (Position) e.getItem();
-					if (position==Position.NONE){
-						filterHeader.setPosition(position);
-						mainPanel.add(filterHeader, BorderLayout.SOUTH);
-					} else {
-						mainPanel.remove(filterHeader);						
-						filterHeader.setPosition(position);
-					}
-					mainPanel.revalidate();
-				}
-			}
-		});
-        
-        actions.visibleCheckBox.addItemListener(new ItemListener() {			
-        	@Override public void itemStateChanged(ItemEvent e) {
-        		filterHeader.setVisible(e.getStateChange()==ItemEvent.SELECTED);
-			}
-		});
 
-        actions.enabledCheckBox.addItemListener(new ItemListener() {			
-        	@Override public void itemStateChanged(ItemEvent e) {
-        		filterHeader.setEnabled(e.getStateChange()==ItemEvent.SELECTED);
-			}
-		});
+        actions.positionComboBox.addItemListener(new ItemListener() {
+
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        Position position = (Position) e.getItem();
+                        if (position == Position.NONE) {
+                            filterHeader.setPosition(position);
+                            mainPanel.add(filterHeader, BorderLayout.SOUTH);
+                        } else {
+                            mainPanel.remove(filterHeader);
+                            filterHeader.setPosition(position);
+                        }
+                        mainPanel.revalidate();
+                    }
+                }
+            });
+
+        actions.visibleCheckBox.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    filterHeader.setVisible(e.getStateChange() == ItemEvent.SELECTED);
+                }
+            });
+
+        actions.enabledCheckBox.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    filterHeader.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+                }
+            });
 
         getContentPane().add(mainPanel);
     }
-    
-    void setTableRenderers() {
+
+    void customizeTable() {
         table.getColumnModel().getColumn(table.convertColumnIndexToView(tableModel.getColumn(TestTableModel.COUNTRY))).setCellRenderer(new FlagRenderer());
         table.getColumnModel().getColumn(table.convertColumnIndexToView(tableModel.getColumn(TestTableModel.AGE))).setCellRenderer(new CenteredRenderer());
-
+        filterHeader.setTableCellRenderer(tableModel.getColumn(TestTableModel.AGE), new CenteredRenderer());
+        filterHeader.setTableCellRenderer(tableModel.getColumn(TestTableModel.COUNTRY), new FlagRenderer());
     }
 
-    void setChoiceRenderers() {
-        ((TableChoiceFilterEditor)filterHeader.getFilterEditor(tableModel.getColumn(TestTableModel.COUNTRY))).setChoiceRenderer(new FlagRenderer());
-        ((TableChoiceFilterEditor)filterHeader.getFilterEditor(tableModel.getColumn(TestTableModel.AGE))).setChoiceRenderer(new CenteredRenderer());
+    static class ButtonsPanel extends JPanel {
+        private static final long serialVersionUID = -4221513653085366887L;
+        JComboBox positionComboBox = new JComboBox(new DefaultComboBoxModel(Position.values()));
+        JCheckBox visibleCheckBox = new JCheckBox("Visible", true);
+        JCheckBox enabledCheckBox = new JCheckBox("Enabled", true);
 
-    }
-    
-    static class ButtonsPanel extends JPanel
-    {
-    	JComboBox positionComboBox = new JComboBox(new DefaultComboBoxModel(Position.values()));
-    	JCheckBox visibleCheckBox = new JCheckBox("Visible", true);
-    	JCheckBox enabledCheckBox = new JCheckBox("Enabled", true);
-    	
-    	public ButtonsPanel() {
-    		super(new GridLayout(3, 1, 0, 8));
-    		setBorder(BorderFactory.createCompoundBorder(
-    				BorderFactory.createEmptyBorder(8, 8, 8, 8), 
-    				BorderFactory.createCompoundBorder(
-    						BorderFactory.createEtchedBorder(),
-    						BorderFactory.createEmptyBorder(8, 24, 8, 24)
-    						)));
-    		add(positionComboBox);
-    		add(visibleCheckBox);
-    		add(enabledCheckBox);
-		}
+        public ButtonsPanel() {
+            super(new GridLayout(3, 1, 0, 8));
+            setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createEmptyBorder(8, 8, 8, 8),
+                    BorderFactory.createCompoundBorder(
+                        BorderFactory.createEtchedBorder(),
+                        BorderFactory.createEmptyBorder(8, 24, 8, 24))));
+            add(positionComboBox);
+            add(visibleCheckBox);
+            add(enabledCheckBox);
+        }
     }
 
-    
-    static class StartDialog extends JDialog{  
-    	
-    	ButtonsPanel actions = new ButtonsPanel();
 
-    	public StartDialog() {
-    		super((JDialog)null, "Bug2_1_0_SetVisible", true);
-    		setContentPane(actions);
-		}
+    static class StartDialog extends JDialog {
+
+        ButtonsPanel actions = new ButtonsPanel();
+
+        public StartDialog() {
+            super((Frame) null, "Bug2_1_0_SetVisible", true);
+            setContentPane(actions);
+        }
     }
-    
-    
-    public final static void main(String[] args) {
 
-    	StartDialog dialog = new StartDialog();
-    	dialog.pack();
-    	dialog.setVisible(true);
 
-        Bug2_1_0_SetVisible frame = new Bug2_1_0_SetVisible(
-        		(Position) dialog.actions.positionComboBox.getSelectedItem(), 
-        		dialog.actions.visibleCheckBox.isSelected(), 
-        		dialog.actions.enabledCheckBox.isSelected());
+    public static final void main(String[] args) {
+
+        StartDialog dialog = new StartDialog();
+        dialog.pack();
+        dialog.setVisible(true);
+
+        Bug2_1_0_SetVisible frame = new Bug2_1_0_SetVisible((Position) dialog.actions.positionComboBox.getSelectedItem(),
+                                                            dialog.actions.visibleCheckBox.isSelected(),
+                                                            dialog.actions.enabledCheckBox.isSelected());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setBounds(100, 100, 600, 450);

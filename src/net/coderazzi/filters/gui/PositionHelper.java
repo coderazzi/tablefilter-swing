@@ -1,3 +1,28 @@
+/**
+ * Author:  Luis M Pena  ( lu@coderazzi.net )
+ * License: MIT License
+ *
+ * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package net.coderazzi.filters.gui;
 
 import java.awt.BorderLayout;
@@ -156,6 +181,29 @@ class PositionHelper implements PropertyChangeListener{
 	        		super.setView(filterHeader);
         		} 
         	}
+		    /**
+		     * Locates the passed component in the header, with the position depending on the current header location
+		     * @param header the table header, added to the current filter header
+		     */
+		    private void placeTableHeader(Component header){
+		    	if (header!=null){
+		    		filterHeader.add(header, location==Position.TOP? BorderLayout.SOUTH : BorderLayout.NORTH);
+		    		filterHeader.revalidate();
+		    	}
+			}
+		    
+		    /**
+		     * Removes the current JTableHeader in the filterHeader, returning it.
+		     * it does nothing if there is no such JTableHeader
+		     */
+		    private Component removeTableHeader(){
+		    	Component tableHeader=getTableHeader();
+		    	if (tableHeader!=null){
+		    		filterHeader.remove(tableHeader);
+		    	}
+		    	return tableHeader;
+			}
+		    
         };
         JViewport currentColumnHeader=scrollPane.getColumnHeader();
         if (currentColumnHeader!=null){
@@ -198,32 +246,9 @@ class PositionHelper implements PropertyChangeListener{
     }
     
     /**
-     * Locates the passed component in the header, with the position depending on the current header location
-     * @param header the table header, added to the current filter header
-     */
-    private void placeTableHeader(Component header){
-    	if (header!=null){
-    		filterHeader.add(header, location==Position.TOP? BorderLayout.SOUTH : BorderLayout.NORTH);
-    		filterHeader.revalidate();
-    	}
-	}
-    
-    /**
-     * Removes the current JTableHeader in the filterHeader, returning it.
-     * it does nothing if there is no such JTableHeader
-     */
-    private Component removeTableHeader(){
-    	Component tableHeader=getTableHeader();
-    	if (tableHeader!=null){
-    		filterHeader.remove(tableHeader);
-    	}
-    	return tableHeader;
-	}
-    
-    /**
      * Returns the JTableHeader in the filterHeader, if any
      */
-    private Component getTableHeader(){
+    Component getTableHeader(){
     	for (Component component : filterHeader.getComponents()){
     		//there should be just one (the header's controller) 
     		//or two components (with the table header)
