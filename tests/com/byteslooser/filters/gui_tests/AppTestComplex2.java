@@ -24,32 +24,13 @@
  */
 package com.byteslooser.filters.gui_tests;
 
-import com.byteslooser.filters.TableFilter;
-import com.byteslooser.filters.gui.ITableFilterEditor;
-import com.byteslooser.filters.gui.ITableFilterTextBasedEditor;
-import com.byteslooser.filters.gui.TableFilterHeader;
-import com.byteslooser.filters.gui.editors.ChoiceFilterEditor;
-import com.byteslooser.filters.gui.editors.TableChoiceFilterEditor;
-import com.byteslooser.filters.gui.editors.TextFilterEditor;
-import com.byteslooser.filters.gui_tests.TestData.ExamInformation;
-import com.byteslooser.filters.gui_tests.resources.Messages;
-import com.byteslooser.filters.parser.FilterTextParsingException;
-import com.byteslooser.filters.parser.IFilterTextParser;
-import com.byteslooser.filters.parser.ITypeBuilder;
-import com.byteslooser.filters.parser.generic.FilterTextParser;
-import com.byteslooser.filters.parser.generic.TableFilterHelper;
-import com.byteslooser.filters.parser.re.REFilterTextParser;
-
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,6 +50,22 @@ import javax.swing.RowFilter;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import com.byteslooser.filters.TableFilter;
+import com.byteslooser.filters.gui.ITableFilterEditor;
+import com.byteslooser.filters.gui.ITableFilterTextBasedEditor;
+import com.byteslooser.filters.gui.TableFilterHeader;
+import com.byteslooser.filters.gui.editors.ChoiceFilterEditor;
+import com.byteslooser.filters.gui.editors.TableChoiceFilterEditor;
+import com.byteslooser.filters.gui.editors.TextFilterEditor;
+import com.byteslooser.filters.gui_tests.TestData.ExamInformation;
+import com.byteslooser.filters.gui_tests.resources.Messages;
+import com.byteslooser.filters.parser.FilterTextParsingException;
+import com.byteslooser.filters.parser.IFilterTextParser;
+import com.byteslooser.filters.parser.ITypeBuilder;
+import com.byteslooser.filters.parser.generic.FilterTextParser;
+import com.byteslooser.filters.parser.generic.TableFilterHelper;
+import com.byteslooser.filters.parser.re.REFilterTextParser;
 
 
 public class AppTestComplex2 extends JFrame implements ListSelectionListener {
@@ -97,7 +94,7 @@ public class AppTestComplex2 extends JFrame implements ListSelectionListener {
 
     public AppTestComplex2() {
         super(Messages.getString("TestAdvanced.Title")); //$NON-NLS-1$
-        tableModel = createModel();
+        tableModel = TestTableModel.createTestTableModel();
         createGui();
         initGui();
         setTableRenderers();
@@ -359,7 +356,7 @@ public class AppTestComplex2 extends JFrame implements ListSelectionListener {
 
         resetModelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    tableModel = createModel();
+                	tableModel = TestTableModel.createTestTableModel();
                     table.setModel(tableModel);
                     setTableRenderers();
                     setChoiceRenderers();
@@ -411,28 +408,16 @@ public class AppTestComplex2 extends JFrame implements ListSelectionListener {
     }
 
 
-    TestTableModel createModel() {
-        TestData.resetRandomness();
-
-        List<TestData> ltd = new ArrayList<TestData>();
-
-        for (int i = 0; i < 2; i++)
-            ltd.add(new TestData());
-
-        return new TestTableModel(ltd);
-    }
-
-
     public final static void main(String[] args) {
 
-        try {
-//                      UIManager.setLookAndFeel(
-//                          UIManager.getCrossPlatformLookAndFeelClassName());
-//                      UIManager.setLookAndFeel(
-//                          UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+//        try {
+//          UIManager.setLookAndFeel(
+//              UIManager.getCrossPlatformLookAndFeelClassName());
+//          UIManager.setLookAndFeel(
+//              UIManager.getSystemLookAndFeelClassName());
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
 
         AppTestComplex2 frame = new AppTestComplex2();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

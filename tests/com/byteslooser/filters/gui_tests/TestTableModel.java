@@ -59,6 +59,34 @@ public class TestTableModel extends AbstractTableModel {
     private static boolean changedModel;
     private List<TestData> data;
     private int[] columnsOrder;
+    
+    
+    public static TestTableModel createTestTableModel()
+    {
+    	return createTestTableModel(1000);	
+    }
+    
+    public static TestTableModel createTestTableModel(int elements)
+    {
+        TestData.resetRandomness();
+
+        List<TestData> ltd = new ArrayList<TestData>();
+
+        for (int i = 0; i < elements; i++)
+            ltd.add(new TestData());
+
+        return new TestTableModel(ltd);
+    	
+    }
+
+
+
+    public static TestTableModel createLargeTestTableModel(int elements)
+    {
+        changedModel=true;
+        return createTestTableModel(elements);    	
+    }
+
 
 
     public TestTableModel(List<TestData> data) {

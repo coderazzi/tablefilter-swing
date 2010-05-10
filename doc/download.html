@@ -4,20 +4,31 @@
 </head>
 <body><div id='content'>
 
-  <p>
   <ul>
     <li><a href='#version'>Version</a></li>
     <li><a href='#download'>Download</a></li>
     <li><a href='#license'>License</a></li>
     <li><a href='#support'>Support</a></li>
   </ul>
-  </p>
 
   <h1><a name='version'>Version</a></h1>
 
-    <p>Current version is 1.2.7, released the 21th July 2008.</p>
+    <p>Current version is 1.3.0, released the 17th February 2008.</p>
     
-    <p>1.2.7 solves a minor bug on 1.2.6: setting the table on a beans editor would result on an exception.</p> 
+    <p>1.3.0 introduces automatic layout management for the filter header. 
+      On previous versions, the user had to place manually the header in the Gui container, 
+      as detailed <a href='header.html#manual'>here</a>, while now is is enough to
+      instantiate the header and set the associated table:
+    </p> 
+    
+    <pre>TableFilterHeader filterHeader = new TableFilterHeader(table);</pre>
+    
+    <p>
+      Version 1.3.0 keeps backwards compatibility: if the 
+      <a href='api/com/byteslooser/filters/gui/TableFilterHeader.html'>TableFilterHeader</a>
+      is explicitely included in some Gui container, the default behaviour to 
+      automatically setup the filter header close by the table header is deactivated.
+    </p>
 
   <h1><a name='download'>Download</a></h1>
 
@@ -27,30 +38,57 @@
       The license is MIT open source, please look below for the complete details.
     </p>
 
-    <p>
     <ul>
-      <li>Java 6 or later
+     <li>Version 1.3.0.
       <ul>
-        <li><a href='download/tablefilter-v1.2.7.jar'>Binary distribution</a>
+       <li>Java 6 or later
+        <ul>
+         <li><a href='download/tablefilter-v1.3.0.jar'>Binary distribution</a>
           (without sources, tests not included)</li>
-        <li><a href='download/tablefilterDbg-v1.2.7.jar'>Binary distribution with sources</a>
+         <li><a href='download/tablefilterDbg-v1.3.0.jar'>Binary distribution with sources</a>
           (useful for debug purposes)</li>
-        <li><a href='download/tablefilter-v1.2.7.zip'>Source distribution</a>
+         <li><a href='download/tablefilter-v1.3.0.zip'>Source distribution</a>
           (with sources, and tests are included)</li>
+        </ul>
+       </li>
+       <li>Java 5
+        <ul>
+         <li><a href='download/tablefilter5-v1.3.0.jar'>Binary distribution</a> 
+          (without sources, tests not included)</li>
+         <li><a href='download/tablefilterDbg5-v1.3.0.jar'>Binary distribution with sources</a>
+          (useful for debug purposes)</li>
+         <li><a href='download/tablefilter5-v1.3.0.zip'>Source distribution</a> 
+          (with sources, and tests are included)</li>
+        </ul>
+       </li>
       </ul>
-      </li>
-      <li>Java 5
+     </li>
+	<p></p>
+     <li>Version 1.2.7 (21th July 2008)
       <ul>
-        <li><a href='download/tablefilter5-v1.2.7.jar'>Binary distribution</a> 
+       <li>Java 6 or later
+        <ul>
+         <li><a href='download/tablefilter-v1.2.7.jar'>Binary distribution</a>
           (without sources, tests not included)</li>
-        <li><a href='download/tablefilterDbg5-v1.2.7.jar'>Binary distribution with sources</a>
+         <li><a href='download/tablefilterDbg-v1.2.7.jar'>Binary distribution with sources</a>
           (useful for debug purposes)</li>
-        <li><a href='download/tablefilter5-v1.2.7.zip'>Source distribution</a> 
+         <li><a href='download/tablefilter-v1.2.7.zip'>Source distribution</a>
           (with sources, and tests are included)</li>
+        </ul>
+       </li>
+       <li>Java 5
+        <ul>
+         <li><a href='download/tablefilter5-v1.2.7.jar'>Binary distribution</a> 
+          (without sources, tests not included)</li>
+         <li><a href='download/tablefilterDbg5-v1.2.7.jar'>Binary distribution with sources</a>
+          (useful for debug purposes)</li>
+         <li><a href='download/tablefilter5-v1.2.7.zip'>Source distribution</a> 
+          (with sources, and tests are included)</li>
+        </ul>
+       </li>
       </ul>
-      </li>
+     </li>
     </ul>
-    </p>
 
   <h1><a name='license'>License</a></h1>
 

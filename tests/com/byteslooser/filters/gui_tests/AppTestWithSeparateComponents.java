@@ -24,6 +24,16 @@
  */
 package com.byteslooser.filters.gui_tests;
 
+import java.awt.BorderLayout;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTable;
+
 import com.byteslooser.filters.AndFilter;
 import com.byteslooser.filters.NotFilter;
 import com.byteslooser.filters.OrFilter;
@@ -34,19 +44,6 @@ import com.byteslooser.filters.gui.editors.TextFilterEditor;
 import com.byteslooser.filters.gui_tests.resources.Messages;
 import com.byteslooser.filters.parser.generic.FilterTextParser;
 import com.byteslooser.filters.parser.generic.TableFilterHelper;
-
-import java.awt.BorderLayout;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
 
 
 public class AppTestWithSeparateComponents extends JFrame {
@@ -66,11 +63,7 @@ public class AppTestWithSeparateComponents extends JFrame {
     }
 
     private void initGui() {
-        List<TestData> ltd = new ArrayList<TestData>();
-        for (int i = 0; i < 100; i++)
-            ltd.add(new TestData());
-
-        tableModel = new TestTableModel(ltd);
+        tableModel = TestTableModel.createTestTableModel(100);
         table.setModel(tableModel);
         tableFilter = new TableFilter();
         tableFilter.setTable(table);

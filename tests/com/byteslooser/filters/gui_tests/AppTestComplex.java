@@ -31,9 +31,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,7 +47,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -96,7 +93,7 @@ public class AppTestComplex extends JFrame implements ListSelectionListener {
 
     public AppTestComplex() {
         super(Messages.getString("TestAdvanced.Title")); //$NON-NLS-1$
-        tableModel = createModel();
+        tableModel = TestTableModel.createTestTableModel();
         createGui();
         initGui();
         setTableRenderers();
@@ -361,7 +358,7 @@ public class AppTestComplex extends JFrame implements ListSelectionListener {
 
         resetModelButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    tableModel = createModel();
+                	tableModel = TestTableModel.createTestTableModel();
                     table.setModel(tableModel);
                     setTableRenderers();
                     setChoiceRenderers();
@@ -413,26 +410,14 @@ public class AppTestComplex extends JFrame implements ListSelectionListener {
     }
 
 
-    TestTableModel createModel() {
-        TestData.resetRandomness();
-
-        List<TestData> ltd = new ArrayList<TestData>();
-
-        for (int i = 0; i < 1000; i++)
-            ltd.add(new TestData());
-
-        return new TestTableModel(ltd);
-    }
-
-
     public final static void main(String[] args) {
 
-        try {
-            //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+//        try {
+//            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
 
         AppTestComplex frame = new AppTestComplex();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

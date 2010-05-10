@@ -25,6 +25,18 @@
 
 package com.byteslooser.filters.gui;
 
+import com.byteslooser.filters.IFilterObservable;
+import com.byteslooser.filters.IFilterObserver;
+import com.byteslooser.filters.TableFilter;
+import com.byteslooser.filters.gui.editors.TableChoiceFilterEditor;
+import com.byteslooser.filters.gui.editors.TextChoiceFilterEditor;
+import com.byteslooser.filters.gui.editors.TextFilterEditor;
+import com.byteslooser.filters.parser.IFilterTextParser;
+import com.byteslooser.filters.parser.IdentifierInfo;
+import com.byteslooser.filters.parser.generic.FilterTextParser;
+import com.byteslooser.filters.parser.generic.TableFilterHelper;
+import com.byteslooser.filters.resources.Messages;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -51,26 +63,16 @@ import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import com.byteslooser.filters.IFilterObservable;
-import com.byteslooser.filters.IFilterObserver;
-import com.byteslooser.filters.TableFilter;
-import com.byteslooser.filters.gui.editors.TableChoiceFilterEditor;
-import com.byteslooser.filters.gui.editors.TextChoiceFilterEditor;
-import com.byteslooser.filters.gui.editors.TextFilterEditor;
-import com.byteslooser.filters.parser.IFilterTextParser;
-import com.byteslooser.filters.parser.IdentifierInfo;
-import com.byteslooser.filters.parser.generic.FilterTextParser;
-import com.byteslooser.filters.parser.generic.TableFilterHelper;
-import com.byteslooser.filters.resources.Messages;
-
 
 /**
  * <p>Implementation of a table filter that displays a set of editors associated to each table's
  * column. This is the main Gui component in this library.</p>
  *
  * <p>These editors are moved and resized as the table's columns are resized, so this Swing
- * component is better suited to be displayed atop the {@link JTable}, or just below, using the same
- * size -and resizing- as the table itself.</p>
+ * component is better suited to be displayed atop or inline the {@link JTable}, or just below, 
+ * using the same size -and resizing- as the table itself. Starting on version 1.3, the 
+ * position can be automatically handled by the header itself, check the {@link Position}
+ * enumeration.</p>
  *
  * <p>Each column can have a different type of editor associated, and there are four predefined
  * editors:
@@ -125,6 +127,22 @@ public class TableFilterHeader extends JPanel {
         NULL, SLIM, BASIC, CHOICE
     }
 
+    /**
+     * <p>Location of the header in relation to the table</p>
+     * <p>Note that this location is only meaningful when the table is set inside a scroll pane,
+     * and this header instance is not explicitely included in a container</p>
+     * <ul>
+     * <li>TOP: the filter is placed automatically above the table header.</li>
+     * <li>INLINE: the filter is placed below the table header, above the table's content.</li>
+     * </ul>
+     *
+     * @author  Luis M Pena - byteslooser@gmail.com
+     * @since 1.3
+     */
+    public enum Position {
+    	TOP, INLINE
+    }
+
     /** Colors for the filters */
     private Color fg, bg, errorFg, errorBg;
 
@@ -149,46 +167,92 @@ public class TableFilterHeader extends JPanel {
     TableFilter filtersHandler = new TableFilter();
 
     /**
+     * The associated locator to handle the location of the filter in the table header
+     */
+    private PositionHelper positionHelper = new PositionHelper(this);
+    
+    /**
      * Revalidate automatically the controller when the table changes size
      */
-    ComponentAdapter resizer = new ComponentAdapter(){
+    private ComponentAdapter resizer = new ComponentAdapter(){
         @Override
         public void componentResized(ComponentEvent e) {
             columnsController.revalidate();
         }  
     };
 
-    
+
     /**
      * Constructor; the object is functional after a table is attached
+     * The default filter is the basic filter, with inline location.
      *
      * @see  TableFilterHeader#setTable(JTable)
      */
     public TableFilterHeader() {
-        this(EditorMode.BASIC);
+        this((JTable)null);
+    }
+
+    /**
+     * Constructor, using the basic filter, with inline location.
+     *
+     * @see  TableFilterHeader#setTable(JTable)
+     * 
+     * @since 1.3
+     */
+    public TableFilterHeader(JTable table) {
+        this(table, EditorMode.BASIC);
     }
 
     /**
      * Constructor; the object is functional after a table is attached
+     * It uses default inline location
      *
-     * @see  TableFilterHeader#setMode(com.byteslooser.filters.gui.TableFilterHeader.EditorMode)
+     * @see  TableFilterHeader#setTable(JTable)
      */
     public TableFilterHeader(EditorMode mode) {
+        this(null, mode);
+    }
+
+    /**
+     * Constructor, using the default inline location
+     *
+     * @see  TableFilterHeader#setMode(com.byteslooser.filters.gui.TableFilterHeader.EditorMode)
+     * @see  TableFilterHeader#setPosition(com.byteslooser.filters.gui.TableFilterHeader.Position)
+     * 
+     * @since 1.3
+     */
+    public TableFilterHeader(JTable table, EditorMode mode) {
+    	this(table, mode, Position.INLINE);
+    }
+
+    /**
+     * Full constructor
+     *
+     * @see  TableFilterHeader#setTable(JTable)
+     * @see  TableFilterHeader#setMode(com.byteslooser.filters.gui.TableFilterHeader.EditorMode)
+     * @see  TableFilterHeader#setPosition(com.byteslooser.filters.gui.TableFilterHeader.Position)
+     * 
+     * @since 1.3
+     */
+    public TableFilterHeader(JTable table, EditorMode mode, Position location) {
         super(new BorderLayout());
 
         Font italicFont = UIManager.getFont("TableHeader.font").deriveFont(Font.ITALIC);
         setFont(italicFont.deriveFont(italicFont.getSize2D() * DEFAULT_FONT_PROPORTION));
         setMode(mode);
+        setPosition(location);
+        setTable(table);
     }
 
     /**
-     * <p>Attachs the table where the filtering will be applied.</p>
+     * <p>Attaches the table where the filtering will be applied.</p>
      *
      * <p>It will be created a row of editors, of the type currently set {@link
      * TableFilterHeader.EditorMode} that follow the size and position of each of the columns in the
      * table.</p>
      */
     public void setTable(JTable table) {
+    	positionHelper.changeTable(this.table, table);
         if (this.table!=null){
             this.table.removeComponentListener(resizer);
         }
@@ -205,7 +269,7 @@ public class TableFilterHeader extends JPanel {
     }
 
     /**
-     * Returns the table currently atached
+     * Returns the table currently attached
      */
     public JTable getTable() {
         return table;
@@ -233,6 +297,23 @@ public class TableFilterHeader extends JPanel {
         filtersHandler = filter;
     }
 
+
+    /**
+     * <p>Defines the behaviour of the header concerning its position related to the table.</p>
+     * @since 1.3
+     */
+    public void setPosition(Position location) {
+        positionHelper.setPosition(location);
+    }
+
+
+    /**
+     * <p>Returns the mode currently associated to the TableHeader</p>
+     * @since 1.3
+     */
+    public Position getPosition() {
+        return positionHelper.getPosition();
+    }
 
     /**
      * <p>Defines the type of the filter editors associated by default to the columns.</p>
@@ -263,13 +344,14 @@ public class TableFilterHeader extends JPanel {
     public void resetMode(EditorMode mode) {
         this.mode = mode;
         filtersHandler.enableNotifications(false);
-        removeController();
+        if (removeController()){
 
-        if (mode == EditorMode.CHOICE) {
-            filtersHandler.sendPendingNotifications();
+        	if (mode == EditorMode.CHOICE) {
+        		filtersHandler.sendPendingNotifications();
+        	}
+
+        	recreateController();
         }
-
-        recreateController();
         filtersHandler.enableNotifications(true);
     }
 
@@ -306,15 +388,27 @@ public class TableFilterHeader extends JPanel {
     }
 
     /**
-     * removes the current columnsController
+     * Method automatically invoked when the class ancestor changes
      */
-    private void removeController() {
+    @Override
+    public void addNotify() {
+    	super.addNotify();
+    	positionHelper.filterHeaderContainmentUpdate();
+    }
+    
+    /**
+     * removes the current columnsController
+     * @return true if there was a controller
+     */
+    private boolean removeController() {
 
         if (columnsController != null) {
             columnsController.detach();
             remove(columnsController);
             columnsController = null;
+            return true;
         }
+        return false;
     }
 
     /**
@@ -830,7 +924,6 @@ public class TableFilterHeader extends JPanel {
             }
         }
 
-
         /**
          * Computes the proper preferred size -only the height, the width is not important-
          */
@@ -990,8 +1083,7 @@ public class TableFilterHeader extends JPanel {
             filtersHandler.enableNotifications(false);
             createColumn(e.getToIndex());
             updateHeight();
-            autoRun += 1;
-            SwingUtilities.invokeLater(this);
+            update();
         }
 
 
@@ -1002,13 +1094,11 @@ public class TableFilterHeader extends JPanel {
 
             //see the comment on columnAdded
             filtersHandler.enableNotifications(false);
-
             FilterColumnPanel fcp = columns.remove(e.getFromIndex());
             fcp.detach();
             updateHeight();
             remove(fcp);
-            autoRun += 1;
-            SwingUtilities.invokeLater(this);
+            update();
         }
 
 
@@ -1016,6 +1106,21 @@ public class TableFilterHeader extends JPanel {
          * TableColumnModelListener interface
          */
         public void columnSelectionChanged(ListSelectionEvent e) {
+        }
+        
+        /**
+         * Updates the columns. If this is the GUI thread, better wait
+         * until all the events have been handled. Otherwise, do it
+         * immediately, as it is not known how the normal/Gui thread
+         * can interact
+         */
+        private void update(){
+            autoRun += 1;
+        	if (SwingUtilities.isEventDispatchThread()){
+        		SwingUtilities.invokeLater(this);
+        	} else {
+        		run();
+        	}
         }
 
 
@@ -1025,7 +1130,7 @@ public class TableFilterHeader extends JPanel {
         public void run() {
 
             //see the comment on columnAdded
-            if (--autoRun == 0)
+            if (--autoRun == 0 && table != null)
                 updateIdentifiers();
             filtersHandler.enableNotifications(true);
         }

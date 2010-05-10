@@ -8,6 +8,7 @@
     <p>
       <ul>
         <li><a href='#basic'>Basic usage</a></li>
+        <li><a href='#manual'>Placing manually the header</a></li>
         <li><a href='#advanced'>Advanced usage</a></li>
       </ul>
     </p>
@@ -23,19 +24,24 @@
     </p>
 
     <p>
-      This header places together a set of filter editors, one per table's 
-      column, and is responsible to resize / move them as the table's columns 
-      change their layout.
+      The header can be automatically be placed inline, like in the previous figure,
+      or just above the table:  
     </p>
 
     <p>
-      It is also possible to place the component just below the table, although 
-      in this case we should probably better speak of a footer; it would look 
-      like:
+      <img src="images/exampleold.png" class="centered">
     </p>
     
     <p>
-      <img src="images/exampledown.png" class="centered">
+    	Obtaining such results is simple, just by coding:
+    </p>
+
+	<pre>TableFilterHeader filterHeader = new TableFilterHeader(table);</pre>
+
+    <p>
+      This header places together a set of filter editors, one per table's 
+      column, and is responsible to resize / move them as the table's columns 
+      change their layout.
     </p>
 
     <p>
@@ -58,37 +64,10 @@
       </p>
 
       <p>
-        Setting up the <span class='mark'>TableFilterHeader</span> requires two 
-        steps: including the GUI component in the global layout of the 
-        application, and attaching it to the associated table.
+        Setting up the <span class='mark'>TableFilterHeader</span> is as simple as:
       </p>
 
-      <p>
-        The header should be located just above or below the table. Placing it 
-        anywhere else misses the point of this component, as the columns will 
-        resize and move automatically as the user modifies the table columns 
-        layout. In this case, it is better to consider using the editors as 
-        <a href='standalone.html'>standalone components</a>.
-      </p>
-
-      <p>
-        An example of code setting up this component is:
-      </p>
-
-<pre>JPane pane=new JPane(new BorderLayout());
-JScrollPane scrollPane = new JScrollPane();
-JTable table = new JTable();
-TableFilterHeader filterHeader = new TableFilterHeader();
-scrollPane.setViewportView(table);
-
-pane.add(scrollPane, BorderLayout.CENTER);
-pane.add(filterHeader, BorderLayout.NORTH);</pre>
-
-      <p>
-        Attaching now the filter header to the table is all that is needed to have a working filter
-      </p> 
-      
-      <pre>filterHeader.setTable(table);</pre>
+	<pre>TableFilterHeader filterHeader = new TableFilterHeader(table);</pre>
 
       <p>
         Writing the previous code will use the default editor; the 
@@ -107,7 +86,7 @@ pane.add(filterHeader, BorderLayout.NORTH);</pre>
       </p>
 
       <p>
-        Setting up a different mode is as simple as writing:
+        Setting up a different mode requires code such as:
       </p> 
       
       <pre>filterHeader.setMode(TableFilterHeader.EditorMode.CHOICE);</pre>
@@ -120,6 +99,70 @@ pane.add(filterHeader, BorderLayout.NORTH);</pre>
         and the configuration possibilies of the 
         <a href='editors.html#ChoiceFilterEditor'>later</a>.
       </p>
+      
+      <p>
+        By default, the location of the filter is inline the table, just below
+        the table header. It can be modified with:
+      </p> 
+      
+      <pre>filterHeader.setPosition(TableFilterHeader.Position.TOP);</pre>
+
+    <h2><a name='#manual'>Placing manually the header</a></h2>
+
+      <p>
+        On versions pre 1.3, the user had to place the header manually in the Gui.
+        This option is still available on later versions: when the user specifically
+        includes the header in some Gui container, the default behaviour to 
+        automatically setup the filter header by the table header is deactivated.
+      </p> 
+      
+      <p>   
+        To setup programatically the <span class='mark'>TableFilterHeader</span> on 
+        the Gui, for example to place it as a footer below the table, two steps are
+        required: including the header in the global layout of the 
+        application, and attaching it to the associated table.
+      </p>
+
+      <p>
+        In this case, the header should be located just above or below the table. 
+        Placing it anywhere else misses the point of this component, as the columns 
+        will resize and move automatically as the user modifies the table columns 
+        layout. In this case, it is better to consider using the editors as 
+        <a href='standalone.html'>standalone components</a>.
+      </p>
+
+      <p>
+        An example of code setting up this component is:
+      </p>
+
+<pre>JPane pane=new JPane(new BorderLayout());
+JScrollPane scrollPane = new JScrollPane();
+JTable table = new JTable();
+TableFilterHeader filterHeader = new TableFilterHeader();
+scrollPane.setViewportView(table);
+
+pane.add(scrollPane, BorderLayout.CENTER);
+pane.add(filterHeader, BorderLayout.SOUTH);</pre>
+
+      <p>
+        Attaching now the filter header to the table is all that is needed to have a working filter
+      </p> 
+      
+      <pre>filterHeader.setTable(table);</pre>
+
+      <p>
+        <img src="images/exampledown.png" class="centered">
+      </p>
+    
+      <p>
+        The image above shows the result of the previous coding. Nevertheless, the layout
+        only makes sense when the table is set to be resized automatically: if the associated
+        <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JScrollPane.html?is-external=true'>JScrollPane</a>
+        can scroll horizontally, the header will not scroll when the previous code is used. 
+      </p>
+       
+      
+
 
       
       

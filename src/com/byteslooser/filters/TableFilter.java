@@ -103,6 +103,12 @@ public class TableFilter extends AndFilter {
      * javax.swing.RowSorter}, the default one is automatically created.
      */
     public void setTable(JTable table) {
+    	if (this.table!=null){
+            RowSorter<?> sorter = getRowSorter();
+            if (sorter instanceof DefaultRowSorter) {
+                ((DefaultRowSorter<?, ?>) sorter).setRowFilter(null);
+            }
+    	}
         this.table = table;
         getRowSorter();
     }
