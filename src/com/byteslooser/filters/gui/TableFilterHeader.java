@@ -192,11 +192,16 @@ public class TableFilterHeader extends JPanel {
         if (this.table!=null){
             this.table.removeComponentListener(resizer);
         }
-        this.table = table;
-        this.table.addComponentListener(resizer);
         filtersHandler.setTable(table);
-        recreateController();
-        columnsController.updateIdentifiers();
+        this.table = table;
+        if (table==null){
+            removeController();
+        }
+        else{
+            this.table.addComponentListener(resizer);
+            recreateController();
+            columnsController.updateIdentifiers();
+        }
     }
 
     /**
