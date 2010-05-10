@@ -84,6 +84,14 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
 
     /** The list of choices presented to the user */
     protected Object[] choices;
+    
+    /** Specific class to know exactly the model in the editor **/
+    protected final static class SpecificDefaultComboBoxModel extends DefaultComboBoxModel{
+		private static final long serialVersionUID = 5696709612977683062L;
+		public SpecificDefaultComboBoxModel(final Object items[]) {
+    		 super(items);
+    	 }    	
+    }
 
     /**
      * <p>The object representing the notion of 'other choices'.</p>
@@ -269,7 +277,7 @@ public class ChoiceFilterEditor extends JComboBox implements ITableFilterEditor 
      * @param  choices       All the values to show in the combo box, in the provided order
      */
     protected void setChoiceModel(Object selected, Object otherChoices, Object[] choices) {
-        DefaultComboBoxModel model = new DefaultComboBoxModel(choices);
+        DefaultComboBoxModel model = new SpecificDefaultComboBoxModel(choices);
         model.insertElementAt(NO_FILTER, 0);
 
         if (otherChoices != null) {

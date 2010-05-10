@@ -25,29 +25,33 @@
 
 package net.coderazzi.filters.gui.editors;
 
-import net.coderazzi.filters.gui.ITableFilterEditor;
-
 import java.awt.Component;
-
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.JTable;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+
+import net.coderazzi.filters.gui.ITableFilterEditor;
 
 
 /**
  * <p>Specialization of the {@link ChoiceFilterEditor} class that extracts the choices from the
  * contents of a table's column</p>
+ * 
+ * <p>Since version 1.5.0, the contents are automatically updated when the table changes</p>
  *
  * @author  Luis M Pena - dr.lu@coderazzi.net
  */
@@ -72,12 +76,38 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
                 return (o2 == null) ? 1 : o1.toString().compareTo(o2.toString());
             }
         };
+        
+    private final TableModelListener tableModelListener = new TableModelListener() {
+		
+		@Override
+		public void tableChanged(TableModelEvent e) {
+			int r = e.getFirstRow();
+			
+			if (r == TableModelEvent.HEADER_ROW){				
+				extractFilterContentsFromModel(getSelectedItem());
+			} else if (maxShow == Integer.MAX_VALUE && e.getType()!=TableModelEvent.DELETE){
+				
+				int c = e.getColumn(); 
+				
+				if (c == TableModelEvent.ALL_COLUMNS || c == filterPosition){
+					
+					int last = e.getLastRow();
+					
+					if (r==0 && last >= table.getRowCount()){
+						extractFilterContentsFromModel(getSelectedItem());
+					} else {
+						extendFilterContentsFromModel(r, last);
+					}
+				}
+			}
+		}
+	};
 
     /** Max number of elements to show as choices */
     private int maxShow = Integer.MAX_VALUE;
 
-    /** The comparator between objects, to know in which order to display them */
-    private Comparator<Object> comparator;
+    /** The elements shown in the filter */
+    private Set<Object> filterOptions;
 
     /** The associated table */
     JTable table;
@@ -122,7 +152,7 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
      */
     @Override public void updateFilter() {
         if (this.table != null) {
-            extractColumnContentsFromModel(getSelectedItem());
+        	extractFilterContentsFromModel(getSelectedItem());
         }
         super.updateFilter();
     }
@@ -139,7 +169,7 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
         if (this.table == null) {
             getModel().setSelectedItem(NO_FILTER);
         } else {
-            extractColumnContentsFromModel(NO_FILTER);
+            extractFilterContentsFromModel(NO_FILTER);
         }
         filter.propagateFilterChange(false);
     }
@@ -171,10 +201,14 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
     }
 
     /**
-     * Sets the comparator to sort elements in the combobox
+     * Sets the comparator to sort elements in the combobox.
+     * If a table is attached to the editor, it must be attached before invoking 
+     * this method.
      */
     public void setComparator(Comparator<Object> comparator) {
-        this.comparator = comparator;
+    	TreeSet<Object> filterOptions = new TreeSet<Object>(comparator);
+    	filterOptions.addAll(this.filterOptions);
+        this.filterOptions = filterOptions;
     }
 
     /**
@@ -187,11 +221,16 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
      */
     public void setTable(JTable table, int modelColumn) {
 
+    	if (this.table!=null){
+    		this.table.getModel().removeTableModelListener(tableModelListener);
+    	}
         this.table = table;
         setFilterPosition(modelColumn);
-        extractColumnContentsFromModel(NO_FILTER);
+        filterOptions = null;
+        extractFilterContentsFromModel(NO_FILTER);
+        this.table.getModel().addTableModelListener(tableModelListener);
     }
-
+    
     /**
      * <p>Sets the default choice mode, that shows each different value in the table's column as a
      * choice</p>
@@ -202,6 +241,7 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
 
     /**
      * <p>Sets the maximum number of choices to display.</p>
+     * <p>Note that, if the table contents change, the filter is not automatically updated.</p>
      *
      * <p>The algorithm used is to display the more frequent choices.</p>
      */
@@ -218,7 +258,7 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
     public void setFixedChoiceMode(Object lessFrequentChoices, int maxShow) {
         this.maxShow = maxShow;
         otherChoices = lessFrequentChoices;
-        extractColumnContentsFromModel(getSelectedItem());
+        extractFilterContentsFromModel(getSelectedItem());
     }
 
     /**
@@ -241,15 +281,24 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
     /**
      * Method to extract the filterPosition contents from the model
      */
-    void extractColumnContentsFromModel(Object selected) {
+    void extractFilterContentsFromModel(Object selected) {
         Map<Object, Integer> columnContents = new HashMap<Object, Integer>();
-        Set<Object> modelContents = new HashSet<Object>();
 
         TableModel model = table.getModel();
 
         if (model != null) {
+        	
+        	if (filterOptions == null){
+        		if ((model.getColumnCount() > filterPosition) &&
+        				Comparable.class.isAssignableFrom(model.getColumnClass(filterPosition))){
+        			filterOptions = new TreeSet<Object>();
+        		}
+        		else {
+        			filterOptions = new TreeSet<Object>(defaultComparator);
+        		}
+        	}
 
-            if (model.getColumnCount() > filterPosition) {
+    		if (model.getColumnCount() > filterPosition) {
                 int row = model.getRowCount();
 
                 while (row-- > 0) {
@@ -266,7 +315,7 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
             }
 
             if (maxShow >= columnContents.size()) {
-                modelContents.addAll(columnContents.keySet());
+                filterOptions.addAll(columnContents.keySet());
             } else {
                 TreeSet<Integer> values = new TreeSet<Integer>(inverseComparator);
                 values.addAll(columnContents.values());
@@ -275,23 +324,56 @@ public class TableChoiceFilterEditor extends ChoiceFilterEditor {
 
                     for (Entry<Object, Integer> e : columnContents.entrySet())
                         if (e.getValue() == value)
-                            modelContents.add(e.getKey());
+                        	filterOptions.add(e.getKey());
 
-                    if (modelContents.size() >= maxShow)
+                    if (filterOptions.size() >= maxShow)
                         break;
                 }
             }
         }
 
-        Object[] content = modelContents.toArray();
-
-        try {
-            Arrays.sort(content, comparator);
-        } catch (Exception ex) {
-            Arrays.sort(content, defaultComparator);
-        }
+        Object[] content = filterOptions.toArray();
 
         setChoiceModel((selected == null) ? NO_FILTER : selected, otherChoices, content);
+    }
+    
+    /**
+     * <p>Adds the contents of the table at the given rows in the filter.</p>
+     * <p>Note that it does not check for the maximum number of elements to show</p>
+     */
+    void extendFilterContentsFromModel(int firstRow, int lastRow){
+    	
+        Set<Object> previousContents = new HashSet<Object>(filterOptions);
+
+        TableModel tableModel = table.getModel();
+
+        while (lastRow >= firstRow) {
+        	filterOptions.add(tableModel.getValueAt(lastRow--, filterPosition));
+        }
+        
+        if (filterOptions.size() > previousContents.size()){
+        
+	        DefaultComboBoxModel model = (DefaultComboBoxModel) getModel();
+	        
+	        int position = 1; //first element should be NO_FILTER
+	        
+	        for (Object c : filterOptions){
+	        	if (!previousContents.contains(c)){
+	        		model.insertElementAt(c, position);
+	        	}
+	        	++position;
+	        }	        
+        }
+    }
+    
+    @Override
+    public void setModel(ComboBoxModel aModel) {
+    	super.setModel(aModel);
+    	//if the user sets a model, no reason to continue listening for events
+    	//note that this happens also if the user provides a list of choices
+    	if (this.table!=null && !(aModel instanceof SpecificDefaultComboBoxModel)){
+    		this.table.getModel().removeTableModelListener(tableModelListener);
+    	}
     }
 
 }

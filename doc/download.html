@@ -18,7 +18,45 @@
       The license is MIT open source, please look below for the complete details.
     </p>
     
-    <p>The three last versions are available for download:</p>
+    <p>The last versions are available for download:</p>
+
+    <h2>Version 1.5.0 ( 7th August 2009 ) </h2>
+      <ul>
+       <li>Download for Java 6 or later
+        <ul>
+         <li><a href='download/tablefilter-v1.5.0.jar'>Binary distribution</a>
+          (without sources, tests not included)</li>
+         <li><a href='download/tablefilterDbg-v1.5.0.jar'>Binary distribution with sources</a>
+          (useful for debug purposes)</li>
+         <li><a href='download/tablefilter-v1.5.0.zip'>Source distribution</a>
+          (with sources, and tests are included)</li>
+        </ul>
+       </li>
+       <li>Download for Java 5
+        <ul>
+         <li><a href='download/tablefilter5-v1.5.0.jar'>Binary distribution</a> 
+          (without sources, tests not included)</li>
+         <li><a href='download/tablefilterDbg5-v1.5.0.jar'>Binary distribution with sources</a>
+          (useful for debug purposes)</li>
+         <li><a href='download/tablefilter5-v1.5.0.zip'>Source distribution</a> 
+          (with sources, and tests are included)</li>
+        </ul>
+       </li>
+       <li>Changes; this release improves on the usage of the 
+       <a href='api/net/coderazzi/filters/gui/editors/TableChoiceFilterHeader'>TableChoiceFilterHeader</a>,
+          that is, the editor filter that offers the user a list of the different options
+          as found in the table model:
+       <ul>
+        <li>The choices are automatically updated when new entries are included in the table.
+        That is, new values are added to the filter's choices; however, old values, that
+        are removed or replaced out of the table model, are not removed from the filter's choices.
+        </li>
+        <li>In addition, the comparator function used to set the order among the choices in
+        the editor, is replaced, to use automatically the comparison method supplied on
+        <a href='http://java.sun.com/javase/6/docs/api/java/lang/Comparable.html'>Comparable classes</a>
+         (if supplied, that is)</li>
+       </ul>
+      </ul>
 
   	<h2>Version 1.4.1 ( 4th July 2009 ) </h2>
       <ul>
@@ -55,25 +93,6 @@
 
   	<h2>Version 1.4.0 ( 10th June 2009 ) </h2>
       <ul>
-       <li>Download for Java 6 or later
-        <ul>
-         <li><a href='download/tablefilter-v1.4.0.jar'>Binary distribution</a>
-          (without sources, tests not included)</li>
-         <li><a href='download/tablefilterDbg-v1.4.0.jar'>Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href='download/tablefilter-v1.4.0.zip'>Source distribution</a>
-          (with sources, and tests are included)</li>
-        </ul>
-       </li>
-       <li>Download for Java 5
-        <ul>
-         <li><a href='download/tablefilter5-v1.4.0.jar'>Binary distribution</a> 
-          (without sources, tests not included)</li>
-         <li><a href='download/tablefilterDbg5-v1.4.0.jar'>Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href='download/tablefilter5-v1.4.0.zip'>Source distribution</a> 
-          (with sources, and tests are included)</li>
-        </ul>
        </li>
        <li>Changes:
        <ul>
@@ -84,26 +103,6 @@
 
   	<h2>Version 1.3.0 ( 17th February 2009 ) </h2>
       <ul>
-       <li>Download for Java 6 or later
-        <ul>
-         <li><a href='download/tablefilter-v1.3.0.jar'>Binary distribution</a>
-          (without sources, tests not included)</li>
-         <li><a href='download/tablefilterDbg-v1.3.0.jar'>Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href='download/tablefilter-v1.3.0.zip'>Source distribution</a>
-          (with sources, and tests are included)</li>
-        </ul>
-       </li>
-       <li>Download for Java 5
-        <ul>
-         <li><a href='download/tablefilter5-v1.3.0.jar'>Binary distribution</a> 
-          (without sources, tests not included)</li>
-         <li><a href='download/tablefilterDbg5-v1.3.0.jar'>Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href='download/tablefilter5-v1.3.0.zip'>Source distribution</a> 
-          (with sources, and tests are included)</li>
-        </ul>
-       </li>
        <li>Changes:
        <ul>
        	<li>Automatic layout management for the filter header.
