@@ -1,73 +1,310 @@
 <html>
 <head>
 <title>TableFilter</title>
+<link rel="stylesheet" type="text/css" href="tablefilter.css">
 </head>
 <body><div id='content'>
   <h1>TableFilter</h1>
-    <p>
-      <img src="images/example.png" class="centered">
-    </p>
     <p>
       <span class="mark">TableFilter</span> is a set of Swing components 
       to support user-driven filtering on tables: 
 	  it is, currently, the more comprehensive table filter for Java (Swing),
 	  offering a filtering of the type found in Microsoft Excel.
-    </p>
-    <p>
-      It can handle complex expressions, or simple selections. You can try it with
-      <a href='download/example6.jar'>this example application</a>.  
-    </p>
-    <p>
-      <img src="images/examplef.png" class="centered">
-    </p>
-    <p>
-      Its is <a href='download.html'>freely available</a>, 
-      under <a href='download.html#license'>MIT license</a>. 
-      It works under <b>Java 5</b> or later. 
+	  It is <a href='download.html'>freely available</a>, under 
+      <a href='download.html#license'>MIT license</a>, working under <b>Java 5</b> or later. 
+      You can try it with <a href='download/example6.jar'>this example application</a>. 
     </p>
 
+    <p><a name='mainfigure'><img src="images/show.png" class="centered"></a></p>
+
     <p>
-    This documentation includes:
-    <ul>
-      <li>
-        Description of the main component, 
-        a <a href='header.html'>header</a> for the 
-        <a href='http://java.sun.com/javase/6/docs/api/javax/swing/JTable.html?is-external=true'>JTable</a>.
-      </li>
-      <li>
-        Information on the supplied <a href='parsers.html'>parsers</a>, 
-        supporting regular expressions or complex compound expressions.
-        Also, <a href='types.html'>support</a> on these parsers for specific types, including dates.
-      </li>
-      <li>
-        Description of the different <a href='editors.html'>filter editors</a>
-        directly available with this library.
-       </li>
-      <li>
-        How to use the filter editors as 
-        <a href='standalone.html'>standalone</a> components.
-      </li>
-      <li>
-        Altering the default <a href='properties.html'>behaviour</a>.
-      </li>
-      <li>
-        Specific information for <a href='java5.html'>Java 5</a> users, as 
-        filtering is a feature available on the JTable only since Java 6.
-      </li>
-      <li>
-        <a href='examples.html'>Examples</a> provided with the source distribution.
-      </li>
-      <li>
-        References to the <a href='javadoc.html'>javadoc</a> documentation.
-      </li>
-      <li>
-        <a href='download.html#version'>Version</a> 
-        and <a href='download.html#license'>license</a> information.
-      </li>
-      <li>
-        <a href='howto.html'>Small HowTo / Frequently asked questions section.</a>
-      </li>      
-    </ul>
+      The filtering capabilities can be provided to a table with just a single line of code: 
     </p>
+
+    <pre>TableFilterHeader filterHeader = new TableFilterHeader(table);</pre>
+
+    <p>
+      Version 3.0 includes a complete new Gui, ensuring full consistency among platforms, and
+       simplifying the development and usage of the library.
+    </p>
+
+
+    <p>
+      <ul>
+        <li><a href='#header'>Filter Header</a></li>
+        <li><a href='#editor'>Filter Editor</a></li>
+        <li><a href='#parser'>Filter expressions</a></li>
+        <li><a href='#types'>Custom types</a></li>
+        <li><a href='#settings'>Settings</a></li>
+        <li><a href='#examples'>Examples</a></li>
+      </ul>
+    </p>
+    
+    
+	<h2><a name='header'>Filter Header</a></h2>
+	
+	<p>
+      <span class='mark'>TableFilterHeader</span> is the main Gui component in 
+      the <span class='mark'>TableFilter</span> library; it has been already shown 
+	  <a href='#mainfigure'>above</a>, and it can be easily tweaked to be placed,
+	  not inline the table but just atop:
+    <p>
+
+    <p><img src="images/top.png" class="centered"></p>
+
+    <p>
+      This is easily achieved using the following constructor:
+    </p>
+
+    <pre>TableFilterHeader filterHeader = new TableFilterHeader(table, Position.TOP);</pre>
+
+    
+    <p>
+      This header places together a set of filter editors, one per table's 
+      column, and is responsible to resize / move them as the table's columns 
+      change their layout. Please note that the colors, fonts, are fully customizable, and will
+      mimic by default the table header. The default look and feel, on Windows Vista, looks like:
+    </p>
+
+    <p><img src="images/vista.png" class="centered"></p>
+    
+    <p>
+      It is also possible to place manually the header, for example as a footer below the table:
+    </p>
+        
+    <p><img src="images/below.png" class="centered"></p>
+    
+    
+    <h2><a name='editor'>Filter Editor</a></h2>
+    
+    <p>
+      Each column in a table with a TableFilterHeader has an associated filter editor, that looks
+      like:
+    </p>
+    
+    <p><img src="images/version3.png" class="centered"></p>
+     
+    <p>
+      In this case, the content is text based, and a pop down menu will show any list of
+      prepopulated options, as well as a historic of the last provided inputs. The editor
+      provides autocompletion, and, if defined as non editable, will restrict the input to one of the
+      available options.
+    </p>
+     
+    <p>
+      It is possible to provide a renderer, as it is done on generic swing tables and lists, 
+      supporting implementations such as:
+    </p>
+
+    <p><img src="images/version3-b.png" class="centered"></p>
+     
+    <p>
+      An editor has the type <a href='api/net/coderazzi/filters/gui/editor/FilterEditor.html'>FilterEditor</a>,
+      and can be obtained from the <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html'>TableFilterHeader</a>
+      as:
+    </p>
+     
+    <pre>FilterEditor editor = filterHeader.getFilterEditor(modelColumn);</pre>
+     
+    <p>
+      Its API includes methods such as:
+    </p>
+	<ul>
+	  <li>
+	    <a href='api/net/coderazzi/filters/gui/editor/FilterEditor.html#setEditable(boolean)'>setEditable</a>:
+	    defines whether the user can enter free text, or choose one of the available, prepopulated, options.        
+	  </li>
+	  <li>
+	    <a href='api/net/coderazzi/filters/gui/editor/FilterEditor.html#setAutoOptions(javax.swing.table.TableModel)'>setAutoOptions</a>:
+	    instructs the editor to extract the options from the table's content. This is a dynamic process, if new
+	    content is added to the table, new options will be presented to the user.        
+	  </li>
+	  <li>
+	    <a href='api/net/coderazzi/filters/gui/editor/FilterEditor.html#setOptions(java.util.Collection)'>setOptions</a>:
+	    defines the set of options that the user can choose. If the editor is defined as non editable,
+	    the user can only choose one of these options.
+	  </li>
+	  <li>
+	    <a href='api/net/coderazzi/filters/gui/editor/FilterEditor.html#setMaxHistory(int)'>setMaxHistory</a>:
+	    if there are options available, the max history defines the number of historic elements to present.
+	    The history can therefore be disabled by setting the max history to 0.
+	  </li>
+	  <li>
+	    <a href='api/net/coderazzi/filters/gui/editor/FilterEditor.html#setListCellRenderer(javax.swing.ListCellRenderer)'>setListCellRenderer</a>:
+	    defines (or unsets) the renderer used to display the filter's content. Setting a renderer has a major
+	    implication: editor becomes non editable.<br>
+	    There is an alternative method to setup the filter's renderer: setting a 
+	    <a href='http://java.sun.com/javase/6/docs/api/javax/swing/table/TableCellRenderer.html?is-external=true'>TableCellRenderer</a>,
+	    using the TableFilterHeader' 
+	    <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setTableCellRenderer(int, javax.swing.table.TableCellRenderer)'>setTableCellRenderer</a> method.
+	  </li>
+	</ul>
+     
+    <p>
+      It is possible to affect the look and feel and the behaviour of all the editors 
+      by using directly the API of the
+      <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html'>filter header</a>. 
+      For example, the following line of code changes the background color:
+    </p>
+     
+    <pre>filterHeader.setBackground(Color.lightGray);</pre> 
+     
+  
+    <h2><a name='parser'>Filter expressions</a></h2>
+     
+    <p>
+      The library is delivered with a single expression parser, which supports
+      a comprehensive set of operators to define simple filtering expressions. Each filter editor
+      can have a separate parser, and it is possible to define new parsers by implementing the
+      <a href='api/net/coderazzi/filters/IFilterTextParser.html'>IFilterTextParser</a> interface.
+    </p>
+
+    <p>		
+      The supported operators include:
+      <ul>
+	      <li>
+		      Comparison operators. The comparison is done on the parsed object, not on the string 
+		      representation, unless no <A HREF="http://java.sun.com/javase/6/docs/api/java/text/Format.html?is-external=true" title="class or interface in java.text"><CODE>Format</CODE></A> or <A HREF="http://java.sun.com/javase/6/docs/api/java/util/Comparator.html?is-external=true" title="class or interface in java.util"><CODE>Comparator</CODE></A> is defined for the given type.
+		      For example, specifying the text &quot;&gt;= 4&quot; implies, for a column with integer types,
+		      that a direct comparison between integers will be performed. These operators are:
+		      <ul>
+			      <li>&gt;=</li>
+			
+			      <li>&gt;</li>
+			      <li>&lt;</li>
+			      <li>&lt;=</li>
+			      <li>&lt;&gt;</li>
+		      </ul>
+	      </li>
+	      <li>
+		      Equal operators. The comparison is done on the parsed object, not on the string 
+		      representation, unless no <A HREF="http://java.sun.com/javase/6/docs/api/java/text/Format.html?is-external=true" title="class or interface in java.text"><CODE>Format</CODE></A> is defined for the given type. The comparison is
+		      performed using the equals method. These operators are:
+		      <ul>
+			      <li>!=: note that, in most cases, it will behave as the operator &lt;&gt;</li>
+			
+			      <li>! : equivalent to !=</li>
+			      <li>&lt;</li>
+			      <li>=</li>
+			      <li>==: equivalent to =</li>
+		      </ul>
+	      </li>
+	      <li>
+		      Basic wildcard operators. These operators work using the string representation of the
+		      types (using, when possible, the defined <A HREF="http://java.sun.com/javase/6/docs/api/java/text/Format.html?is-external=true" title="class or interface in java.text"><CODE>Format</CODE></A> instance). Only two wildcard characters
+		      are defined: * and ?
+		      <ul>	
+			      <li>~: for example ~ *vadis* will filter in all expressions including the substring vadis</li>
+			      <li>!~: negates the previous operator</li>
+		      </ul>
+	      </li>
+	      <li>
+	          Regular expression operator. There is only one such operator: ~~, accepting a java regular
+		      expression.
+	      </li>
+      </ul>		     
+     <p>
+     
+     <p>There are 3 specific methods in the parser that greatly affect its behaviour:</p>
+     
+     <ul>
+        <li>
+        <a href='api/net/coderazzi/filters/IFilterTextParser.html#setIgnoreCase(boolean)'>setIgnoreCase</a>:
+        defines if the filter matching is case sensitive or not. It also affects how the options in the
+        filter editor are located, ignoring case or not.
+        </li>
+        <li>
+        <a href='api/net/coderazzi/filters/IFilterTextParser.html#setDefaultOperator(java.lang.String)'>setDefaultOperator</a>:
+        if the user does not provide specifically an operator, the default operator -which is ~ by default- is used.
+        </li>
+        <li>
+        <a href='api/net/coderazzi/filters/IFilterTextParser.html#setFormat(java.lang.Class, java.text.Format)'>setFormat</a>:
+        this and the <a href='api/net/coderazzi/filters/IFilterTextParser.html#setComparator(java.lang.Class, java.util.Comparator)'>setComparator</a>
+        method are normally required to use custom types, as detailed <a href='#types'>below</a>.
+        </li>
+     </ul> 
+
+
+     <h2><a name='types'>Custom types</a></h2>
+     
+     <p>
+       The type associated to each table's column is defined by its table model. Primitive types
+       are directly supported, but the user must provide specific 
+       <a href='http://java.sun.com/javase/6/docs/api/java/text/Format.html?is-external=true'>format</a>
+       instances to define how to parse or format other objects.
+     </p>
+     
+     <p>
+       If the user fails to define the format for any non primitive, the library will use the default
+       string representation. If the table includes some renderer to format an object, the default
+       string representation will normally be not enough, and the filtering will look wrong. In addition,
+       all the filtering operations will be string based, which can affect to the performance and, worse, to the
+       operation logic.
+     </p>
+     
+     <p>
+       For example, a date can be renderer as <span class='mark'>DD/MM/YYYY</span>; if this format
+       is not provided, an expression such as <span class='mark'> &gt; 01/02/2020</span> can give
+       faux positives for dates like <span class='mark'>11/12/2019</span>.
+     </p>
+     
+     <p>
+       Dates are, in fact, the only non primitive type directly supported by the library, although
+       the user should still provide the right used format. The default format is predefined in
+       <a href='api/net/coderazzi/filters/gui/FilterSettings.html#dateFormat'>FilterSettings.dateFormat</a>,
+       or can be specified on each parser separately, using the 
+       <a href='api/net/coderazzi/filters/IFilterTextParser.html#setFormat(java.lang.Class, java.text.Format)'>setFormat</a> method.
+     </p>
+
+
+
+     <h2><a name='settings'>Settings</a></h2>
+     
+     <p>
+       The <a href='api/net/coderazzi/filters/gui/FilterSettings.html'>FilterSettings</a> singleton
+       collects all default settings that will be used when new FilterHeaders are created. As in previous
+       versions, it is also possible defining theses settings using system properties; it includes: 
+     </p>
+     
+     <ul>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#autoOptions'>autoOptions</a>,
+	     false by default, defines whether the editors should automatically extract the options from
+	     the associated table models.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#autoSelection'>autoSelection</a>,
+	     true by default, defines whether the filter will automatically select a row when that row is
+	     the only one remaining in the table after a filter operation.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#dateFormat'>dateFormat</a>,
+	     used by the parser, as detailed <a href='#types'>above</a></li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#defaultOperator'>defaultOperator</a>,
+	     used by the parser, as detailed <a href='#parser'>above</a></li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#headerPosition'>headerPosition</a>,
+	     whether to locate the filter header just above or below the table's header, or wheter the
+	     placement will be done manually by the programmer.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#ignoreCase'>ignoreCase</a></li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#maxPopupHistory'>maxPopupHistory</a>,
+	     used by all the filter editors.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#maxVisiblePopupRows '>maxVisiblePopupRows </a>,
+	     used to limit the size of the popup menus in the filter editors.</li>
+     </ul>
+
+
+	<h2><a name='examples'>Examples</a></h2>
+	
+	<p>
+	  The source distribution includes a test program -whose screenshots are used in this document-.
+	  The program makes use of most of the features built in the library, so its code can be used
+	  to study how to use the library. It is also useful to check the effect of the settings on the
+	  filters.
+	</p>
+	
+	<p>
+	  The example is located in the package <span class='mark'>net.coderazzi.filters.examples</span>,
+	  under the examples folder.
+	</p>
+	
+	<p>
+	  It can be also directly tested using this <a href='download/example6.jar'>link</a>.
+	</p>  
+	 
 </div></body>
 </html>

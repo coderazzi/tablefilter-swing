@@ -1,11 +1,13 @@
 <html>
 <head>
 <title>TableFilter - license and download</title>
+<link rel="stylesheet" type="text/css" href="tablefilter.css">
 </head>
 <body><div id='content'>
   <ul>
     <li><a href="#download">Download</a></li>
     <li><a href="#license">License</a></li>
+    <li><a href="#history">History</a></li>
     <li><a href="#support">Support</a></li>
   </ul>
 
@@ -17,171 +19,316 @@
       The license is MIT open source, please look below for the complete details.
     </p>
        
-    <p>The last versions are available for download:</p>
+    <p>The last versions are available for download; please note that version 3.0 is a major
+    rewriting of the library and breaks compatibility with previous versions.</p>
+    
+    <table>
+    	<tr>
+			<th></th>
+			<th></th>
+			<th colspan='3'>Java 6</th>
+			<th colspan='3'>Java 5</th>
+		</tr>			
+    	<tr>
+			<th>Version</th>
+			<th>Date</th>
+			<th>Binary</th>
+			<th>Binary + Sources</th>
+			<th>Source (inc. tests)</th>
+			<th>Binary</th>
+			<th>Binary + Sources</th>
+			<th>Source (inc. tests)</th>
+		</tr>			
+    	<tr>
+			<td>3.0.0</td>
+			<td>28th April 2010</td>
+			<td><a href="download/tablefilter-v3.0.0.jar">tablefilter-v3.0.0.jar</a></td>
+			<td><a href="download/tablefilterDbg-v3.0.0.jar">tablefilterDbg-v3.0.0.jar</a></td>
+			<td><a href="download/tablefilter-v3.0.0.zip">tablefilter-v3.0.0.zip</a></td>
+			<td><a href="download/tablefilter5-v3.0.0.jar">tablefilter5-v3.0.0.jar</a></td>
+			<td><a href="download/tablefilterDbg5-v3.0.0.jar">tablefilterDbg5-v3.0.0.jar</a></td>
+			<td><a href="download/tablefilter5-v3.0.0.zip">tablefilter5-v3.0.0.zip</a></td>
+		</tr>			
+    	<tr>
+			<td>2.2.0</td>
+			<td>12th April 2010</td>
+			<td><a href="download/tablefilter-v2.2.0.jar">tablefilter-v2.2.0.jar</a></td>
+			<td><a href="download/tablefilterDbg-v2.2.0.jar">tablefilterDbg-v2.2.0.jar</a></td>
+			<td><a href="download/tablefilter-v2.2.0.zip">tablefilter-v2.2.0.zip</a></td>
+			<td><a href="download/tablefilter5-v2.2.0.jar">tablefilter5-v2.2.0.jar</a></td>
+			<td><a href="download/tablefilterDbg5-v2.2.0.jar">tablefilterDbg5-v2.2.0.jar</a></td>
+			<td><a href="download/tablefilter5-v2.2.0.zip">tablefilter5-v2.2.0.zip</a></td>
+		</tr>			
+    	<tr>
+			<td>2.1.2</td>
+			<td>26th january 2010</td>
+			<td><a href="download/tablefilter-v2.1.2.jar">tablefilter-v2.1.2.jar</a></td>
+			<td><a href="download/tablefilterDbg-v2.1.2.jar">tablefilterDbg-v2.1.2.jar</a></td>
+			<td><a href="download/tablefilter-v2.1.2.zip">tablefilter-v2.1.2.zip</a></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>			
+    </table>
 
-    <h2>Version 2.2.0 ( 12th April 2010 ) </h2>
+  <h2><a name="license">License</a></h2>
+
+    <p>
+      <span class="mark">TableFilter</span> is available under the 
+      <a href="http://www.opensource.org/licenses/mit-license.php">MIT</a> 
+      license.
+    </p>
+
+    <pre>Copyright (c) 2007 Luis M. Pena  - lu@coderazzi.net
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</pre>
+
+     <p>
+       The source distribution contains, in addition to the 
+      library's source code, some tests. These tests make usage of
+      a general icon library (FamFamFam), and, in case of the Java 1.5 
+      version, of a open source class called TableSorter.java, which 
+      retains the original copyright.
+    </p>
+    
+    <p>
+      As of version 1.2.0, there are also icons in the library, to facilitate
+      its usage under Gui editors. These icons come from the 
+      <a href="http://www.famfamfam.com/lab/icons/silk/">FamFamFam</a> silk icon library, 
+      licensed under a
+      <a href="http://creativecommons.org/licenses/by/2.5/">Creative Commons Attribution 2.5 License</a>.
+    </p>
+
+  <h2><a name="history">History</a></h2>
+    <h3>Version 3.0.0 ( 28th April 2010 ) </h3>
+    	<ul>
+    		<li>
+    			Version 3.0 is a major rewriting of the library. It is mostly focused to the Gui, 
+    			but it affects to many internal aspects. In general, it should be much simpler 
+    			using the library, for the programmer and for the user. The major changes are 
+    			listed below.
+    		</li>
+    		<li>
+    			<span class='mark'>Look and feel</span><br>
+    			Previous versions of TableFilter could look -depending on the platform and look and feel-, like:
+    			
+    			<img src="images/old-a.png" class="centered">
+    			
+    			The inconsistencies would appear when the user mixed different types of editors 
+    			on the same header. The most usual headers were implemented using combo boxes, 
+    			which could be editable or not. As far as the platform would show both kind of 
+    			editors in a similar way, the appearance was fine. 
+    			In Windows XP, for example, both look almost the same, although the background 
+    			is different; but on Os X, it would look as bad as:
+    			
+    			<img src="images/old-b.png" class="centered">
+    			
+    			Even if the user didn't mix editor types, the editable combo box looks here 
+    			pretty bad (is the age and male columns in the figure).
+    			<br>The new version solves these inconsistencies by implementing its own 
+    			editor component, looking as:
+    			
+    			<img src="images/version3.png" class="centered">
+    			
+    			Where there were before 4 types of editors -plus any custom creation by 
+    			the user-, there is now only one, covering the whole functionality provided 
+    			before by the 4 types:
+    			<ul>
+				  <li>Each editor has its own history, which can be disabled.</li>
+				  <li>In addition to historic items, it is possible to specify options for each editor, or even
+				      obtaining these options automatically from the table's content.</li>
+				  <li>The editor's content can be edited, and autocompletion is built-in.</li>
+				  <li>An editor can be defined as non editable. In this case, the input can only match one of
+				      the existing options.</li>
+				  <li>The editor's content can use custom renderers, like in the following figure.</li>
+			   </ul>
+			   
+			   <img src="images/version3-b.png" class="centered">
+  
+			  There is no need anymore of casting editor types to use the functionality associated to
+			  each type of editor. There is a disadvantage: users cannot define anymore their own editor
+			  components. 
+    		</li>
+    		<li>
+    			<span class='mark'>Custom types</span><br>
+    			
+    			Previous versions required the usage of the interface 
+				  <span class='mark'>net.coderazzi.filters.parser.ITypeBuilder</span>
+				  to handle non primitive types, including Dates. Its only method, 
+				  <span class='mark'>parse</span>, would produce an Object
+				  from a String, very much as the standard <span class='mark'>java.text.Format</span> class does.
+				  While writing the new version, I uncovered some errors on the initial implementation,
+				  realizing that the filtering requires, not only parsing provided text, but also to format
+				  objects into Strings.
+  
+			  <br>What this means is that the <span class='mark'>net.coderazzi.filters.parser.ITypeBuilder</span>
+			  type is now gone, replaced by usage of <span class='mark'>java.text.Format</span> instances.
+    		</li>
+    		<li>
+    			<span class='mark'>Filter parser</span><br>
+			
+			  The original version of TableFilter allowed the definition of complex expressions. For 
+			  example, for a table having a column called age and other called name, the user could enter
+			  an expression such as:
+			  
+			   <pre>age &gt; 25 & age &lt; 30 & name ~ Fred*</pre>
+			   
+			   This is very convenient, even if it could be misleading: the previous expression could be
+			   entered on any column, not just on the age or name columns. But the main problem is that the
+			   parser was not very configurable, defined quite exotic operators, 
+			   and included some obvious errors -using of spaces, for example,
+			   would normally lead to problems-.
+			   
+			   <br>In version 3.0, the distributed parser only allows basic filtering expressions, without 
+			   variable names. The original parser could still work -the interface is mostly the same-, but
+			   I have preferred to discontinue it. If it were still needed, I will favor implementing a
+			   correct parser instead.
+			   
+			   <br>And, of course, the user can still use its own parser, as the interface has only slightly
+			   changed.
+       		</li>
+    	</ul>
+    <h3>Version 2.2.0 ( 12th April 2010 ) </h3>
       <ul>
-       <li>Download for Java 6 or later
-        <ul>
-         <li><a href="download/tablefilter-v2.2.0.jar">Binary distribution</a>
-          (without sources, tests not included)</li>
-         <li><a href="download/tablefilterDbg-v2.2.0.jar">Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href="download/tablefilter-v2.2.0.zip">Source distribution</a>
-          (with sources, and tests are included)</li>
-        </ul>
-       </li>
-       <li>Download for Java 5
-        <ul>
-         <li><a href="download/tablefilter5-v2.2.0.jar">Binary distribution</a> 
-          (without sources, tests not included)</li>
-         <li><a href="download/tablefilterDbg5-v2.2.0.jar">Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href="download/tablefilter5-v2.2.0.zip">Source distribution</a> 
-          (with sources, and tests are included)</li>
-        </ul>
-       </li>
-       <li>This version reintroduces compatibility with Java 5, temporarily excluded on version 2.1, 
-       although not all features are available in the old Java version; more specifically, autoselection
-       will not be supported under Java 5. In addition, many tests for the Java 5 version have been 
-       rewritten, as they contained important bugs<br>
-       Concerning Java 6, this release solves a minor bug, as not all resources would be released
-       when a new table model was applied to a table filter.<br>               
-       </li>
+       <li>
+	       This version reintroduces compatibility with Java 5, temporarily excluded on version 2.1, 
+	       although not all features are available in the old Java version; more specifically, autoselection
+	       will not be supported under Java 5. In addition, many tests for the Java 5 version have been 
+	       rewritten, as they contained important bugs
+	   </li>
+       <li>
+	       Concerning Java 6, this release solves a minor bug, as not all resources would be released
+	       when a new table model was applied to a table filter.               
+	   </li>
       </ul>
 
-    <h2>Version 2.1.2 ( 26th January 2010 ) </h2>
-      <ul>
-         <li><a href="download/tablefilter-v2.1.2.jar">Binary distribution</a>
-          (without sources, tests not included)</li>
-         <li><a href="download/tablefilterDbg-v2.1.2.jar">Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href="download/tablefilter-v2.1.2.zip">Source distribution</a>
-          (with sources, and tests are included)</li>
-        </ul>
-       </li>
-       <ol>
-       <li>Added a new singleton instance to facilitate updating the default settings
-       of the library (what can be achieved, anyway, using system properties).
+    <h3>Version 2.1.2 ( 26th January 2010 ) </h3>
+       <ul>
+       <li>
+	       Added a new singleton instance to facilitate updating the default settings
+	       of the library (what can be achieved, anyway, using system properties).
        </li>
        
-       <li>Added an autoselection mode, enabled by default. If the current filtering
-       filters out all rows in the table but one, that row become automatically selected.
-       Likewise, selected rows are automatically de-selected when they are filtered out
-       (this is the usual operation mode in the Java 6 table sorter)</li>
+       <li>
+	       Added an autoselection mode, enabled by default. If the current filtering
+	       filters out all rows in the table but one, that row become automatically selected.
+	       Likewise, selected rows are automatically de-selected when they are filtered out
+	       (this is the usual operation mode in the Java 6 table sorter)
+       </li>
        
-       <li>Modified the default behaviour of the filters, to use wildcard expressions when
-       the user does not specify any operator.</li>
+       <li>
+	       Modified the default behaviour of the filters, to use wildcard expressions when
+	       the user does not specify any operator.
+       </li>
        
-       <li>All the filter editor constructors where the filter position (table's column)
-       was specified, are now deprecated.</li>
+       <li>
+	       All the filter editor constructors where the filter position (table's column)
+	       was specified, are now deprecated.
+       </li>
        
-       <li>Solved bugs related to setting the header visible or hidden, and enabled or 
-       disabled</li>
+       <li>
+	       Solved bugs related to setting the header visible or hidden, and enabled or disabled
+       </li>
       
-       <li>Added new Position type NONE, to ensure that the header is not automatically
-       placed -if that is so required-.</li>
-     </ol>
+       <li>
+	       Added new Position type NONE, to ensure that the header is not automatically
+	       placed -if that is so required-.
+       </li>
+     </ul>
       
 
-    <h2>Version 2.0.1 ( 13th November 2009 ) </h2>
-      <ul>
-       <li>Download for Java 6 or later
-        <ul>
-         <li><a href="download/tablefilter-v2.0.1.jar">Binary distribution</a>
-          (without sources, tests not included)</li>
-         <li><a href="download/tablefilterDbg-v2.0.1.jar">Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href="download/tablefilter-v2.0.1.zip">Source distribution</a>
-          (with sources, and tests are included)</li>
-        </ul>
+    <h3>Version 2.0.1 ( 13th November 2009 ) </h3>
+     <ul>
+       <li>
+	       This version is limited to defining properly the properties that
+	       define the default behaviour. Although already partially included in
+	       version 2.0.0, the inclusion was not complete and buggy in the case of
+	       some of these properties.<br>
+	       The full list of system properties that can be defined to override
+	       the default TableFilter behavior is listed <a href='properties.html'>here</a>.
        </li>
-       <li>Download for Java 5
-        <ul>
-         <li><a href="download/tablefilter5-v2.0.1.jar">Binary distribution</a> 
-          (without sources, tests not included)</li>
-         <li><a href="download/tablefilterDbg5-v2.0.1.jar">Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href="download/tablefilter5-v2.0.1.zip">Source distribution</a> 
-          (with sources, and tests are included)</li>
-        </ul>
+       <li>
+	       A new <a href='examples.html#AppTestProperties'>example</a> is provided to test the extended behaviour.
        </li>
-       <li>This version is limited to defining properly the properties that
-       define the default behaviour. Although already partially included in
-       version 2.0.0, the inclusion was not complete and buggy in the case of
-       some of these properties.<br>
-       The full list of system properties that can be defined to override
-       the default TableFilter behavior is listed <a href='properties.html'>here</a>.
-       <br>
-       A new <a href='examples.html#AppTestProperties'>example</a> is provided to test the extended behaviour.
-       </li>
-      </ul>
+     </ul>
 
-    <h2>Version 2.0.0 ( 1st September 2009 ) </h2>
+    <h3>Version 2.0.0 ( 1st September 2009 ) </h3>
       <ul>
-       <li>Download for Java 6 or later
-        <ul>
-         <li><a href="download/tablefilter-v2.0.0.jar">Binary distribution</a>
-          (without sources, tests not included)</li>
-         <li><a href="download/tablefilterDbg-v2.0.0.jar">Binary distribution with sources</a>
-          (useful for debug purposes)</li>
-         <li><a href="download/tablefilter-v2.0.0.zip">Source distribution</a>
-          (with sources, and tests are included)</li>
-        </ul>
-       </li>
-       <li>Download for Java 5
-        <ul>
-         <li><a href="download/tablefilter5-v2.0.0.jar">Binary distribution</a> 
-          (without sources, tests not included)</li>
-         <li><a href="download/tablefilter5-v2.0.0.zip">Source distribution</a> 
-          (with sources, and tests are included)</li>
-        </ul>
-       </li>
-       <li>This version extends some public interfaces, adding functionality. However,
+       <li>
+       This version extends some public interfaces, adding functionality. However,
        it means that users that implemented their own table filter editors or text parsers 
        must now implement
        the new interfaces, so the compatibility is broken. Most users uniquely use the existing
        table filter editors and parsers, and will not face any compatibiliy issues:
-       <ul>
-
-        <li>Changed interface on 
-        <a href="api/net/coderazzi/filters/gui/ITableFilterEditor.html">ITableFilterEditor</a>
-        <ul>
-            <li>It is possible to retrieve the applied filter on any table's column</li>
-            <li>It is also possible to set dynamically the filter on any column</li>
-            <li>Its is supported, through the use of the new 
-            <a href="api/net/coderazzi/filters/gui/ITableFilterEditorObserver.html">ITableFilterEditorObserver</a>
-            interface, to be notified of changes on the filter's editor.</li>
-        </ul>
-        </li>
-        <li>Changed interface on 
-        <a href="api/net/coderazzi/filters/parser/IFilterTextParser.html">IFilterTextParser</a>,
-        including two methods already defined in the generic implementation in 
-        <a href="api/net/coderazzi/filters/parser/generic/FilterTextParser.html">FilterTextParser</a>:
-        <ul>
-            <li>Define a type builder for specific user types.</li>
-            <li>Define a comparator for any type.</li>
-        </ul>
-        </li>
-        <li>Added interface on 
-        <a href="api/net/coderazzi/filters/gui/ITableFilterHeaderObserver.html">ITableFilterHeaderObserver</a>,
-        to observe events on the <a href="api/net/coderazzi/filters/gui/TableFilterHeader.html">TableFilterHeader</a>.
-        </li>
-        <li>Dates are now <a href='types.html#dates'>automatically handled</a> in the library.</li>
-        <li>The user can provide properties that override some default behaviours. These properties
-        have been later redefined in 2.0.1.
-        </li>
-        <li>Bug solved: usage of renderers on 
-        <a href="api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html">TableChoiceFilterEditor</a> 
-        would likely drive to AWT exceptions.</li>
-        <li>Bug solved: changing the table or the model, using the 
-        <a href="api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html">TableChoiceFilterEditor</a>
-        on a column with boolean or enumeration types, would hide all the elements, as if they would not
-        validate the filter -even if empty-
-        </li>
-        <li><a href="api/net/coderazzi/filters/UserFilter.html">UserFilter</a>s are automatically enabled</li>
-        <li>Extended examples to show how to listen for events on the table editors</li>
+       <ul>	
+	        <li>
+		        Changed interface on 
+		        <a href="api/net/coderazzi/filters/gui/ITableFilterEditor.html">ITableFilterEditor</a>
+		        <ul>
+		            <li>It is possible to retrieve the applied filter on any table's column</li>
+		            <li>It is also possible to set dynamically the filter on any column</li>
+		            <li>Its is supported, through the use of the new 
+		            <a href="api/net/coderazzi/filters/gui/ITableFilterEditorObserver.html">ITableFilterEditorObserver</a>
+		            interface, to be notified of changes on the filter's editor.</li>
+		        </ul>
+	        </li>
+	        <li>
+		        Changed interface on 
+		        <a href="api/net/coderazzi/filters/parser/IFilterTextParser.html">IFilterTextParser</a>,
+		        including two methods already defined in the generic implementation in 
+		        <a href="api/net/coderazzi/filters/parser/generic/FilterTextParser.html">FilterTextParser</a>:
+		        <ul>
+		            <li>Define a type builder for specific user types.</li>
+		            <li>Define a comparator for any type.</li>
+		        </ul>
+	        </li>
+	        <li>
+		        Added interface on 
+		        <a href="api/net/coderazzi/filters/gui/ITableFilterHeaderObserver.html">ITableFilterHeaderObserver</a>,
+		        to observe events on the <a href="api/net/coderazzi/filters/gui/TableFilterHeader.html">TableFilterHeader</a>.
+	        </li>
+	        <li>
+	        	Dates are now <a href='types.html#dates'>automatically handled</a> in the library.
+	    	</li>
+	        <li>
+		        The user can provide properties that override some default behaviours. These properties
+		        have been later redefined in 2.0.1.
+	        </li>
+	        <li>
+		        Bug solved: usage of renderers on 
+		        <a href="api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html">TableChoiceFilterEditor</a> 
+		        would likely drive to AWT exceptions.
+	        </li>
+	        <li>
+		        Bug solved: changing the table or the model, using the 
+		        <a href="api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html">TableChoiceFilterEditor</a>
+		        on a column with boolean or enumeration types, would hide all the elements, as if they would not
+		        validate the filter -even if empty-
+	        </li>
+	        <li>
+	        	<a href="api/net/coderazzi/filters/UserFilter.html">UserFilter</a>s are automatically enabled
+	    	</li>
+	        <li>
+		        Extended examples to show how to listen for events on the table editors
+	        </li>
        </ul>
+       </li>
       </ul>
 
     <h3>Version 1.5.0 ( 7th August 2009 ) </h3>
@@ -246,51 +393,7 @@
       </li></ul>
 
     
-  <h1><a name="license">License</a></h1>
-
-    <p>
-      <span class="mark">TableFilter</span> is available under the 
-      <a href="http://www.opensource.org/licenses/mit-license.php">MIT</a> 
-      license.
-    </p>
-
-    <pre>Copyright (c) 2007 Luis M. Pena  - lu@coderazzi.net
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.</pre>
-
-     <p>
-       The source distribution contains, in addition to the 
-      library's source code, some tests. These tests make usage of
-      a general icon library (FamFamFam), and, in case of the Java 1.5 
-      version, of a open source class called TableSorter.java, which 
-      retains the original copyright.
-    </p>
-    
-    <p>
-      As of version 1.2.0, there are also icons in the library, to facilitate
-      its usage under Gui editors. These icons come from the 
-      <a href="http://www.famfamfam.com/lab/icons/silk/">FamFamFam</a> silk icon library, 
-      licensed under a
-      <a href="http://creativecommons.org/licenses/by/2.5/">Creative Commons Attribution 2.5 License</a>.
-    </p>
-
-  <h1><a name="support">Support</a></h1>
+  <h2><a name="support">Support</a></h2>
 
     <p>
       Would you require commercial support on this library, or specific 

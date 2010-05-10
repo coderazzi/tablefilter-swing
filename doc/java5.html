@@ -1,6 +1,7 @@
 <html>
 <head>
 <title>TableFilter - Java 5 support</title>
+<link rel="stylesheet" type="text/css" href="tablefilter.css">
 </head>
 <body><div id='content'>
 
@@ -38,16 +39,6 @@
       itself does obviously not require it.
     </p>
     
-   <p>
-      Starting with version 1.2.6, the TableSorter included in the tests package has
-      been modified: the original implementation re-sorts the whole table when there are
-      changes on any cell. However, that is not the default behaviour under Java 6; 
-      updating the value of one or more cells -in sequence- in the table does not
-      imply invoking again the sorting or filtering mechanisms. This behaviour is quite 
-      consistent: otherwise, updating a row could imply moving that row -to other position 
-      or outside the view, if is filtered out-.
-    </p>
-
     <p>
       Although this library exports the same interface to Java 5 and 6 users, 
       the internal implementation is quite different; in Java 6, there is one 
@@ -58,7 +49,7 @@
         <li>A model providing the filtering capabilities.</li>
       </ul>
     </p>
-
+    
     <p>
       This library is distributed with an implementation of the second model, 
       described below, and it can be setup automatically; note, however, that 
@@ -71,6 +62,18 @@
       to enquiry for translations between both views, but in version 5, users 
       must extract the model and perform these queries against the model.
     </p>
+    
+    <p>
+      In practical terms, this means that the user must perform multiple model conversions;
+      for example, the provided <a href='index.html#examples'>example</a> includes the following
+      code to obtain the selected row element:      
+    </p>
+    
+    <pre>int selected = table.getSelectedRow();
+if (selected != -1) {
+  int model = ((TableModelFilter) table.getModel()).convertRowIndexToModel(selected);
+  Object selection = tableModel.getRow(tableSorter.modelIndex(model));
+}</pre>
     
     
     
