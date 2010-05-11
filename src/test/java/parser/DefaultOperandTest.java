@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.text.ParseException;
 
 
-public class DefaultOperand extends DefaultTestCase {
+public class DefaultOperandTest extends AbstractTestCase {
 
 
     @Test

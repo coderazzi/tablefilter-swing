@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 import net.coderazzi.filters.parser.FilterTextParser;
 
 
-public abstract class DefaultTestCase extends TestCase {
+public abstract class AbstractTestCase extends TestCase {
 
     static class TableModel extends AbstractTableModel {
         private static final long serialVersionUID = 8203189653936226308L;

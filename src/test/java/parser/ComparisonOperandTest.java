@@ -8,7 +8,7 @@ import net.coderazzi.filters.parser.FilterTextParser;
 import org.junit.Test;
 
 
-public class ComparisonOperand extends DefaultTestCase {
+public class ComparisonOperandTest extends AbstractTestCase {
 
 
     @Test

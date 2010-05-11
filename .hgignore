@@ -1,0 +1,9 @@
+
+syntax: regexp
+^bin$
+syntax: regexp
+^target$
+syntax: regexp
+^release\.properties$
+syntax: regexp
+^pom\.xml\.releaseBackup$

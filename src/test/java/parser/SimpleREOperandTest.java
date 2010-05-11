@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.text.ParseException;
 
 
-public class SimpleREOperand extends DefaultTestCase {
+public class SimpleREOperandTest extends AbstractTestCase {
 
     @Test
     public void testBasic1() throws ParseException {

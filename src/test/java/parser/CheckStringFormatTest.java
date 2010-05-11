@@ -10,7 +10,7 @@ import net.coderazzi.filters.parser.FilterTextParser;
 import org.junit.Test;
 
 
-public class CheckStringFormat extends DefaultTestCase {
+public class CheckStringFormatTest extends AbstractTestCase {
 
     static class StrangeInteger implements Comparable<StrangeInteger> {
         Integer i;
