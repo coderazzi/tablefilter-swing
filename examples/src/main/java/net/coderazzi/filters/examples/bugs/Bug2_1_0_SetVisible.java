@@ -48,9 +48,10 @@ import net.coderazzi.filters.gui.TableFilterHeader.Position;
 
 
 /**
- * Previously to release 2.1.1, setting the header as non visible, would normally hide as well the
- * header of the table (if autoplace was in order). Disabling it would also disable the header of
- * the table (this had not so much impact, but it was not properly done, anyway).
+ * Previously to release 2.1.1, setting the header as non visible, 
+ * would normally hide as well the header of the table 
+ * (if autoplace was in order). Disabling it would also disable the header of
+ * the table (this had not so much impact, but it was not properly done, anyway)
  */
 @SuppressWarnings({ "serial" })
 public class Bug2_1_0_SetVisible extends JFrame {
@@ -116,14 +117,16 @@ public class Bug2_1_0_SetVisible extends JFrame {
         actions.visibleCheckBox.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
-                    filterHeader.setVisible(e.getStateChange() == ItemEvent.SELECTED);
+                    filterHeader.setVisible(e.getStateChange() 
+                    		== ItemEvent.SELECTED);
                 }
             });
 
         actions.enabledCheckBox.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
-                    filterHeader.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+                    filterHeader.setEnabled(e.getStateChange() 
+                    		== ItemEvent.SELECTED);
                 }
             });
 
@@ -131,15 +134,24 @@ public class Bug2_1_0_SetVisible extends JFrame {
     }
 
     void customizeTable() {
-        table.getColumnModel().getColumn(table.convertColumnIndexToView(tableModel.getColumn(TestTableModel.COUNTRY))).setCellRenderer(new FlagRenderer());
-        table.getColumnModel().getColumn(table.convertColumnIndexToView(tableModel.getColumn(TestTableModel.AGE))).setCellRenderer(new CenteredRenderer());
-        filterHeader.setTableCellRenderer(tableModel.getColumn(TestTableModel.AGE), new CenteredRenderer());
-        filterHeader.setTableCellRenderer(tableModel.getColumn(TestTableModel.COUNTRY), new FlagRenderer());
+        table.getColumnModel().getColumn(table.convertColumnIndexToView(
+        		tableModel.getColumn(TestTableModel.COUNTRY))).
+        		setCellRenderer(new FlagRenderer());
+        table.getColumnModel().getColumn(table.convertColumnIndexToView(
+        		tableModel.getColumn(TestTableModel.AGE))).
+        		setCellRenderer(new CenteredRenderer());
+        filterHeader.setTableCellRenderer(
+        		tableModel.getColumn(TestTableModel.AGE), 
+        		new CenteredRenderer());
+        filterHeader.setTableCellRenderer(
+        		tableModel.getColumn(TestTableModel.COUNTRY), 
+        		new FlagRenderer());
     }
 
     static class ButtonsPanel extends JPanel {
         private static final long serialVersionUID = -4221513653085366887L;
-        JComboBox positionComboBox = new JComboBox(new DefaultComboBoxModel(Position.values()));
+        JComboBox positionComboBox = 
+        	new JComboBox(new DefaultComboBoxModel(Position.values()));
         JCheckBox visibleCheckBox = new JCheckBox("Visible", true);
         JCheckBox enabledCheckBox = new JCheckBox("Enabled", true);
 
@@ -174,9 +186,10 @@ public class Bug2_1_0_SetVisible extends JFrame {
         dialog.pack();
         dialog.setVisible(true);
 
-        Bug2_1_0_SetVisible frame = new Bug2_1_0_SetVisible((Position) dialog.actions.positionComboBox.getSelectedItem(),
-                                                            dialog.actions.visibleCheckBox.isSelected(),
-                                                            dialog.actions.enabledCheckBox.isSelected());
+        Bug2_1_0_SetVisible frame = new Bug2_1_0_SetVisible(
+        		(Position) dialog.actions.positionComboBox.getSelectedItem(),
+                dialog.actions.visibleCheckBox.isSelected(),
+                dialog.actions.enabledCheckBox.isSelected());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setBounds(100, 100, 600, 450);

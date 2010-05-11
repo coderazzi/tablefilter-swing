@@ -32,7 +32,8 @@ public class Bug1_4_0MissingFilterHeaderAltC_Ok extends JPanel{
 	}
 	
 	public static void main(String[] args) {
-		Bug1_4_0MissingFilterHeaderAltC_Ok testTableFilter = new Bug1_4_0MissingFilterHeaderAltC_Ok();
+		Bug1_4_0MissingFilterHeaderAltC_Ok testTableFilter = 
+			new Bug1_4_0MissingFilterHeaderAltC_Ok();
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(testTableFilter);

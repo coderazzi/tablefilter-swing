@@ -46,37 +46,46 @@ public class TestData {
     private static Random random = new Random();
 
     static final String[] maleNames = {
-            "Alfred", "Alvin", "Blake", "Bob", "Brandon", "Bud", "Burton", "Charles", "Clark",
-            "Dale", "Damon", "Darren", "Dustin", "Edward", "Elton", "Fletcher", "Forrester", "Gary",
-            "Harley", "Harold", "Hugh", "James", "Keane", "Kenneth", "Landon", "Lee", "Lincoln",
-            "Maxwell", "Miller", "Nash", "Nelson", "Norman", "Oswald", "Perry", "Prentice", "Ralph",
-            "Raymond", "Richard", "Robert", "Scott", "Spencer", "Stanley", "Sutton", "Taylor",
-            "Thorne", "Truman", "Tyler", "Wallace",
+            "Alfred", "Alvin", "Blake", "Bob", "Brandon", "Bud", "Burton", 
+            "Charles", "Clark", "Dale", "Damon", "Darren", "Dustin", 
+            "Edward", "Elton", "Fletcher", "Forrester", "Gary",
+            "Harley", "Harold", "Hugh", "James", "Keane", "Kenneth", 
+            "Landon", "Lee", "Lincoln", "Maxwell", "Miller", "Nash", "Nelson", 
+            "Norman", "Oswald", "Perry", "Prentice", "Ralph", "Raymond", 
+            "Richard", "Robert", "Scott", "Spencer", "Stanley", "Sutton", 
+            "Taylor", "Thorne", "Truman", "Tyler", "Wallace",
         };
 
     static final String[] femaleNames = {
-            "Aida", "Ashley", "Audrey", "Beverly", "Brenda", "Brook", "Cameron", "Carling",
-            "Chelsea", "Dale", "Dawn", "Devon", "Dustin", "Erika", "Farrah", "Harmony", "Hazel",
-            "Heather", "Holly", "Jamie", "Joyce", "Joy", "Kim", "Kirsten", "Kyla", "Lark", "Lee",
-            "Leigh", "Leslie", "Lindsay", "Mercy", "Nara", "Rowena", "Sabrina", "Scarlet", "Shelby",
-            "Shirley", "Sparrow", "Spring", "Storm", "Summer", "Taylor", "Tina", "Trudy", "Ulla",
-            "Verity", "Wendy", "Whitney", "Wilona"
+            "Aida", "Ashley", "Audrey", "Beverly", "Brenda", "Brook", 
+            "Cameron", "Carling", "Chelsea", "Dale", "Dawn", "Devon", "Dustin", 
+            "Erika", "Farrah", "Harmony", "Hazel", "Heather", "Holly", 
+            "Jamie", "Joyce", "Joy", "Kim", "Kirsten", "Kyla", "Lark", "Lee",
+            "Leigh", "Leslie", "Lindsay", "Mercy", "Nara", "Rowena", 
+            "Sabrina", "Scarlet", "Shelby", "Shirley", "Sparrow", "Spring", 
+            "Storm", "Summer", "Taylor", "Tina", "Trudy", "Ulla", "Verity", 
+            "Wendy", "Whitney", "Wilona"
         };
 
     // source: http://en.wikipedia.org/wiki/List_of_most_common_surnames#United_States
     static final String[] familyNames = {
-            "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore",
-            "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson",
-            "Garcia", "Martinez", "Robinson", "Clark", "Rodriguez", "Lewis", "Lee", "Walker",
-            "Hall", "Allen", "Young", "Hernandez", "King", "Wright", "Lopez", "Hill", "Scott",
-            "Green", "Adams", "Baker", "Gonzalez", "Nelson", "Carter", "Mitchell", "Perez",
-            "Roberts", "Turner", "Phillips", "Campbell", "Parker", "Evans", "Edwards", "Collins",
-            "Stewart", "Sanchez", "Morris", "Rogers", "Reed", "Cook", "Morgan", "Bell", "Murphy",
-            "Bailey", "Rivera", "Cooper", "Richardson", "Cox", "Howard", "Ward", "Torres",
-            "Peterson", "Gray", "Ramirez", "James", "Watson", "Brooks", "Kelly", "Sanders", "Price",
-            "Bennett", "Wood", "Barnes", "Ross", "Henderson", "Coleman", "Jenkins", "Perry",
-            "Powell", "Long", "Patterson", "Hughes", "Flores", "Washington", "Butler", "Simmons",
-            "Foster", "Gonzales", "Bryant", "Alexander", "Russell", "Griffin", "Diaz", "Hayes"
+            "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", 
+            "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", 
+            "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", 
+            "Martinez", "Robinson", "Clark", "Rodriguez", "Lewis", "Lee", 
+            "Walker", "Hall", "Allen", "Young", "Hernandez", "King", 
+            "Wright", "Lopez", "Hill", "Scott", "Green", "Adams", "Baker", 
+            "Gonzalez", "Nelson", "Carter", "Mitchell", "Perez", 
+            "Roberts", "Turner", "Phillips", "Campbell", "Parker", 
+            "Evans", "Edwards", "Collins", "Stewart", "Sanchez", "Morris", 
+            "Rogers", "Reed", "Cook", "Morgan", "Bell", "Murphy",
+            "Bailey", "Rivera", "Cooper", "Richardson", "Cox", "Howard", 
+            "Ward", "Torres", "Peterson", "Gray", "Ramirez", "James", 
+            "Watson", "Brooks", "Kelly", "Sanders", "Price", "Bennett", 
+            "Wood", "Barnes", "Ross", "Henderson", "Coleman", "Jenkins", 
+            "Perry", "Powell", "Long", "Patterson", "Hughes", "Flores", 
+            "Washington", "Butler", "Simmons", "Foster", "Gonzales", 
+            "Bryant", "Alexander", "Russell", "Griffin", "Diaz", "Hayes"
         };
 
     static List<Icon> served = new ArrayList<Icon>(), allIcons;
@@ -107,20 +116,23 @@ public class TestData {
         firstName = getFirstName(male);
         name = getName(firstName);
         while ((tutor == null) || tutor.equals(name)) {
-            tutor = (random.nextBoolean() || random.nextBoolean() || random.nextBoolean()) ? getName(random.nextBoolean()) : "";
+            tutor = (random.nextBoolean() || random.nextBoolean() || 
+            		random.nextBoolean()) ? getName(random.nextBoolean()) : "";
         }
         flag = getFlag();
         club = getClub();
         // date is not exact (not everybody can be born at 00:00!)
-        date = new GregorianCalendar(random.nextInt(50) + 1940, random.nextInt(12), random.nextInt(28), 1, 1).getTime();
+        date = new GregorianCalendar(random.nextInt(50) + 1940, 
+        		random.nextInt(12), random.nextInt(28), 1, 1).getTime();
     }
 
     static void getAllIcons() {
         allIcons = new ArrayList<Icon>();
         try {
             Pattern p = Pattern.compile("gif/(.+)\\.gif");
-            ZipInputStream zip = new ZipInputStream(TestData.class.getResourceAsStream(
-                        "/net/coderazzi/filters/examples/utils/famfamfam_flag_icons.zip"));
+            ZipInputStream zip = new ZipInputStream(
+            		TestData.class.getResourceAsStream(
+                    "/net/coderazzi/filters/examples/utils/famfamfam_flag_icons.zip"));
             ZipEntry entry;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[16384];
@@ -145,7 +157,8 @@ public class TestData {
 
             zip.close();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Error reading icons:" + ex.getMessage());
+            JOptionPane.showMessageDialog(null, 
+            		"Error reading icons:" + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -163,7 +176,8 @@ public class TestData {
     }
 
     private String getName(String firstName) {
-        return firstName + " " + familyNames[random.nextInt(familyNames.length - 1)];
+        return firstName + " " 
+        	+ familyNames[random.nextInt(familyNames.length - 1)];
     }
 
     private String getName(boolean male) {

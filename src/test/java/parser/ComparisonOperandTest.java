@@ -121,7 +121,8 @@ public class ComparisonOperandTest extends AbstractTestCase {
                     @Override
                     public void customize(FilterTextParser parser) {
                         integerCustomizer.customize(parser);
-                        parser.setComparator(Integer.class, new Comparator<Integer>() {
+                        parser.setComparator(Integer.class, 
+                        		new Comparator<Integer>() {
                                 @Override
                                 public int compare(Integer o1,
                                                    Integer o2) {

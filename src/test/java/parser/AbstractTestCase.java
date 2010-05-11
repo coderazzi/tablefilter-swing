@@ -89,7 +89,8 @@ public abstract class AbstractTestCase extends TestCase {
             @Override
             public void customize(FilterTextParser parser) {
                 parser.setFormat(Integer.class, new Format() {
-                        private static final long serialVersionUID = -136765772975883655L;
+                        private static final long serialVersionUID = 
+                        	-136765772975883655L;
 
 						@Override
                         public StringBuffer format(Object obj,

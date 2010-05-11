@@ -21,7 +21,8 @@ public class CheckStringFormatTest extends AbstractTestCase {
 
         @Override
         public String toString() {
-            return "Integer: " + i; // check that the string format is not important
+        	//check that the string format is not important
+            return "Integer: " + i; 
         }
 
         @Override
@@ -31,7 +32,8 @@ public class CheckStringFormatTest extends AbstractTestCase {
 
         @Override
         public boolean equals(Object obj) {
-            return (obj instanceof StrangeInteger) && (((StrangeInteger) obj).i == i);
+            return (obj instanceof StrangeInteger) 
+            	&& (((StrangeInteger) obj).i == i);
         }
 
 		@Override
@@ -74,12 +76,14 @@ public class CheckStringFormatTest extends AbstractTestCase {
 
     @Test
     public void testBasic1() throws ParseException {
-        assertFalse(check(StrangeInteger.class, new StrangeInteger(2), "= 2", null));
+        assertFalse(check(StrangeInteger.class, 
+        		new StrangeInteger(2), "= 2", null));
     }
 
     @Test
     public void testBasic2() throws ParseException {
-        assertTrue(check(StrangeInteger.class, new StrangeInteger(2), "= 2", new StrangeIntegerCustomizer()));
+        assertTrue(check(StrangeInteger.class, new StrangeInteger(2), "= 2", 
+        		new StrangeIntegerCustomizer()));
     }
 
 }

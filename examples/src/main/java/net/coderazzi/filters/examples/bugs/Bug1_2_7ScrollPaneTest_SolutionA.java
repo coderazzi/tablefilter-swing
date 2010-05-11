@@ -47,7 +47,8 @@ public class Bug1_2_7ScrollPaneTest_SolutionA extends JPanel {
 	 * @param filterHeader
 	 * @return
 	 */
-	public static JScrollPane getFilterTableScollPane(JTable table, TableFilterHeader filterHeader) {
+	public static JScrollPane getFilterTableScollPane(JTable table, 
+			TableFilterHeader filterHeader) {
 		// the overrides are to prevent the column header from being reset by
 		// JTable::configureEnclosingScrollPane()
 		JScrollPane scrollPane = new JScrollPane(table) {
@@ -89,7 +90,8 @@ public class Bug1_2_7ScrollPaneTest_SolutionA extends JPanel {
 	}
 
 	public static void main(String[] args) {
-		Bug1_2_7ScrollPaneTest_SolutionA testTableFilter = new Bug1_2_7ScrollPaneTest_SolutionA();
+		Bug1_2_7ScrollPaneTest_SolutionA testTableFilter = 
+			new Bug1_2_7ScrollPaneTest_SolutionA();
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(testTableFilter);

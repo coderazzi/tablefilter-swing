@@ -32,7 +32,8 @@
 
 	<target name='debug' depends='prepare'>
 		<delete dir='${javacoutput}'/>
-		<javac srcdir='src' destdir='build' includes='**/*.java' source='1.6'  debug='true'/>
+		<javac srcdir='src' destdir='build' includes='**/*.java' 
+			   source='1.6'  debug='true'/>
 		<jar destfile='build/tablefilterDbg-v${version}.jar'>
 			<fileset dir='build'
 				 includes='net/coderazzi/filters/**/*.class'
@@ -64,7 +65,8 @@
 	<target name='example' depends='prepare'>
 		<property name="output" value="build/example6.jar"/>
 		<delete dir='${javacoutput}'/>
-		<javac destdir='build' source='1.6' debug='off' srcdir='src' includes='**/*.java'/>
+		<javac destdir='build' source='1.6' debug='off' srcdir='src' 
+			   includes='**/*.java'/>
 		<javac destdir='build' source='1.6' debug='off' srcdir='examples' 
 			includes='**/*.java' excludes='**/bugs/*.java'/>
 		<jar destfile='${output}'> 
@@ -73,7 +75,8 @@
 			<fileset dir='examples'
 				     includes='**/*.zip'/>
 			<manifest>
-			  <attribute name="Main-Class" value="net.coderazzi.filters.examples.TableFilterExample"/>			
+			  <attribute name="Main-Class" 
+			  	    value="net.coderazzi.filters.examples.TableFilterExample"/>			
 		      <attribute name="Created-By" value="lu@coderazzi.net"/>
 		      <attribute name="Implementation-Vendor" value="coderazzi"/>
 		      <attribute name="Implementation-Title" value="TableFilter Example"/>

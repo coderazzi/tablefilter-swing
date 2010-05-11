@@ -40,7 +40,8 @@ public class Bug1_4_0MissingFilterHeader extends JPanel{
 	}
 	
 	public static void main(String[] args) {
-		Bug1_4_0MissingFilterHeader testTableFilter = new Bug1_4_0MissingFilterHeader();
+		Bug1_4_0MissingFilterHeader testTableFilter = 
+			new Bug1_4_0MissingFilterHeader();
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(testTableFilter);

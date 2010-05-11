@@ -54,7 +54,8 @@ public class Bug1_2_7Solution extends JPanel{
 				} else if (now.equals(INLINE)){
 					filterHeader = new TableFilterHeader();
 					filterHeader.setPosition(Position.INLINE);
-					filterHeader.setTable(buttonChoice.getText().equals(RIGHT)? tableA : tableB);
+					filterHeader.setTable(buttonChoice.getText().equals(RIGHT)? 
+							tableA : tableB);
 					buttonLocation.setText(TOP);
 				} else {
 					filterHeader.setPosition(Position.TOP);

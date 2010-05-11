@@ -24,7 +24,8 @@ public class Bug1_4_0AddingExternalFilter extends JPanel{
 	BaseFilter addedFilter = new BaseFilter(){
 		@Override
 		public boolean include(Entry entry) {
-			return -1!=entry.getStringValue(model.getColumn(TestTableModel.NAME)).indexOf('e');
+			return -1!=entry.getStringValue(
+					model.getColumn(TestTableModel.NAME)).indexOf('e');
 		}
 	};
 	
@@ -34,7 +35,8 @@ public class Bug1_4_0AddingExternalFilter extends JPanel{
 		final TableFilterHeader filterHeader = new TableFilterHeader(table);
 		add(new JScrollPane(table), BorderLayout.CENTER);
 		
-		JCheckBox check = new JCheckBox("Filter out any row where the name does not contain a lower case 'e'");
+		JCheckBox check = new JCheckBox(
+				"Filter out any row where the name does not contain a lower case 'e'");
 		add(check, BorderLayout.SOUTH);
 		
 		check.addItemListener(new ItemListener() {
@@ -50,7 +52,8 @@ public class Bug1_4_0AddingExternalFilter extends JPanel{
 	}
 	
 	public static void main(String[] args) {
-		Bug1_4_0AddingExternalFilter testTableFilter = new Bug1_4_0AddingExternalFilter();
+		Bug1_4_0AddingExternalFilter testTableFilter =
+			new Bug1_4_0AddingExternalFilter();
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(testTableFilter);
