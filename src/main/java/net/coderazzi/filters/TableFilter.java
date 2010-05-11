@@ -35,46 +35,51 @@ import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 
 
-
 /**
- * <p>TableFilter represents a {@link javax.swing.RowFilter} instance that can be attached to a
- * {@link javax.swing.JTable} to compose dynamically the outcome of one or more filter editors. As
- * such, it is a dynamic filter, which updates the table when there are changes in any of the
- * composed sub filters.</p>
+ * <p>TableFilter represents a {@link javax.swing.RowFilter} instance that can 
+ * be attached to a {@link javax.swing.JTable} to compose dynamically the 
+ * outcome of one or more filter editors. As such, it is a dynamic filter, 
+ * which updates the table when there are changes in any of the composed 
+ * sub filters.</p>
  *
- * <p>Users require instancing TableFilter instances only when managing their own filter editors.
- * Note that the {@link net.coderazzi.filters.gui.TableFilterHeader} already handles its own
- * TableFilter, and keeps track of any table changes, updating automatically the editors.</p>
+ * <p>Users require instancing TableFilter instances only when managing their 
+ * own filter editors.
+ * Note that the {@link net.coderazzi.filters.gui.TableFilterHeader} already 
+ * handles its own TableFilter, and keeps track of any table changes, 
+ * updating automatically the editors.</p>
  * </p>
  *
- * <p>When users instanciate directly TableFilter objects, care must be taken to update the
- * associated editors when the table model changes.</p>
+ * <p>When users instanciate directly TableFilter objects, care must be taken 
+ * to update the associated editors when the table model changes.</p>
  *
- * <p>In Java 6, a filter is automatically associated to a {@link javax.swing.RowSorter}, so
- * {@link javax.swing.JTable} instances with a TableFilter must define their own
- * {@link javax.swing.RowSorter}. Being this not the case, the TableFilter will automatically set
- * the default {@link javax.swing.RowSorter} in that table. That is, tables with a TableFilter will
- * always have sorting enabled.</p>
+ * <p>In Java 6, a filter is automatically associated to a 
+ * {@link javax.swing.RowSorter}, so {@link javax.swing.JTable} instances with 
+ * a TableFilter must define their own {@link javax.swing.RowSorter}. 
+ * Being this not the case, the TableFilter will automatically set the 
+ * default {@link javax.swing.RowSorter} in that table. That is, tables with 
+ * a TableFilter will always have sorting enabled.</p>
  *
- * <p>The {@link javax.swing.RowSorter} interface does not support filtering capabilities, which are
- * only enabled via the {@link javax.swing.DefaultRowSorter} class. If the registered table uses any
- * sorter that does not subclass the {@link javax.swing.DefaultRowSorter} class, the TableFilter
- * will perform <b>no filtering at all</b>.</p>
+ * <p>The {@link javax.swing.RowSorter} interface does not support filtering 
+ * capabilities, which are only enabled via the 
+ * {@link javax.swing.DefaultRowSorter} class. If the registered table uses any
+ * sorter that does not subclass the {@link javax.swing.DefaultRowSorter} class, 
+ * the TableFilter will perform <b>no filtering at all</b>.</p>
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
 public class TableFilter extends AndFilter {
 
     /**
-     * sendNotifications is used internally as a semaphore to disable temporarily notifications to
-     * the filter observers. Notifications are only sent to the observers when this variable is non
-     * negative.
+     * sendNotifications is used internally as a semaphore to disable 
+     * temporarily notifications to the filter observers. Notifications 
+     * are only sent to the observers when this variable is non negative.
      */
     int sendNotifications = 0;
 
     /**
-     * pendingNotifications keeps track of notifications to be sent to the observers, but were
-     * discarded because the variable sendNotifications was false.
+     * pendingNotifications keeps track of notifications to be sent to the 
+     * observers, but were discarded because the variable sendNotifications 
+     * was negative.
      */
     private boolean pendingNotifications;
 
@@ -123,14 +128,14 @@ public class TableFilter extends AndFilter {
         return table;
     }
 
-
     /**
-     * <p>Temporarily enable/disable notifications to the observers, including the registered
-     * {@link javax.swing.JTable}.</p>
+     * <p>Temporarily enable/disable notifications to the observers, including 
+     * the registered {@link javax.swing.JTable}.</p>
      *
-     * <p>Multiple calls to this method can be issued, but the caller must ensure that there are as
-     * many calls with true parameter as with false parameter, as the notifications are only
-     * re-enabled when the zero balance is reached.</p>
+     * <p>Multiple calls to this method can be issued, but the caller must 
+     * ensure that there are as many calls with true parameter as with false 
+     * parameter, as the notifications are only re-enabled when the zero 
+     * balance is reached.</p>
      */
     public boolean enableNotifications(boolean enable) {
         sendNotifications += enable ? 1 : -1;
@@ -142,11 +147,11 @@ public class TableFilter extends AndFilter {
     }
 
     /**
-     * <p>Method to force the sending of notifications, even if they are currently temporarily
-     * disabled.</p>
+     * <p>Method to force the sending of notifications, even if they are 
+     * currently temporarily disabled.</p>
      *
-     * <p>Note that, in any case, the update notification is only sent if there is any pending
-     * notifications.</p>
+     * <p>Note that, in any case, the update notification is only sent if 
+     * there is any pending notifications.</p>
      */
     public void sendPendingNotifications() {
         if (pendingNotifications) {
@@ -155,10 +160,10 @@ public class TableFilter extends AndFilter {
     }
 
     /**
-     * Sets the autoselection mode
+     * <p>Sets the autoselection mode</p>
      *
-     * <p>if autoSelection is true, if there is only one possible row to select on the table, it
-     * will be selected.
+     * <p>if autoSelection is true, if there is only one possible 
+     * row to select on the table, it will be selected.
      */
     public void setAutoSelection(boolean enable) {
         autoSelector.setAutoSelection(enable);
@@ -174,8 +179,8 @@ public class TableFilter extends AndFilter {
     }
 
     /**
-     * Internal method to send a notification to the observers, verifying first if the notifications
-     * are currently enabled.
+     * Internal method to send a notification to the observers, verifying 
+     * first if the notifications are currently enabled.
      */
     void notifyUpdatedFilter(boolean forced) {
         if (forced || (sendNotifications < 0)) {
@@ -187,30 +192,33 @@ public class TableFilter extends AndFilter {
     }
 
     /**
-     * Internal method to send without further checks a notification to the observers. To reapply
-     * the filtering, it is enough to invoke again setRowFilter. Alternatively, it could just be
-     * invoked sort()
+     * Internal method to send without further checks a notification 
+     * to the observers.
      */
     private boolean sendFilterUpdateNotification() {
         if (autoSelector.sorter == null) {
             return true;
         }
+        //To reapply the filtering, it is enough to invoke again setRowFilter. 
+        //Alternatively, it could just be invoked sort()
         autoSelector.sorter.setRowFilter(this);
         return false;
     }
     
     /**
-     * Class performing the auto selection. Note that it depends only on the model, and not on the
-     * filters. If the model contains one single row, it will be automatically selected, even if the
-     * filters are empty.
+     * <p>Class performing the auto selection.</p> 
+     * <p>Note that it depends only on the model, and not on the filters.<br>
+     * If the model contains one single row, it will be automatically selected, 
+     * even if the filters are empty.</p>
      */
-    class AutoSelector implements RowSorterListener, Runnable, PropertyChangeListener {
+    class AutoSelector implements RowSorterListener, Runnable, 
+                                  PropertyChangeListener {
 
         /** The associated sorter, if any. */
         DefaultRowSorter<?, ?> sorter;
+        
         /** Autoselection mode * */
         boolean autoSelection = true;
-
 
 		public void replacedTable(JTable oldTable,
                                   JTable newTable) {
@@ -275,7 +283,8 @@ public class TableFilter extends AndFilter {
 
         @Override
         public void sorterChanged(RowSorterEvent e) {
-            if ((e.getType() == RowSorterEvent.Type.SORTED) && (e.getSource().getViewRowCount() == 1)) {
+            if ((e.getType() == RowSorterEvent.Type.SORTED) && 
+            	(e.getSource().getViewRowCount() == 1)) {
                 SwingUtilities.invokeLater(this);
             }
         }

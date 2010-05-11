@@ -34,26 +34,32 @@ import java.util.List;
 import javax.swing.AbstractListModel;
 import javax.swing.ListCellRenderer;
 
+
 /**
  * List model to handle the options in the popup menu.<br>
- * When the user specifies a {@link ListCellRenderer}, options are considered non-text.
- * Otherwise, content is converted, if needed, to Strings, and sorted. This is needed
- * to always show the popup's matches in sequential order. 
+ * When the user specifies a {@link ListCellRenderer}, options are 
+ * considered non-text; otherwise, content is converted, if needed, 
+ * to Strings, and sorted.<br>
+ * This is needed to always show the popup's matches in sequential order. 
  */
 class OptionsListModel extends AbstractListModel {
 
 	private static final long serialVersionUID = 3523952153693100563L;
 	private List content;
 	/** 
-	 * content, converted to Strings. If the content's list is already Strins, stringContent
-	 * merely references the content's list (i.e., stringContent = content).<br>
+	 * content, converted to Strings. If the content's list is already Strings, 
+	 * stringContent merely references the content's list 
+	 * (i.e., stringContent = content).<br>
 	 * This list is null if the content is considered non-text 
 	 */
 	private List stringContent;
 	private Format formatter = defaultFormatter;
 	private boolean ignoreCase;
 	
-	/** Basic implementation, to convert any Object to String using the toString method */
+	/** 
+	 * Basic implementation, to convert any Object to String 
+	 * using its defined toString method 
+	 **/
 	private static Format defaultFormatter = new Format(){
 		private static final long serialVersionUID = 3313449946741441248L;
 		@Override
@@ -61,11 +67,14 @@ class OptionsListModel extends AbstractListModel {
 			return source.toString();
 		}
 		@Override
-		public StringBuffer format(Object obj, StringBuffer toAppendTo, java.text.FieldPosition pos) {
+		public StringBuffer format(Object obj, StringBuffer toAppendTo, 
+				java.text.FieldPosition pos) {
 			return toAppendTo.append(obj.toString());
 		}
 		@Override
-		public Object parseObject(String source, java.text.ParsePosition pos) {return source;}
+		public Object parseObject(String source, java.text.ParsePosition pos) {
+			return source;
+		}
 	};
 
 	public OptionsListModel() {
@@ -75,7 +84,7 @@ class OptionsListModel extends AbstractListModel {
 
 	/** 
 	 * Sets the flag to ignore case or be case sensitive<br>
-	 * This affects to the algorithms to search for the best match on the content. 
+	 * It affects to the algorithms to search for the best match on the content. 
 	 */
 	public void setIgnoreCase(boolean set){
 		ignoreCase = set;
@@ -85,13 +94,14 @@ class OptionsListModel extends AbstractListModel {
 		return stringContent == null ? content.size() : stringContent.size();
 	}
 
-	public Object getElementAt(int index) {
-		return stringContent == null ? content.get(index) : stringContent.get(index);
+	public Object getElementAt(int i) {
+		return stringContent == null ? content.get(i) : stringContent.get(i);
 	}
 
 	/**
-	 * Specifies how to handle the content. If no renderer is used, the content is text based,
-	 * and converted to Strings -and displayed and searched as strings-. 
+	 * Specifies how to handle the content. If no renderer is used, 
+	 * the content is text based, and converted to Strings 
+	 * -and displayed and searched as strings-. 
 	 */
 	public void setStringContent(boolean set) {
 		if (set == false) {
@@ -142,7 +152,8 @@ class OptionsListModel extends AbstractListModel {
 		if (stringContent == null) {
 			return new PopupComponent.Match(content.indexOf(hint));
 		}
-		return (hint instanceof String)? findOnSortedContent((String)hint, exact) : null;
+		return (hint instanceof String)? 
+				findOnSortedContent((String)hint, exact) : null;
 	}
 
 	public void clearContent() {
@@ -161,8 +172,10 @@ class OptionsListModel extends AbstractListModel {
 	}
 
 	/** 
-	 * Adds additional options. If the content is text-based, the options are converted into
-	 * Strings, and sorted. Otherwise, no sorting is performed, although duplicates are still
+	 * Adds additional options.<br>
+	 * If the content is text-based, the options are converted into Strings, 
+	 * and sorted.<br>
+	 * Otherwise, no sorting is performed, although duplicates are still
 	 * discarded
 	 */
 	public void addContent(Collection addedContent) {
@@ -173,9 +186,10 @@ class OptionsListModel extends AbstractListModel {
 			}
 			if (stringContent != null) {
 				if (stringContent == content) {
-					// this menas that content contains only Strings. We need to
-					// ensure now that the addedContent is all Strings, otherwise we have to
-					// create a separate content for stringContent
+					// this menas that content contains only Strings. 
+					// We need to ensure now that the addedContent is all 
+					// Strings, otherwise we have to create a separate content 
+					// for stringContent
 					for (Object o : addedContent) {
 						if (!(o instanceof String)) {
 							stringContent = new ArrayList(content);
@@ -216,7 +230,8 @@ class OptionsListModel extends AbstractListModel {
 	}
 
 	/** Creation of the Match, for text based, sorted content */
-	private PopupComponent.Match findOnSortedContent(String strStart, boolean fullMatch) {
+	private PopupComponent.Match findOnSortedContent(String strStart, 
+			                                         boolean fullMatch) {
 		PopupComponent.Match ret = new PopupComponent.Match();
 		if (stringContent.isEmpty()) {
 			ret.index = -1;
@@ -230,7 +245,9 @@ class OptionsListModel extends AbstractListModel {
 					int osLength = os.length();
 					if (osLength >= ret.len) {
 						String cmpStr = os.substring(0, ret.len); 
-						int cmp = ignoreCase? cmpStr.compareToIgnoreCase(strStart) : cmpStr.compareTo(strStart);
+						int cmp = ignoreCase? 
+								cmpStr.compareToIgnoreCase(strStart) 
+								: cmpStr.compareTo(strStart);
 						if (cmp == 0) {
 							ret.exact = osLength == originalLen;
 							return ret;

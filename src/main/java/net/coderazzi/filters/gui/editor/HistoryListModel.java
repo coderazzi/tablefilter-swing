@@ -33,16 +33,18 @@ import javax.swing.ListCellRenderer;
 
 import net.coderazzi.filters.gui.FilterSettings;
 
+
 /**
  * List model to handle the history in the popup menu.<br>
- * When the user specifies a {@link ListCellRenderer}, history elements are considered non-text.
- * This affects to the search algorithm to fidn the best matches 
+ * When the user specifies a {@link ListCellRenderer}, 
+ * history elements are considered non-text; this affects to the 
+ * search algorithm to find the best matches 
  * {@link PopupComponent#selectBestMatch(Object, boolean)}
  */
 class HistoryListModel extends AbstractListModel {
 	private static final long serialVersionUID = -374115548677017807L;
 	private List<Object> history = new ArrayList<Object>();
-	/** history, converted to lower case. Will be null if content is not text-based */
+	/** history, converted to lower case. Null if content is not text-based */
 	private List<Object> historyLC;
 	private int maxHistory = FilterSettings.maxVisiblePopupRows;
 	private boolean stringContent = true;
@@ -50,15 +52,16 @@ class HistoryListModel extends AbstractListModel {
 	
 	/** 
 	 * Sets the flag to ignore case or be case sensitive<br>
-	 * This affects to the algorithms to search for the best match on the content. 
+	 * It affects to the algorithms to search for the best match on the content. 
 	 */
 	public void setIgnoreCase(boolean set){
 		ignoreCase = set;
 	}
 	
 	/**
-	 * Specifies how to handle the content. If no renderer is used, the content is text based,
-	 * and converted to Strings -and displayed and searched as strings-. 
+	 * Specifies how to handle the content. If no renderer is used, the content 
+	 * is text based, and converted to Strings 
+	 * -and displayed and searched as strings-. 
 	 */
 	public boolean setStringContent(boolean set){
 		if (stringContent!=set){
@@ -109,7 +112,7 @@ class HistoryListModel extends AbstractListModel {
 		return history.size();
 	}
 
-	/** Sets the max history, returning true if the number of hold elements changes */
+	/** Sets the max history; returns true if the number of elements changes */
 	public boolean setMaxHistory(int size) {
 		maxHistory = size;
 		int current=history.size();
@@ -150,8 +153,12 @@ class HistoryListModel extends AbstractListModel {
 		return new PopupComponent.Match(history.indexOf(hint));
 	}
 	
-	/** Method to find the best match on a given unsorted list -search is case sensitive- */
-	private PopupComponent.Match findOnUnsortedContent(List list, String strStart, boolean fullMatch) {
+	/** 
+	 * Method to find the best match on a given unsorted list 
+	 * -search is case sensitive- 
+	 **/
+	private PopupComponent.Match findOnUnsortedContent(List list, 
+			String strStart, boolean fullMatch) {
 		PopupComponent.Match ret = new PopupComponent.Match();
 		if (list.isEmpty()) {
 			ret.index = -1;

@@ -39,7 +39,8 @@ import javax.swing.table.JTableHeader;
 import net.coderazzi.filters.gui.TableFilterHeader.Position;
 
 /**
- * <p>Helper class to locate the filter header on the expected place by the table header</p>
+ * <p>Helper class to locate the filter header on the expected place 
+ * by the table header</p>
  * 
  * @author  Luis M Pena - lu@coderazzi.net
  */
@@ -70,7 +71,8 @@ class PositionHelper implements PropertyChangeListener{
     
     
     /**
-     * <p>Defines the behaviour of the header concerning its position related to the table.</p>
+     * <p>Defines the behaviour of the header concerning its position 
+     * related to the table.</p>
      */
     public void setPosition(Position location) {
         this.location = location;
@@ -123,9 +125,10 @@ class PositionHelper implements PropertyChangeListener{
      * PropertyChangeListener interface
      */
 	public void propertyChange(PropertyChangeEvent evt) {
-		//the table has changed containment. clean up status and prepare again, if possible
-		//However, do nothing if the current setup is fine
-		if (previousTableViewport!=evt.getNewValue() || evt.getSource()!=filterHeader.getTable()){
+		//the table has changed containment. clean up status and prepare again, 
+		//if possible; however, do nothing if the current setup is fine
+		if (previousTableViewport!=evt.getNewValue() 
+				|| evt.getSource()!=filterHeader.getTable()){
 			previousTableViewport=null;
 			cleanUp();
 			trySetUp(filterHeader.getTable());
@@ -147,7 +150,8 @@ class PositionHelper implements PropertyChangeListener{
      * Tries to setup the filter header automatically for the given table
      */
     private void trySetUp(JTable table){
-    	if (table!=null && table.isVisible() && canHeaderLocationBeManaged() && filterHeader.isVisible() ){
+    	if (table!=null && table.isVisible() && canHeaderLocationBeManaged() 
+    			&& filterHeader.isVisible() ){
 	        Container p = table.getParent();
 	        if (p instanceof JViewport) {
 	            Container gp = p.getParent();
@@ -182,12 +186,14 @@ class PositionHelper implements PropertyChangeListener{
         		} 
         	}
 		    /**
-		     * Locates the passed component in the header, with the position depending on the current header location
+		     * Locates the passed component in the header, with the position 
+		     * depending on the current header location
 		     * @param header the table header, added to the current filter header
 		     */
 		    private void placeTableHeader(Component header){
 		    	if (header!=null){
-		    		filterHeader.add(header, location==Position.TOP? BorderLayout.SOUTH : BorderLayout.NORTH);
+		    		filterHeader.add(header, location==Position.TOP? 
+		    				         BorderLayout.SOUTH : BorderLayout.NORTH);
 		    		filterHeader.revalidate();
 		    	}
 			}
@@ -229,7 +235,8 @@ class PositionHelper implements PropertyChangeListener{
 	    		JScrollPane scrollPane=(JScrollPane)parent;
 	    		if (scrollPane.getColumnHeader()==currentViewport){
 			    	Component tableHeader=getTableHeader();
-	    			JViewport newView = tableHeader==null? null : createCleanViewport(tableHeader);
+	    			JViewport newView = tableHeader==null? 
+	    					            null : createCleanViewport(tableHeader);
 	    			scrollPane.setColumnHeader(newView);
 	    		}
 	    	}

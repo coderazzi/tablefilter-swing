@@ -28,9 +28,9 @@ package net.coderazzi.filters.gui;
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
 /**
- * <p>A ITableFilterHeaderObserver instance receives notifications when the associated 
- * {@link net.coderazzi.filters.gui.editor.FilterEditor} instances are created, destroyed,
- * or update the held filter.
+ * <p>A ITableFilterHeaderObserver instance receives notifications when the 
+ * associated {@link net.coderazzi.filters.gui.editor.FilterEditor} instances 
+ * are created, destroyed, or update the held filter.
  * </p>
  *
  * @author  Luis M Pena - lu@coderazzi.net
@@ -42,7 +42,8 @@ public interface IFilterHeaderObserver {
      * @param header the associated table filter header
 	 * @param editor
 	 */
-	public void tableFilterEditorCreated(TableFilterHeader header, FilterEditor editor);
+	public void tableFilterEditorCreated(TableFilterHeader header, 
+			                             FilterEditor editor);
 
 	/**
 	 * <p>Informs the observer than an existing filter editor has been
@@ -50,13 +51,16 @@ public interface IFilterHeaderObserver {
      * @param header the associated table filter header
 	 * @param editor
 	 */
-	public void tableFilterEditorExcluded(TableFilterHeader header, FilterEditor editor);
+	public void tableFilterEditorExcluded(TableFilterHeader header, 
+			                              FilterEditor editor);
 
     /**
-     * <p>Notification made by the {@link net.coderazzi.filters.gui.editor.FilterEditor}
+     * <p>Notification made by the 
+     * {@link net.coderazzi.filters.gui.editor.FilterEditor}
      * when the filter's content is updated</p>
      * @param header the associated table filter header
      * @param editor the observable instance
      */
-    public void tableFilterUpdated(TableFilterHeader header, FilterEditor editor);
+    public void tableFilterUpdated(TableFilterHeader header, 
+    		                       FilterEditor editor);
 }

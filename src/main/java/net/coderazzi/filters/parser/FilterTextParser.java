@@ -19,15 +19,17 @@ import net.coderazzi.filters.IFilterTextParser;
 
 
 /**
- * Basic implementation of a {@link IFilterTextParser}, supporting only simple operators referring
- * to the content of a single column.<br>
+ * Basic implementation of a {@link IFilterTextParser}, supporting only 
+ * simple operators referring to the content of a single column.<br>
  * The supporter operators include:
  *
  * <ul>
- *   <li>Comparison operators. The comparison is done on the parsed object, not on the string
- *     representation, unless no {@link Format} or {@link Comparator} is defined for the given type.
- *     For example, specifying the text &quot;&gt;= 4&quot; implies, for a column with integer
- *     types, that a direct comparison between integers will be performed. These operators are:
+ *   <li>Comparison operators. The comparison is done on the parsed object, 
+ *     not on the string representation, unless no {@link Format} or 
+ *     {@link Comparator} is defined for the given type.
+ *     For example, specifying the text &quot;&gt;= 4&quot; implies, for a 
+ *     column with integer types, that a direct comparison between integers 
+ *     will be performed. These operators are:
  *
  *     <ul>
  *       <li>&gt;=</li>
@@ -37,36 +39,40 @@ import net.coderazzi.filters.IFilterTextParser;
  *       <li>&lt;&gt;</li>
  *     </ul>
  *   </li>
- *   <li>Equal operators. The comparison is done on the parsed object, not on the string
- *     representation, unless no {@link Format} is defined for the given type. The comparison is
- *     performed using the equals method. These operators are:
+ *   <li>Equal operators. The comparison is done on the parsed object, 
+ *     not on the string representation, unless no {@link Format} is 
+ *     defined for the given type. The comparison is performed using the 
+ *     equals method. These operators are:
  *
  *     <ul>
- *       <li>!=: note that, in most cases, it will behave as the operator &lt;&gt;</li>
+ *       <li>!=: note that, in most cases, it will behave 
+ *           as the operator &lt;&gt;</li>
  *       <li>! : equivalent to !=</li>
  *       <li>&lt;</li>
  *       <li>=</li>
  *       <li>==: equivalent to =</li>
  *     </ul>
  *   </li>
- *   <li>Basic wildcard operators. These operators work using the string representation of the types
- *     (using, when possible, the defined {@link Format} instance). Only two wildcard characters are
- *     defined: * and ?
+ *   <li>Basic wildcard operators. These operators work using the string 
+ *     representation of the types (using, when possible, the defined 
+ *     {@link Format} instance). 
+ *     Only two wildcard characters are defined: * and ?
  *
  *     <ul>
- *       <li>~: for example ~ *vadis* will filter in all expressions including the substring
- *         vadis</li>
+ *       <li>~: for example ~ *vadis* will filter in all expressions 
+ *         including the substring vadis</li>
  *       <li>!~: negates the previous operator</li>
  *     </ul>
  *   </li>
- *   <li>Regular expression operator. There is only one such operator: ~~, accepting a java regular
- *     expression.</li>
+ *   <li>Regular expression operator. There is only one such operator: ~~, 
+ *     accepting a java regular expression.</li>
  * </ul>
  */
 public class FilterTextParser implements IFilterTextParser {
 
     Map<Class<?>, Format> formatters = new HashMap<Class<?>, Format>();
-    Map<Class<?>, Comparator<?>> comparators = new HashMap<Class<?>, Comparator<?>>();
+    Map<Class<?>, Comparator<?>> comparators = 
+    	new HashMap<Class<?>, Comparator<?>>();
     boolean ignoreCase;
     private IOperand defaultOperand;
     private String defaultOperandString = "~";
@@ -76,7 +82,8 @@ public class FilterTextParser implements IFilterTextParser {
     private PropertyChangeSupport propertiesHandler = new PropertyChangeSupport(this);
 
     public FilterTextParser() {
-        expressionMatcher = Pattern.compile("^(>=|<=|<>|!=|!~|~~|==|>|<|=|~|!)?\\s*(.*)$");
+        expressionMatcher = 
+        	Pattern.compile("^(>=|<=|<>|!=|!~|~~|==|>|<|=|~|!)?\\s*(.*)$");
         operands = new HashMap<String, IOperand>();
         operands.put("~~", new REOperand(true));
         operands.put("~", new SimpleREOperand(true));
@@ -113,11 +120,13 @@ public class FilterTextParser implements IFilterTextParser {
         defaultOperand = operands.get(defaultOperandString);
     }
 
-    @Override public void addPropertyChangeListener(PropertyChangeListener listener) {
+    @Override 
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertiesHandler.addPropertyChangeListener(listener);
     }
 
-    @Override public void removePropertyChangeListener(PropertyChangeListener listener) {
+    @Override 
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertiesHandler.removePropertyChangeListener(listener);
     }
 
@@ -156,7 +165,7 @@ public class FilterTextParser implements IFilterTextParser {
         propertiesHandler.firePropertyChange("format", old, format);
         if (Date.class.isAssignableFrom(c) && (format != null)) {
             Comparator<?> comparator = getComparator(c);
-            if ((comparator == null) || (comparator instanceof DateComparator)) {
+            if ((comparator == null) || (comparator instanceof DateComparator)){
                 setComparator(c, DateComparator.getDateComparator(format));
             }
         }
@@ -197,14 +206,16 @@ public class FilterTextParser implements IFilterTextParser {
             try {
                 return op.create(matcher.group(2).trim(), c, modelPosition);
             } catch (ParseException pex) {
-                throw new ParseException("", pex.getErrorOffset() + matcher.start(2));
+                throw new ParseException("", 
+                		pex.getErrorOffset() + matcher.start(2));
             }
         }
         return null;
     }
 
     /** Basic {@link Comparator} using {@link Comparable} instances */
-    static Comparator<Comparable> comparatorOfComparables = new Comparator<Comparable>() {
+    static Comparator<Comparable> comparatorOfComparables = 
+    	new Comparator<Comparable>() {
             @SuppressWarnings("unchecked")
             @Override public int compare(Comparable o1,
                                Comparable o2) {
@@ -260,7 +271,8 @@ public class FilterTextParser implements IFilterTextParser {
                     @SuppressWarnings("unchecked")
                     @Override public boolean include(Entry entry) {
                         Object left = entry.getValue(modelPosition);
-                        return (left != null) && matches(comparator.compare(left, right));
+                        return (left != null) && 
+                        	matches(comparator.compare(left, right));
                     }
                 };
         }
@@ -270,7 +282,9 @@ public class FilterTextParser implements IFilterTextParser {
                                                  int modelPosition) {
             return new StringRowFilter(modelPosition, formatter) {
                     @Override public boolean include(String left) {
-                        return matches(ignoreCase ? left.compareToIgnoreCase(right) : left.compareTo(right));
+                        return matches(ignoreCase ? 
+                        		left.compareToIgnoreCase(right) 
+                        		: left.compareTo(right));
                     }
                 };
         }
@@ -295,7 +309,6 @@ public class FilterTextParser implements IFilterTextParser {
         }
     }
 
-
     class REOperand implements IOperand {
         boolean equals;
 
@@ -318,7 +331,8 @@ public class FilterTextParser implements IFilterTextParser {
 
         protected Pattern getPattern(String right) throws ParseException {
             try {
-                return Pattern.compile(right, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                return Pattern.compile(right, 
+                		ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
             } catch (PatternSyntaxException pse) {
                 throw new ParseException("", pse.getIndex());
             }
@@ -331,8 +345,10 @@ public class FilterTextParser implements IFilterTextParser {
             super(equals);
         }
 
-        @Override protected Pattern getPattern(String right) throws ParseException {
-            return super.getPattern(convertWilcardExpressionToRegularExpression(right));
+        @Override 
+        protected Pattern getPattern(String right) throws ParseException {
+            return super.getPattern(
+            		convertWilcardExpressionToRegularExpression(right));
         }
 
         private String convertWilcardExpressionToRegularExpression(String s) {
@@ -415,7 +431,8 @@ public class FilterTextParser implements IFilterTextParser {
 
         @Override public boolean include(Entry entry) {
             Object o = entry.getValue(modelPosition);
-            String left = (o == null) ? "" : ((formatter == null) ? o.toString() : formatter.format(o));
+            String left = (o == null) ? "" : 
+            	((formatter == null) ? o.toString() : formatter.format(o));
             return include(left);
         }
 

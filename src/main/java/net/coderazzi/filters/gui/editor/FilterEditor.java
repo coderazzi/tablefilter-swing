@@ -70,10 +70,11 @@ import net.coderazzi.filters.IFilterTextParser;
  * Custom component to handle the filter' editors<br>
  * It includes:<ul>
  * <li>A editor component, usually a text field to enter the filter text.</li>
- * <li>A popup menu that contains both history and predefined option elements.</li>
+ * <li>A popup menu containing both history and predefined option elements.</li>
  * <li>An arrow button to display the popup menu.</li></ul>
- * The component keeps the same look and feel under all cases (being editable or not, having
- * custom cell renderers or not). Mixing therefore different editors under the same filter header
+ * The component keeps the same look and feel under all cases 
+ * (being editable or not, having custom cell renderers or not). 
+ * Mixing therefore different editors under the same filter header
  * should keep the look and feel consistency.
  */
 public class FilterEditor extends JComponent{
@@ -87,8 +88,6 @@ public class FilterEditor extends JComponent{
 	EditorComponent editor;
 	PopupComponent popup;
 
-
-    
 	public FilterEditor() {
 		setLayout(new BorderLayout());
 		setBorder(border);
@@ -97,7 +96,8 @@ public class FilterEditor extends JComponent{
 		textParserListener = new PropertyChangeListener() {
 			
 			@Override public void propertyChange(PropertyChangeEvent evt) {
-				popup.setIgnoreCase(((IFilterTextParser)evt.getSource()).isIgnoreCase());
+				popup.setIgnoreCase(((IFilterTextParser)evt.getSource())
+						.isIgnoreCase());
 				filter.update();
 			}
 		};
@@ -124,7 +124,10 @@ public class FilterEditor extends JComponent{
 		setDisabledForeground(Color.lightGray);
 	}
 	
-	/** Sets the maximum number of visible rows in the popup menu (a minimum is always enforced) */
+	/** 
+	 * Sets the maximum number of visible rows in the popup menu<br>
+	 * A minimum is always enforced
+	 **/
 	public void setMaxVisibleRows(int maxVisibleRows) {
 		popup.setMaxVisibleRows(maxVisibleRows);
 	}
@@ -136,8 +139,8 @@ public class FilterEditor extends JComponent{
 
 	/**
 	 * Limits the history size. <br>
-	 * This limit is only used when the popup contains also options. Otherwise, the
-	 * maximum history size corresponds to the maximum number of visible rows<br>
+	 * This limit is only used when the popup contains also options. Otherwise, 
+	 * the maximum history size is to the maximum number of visible rows<br>
 	 */
 	public void setMaxHistory(int size) {
 		popup.setMaxHistory(size);
@@ -145,8 +148,9 @@ public class FilterEditor extends JComponent{
 
 	/** 
 	 * Returns the maximum history size, as defined by the user.<br>
-	 * This is not the real maximum history size, as it depends on the max number of visible rows
-	 * and whether the popup contains also options or only history 
+	 * This is not the real maximum history size, as it depends on the max 
+	 * number of visible rows and whether the popup contains only history
+	 * or also options 
 	 */
 	public int getMaxHistory() {
 		return popup.getMaxHistory();
@@ -175,7 +179,7 @@ public class FilterEditor extends JComponent{
 		}
 	}
 	
-	/** Sets the content, updating the associated filter -and propagating any changes- */
+	/** Sets the content, updating the filter -and propagating any changes- */
 	private void setEditorContent(Object content) {
 		editor.setContent(content);
 		filter.checkChanges();
@@ -292,9 +296,11 @@ public class FilterEditor extends JComponent{
     public IFilterTextParser getTextParser(){
     	return editor.getTextParser();
     }
-
     
-    /** Defines the filter position associated to this editor. It corresponds to the table's model*/
+    /** 
+     * Defines the filter position associated to this editor.<br> 
+     * It corresponds to the table's model column
+     **/
 	public void setFilterPosition(int filterPosition) {
 		editor.setPosition(filterPosition);
 		filter.checkChanges();
@@ -305,7 +311,10 @@ public class FilterEditor extends JComponent{
 		return editor.getPosition();
 	}
 	
-	/** Defines the format, used in the options list to convert content into strings -if needed-*/
+	/** 
+	 * Defines the format, used in the options list to convert content 
+	 * into strings (if / when needed)
+	 **/
 	public void setFormat(Format format){
 		popup.setFormat(format);
 	}
@@ -317,9 +326,9 @@ public class FilterEditor extends JComponent{
 	}
 
 	/** 
-	 * Adds the options to the current set. If there is no {@link ListCellRenderer} defined,
-	 * the content is stringfied and sorted.<br>
-	 * Duplicates are always removed.
+	 * Adds the options to the current set, removing any duplicates.<br>
+	 * If there is no {@link ListCellRenderer} defined, the content is 
+	 * stringfied and sorted.<br>
 	 */
 	public void addOptions(Collection<?> options) {
 		popup.addOptions(options);
@@ -352,9 +361,9 @@ public class FilterEditor extends JComponent{
 	}
 
 	/**
-	 * Defines the editor, if text based -i.e., without associated {@link ListCellRenderer},
-	 * as editable: this flag means that the user can enter any text, not being limited to the
-	 * existing options
+	 * Defines the editor, if text based -i.e., without associated 
+	 * {@link ListCellRenderer}, as editable: this flag means that the user 
+	 * can enter any text, not being limited to the existing options
 	 */
 	public void setEditable(boolean enable) {
 		if (!popup.hasOptions()){
@@ -374,8 +383,8 @@ public class FilterEditor extends JComponent{
 	}
 	
 	/**
-	 * Using autoOptions, the options displayed on the popup menu are automatically extracted
-	 * from the associated {@link TableModel}.
+	 * Using autoOptions, the options displayed on the popup menu are 
+	 * automatically extracted from the associated {@link TableModel}.
 	 * @param tableModel can be set to null unset the flag
 	 */
 	public void setAutoOptions(TableModel tableModel){
@@ -414,7 +423,8 @@ public class FilterEditor extends JComponent{
             		}
             	}
 			});
-			newComponent.getComponent().setPreferredSize(editor.getComponent().getPreferredSize());
+			newComponent.getComponent().setPreferredSize(
+					editor.getComponent().getPreferredSize());
 		}
 		if (newComponent!=null){
 			if (editor!=null){
@@ -574,10 +584,10 @@ public class FilterEditor extends JComponent{
 			private static final long serialVersionUID = 1945871436968682881L;
 
 			public void actionPerformed(ActionEvent e) {
-				//if focus is on the popup: select the very last item on the popup,
-				//changing probably from the history list to the option list.
-				//if the item is already on the very last element, or the focus is on the
-				//text field, move the caret to the end
+				//if focus is on the popup: select the very last item on the 
+				//popup, changing probably from the history list to the option 
+				//list;  if the item is already on the very last element, or the 
+				//focus is on the text field, move the caret to the end
 				if (!popup.isPopupFocused() || !popup.selectLast(true)){
 					if (e.getSource() instanceof JTextField){
 						JTextField textField=(JTextField)e.getSource();
@@ -588,7 +598,8 @@ public class FilterEditor extends JComponent{
 		};
 		component.getActionMap().put(actionName, action);
 		component.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_END, Event.CTRL_MASK), actionName);
+				KeyStroke.getKeyStroke(KeyEvent.VK_END, Event.CTRL_MASK), 
+				actionName);
 	}
 
 	private void setupHomeCtrlKey(JComponent component) {
@@ -598,10 +609,10 @@ public class FilterEditor extends JComponent{
 			private static final long serialVersionUID = 3916227645612863334L;
 
 			public void actionPerformed(ActionEvent e) {
-				//if focus is on the popup: select the very first item on the popup,
-				//changing probably from the option list to the history list.
-				//if the item is already on the very first element, or the focus is on the
-				//text field, move the caret home
+				//if focus is on the popup: select the very first item on the 
+				//popup, changing probably from the option list to the history 
+				//list;  if the item is already on the very first element, or 
+				//the focus is on the text field, move the caret home
 				if (!popup.isPopupFocused() || !popup.selectFirst(true)){
 					if (e.getSource() instanceof JTextField){
 						JTextField textField=(JTextField)e.getSource();
@@ -612,7 +623,8 @@ public class FilterEditor extends JComponent{
 		};
 		component.getActionMap().put(actionName, action);
 		component.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_HOME, Event.CTRL_MASK), actionName);
+				KeyStroke.getKeyStroke(KeyEvent.VK_HOME, Event.CTRL_MASK), 
+				actionName);
 	}
 
 	/**
@@ -650,8 +662,8 @@ public class FilterEditor extends JComponent{
 			private static final long serialVersionUID = -1187830005921916553L;
 
 			public void actionPerformed(ActionEvent e) {
-				//without moving the focus, move down one page on the popup menu, probably jumping
-				//to options list
+				//without moving the focus, move down one page on the popup menu, 
+				//probably jumping to options list
 				if (popup.isVisible()) {
 					boolean focusPopup = popup.isPopupFocused();
 					popup.selectDownPage();
@@ -673,8 +685,8 @@ public class FilterEditor extends JComponent{
 			private static final long serialVersionUID = 6590487133211390977L;
 
 			public void actionPerformed(ActionEvent e) {
-				//without moving the focus, move up one page on the popup menu, probably jumping
-				//to history list
+				//without moving the focus, move up one page on the popup menu, 
+				//probably jumping to history list
 				if (popup.isVisible()) {
 					boolean focusPopup = popup.isPopupFocused();
 					popup.selectUpPage();
@@ -694,8 +706,8 @@ public class FilterEditor extends JComponent{
 			private static final long serialVersionUID = 746565926592574009L;
 
 			public void actionPerformed(ActionEvent e) {
-				//if focus is on the popup: move from options to history, and, being already
-				// on history, up to text field.
+				//if focus is on the popup: move from options to history, and, 
+				//being already on history, up to text field.
 				if (popup.isPopupFocused()) {
 					if (!popup.selectUp(true)){
 						popup.setPopupFocused(false);
@@ -705,7 +717,8 @@ public class FilterEditor extends JComponent{
 		};
 		component.getActionMap().put(actionName, action);
 		component.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_UP, Event.CTRL_MASK), actionName);
+				KeyStroke.getKeyStroke(KeyEvent.VK_UP, Event.CTRL_MASK), 
+				actionName);
 	}
 
 	private void setupUpKey(JComponent component) {
@@ -757,7 +770,8 @@ public class FilterEditor extends JComponent{
 		};
 		component.getActionMap().put(actionName, action);
 		component.getInputMap(JComponent.WHEN_FOCUSED).put(
-				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Event.CTRL_MASK), actionName);
+				KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Event.CTRL_MASK), 
+				actionName);
 	}
 
 	private void setupDownKey(JComponent component) {
@@ -787,12 +801,12 @@ public class FilterEditor extends JComponent{
 	}
 
 	/**
-	 * Custom implementation of the arrow button used to display the popup menu.<br>
+	 * Custom implementation of the arrow used to display the popup menu.<br>
 	 * It can have three states:<ul>
-	 * <li>Disabled: shown as a filled triangle with a pre-specified, disabled, color</li> 
-	 * <li>Enabled, full: shown as a filled triangle with normal color</li> 
-	 * <li>Enabled, not full: means that the popup cannot be shown, because has no content,
-	 *  it is displayed as a non-filled triangle with normal color</li> 
+	 * <li>Disabled: shown  with disabled, color</li> 
+	 * <li>Enabled, full: shown with normal color</li> 
+	 * <li>Enabled, not full: means that the popup cannot be shown, because has 
+	 * no content;  it is displayed as disabled</li> 
 	 */
 	final static class FilterArrowButton extends JButton {
 		private static final long serialVersionUID = -777416843479142582L;
@@ -857,8 +871,9 @@ public class FilterEditor extends JComponent{
 	}
 
     /**
-     * Wrapper of the filter associated to the {@link EditorComponent}, ensuring some
-     * added functionality (like auto-adding to the history list when the filter changes) 
+     * Wrapper of the filter associated to the {@link EditorComponent}, 
+     * ensuring some added functionality (like auto-adding to the 
+     * history list when the filter changes) 
      */
     final class Filter extends BaseFilter {
 		RowFilter delegateFilter;
@@ -904,8 +919,8 @@ public class FilterEditor extends JComponent{
 			repaint();
 		}
 		
-		@Override public void paintBorder(Component c, Graphics g, int x, int y, int width,
-				int height) {
+		@Override public void paintBorder(Component c, Graphics g, int x, int y, 
+				int width, int height) {
 			g.setColor(borderColor);
 			g.drawLine(0, height-1, width-1, height-1);
 			g.drawLine(width-1, 0, width-1, height-1);
@@ -921,8 +936,8 @@ public class FilterEditor extends JComponent{
 	}
 
 	/**
-	 * Class to automatically extract the content from the table model, used when
-	 * the filter editor is defined with autoOptions flag.
+	 * Class to automatically extract the content from the table model, 
+	 * used when the filter editor is defined with autoOptions flag.
 	 */
 	final class AutoOptionsHandler implements TableModelListener{
 		TableModel tableModel;
@@ -956,7 +971,7 @@ public class FilterEditor extends JComponent{
 	    private void extendFilterContentsFromModel(int firstRow, int lastRow){
 	    	List<Object> all = new ArrayList<Object>();
             int column = getFilterPosition();
-            
+
             lastRow = Math.min(tableModel.getRowCount() - 1, lastRow);
 
             while (lastRow >= firstRow) {

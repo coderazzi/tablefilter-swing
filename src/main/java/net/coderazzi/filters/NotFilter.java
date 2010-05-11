@@ -36,8 +36,8 @@ import javax.swing.RowFilter;
 public class NotFilter extends AndFilter {
 
     /**
-     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilter}
-     * instances
+     * Constructor built up out of none or more 
+     * {@link net.coderazzi.filters.IFilter} instances
      */
     public NotFilter(IFilter... observables) {
         super(observables);

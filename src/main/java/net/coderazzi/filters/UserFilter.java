@@ -2,6 +2,7 @@ package net.coderazzi.filters;
 
 import net.coderazzi.filters.gui.TableFilterHeader;
 
+
 /**
  * Commodity class to implement a custom user filter. 
  * @author  Luis M Pena - lu@coderazzi.net

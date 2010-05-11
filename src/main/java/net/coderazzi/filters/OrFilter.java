@@ -36,8 +36,8 @@ import javax.swing.RowFilter;
 public class OrFilter extends ComposedFilter {
 
     /**
-     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilter}
-     * instances
+     * Constructor built up out of none or more 
+     * {@link net.coderazzi.filters.IFilter} instances
      */
     public OrFilter(IFilter... observables) {
         super(observables);

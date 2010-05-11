@@ -28,7 +28,6 @@ package net.coderazzi.filters;
 import java.beans.PropertyChangeListener;
 import java.text.Format;
 import java.text.ParseException;
-
 import java.util.Comparator;
 
 import javax.swing.RowFilter;
@@ -43,9 +42,10 @@ import javax.swing.table.TableModel;
 public interface IFilterTextParser {
 
 	/**
-	 * Associates a {@link TableModel} to the parser. The parser can use it to
-	 * extract the type associated to a given column, or to define variables -the name of the 
-	 * column-. The usage is specific to the final implementation.
+	 * Associates a {@link TableModel} to the parser.<br>
+	 * The parser can use it to extract the type associated to a given column, 
+	 * or to define variables-the name of the column-. <br>
+	 * The usage is specific to the final implementation of this interface.
 	 */
     public void setTableModel(TableModel model);
 
@@ -79,25 +79,27 @@ public interface IFilterTextParser {
     public String getDefaultOperator();
 
     /**
-     * <p>Sets a specific comparator for a given class, that should override the default Compare
-     * algorithm for the given class.</p>
+     * <p>Sets a specific comparator for a given class, that should override 
+     * the default compare algorithm for the given class.</p>
      *
-     * <p>If the class is not {@link java.lang.Comparable}, this method should be invoked to support
-     * any comparison operator, or any operation will be invoked on the string representation
-     * of the instance.</p>
+     * <p>If the class is not {@link java.lang.Comparable}, this method should 
+     * be invoked to support any comparison operator, or any operation will 
+     * be invoked on the string representation of the instance.</p>
      */
     public void setComparator(Class<?> c,
                               Comparator<?> cmp);
 
     /**
-     * Returns the comparator provided for the given class
+     * Returns the {@link Comparator} provided for the given class
      */
     public Comparator<?> getComparator(Class<?> c);
 
     /**
-     * Provides the {@link Format} to build non basic types. If a table model defines some
-     * column without specified format, only string operations will apply.<br>
-     * Please note that every IFilterTextParser can define its own set of predefined Formats
+     * Provides the {@link Format} to build non basic types. <br>
+     * If a table model defines some column without specified format, only 
+     * string operations will apply.<br>
+     * Please note that every IFilterTextParser can define its own set of 
+     * predefined formats
      */
     public void setFormat(Class<?> c,
                           Format format);
@@ -108,7 +110,8 @@ public interface IFilterTextParser {
     public Format getFormat(Class<?> c);
 
     /**
-     * Adds a {@link PropertyChangeListener}. Any property change will be transmitted as an event
+     * Adds a {@link PropertyChangeListener}. <br>
+     * Any property change will be transmitted as an event
      */
 	public void addPropertyChangeListener(PropertyChangeListener listener);
 

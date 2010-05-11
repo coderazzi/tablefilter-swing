@@ -42,8 +42,8 @@ abstract public class ComposedFilter extends BaseFilter implements IFilterObserv
     protected Set<IFilter> filters = new HashSet<IFilter>();
 
     /**
-     * Constructor built up out of none or more {@link net.coderazzi.filters.IFilter}
-     * instances
+     * Constructor built up out of none or more 
+     * {@link net.coderazzi.filters.IFilter} instances
      */
     protected ComposedFilter(IFilter... observables) {
         addFilter(observables);
@@ -58,8 +58,8 @@ abstract public class ComposedFilter extends BaseFilter implements IFilterObserv
     }
 
     /**
-     * Subscribes one or more {@link net.coderazzi.filters.IFilter} instances to receive
-     * filter events from this composition filter.
+     * Subscribes one or more {@link net.coderazzi.filters.IFilter} instances to 
+     * receive filter events from this composition filter.
      */
     public void addFilter(IFilter... filtersToAdd) {
         for (IFilter observable : filtersToAdd) {

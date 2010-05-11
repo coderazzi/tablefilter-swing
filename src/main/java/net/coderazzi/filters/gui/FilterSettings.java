@@ -35,24 +35,29 @@ import net.coderazzi.filters.parser.Types;
 
 
 /**
- * Class to define some common settings to the TableFilter library. It is just a sugar replacement
- * to using directly system properties (which could be not available, anyway)
+ * Class to define some common settings to the TableFilter library.<br>
+ * It is just a sugar replacement to using directly system properties 
+ * (which could be not available, anyway)
  */
 public class FilterSettings {
     /**
-     * Set to true to perform automatically the selection of a row that is uniquely identified by
-     * the existing filter. It is true by default.
+     * Set to true to perform automatically the selection of a row that is 
+     * uniquely identified by the existing filter. It is true by default.
      */
-    public static boolean autoSelection = Boolean.parseBoolean(getString("AutoSelection", "true"));
+    public static boolean autoSelection = 
+    	Boolean.parseBoolean(getString("AutoSelection", "true"));
 
     /** Whether to automatically fill with content the editor field's options */
-    public static boolean autoOptions = Boolean.parseBoolean(getString("AutoOptions", "false"));
+    public static boolean autoOptions = 
+    	Boolean.parseBoolean(getString("AutoOptions", "false"));
 
-    /** Whether to ignore case or not. It is false by default (case sensitive) */
-    public static boolean ignoreCase = Boolean.parseBoolean(getString("IgnoreCase", "false"));
+    /** Whether to ignore case or not, false by default (case sensitive) */
+    public static boolean ignoreCase = 
+    	Boolean.parseBoolean(getString("IgnoreCase", "false"));
 
     /** The header position, {@link Position#INLINE} by default. */
-    public static Position headerPosition = Position.valueOf(getString("Header.Position", "INLINE"));
+    public static Position headerPosition = 
+    	Position.valueOf(getString("Header.Position", "INLINE"));
 
     /** The default date format, used on the default text parser */
     public static String dateFormat = getString("DateFormat", null);
@@ -76,14 +81,14 @@ public class FilterSettings {
     public static Types types = new Types();
 
     /**
-     * The class to handle the text parsing by default. It must have a default constructor. It
-     * corresponds to the property TextParser.class
+     * The class to handle the text parsing by default.<br>
+     * It must have a default constructor. <br>
+     * It corresponds to the property TextParser.class
      */
     public static Class<? extends IFilterTextParser> filterTextParserClass;
 
     /** The class implementing the {@link FilterEditor} */
     public static Class<? extends FilterEditor> filterEditorClass;
-
 
     /** Creates a FilterEditor as defined by default */
     public static FilterEditor newFilterEditor() {
@@ -114,24 +119,30 @@ public class FilterSettings {
         String cl = getString("TextParser.class", null);
         if (cl != null) {
             try {
-                filterTextParserClass = (Class<? extends IFilterTextParser>) Class.forName(cl);
+                filterTextParserClass = (Class<? extends IFilterTextParser>) 
+                                        Class.forName(cl);
             } catch (ClassNotFoundException cne) {
-                throw new RuntimeException("Error finding filter text parser of class " + cl, cne);
+                throw new RuntimeException(
+                		"Error finding filter text parser of class " + cl, cne);
             } catch (ClassCastException cce) {
-                throw new RuntimeException("Filter text parser of class " + cl
-                                           + " is not a valid IFilterTextParser class");
+                throw new RuntimeException(
+                		"Filter text parser of class " + cl
+                        + " is not a valid IFilterTextParser class");
             }
         }
         filterEditorClass = FilterEditor.class;
         cl = getString("FilterEditor.class", null);
         if (cl != null) {
             try {
-            	filterEditorClass = (Class<? extends FilterEditor>) Class.forName(cl);
+            	filterEditorClass = (Class<? extends FilterEditor>) 
+            	                    Class.forName(cl);
             } catch (ClassNotFoundException cne) {
-                throw new RuntimeException("Error finding filter editor of class " + cl, cne);
+                throw new RuntimeException(
+                		"Error finding filter editor of class " + cl, cne);
             } catch (ClassCastException cce) {
-                throw new RuntimeException("Filter editor of class " + cl
-                                           + " is not a valid FilterEditor class");
+                throw new RuntimeException(
+                		"Filter editor of class " + cl
+                        + " is not a valid FilterEditor class");
             }
         }
     }

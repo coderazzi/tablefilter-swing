@@ -27,11 +27,13 @@ package net.coderazzi.filters;
 
 import javax.swing.RowFilter;
 
+
 /**
- * <p>Interface to be implemented by any instance holding a filter than can be updated
- * dynamically.</p>
+ * <p>Interface to be implemented by any instance holding a filter than 
+ * can be updated dynamically.</p>
  *
- * <p>Ant change on the filter is propagated to the observers, in no prefixed order.</p>
+ * <p>Ant change on the filter is propagated to the observers, 
+ * in no prefixed order.</p>
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
@@ -43,7 +45,8 @@ public interface IFilter {
     public void addFilterObserver(IFilterObserver observer);
 
     /**
-     * Unregisters an observer, that will not receive no further filter update notifications.
+     * Unregisters an observer, that will not receive 
+     * any further filter update notifications.
      */
     public void removeFilterObserver(IFilterObserver observer);
 

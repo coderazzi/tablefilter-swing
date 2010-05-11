@@ -39,15 +39,23 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 /**
- * Special renderer used on the history and options list, and to render the content
- * when is not text-based (the user has specified a {@link ListCellRenderer}<br>
- * This FilterListCellRenderer encapsulated the user's {@link ListCellRenderer}, to
- * have some specific appearance: it differentiates between selected cells, selected focused cells,
- * and other cells; a cell that is selected is considered focused if the current focus lies
- * on the Popup menu (and not on the editor itself):<ul>
- * <li>A selected and focused cells is displayed as usual (selected background).</li>
- * <li>A selected, not focused cell, only gets an arrow, shown on its left side.</li></ul>
- * To avoid inconsistencies, the space required for the arrow is left blank on the unselected cells 
+ * Special renderer used on the history and options list, 
+ * and to render the content when is not text-based 
+ * (the user has specified a {@link ListCellRenderer}<br>
+ * 
+ * This FilterListCellRenderer encapsulated the user's {@link ListCellRenderer}, 
+ * to have some specific appearance: it differentiates between selected cells, 
+ * selected focused cells, and other cells; a cell that is selected is 
+ * considered focused if the current focus lies on the Popup menu 
+ * (and not on the editor itself):
+ * <ul>
+ * <li>A selected and focused cells is displayed as usual 
+ * (selected background).</li>
+ * <li>A selected, not focused cell, only gets an arrow, 
+ * shown on its left side.</li>
+ * </ul>
+ * To avoid inconsistencies, the space required for the arrow is left blank 
+ * on the unselected cells 
  * <br>
  */
 class FilterListCellRenderer extends JComponent implements ListCellRenderer {
@@ -77,7 +85,10 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		this.referenceList = mainList;
 	}
 
-	/** Indicates that the focus is currenly on the list. Selected cells are selected-focused cells */
+	/** 
+	 * Indicates that the focus is currenly on the list.<br>
+	 * Selected cells are selected-focused cells
+	 **/
 	public void setFocusOnList(boolean set) {
 		this.focusOnList = set;
 	}
@@ -94,10 +105,12 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		return userRenderer==defaultRenderer? null : userRenderer;
 	}
 
-	public Component getListCellRendererComponent(JList list, Object value, int index,
-			boolean isSelected, boolean cellHasFocus) {
-		setupRenderer(list, value, index, focusOnList && isSelected, cellHasFocus);
-		width = referenceList.isShowing() ? referenceList.getWidth() : list.getWidth();
+	public Component getListCellRendererComponent(JList list, Object value, 
+			int index, boolean isSelected, boolean cellHasFocus) {
+		setupRenderer(list, value, index, 
+				focusOnList && isSelected, cellHasFocus);
+		width = referenceList.isShowing() ? 
+				referenceList.getWidth() : list.getWidth();
 		selected = isSelected;
 		xDeltaBase = WIDTH_ARROW + 2 * X_MARGIN_ARROW;
 		return this;
@@ -112,14 +125,17 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		return this;
 	}
 
-	private void setupRenderer(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+	private void setupRenderer(JList list, Object value, int index, 
+			boolean isSelected, boolean cellHasFocus) {
 		try {
-			inner = userRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			inner = userRenderer.getListCellRendererComponent(list, value, 
+					index, isSelected, cellHasFocus);
 		} catch (Exception ex) {
 			inner = null;
 		}
 		if (inner == null) {
-			inner = defaultRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			inner = defaultRenderer.getListCellRendererComponent(list, value, 
+					index, isSelected, cellHasFocus);
 		}
 		inner.setFont(list.getFont());
 		inner.setEnabled(isEnabled());
@@ -132,7 +148,8 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		int xDelta = xDeltaBase;
 		int yDelta = 0;
 		if (selected) {
-			Object old = ((Graphics2D) g).getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+			Object old = ((Graphics2D) g).getRenderingHint(
+					RenderingHints.KEY_ANTIALIASING);
 			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
 			yDelta = height / 2 + 1 - HEIGHT_ARROW / 2;
@@ -140,7 +157,8 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			g.translate(X_MARGIN_ARROW, yDelta);
 			g.setColor(arrowColor);
 			g.fillPolygon(X, Y, X.length);
-			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, old);
+			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+					                          old);
 		} 
 		g.translate(xDelta, -yDelta);
 		painter.paintComponent(g, inner, this, 0, 0, width-xDeltaBase, height);

@@ -30,18 +30,21 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 
+
 /**
  * Class to deduce a sensible {@link Comparator} for {@link Date} instances.<br>
  */
 abstract public class DateComparator implements Comparator<Date>{
+
 	/**
 	 * Factory constructor, returning an instance suitable for the given format.
 	 */
 	public static DateComparator getDateComparator(Format dateFormat){
-		//the idea is to build a date instance, change then each field (milliseconds / seconds
-		// etc) and check the change on the parsed instance. If changing, for example, the
-		// seconds, does not produce a different formatted string, the comparator will not pay
-		// attention to the seconds, and so on
+		//the idea is to build a date instance, change then each field 
+		// (milliseconds / seconds / etc) and check the change on the 
+		// parsed instance. If changing, for example, the seconds, does 
+		// not produce a different formatted string, the comparator will 
+		// not pay attention to the seconds, and so on
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(new Date().getTime());
 		if (change(calendar, dateFormat, Calendar.MILLISECOND)){
@@ -77,12 +80,14 @@ abstract public class DateComparator implements Comparator<Date>{
 		}
 		return new TimeComparator(divisor);
 	}
+	
 	static private boolean change(Calendar c, Format f, int field){
 		c.set(field, 10);
 		String sf = f.format(c.getTime());
 		c.set(field, 11);
 		return !sf.equals(f.format(c.getTime()));
 	}
+	
 	@Override public int compare(Date o1, Date o2) {
 		if (o1==null){
 			return o2==null? 0 : -1;
@@ -93,10 +98,12 @@ abstract public class DateComparator implements Comparator<Date>{
 		long diff = diff(o1, o2);
 		return diff==0? 0 : diff>0? 1 : -1;
 	}
+	
 	public abstract long diff(Date o1, Date o2);
 
 	/**
-	 * DateComparator when the difference relies on time fields (seconds, minutes, hours).
+	 * DateComparator when the difference relies on time fields 
+	 * (seconds, minutes, hours).<br>
 	 * We divide the time to set out the unneeded information, before comparing
 	 */
     static class TimeComparator extends DateComparator{
@@ -128,6 +135,7 @@ abstract public class DateComparator implements Comparator<Date>{
     		return calendar.get(Calendar.YEAR);
     	}
     }
+    
     /** DateComparator that simply compares the year and month's fields */
     static class MonthYearComparator extends YearComparator{
     	public MonthYearComparator(Calendar calendar) {
@@ -138,6 +146,7 @@ abstract public class DateComparator implements Comparator<Date>{
     		return calendar.get(Calendar.YEAR) * 12 + calendar.get(Calendar.MONTH);
     	}
     }
+    
     /** DateComparator that simply compares the year/month/day's fields */
     static class DayMonthYearComparator extends YearComparator{
     	public DayMonthYearComparator(Calendar calendar) {

@@ -60,23 +60,25 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
 
 
 /**
- * <p>Implementation of a table filter that displays a set of editors associated to each table's
- * column. This is the main Gui component in this library.</p>
+ * <p>Implementation of a table filter that displays a set of editors 
+ * associated to each table's column. 
+ * This is the main Gui component in this library.</p>
  *
- * <p>These editors are moved and resized as the table's columns are resized, so this Swing
- * component is better suited to be displayed atop, inline the {@link JTable}, or just below, 
- * using the same size -and resizing- as the table itself. The position can be automatically 
- * handled by the header itself -that is the default behavior-</p>
+ * <p>These editors are moved and resized as the table's columns are resized, 
+ * so this Swing component is better suited to be displayed atop, inline the 
+ * {@link JTable}, or just below, using the same size -and resizing- as the 
+ * table itself. The position can be automatically handled by the header 
+ * itself -that is the default behavior-</p>
  *
- * <p>The editor associated to each column has the type {@link FilterEditor}, and can be
- * manipulated separately.</p>
+ * <p>The editor associated to each column has the type {@link FilterEditor}, 
+ * and can be manipulated separately.</p>
  *
- * <p>The implementation relies on the {@link net.coderazzi.filters.TableFilter} class, please
- * read its documentation to understand the requirements on the table and its model, and how it is
- * affected by this filter</p>
+ * <p>The implementation relies on the {@link net.coderazzi.filters.TableFilter} 
+ * class, please read its documentation to understand the requirements on the 
+ * table and its model, and how it is affected by this filter</p>
  * 
- * <p>The default settings can be modified by using system properties or by setting values on
- * the singleton {@link FilterSettings} instance</p>
+ * <p>The default settings can be modified by using system properties or by 
+ * setting values on the singleton {@link FilterSettings} instance</p>
  * 
  * <p>Providing a filter header to an existing table is as easy as doing:</p>
  * <code>TableFilterHeader filter = new TableFilterHeader(table);</code>
@@ -89,11 +91,13 @@ public class TableFilterHeader extends JPanel {
 
     /**
      * <p>Location of the header in relation to the table</p>
-     * <p>Note that this location is only meaningful when the table is set inside a scroll pane,
-     * and this header instance is not explicitely included in a container</p>
+     * <p>Note that this location is only meaningful when the table is set 
+     * inside a scroll pane, and this header instance is not explicitely 
+     * included in a container</p>
      * <ul>
      * <li>TOP: the filter is placed automatically above the table header.</li>
-     * <li>INLINE: the filter is placed below the table header, above the table's content.</li>
+     * <li>INLINE: the filter is placed below the table header, 
+     * above the table's content.</li>
      * <li>NONE: the filter is not automatically placed.</li>
      * </ul>
      *
@@ -112,17 +116,21 @@ public class TableFilterHeader extends JPanel {
     /** Whether the component is enabled (cannot be delegated to the parent **/
     private boolean enabled=true;
 
-    /** If true,filter editors will automatically extract the content from the table **/
+    /** 
+     * If true, filter editors will automatically extract 
+     * their content from the table's content 
+     **/
     private boolean autoOptions=false;
 
-    /** The associated locator to handle the location of the filter in the table header */
+    /** The helper to handle the location of the filter in the table header */
     private PositionHelper positionHelper = new PositionHelper(this);
         
 	/** This is the total max number of visible rows (history PLUS options) */
 	int maxVisibleRows = FilterSettings.maxVisiblePopupRows;
     
     /**
-     * The columnsController is a glue component, controlling the filters associated to each column
+     * The columnsController is a glue component, controlling the filters 
+     * associated to each column
      */
     FilterColumnsControllerPanel columnsController;
 
@@ -133,17 +141,15 @@ public class TableFilterHeader extends JPanel {
     JTable table;
     
     /**
-     * The privately owned instance of TableFilter that conforms the filter defined by the
-     * TableFilterHeader
+     * The privately owned instance of TableFilter that conforms the filter 
+     * defined by the TableFilterHeader
      */
     TableFilter filtersHandler = new TableFilter();
 
     /** The set of currently subscribed observers */
     Set<IFilterHeaderObserver> observers = new HashSet<IFilterHeaderObserver>();
 
-    /**
-     * Helper to Revalidate automatically the controller when the table changes size
-     */
+    /** Helper to revalidate the controller when the table changes size */
     private ComponentAdapter resizer = new ComponentAdapter(){
         @Override
         public void componentResized(ComponentEvent e) {
@@ -152,7 +158,6 @@ public class TableFilterHeader extends JPanel {
         	}
         }  
     };
-
 
     /**
      * Constructor; the object is functional after a table is attached
@@ -251,9 +256,7 @@ public class TableFilterHeader extends JPanel {
         return table;
     }
 
-    /**
-     * Returns the internal table filter. This can be used to attach additional filters.
-     */
+    /** Returns the TableFilter; additional filters can be then attached */
     public TableFilter getTableFilter() {
         return filtersHandler;
     }
@@ -261,8 +264,8 @@ public class TableFilterHeader extends JPanel {
     /**
      * <p>Sets a new table filter.</p>
      *
-     * <p>The filters associated to the initial {@link TableFilter} are transferred to the new
-     * one.</p>
+     * <p>The filters associated to the initial {@link TableFilter} 
+     * are transferred to the new one.</p>
      */
     public void setTableFilter(TableFilter filter) {
         for (IFilter obs : filtersHandler.getFilterObservables()) {
@@ -273,14 +276,13 @@ public class TableFilterHeader extends JPanel {
         filtersHandler = filter;
     }
 
-
     /**
-     * <p>Defines the behaviour of the header concerning its position related to the table.</p>
+     * <p>Defines the behaviour of the header concerning 
+     * its position related to the table.</p>
      */
     public void setPosition(Position location) {
         positionHelper.setPosition(location);
     }
-
 
     /** Returns the mode currently associated to the TableHeader */
     public Position getPosition() {
@@ -290,9 +292,9 @@ public class TableFilterHeader extends JPanel {
     /**
      * <p>Invokes resetFilter on all the editor filters.</p>
      *
-     * Invokes resetFilter on all the editors.
      * This does not only implies invoking {@link FilterEditor#resetFilter()},
-     * as it tries to reset the original editor options for enums and boolean types 
+     * as it tries to reset the original editor options for enums 
+     * and boolean types 
      *
      * @see  FilterEditor#resetFilter()
      */
@@ -378,8 +380,8 @@ public class TableFilterHeader extends JPanel {
     }
 
     /**
-     * Sets the foreground color used by the parsing text editors when there are error on the
-     * filter expressions.
+     * Sets the foreground color used by the parsing text editors 
+     * when there are errors on the filter expressions.
      */
     public void setErrorForeground(Color fg) {
         this.errorColor = fg;
@@ -389,18 +391,20 @@ public class TableFilterHeader extends JPanel {
     }
 
     /**
-     * <p>Returns the color set by default as foreground on each text editor when the user commits
-     * any error on the filter expression.</p>
+     * <p>Returns the color set by default as foreground on each text editor 
+     * when the user commits any error on the filter expression.</p>
      *
-     * <p>Note that the color of each specific editor can be different, if the user customizes it
-     * directly</p>
+     * <p>Note that the color of each specific editor can be different, 
+     * if the user customizes it directly</p>
      */
     public Color getErrorForeground() {
         return errorColor;
     }
 
-
-	/** Sets the maximum number of visible rows in the popup menu (a minimum is always enforced) */
+	/** 
+	 * Sets the maximum number of visible rows in the popup menu 
+	 * (a minimum is always enforced) 
+	 **/
 	public void setMaxVisibleRows(int maxVisibleRows) {
 		this.maxVisibleRows = maxVisibleRows;
 		if (columnsController!=null){
@@ -416,8 +420,9 @@ public class TableFilterHeader extends JPanel {
     /** Creates an editor for the given column, customized to the associated type */
     FilterEditor createEditor(int modelColumn) {
         
-        FilterEditor ret =  FilterSettings.newFilterEditor();
-        ret.setFormat(getTextParser().getFormat(table.getModel().getColumnClass(modelColumn)));
+        FilterEditor ret = FilterSettings.newFilterEditor();
+        ret.setFormat(getTextParser().getFormat(
+        		table.getModel().getColumnClass(modelColumn)));
         ret.setTextParser(getTextParser());
         ret.setFilterPosition(modelColumn);
         
@@ -448,7 +453,8 @@ public class TableFilterHeader extends JPanel {
      * Populates basic editor options (boolean, enums).<br>
      * Returns false if the editor is not a boolean or enumeration
      */
-    boolean populateBasicEditorOptions(FilterEditor editor, boolean fixMaxHistory) {
+    boolean populateBasicEditorOptions(FilterEditor editor, 
+    		                           boolean fixMaxHistory) {
         
         Class<?> c = table.getModel().getColumnClass(editor.getFilterPosition());
         List<Object> options;
@@ -475,29 +481,32 @@ public class TableFilterHeader extends JPanel {
 
     /** Returns the filter editor for the given column in the table model */
     public FilterEditor getFilterEditor(int modelColumn) {
-        return (columnsController == null)
-            ? null : columnsController.getFilterEditor(table.convertColumnIndexToView(modelColumn));
+        return (columnsController == null) ? null : 
+        	columnsController.getFilterEditor(
+        			table.convertColumnIndexToView(modelColumn));
     }
 
-
     /**
-     * <p>Sets as renderer for the editor a generic {@link TableCellRenderer}, as used by the {@link
-     * JTable}</p>
+     * <p>Sets as renderer for the editor a generic {@link TableCellRenderer}, 
+     * as used by the {@link JTable}</p>
      *
-     * <p>This method allows reusing a renderer already written for a table as the editor's
-     * renderer, but it has an important restriction: it only works if the renderer does not depend
-     * on the cell coordinates</p>
+     * <p>This method allows reusing a renderer already written for a table 
+     * as the editor's renderer, but it has an important restriction: it only 
+     * works if the renderer does not depend on the cell coordinates</p>
      */
-    public void setTableCellRenderer(final int modelColumn, final TableCellRenderer renderer) {
-    	getFilterEditor(modelColumn).setListCellRenderer(new DefaultListCellRenderer() {
+    public void setTableCellRenderer(final int modelColumn, 
+                                     final TableCellRenderer renderer) {
+    	getFilterEditor(modelColumn).setListCellRenderer(
+    			new DefaultListCellRenderer() {
 
     		private static final long serialVersionUID = -5990815893475331934L;
 
-			@Override public Component getListCellRendererComponent(JList list, Object value,
-                int index, boolean isSelected, boolean cellHasFocus) {
+			@Override public Component getListCellRendererComponent(JList list, 
+					Object value, int index, boolean isSelected, 
+					boolean cellHasFocus) {
 
-				Component ret =  renderer.getTableCellRendererComponent(table, value, isSelected,
-                        cellHasFocus, 1, modelColumn);
+				Component ret =  renderer.getTableCellRendererComponent(table, 
+						value, isSelected, cellHasFocus, 1, modelColumn);
 				if (!isSelected){
 					ret.setBackground(list.getBackground());
 					ret.setForeground(list.getForeground());
@@ -506,10 +515,12 @@ public class TableFilterHeader extends JPanel {
             }
         });
     }
+
     /**
      * <p>Sets the parser to be used on text filter editors.</p>
      *
-     * <p>This parser overrides any parser already set on the separate columns filters.</p>
+     * <p>This parser overrides any parser already set 
+     * on the separate columns filters.</p>
      */
     public void setTextParser(IFilterTextParser parser) {
         filterTextParser = parser;
@@ -521,12 +532,12 @@ public class TableFilterHeader extends JPanel {
         }
     }
 
-
     /**
      * <p>Returns the parser used on plain text filters.</p>
      *
-     * <p>Each column can have its own Parser, if setTextParser is used on the associated filter. In
-     * that case, it is needed to access each filter to obtain the used parser.</p>
+     * <p>Each column can have its own Parser, if setTextParser is used on 
+     * the associated filter. In that case, it is needed to access each 
+     * filter to obtain the used parser.</p>
      */
     public IFilterTextParser getTextParser() {
         if (filterTextParser == null) {
@@ -539,7 +550,6 @@ public class TableFilterHeader extends JPanel {
         return filterTextParser;
     }
 
-
     /** Hides / makes visible the header */
 	@Override public void setVisible(boolean flag) {
     	if (isVisible()!=flag){
@@ -550,8 +560,9 @@ public class TableFilterHeader extends JPanel {
 	}
 	
 	/**
-	 * Sets the auto options flag. When set, all editors are automatically populated with
-	 * options extracted from the table's content -and updated as the table is updated-.
+	 * Sets the auto options flag. When set, all editors are automatically 
+	 * populated with options extracted from the table's content 
+	 * -and updated as the table is updated-.
 	 */
 	public void setAutoOptions(boolean set){
 		if (autoOptions!=set){
@@ -572,8 +583,8 @@ public class TableFilterHeader extends JPanel {
     /** Enables/Disables the filters */
     @Override public void setEnabled(boolean enabled) {
     	//it is not possible to call to super.setEnabled(enabled);
-    	//the filter header can embed the the header of the table, which would then
-    	//become also disabled.
+    	//the filter header can embed the the header of the table, which 
+    	//would then become also disabled.
     	this.enabled=enabled;
 
         if (columnsController != null) {
@@ -609,12 +620,15 @@ public class TableFilterHeader extends JPanel {
     }
     
     /**
-     * Class setting up together all the column filters Note that, while the TableFilterHeader
-     * handles columns using their model numbering, the FilterColumnsControllerPanel manages the
-     * columns as they are sorted in the Table. That is, if the user changes the order of two or
-     * more columns, this class reacts by reordering internal data structures
+     * Class setting up together all the column filters<br>
+     * Note that, while the TableFilterHeader handles columns using their 
+     * model numbering, the FilterColumnsControllerPanel manages the columns 
+     * as they are sorted in the Table. That is, if the user changes the 
+     * order of two or more columns, this class reacts by 
+     * reordering internal data structures
      */
-    private class FilterColumnsControllerPanel extends JPanel implements TableColumnModelListener, Runnable {
+    private class FilterColumnsControllerPanel extends JPanel 
+    		implements TableColumnModelListener, Runnable {
 
 		private static final long serialVersionUID = -5183169239497633085L;
 
@@ -625,23 +639,24 @@ public class TableFilterHeader extends JPanel {
         private Dimension preferredSize;
 
         /**
-         * The panel must keep a reference to the TableColumnModel, to be able to 'unregister' when
-         * the controller is destroyed.
+         * The panel must keep a reference to the TableColumnModel, to be able 
+         * to 'unregister' when the controller is destroyed.
          */
         private TableColumnModel tableColumnModel;
 
         /**
-         * Variable keeping track of the number of times that the run() method is going to be
-         * invoked from the gui thread
+         * Variable keeping track of the number of times that the run() 
+         * method is going to be invoked from the gui thread
          */
         private int autoRun;
 
-
         /**
-         * Creates the controller for all the columns It will automatically create an editor of the
-         * current EditorMode for each column
+         * Creates the controller for all the columns<br>
+         * It will automatically create an editor of the current EditorMode 
+         * for each column
          */
-        public FilterColumnsControllerPanel(Font font, Color foreground, Color background) {
+        public FilterColumnsControllerPanel(Font font, Color foreground, 
+        		Color background) {
             super(null);
             super.setFont(font);
             super.setForeground(foreground);
@@ -660,14 +675,14 @@ public class TableFilterHeader extends JPanel {
             tableColumnModel.addColumnModelListener(this);
         }
 
-
         /** Creates the FilterColumnPanel for the given column number */
         private void createColumn(int columnView) {
             int columnModel = table.convertColumnIndexToModel(columnView);
             FilterEditor editor = createEditor(columnModel);
             filtersHandler.addFilter(editor.getFilter());
 
-            FilterColumnPanel column = new FilterColumnPanel(tableColumnModel.getColumn(columnView), editor);
+            FilterColumnPanel column = new FilterColumnPanel(
+            		tableColumnModel.getColumn(columnView), editor);
             customizeEditor(column.editor);
             column.updateHeight();
             columns.add(column);
@@ -683,13 +698,15 @@ public class TableFilterHeader extends JPanel {
             tableColumnModel.removeColumnModelListener(this);
         }
 
-        /** Returns the editor for the given column, or null if such column does not exist */
+        /** 
+         * Returns the editor for the given column, 
+         * or null if such column does not exist 
+         **/
         public FilterEditor getFilterEditor(int viewColumn) {
             return (columns.size() > viewColumn) ? columns.get(viewColumn).editor : null;
         }
 
-
-        /** Computes the proper preferred size -only the height, the width is not important- */
+        /** Computes the proper preferred height -width is not important- */
         private void updateHeight() {
             int h = 0;
 
@@ -711,8 +728,9 @@ public class TableFilterHeader extends JPanel {
 
         /**
          * Invokes resetFilter on all the editors.<br?
-         * This does not only implies invoking {@link FilterEditor#resetFilter()},
-         * as it tries to reset the original editor options for enums and boolean types 
+         * This does not only implies invoking 
+         * {@link FilterEditor#resetFilter()}, as it tries to reset the 
+         * original editor options for enums and boolean types 
 		 */
         public void resetFilters() {
             for (FilterColumnPanel column : columns) {
@@ -728,11 +746,15 @@ public class TableFilterHeader extends JPanel {
             }
     	}
 
-        /** Sets the auto options flag, but not on editors associated to boolean/enumerations */
+        /** 
+         * Sets the auto options flag, 
+         * but not on editors associated to boolean/enumerations 
+         **/
         public void setAutoOptions(boolean set) {
         	
             for (FilterColumnPanel column : columns) {
-                Class<?> c = table.getModel().getColumnClass(column.editor.getFilterPosition());
+                Class<?> c = table.getModel().getColumnClass(
+                		column.editor.getFilterPosition());
                 if (!c.equals(Boolean.class) && !c.isEnum()){
                 	column.editor.setAutoOptions(set? table.getModel() : null);
                 }
@@ -787,12 +809,10 @@ public class TableFilterHeader extends JPanel {
                 filter.setEnabled(enabled);
         }
 
-
         /** {@link TableColumnModelListener} interface */
         public void columnMarginChanged(ChangeEvent e) {
             placeComponents();
         }
-
 
         /** {@link TableColumnModelListener} interface */
         public void columnMoved(TableColumnModelEvent e) {
@@ -804,7 +824,6 @@ public class TableFilterHeader extends JPanel {
             }
         }
 
-
         /** {@link TableColumnModelListener} interface */
         public void columnAdded(TableColumnModelEvent e) {
 
@@ -812,20 +831,20 @@ public class TableFilterHeader extends JPanel {
             //general, when fireTableStructureChanged() is invoked on a
             //table model, all columns are removed, and the definitive ones
             //added.
-            //To avoid sending update notifications to the table, which can be
-            //quite time/CPU consuming, it is better to disable the notifications
-            //and only send them after all columns have been added or removed.
-            //As there is no way to know when the last column is added (or removed),
-            //the implementation disables the notifications and request to be
-            //auto called eventually. This call (run()) will happen when all the
-            //column modifications have concluded, so then it is safe to reactivate
-            //the notifications
+            //To avoid sending update notifications to the table, which 
+        	//may be quite time/CPU consuming, it is better to disable 
+        	//the notifications and only send them after all columns 
+        	//have been added or removed.
+            //As there is no way to know when the last column is added 
+        	//(or removed), the implementation disables the notifications 
+        	//and request to be auto called eventually. This call (run()) 
+        	//will happen when all the column modifications have concluded, 
+        	//so then it is safe to reactivate the notifications
             filtersHandler.enableNotifications(false);
             createColumn(e.getToIndex());
             updateHeight();
             update();
         }
-
 
         /** {@link TableColumnModelListener} interface */
         public void columnRemoved(TableColumnModelEvent e) {
@@ -838,7 +857,6 @@ public class TableFilterHeader extends JPanel {
             remove(fcp);
             update();
         }
-
 
         /** {@link TableColumnModelListener} interface */
         public void columnSelectionChanged(ListSelectionEvent e) {
@@ -860,10 +878,6 @@ public class TableFilterHeader extends JPanel {
         	}
         }
 
-
-        /**
-         * See the comments on columnAdded
-         */
         public void run() {
 
             //see the comment on columnAdded
@@ -886,16 +900,16 @@ public class TableFilterHeader extends JPanel {
             revalidate();
         }
 
-
         @Override public Dimension getPreferredSize() {
             return preferredSize;
         }
         
         /**
-         * Class controlling the filter applied to one specific column It resizes itself
-         * automatically as the associated table column is resized
+         * Class controlling the filter applied to one specific column<br>
+         * It resizes itself automatically as the associated table column is resized
          */
-        private class FilterColumnPanel extends JPanel implements PropertyChangeListener, IFilterObserver {
+        private class FilterColumnPanel extends JPanel 
+        		implements PropertyChangeListener, IFilterObserver {
 
 			private static final long serialVersionUID = 6858728575542289815L;
 
@@ -906,11 +920,10 @@ public class TableFilterHeader extends JPanel {
             int w, h;
 
             /**
-             * The TableColumn object, to which is registered to get property changes, in order to
-             * keep the same width.
+             * The TableColumn object, to which is registered to get property 
+             * changes, in order to keep the same width.
              */
             TableColumn tc;
-
 
             /**
              * Constructor
@@ -945,7 +958,8 @@ public class TableFilterHeader extends JPanel {
                 h = getPreferredSize().height;
             	editor.getFilter().addFilterObserver(this);
                 for (IFilterHeaderObserver observer : observers){
-                	observer.tableFilterEditorCreated(TableFilterHeader.this, editor);
+                	observer.tableFilterEditorCreated(TableFilterHeader.this, 
+	                          editor);
                 }            	
                 repaint();
             }
@@ -955,7 +969,8 @@ public class TableFilterHeader extends JPanel {
                 editorToRemove.detach();
             	editorToRemove.getFilter().removeFilterObserver(this);
                 for (IFilterHeaderObserver observer : observers){
-                	observer.tableFilterEditorExcluded(TableFilterHeader.this, editorToRemove);
+                	observer.tableFilterEditorExcluded(TableFilterHeader.this, 
+                			                           editorToRemove);
                 }            	
             }
 
@@ -983,9 +998,7 @@ public class TableFilterHeader extends JPanel {
                 editor.setEnabled(enabled);
             }
 
-            /**
-             * PropertyChangeListener, listening for changes on the width of the table' column
-             */
+            /** Listening for changes on the width of the table' column */
             public void propertyChange(PropertyChangeEvent evt) {
                 int newW = tc.getWidth();
 

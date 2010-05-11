@@ -66,15 +66,15 @@ interface EditorComponent {
     /** 
      * Call always before {@link #getFilter()} to verify if the filter
      * has been updated. 
-     * @param forceUpdate set to true if the filte must been updated, even when the editor's
-     *   content is not
+     * @param forceUpdate set to true if the filter must been updated, 
+     *   even when the editor's content is not
      * @return true if the filter was updated  
      */
     public boolean checkFilterUpdate(boolean forceUpdate);
 
     /**
-     * Returns the filter associated to the current content. Always invoked after 
-     * {@link #checkFilterUpdate(boolean)}
+     * Returns the filter associated to the current content.<br> 
+     * Always invoked after {@link #checkFilterUpdate(boolean)}
      */
     public RowFilter getFilter();
 
@@ -99,13 +99,16 @@ interface EditorComponent {
     /** Returns the definition associated to the current editor */
     public Object getContent();
     
-    /** Defines the filter position associated to this editor. It corresponds to the table's model*/
+    /** 
+     * Defines the filter position associated to this editor.<br>
+     * It corresponds to the table's model column
+     **/
     public void setPosition(int position);
 
-    /** Returns the filter position associated to this editor*/
+    /** Returns the filter position associated to this editor */
     public int getPosition();
 
-    /** Sets the editable flag. The editor can be edited if the user can enter any content */
+    /** Sets the editable flag. If editable, the user can enter any content */
     public void setEditable(boolean set);
 
     /** Returns the editable flag*/
@@ -133,7 +136,8 @@ interface EditorComponent {
      * EditorComponent for text edition, backed up with a {@link JTextField}<br>
      * It is editable by default.
      */
-    static final class Text extends DocumentFilter implements DocumentListener, EditorComponent {
+    static final class Text extends DocumentFilter 
+    		implements DocumentListener, EditorComponent {
 
         private JTextField textField = new JTextField(15);
         private IFilterTextParser parser;
@@ -142,18 +146,21 @@ interface EditorComponent {
         private int filterPosition;
         private boolean editable;
         private boolean enabled;
-        /** set to true if the content is being set from inside, as to not to raise some events */
-        private boolean controlledSet;
         private Color errorColor = Color.red;
         private Color foreground;
         private Color disabledColor;
         PopupComponent popup;
+        /** 
+         * This variable is set to true if the content is being set from inside, 
+         * to avoid raising some events 
+         **/
+        private boolean controlledSet;
 
         public Text(PopupComponent popupComponent) {
             this.popup = popupComponent;
             setEditable(true);
-            //if the user moves the cursor on the editor, the focus passes automatically
-            // back to the editor (from the popup)
+            //if the user moves the cursor on the editor, the focus passes 
+            //automatically back to the editor (from the popup)
             textField.addCaretListener(new CaretListener() {
                     public void caretUpdate(CaretEvent e) {
                         popup.setPopupFocused(false);
@@ -228,16 +235,19 @@ interface EditorComponent {
             if (isEditable()) {
                 textField.getDocument().removeDocumentListener(this);
             } else {
-                ((AbstractDocument) textField.getDocument()).setDocumentFilter(null);
+                ((AbstractDocument) textField.getDocument()).
+                	setDocumentFilter(null);
             }
             editable = set;
             if (set) {
                 textField.getDocument().addDocumentListener(this);
             } else {
                 // ensure that the text contains something okay
-                String proposal = getProposalOnEdition(textField.getText(), false);
+                String proposal = getProposalOnEdition(textField.getText(), 
+                		                               false);
                 textField.setText((proposal == null) ? EMPTY_FILTER : proposal);
-                ((AbstractDocument) textField.getDocument()).setDocumentFilter(this);
+                ((AbstractDocument) textField.getDocument()).
+                	setDocumentFilter(this);
             }
             controlledSet = false;
         }
@@ -282,7 +292,10 @@ interface EditorComponent {
         	}
         }
 
-        /** Returns the filter associated to the current content, setting the foreground color*/
+        /** 
+         * Returns the filter associated to the current content, 
+         * and sets the foreground color -showing errors, if existing-
+         **/
         private RowFilter parseText(String content) {
         	RowFilter ret;
             Color color = getForeground();
@@ -300,7 +313,7 @@ interface EditorComponent {
             return ret;
         }
 
-        /** set if the content is being set from inside, as to not to raise some events */
+        /** defines that the content is being set from inside */
         public void setControlledSet() {
             controlledSet = true;
         }
@@ -312,7 +325,7 @@ interface EditorComponent {
             return ret;
         }
 
-        /** {@link DocumentFilter}: method called when handler is not editable */
+        /** {@link DocumentFilter}: method called if handler is not editable */
         @Override
         public void insertString(FilterBypass fb,
                                  int offset,
@@ -323,7 +336,7 @@ interface EditorComponent {
             // replace/remove
         }
 
-        /** {@link DocumentFilter}: method called when handler is not editable */
+        /** {@link DocumentFilter}: method called if handler is not editable */
         @Override
         public void replace(FilterBypass fb,
                             int offset,
@@ -332,7 +345,8 @@ interface EditorComponent {
                             AttributeSet attrs) throws BadLocationException {
             String buffer = textField.getText();
             String newContentBegin = buffer.substring(0, offset) + text;
-            String newContent = newContentBegin + buffer.substring(offset + length);
+            String newContent = 
+            	newContentBegin + buffer.substring(offset + length);
             String proposal = getProposalOnEdition(newContent, true);
             if (proposal == null) {
                 // why this part? Imagine having text "se|cond" with the cursor
@@ -351,14 +365,15 @@ interface EditorComponent {
                 controlledSet = false;
                 caret = 0;
             } else {
-                caret = 1 + Math.min(textField.getCaret().getDot(), textField.getCaret().getMark());
+                caret = 1 + Math.min(textField.getCaret().getDot(), 
+                		             textField.getCaret().getMark());
             }
             super.replace(fb, 0, buffer.length(), proposal, attrs);
             textField.setCaretPosition(proposal.length());
             textField.moveCaretPosition(caret);
         }
 
-        /** {@link DocumentFilter}: method called when handler is not editable */
+        /** {@link DocumentFilter}: method called if handler is not editable */
         @Override
         public void remove(FilterBypass fb,
                            int offset,
@@ -366,7 +381,8 @@ interface EditorComponent {
             int caret = textField.getCaret().getDot();
             int mark = textField.getCaret().getMark();
             String buffer = textField.getText();
-            String newContent = buffer.substring(0, offset) + buffer.substring(offset + length);
+            String newContent = buffer.substring(0, offset) 
+            	+ buffer.substring(offset + length);
             String proposal = getProposalOnEdition(newContent, true);
             if (!newContent.equals(proposal)) {
                 if (proposal == null) {
@@ -375,7 +391,8 @@ interface EditorComponent {
                         return;
                     }
                 }
-                if (matchCount(proposal, newContent) <= matchCount(buffer, newContent)) {
+                if (matchCount(proposal, newContent) 
+                		<= matchCount(buffer, newContent)) {
                     proposal = buffer;
                 }
             }
@@ -383,7 +400,8 @@ interface EditorComponent {
             
             //special case if the removal is due to BACK SPACE
     		AWTEvent ev = EventQueue.getCurrentEvent();
-    		if ((ev instanceof KeyEvent) && ((KeyEvent)ev).getKeyCode() == KeyEvent.VK_BACK_SPACE){
+    		if ((ev instanceof KeyEvent) 
+    				&& ((KeyEvent)ev).getKeyCode() == KeyEvent.VK_BACK_SPACE){
                 if (caret > mark) {
                     caret = mark;
                 } else if (buffer == proposal) {
@@ -396,7 +414,7 @@ interface EditorComponent {
             textField.moveCaretPosition(caret);
         }
 
-        /** returns the number of starting characters matching among both parameters */
+        /** returns the number of starting chars matching among both pars */
         private int matchCount(String a,
                                String b) {
             int max = Math.min(a.length(), b.length());
@@ -464,7 +482,8 @@ interface EditorComponent {
                         @Override
                         public boolean include(RowFilter.Entry entry) {
                             Object val = entry.getValue(filterPosition);
-                            return (val == null) ? (cachedContent == null) : val.equals(cachedContent);
+                            return (val == null) ? (cachedContent == null) 
+                            		: val.equals(cachedContent);
                         }
                     };
             }

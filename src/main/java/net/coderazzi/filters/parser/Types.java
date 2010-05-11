@@ -47,15 +47,16 @@ import net.coderazzi.filters.gui.TableFilterHeader;
  * It also includes support for {@link Comparator} of {@link Date} instances.<br>
  * The default {@link IFilterTextParser} is automatically configured to use these 
  * {@link Format} instances, when created by the {@link TableFilterHeader}.<br>
- * Users can add any {@link Format} or {@link Comparator} definitions, as the class is used
- * as a singleton.
+ * Users can add any {@link Format} or {@link Comparator} definitions, as the 
+ * class is used as a singleton.
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
 public class Types{
 
     Map<Class<?>, Format> formatters = new HashMap<Class<?>, Format>();
-    Map<Class<?>, Comparator<?>> comparators = new HashMap<Class<?>, Comparator<?>>();
+    Map<Class<?>, Comparator<?>> comparators = 
+    	new HashMap<Class<?>, Comparator<?>>();
 
     public Types() {
     	setFormat(String.class, new StringTypeFormat());
@@ -118,7 +119,8 @@ public class Types{
 		private static final long serialVersionUID = -6161901343218446716L;
 
 		@Override
-    	public StringBuffer format(Object obj, StringBuffer toAppendTo, FieldPosition pos) {
+    	public StringBuffer format(Object obj, StringBuffer toAppendTo, 
+    			FieldPosition pos) {
         	return toAppendTo.append(obj);
     	}
     	@Override

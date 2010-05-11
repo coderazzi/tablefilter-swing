@@ -33,8 +33,8 @@ import javax.swing.RowFilter;
 
 
 /**
- * Commodity class implementing the interface {@link net.coderazzi.filters.IFilter} on a
- * {@link RowFilter}
+ * Commodity class implementing the interface 
+ * {@link net.coderazzi.filters.IFilter} on a {@link RowFilter}
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
@@ -73,7 +73,8 @@ abstract public class BaseFilter extends RowFilter implements IFilter {
     }
 
     /**
-     * Method to be called by subclasses to report to the observers that the filter has changed
+     * Method to be called by subclasses to report to the observers 
+     * that the filter has changed
      */
     protected void reportFilterUpdatedToObservers() {
         for (IFilterObserver obs : new ArrayList<IFilterObserver>(filterObservers))
