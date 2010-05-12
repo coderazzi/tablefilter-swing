@@ -132,7 +132,7 @@ public class TestData {
             Pattern p = Pattern.compile("gif/(.+)\\.gif");
             ZipInputStream zip = new ZipInputStream(
             		TestData.class.getResourceAsStream(
-                    "/net/coderazzi/filters/examples/utils/famfamfam_flag_icons.zip"));
+                    "/net/coderazzi/filters/examples/resources/famfamfam_flag_icons.zip"));
             ZipEntry entry;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[16384];
