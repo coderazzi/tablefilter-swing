@@ -120,7 +120,7 @@ public class TableFilterHeader extends JPanel {
      * If true, filter editors will automatically extract 
      * their content from the table's content 
      **/
-    private boolean autoOptions=false;
+    private boolean autoOptions=FilterSettings.autoOptions;
 
     /** The helper to handle the location of the filter in the table header */
     private PositionHelper positionHelper = new PositionHelper(this);

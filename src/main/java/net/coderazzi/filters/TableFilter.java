@@ -34,6 +34,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 
+import net.coderazzi.filters.gui.FilterSettings;
+
 
 /**
  * <p>TableFilter represents a {@link javax.swing.RowFilter} instance that can 
@@ -218,7 +220,7 @@ public class TableFilter extends AndFilter {
         DefaultRowSorter<?, ?> sorter;
         
         /** Autoselection mode * */
-        boolean autoSelection = true;
+        boolean autoSelection = FilterSettings.autoSelection;
 
 		public void replacedTable(JTable oldTable,
                                   JTable newTable) {

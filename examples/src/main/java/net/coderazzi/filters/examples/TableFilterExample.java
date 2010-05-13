@@ -529,7 +529,7 @@ public class TableFilterExample extends JFrame {
 //		} catch (Exception ex) {
 //			ex.printStackTrace();
 //		}
-    	
+    	FilterSettings.autoOptions=true;
         TableFilterExample frame = new TableFilterExample();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
