@@ -46,9 +46,9 @@ public class TestData {
     private static Random random = new Random();
 
     static final String[] maleNames = {
-            "Alfred", "Alvin", "Blake", "Bob", "Brandon", "Bud", "Burton", 
+            "alfred", "Alvin", "Blake", "BOb", "Brandon", "BUd", "Burton", 
             "Charles", "Clark", "Dale", "Damon", "Darren", "Dustin", 
-            "Edward", "Elton", "Fletcher", "Forrester", "Gary",
+            "edward", "Elton", "Fletcher", "forrester", "Gary",
             "Harley", "Harold", "Hugh", "James", "Keane", "Kenneth", 
             "Landon", "Lee", "Lincoln", "Maxwell", "Miller", "Nash", "Nelson", 
             "Norman", "Oswald", "Perry", "Prentice", "Ralph", "Raymond", 

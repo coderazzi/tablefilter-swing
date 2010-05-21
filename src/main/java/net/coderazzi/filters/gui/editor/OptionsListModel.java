@@ -42,7 +42,7 @@ import javax.swing.ListCellRenderer;
  * to Strings, and sorted.<br>
  * This is needed to always show the popup's matches in sequential order. 
  */
-class OptionsListModel extends AbstractListModel {
+public class OptionsListModel extends AbstractListModel {
 
 	private static final long serialVersionUID = 3523952153693100563L;
 	private List content;
@@ -82,14 +82,6 @@ class OptionsListModel extends AbstractListModel {
 		this.stringContent = content;
 	}
 
-	/** 
-	 * Sets the flag to ignore case or be case sensitive<br>
-	 * It affects to the algorithms to search for the best match on the content. 
-	 */
-	public void setIgnoreCase(boolean set){
-		ignoreCase = set;
-	}
-	
 	public int getSize() {
 		return stringContent == null ? content.size() : stringContent.size();
 	}
@@ -120,6 +112,21 @@ class OptionsListModel extends AbstractListModel {
 	/** Specifies the format used to convert Objects to Strings */
 	public void setFormat(Format format) {
 		this.formatter = format==null? defaultFormatter : format;
+		ensureRightStringContent();
+	}
+	
+	/** 
+	 * Sets the flag to ignore case or be case sensitive<br>
+	 * It affects to the algorithms to search for the best match on the content. 
+	 */
+	public void setIgnoreCase(boolean set){
+		if (ignoreCase!=set){
+			ignoreCase = set;
+			ensureRightStringContent();
+		}
+	}
+	
+	private void ensureRightStringContent(){
 		if (stringContent != null) {
 			List oldContent = content;
 			List oldStringContent = stringContent;
@@ -130,7 +137,7 @@ class OptionsListModel extends AbstractListModel {
 				stringContent = new ArrayList();
 			}
 			addContent(oldContent);
-		}
+		}					
 	}
 	
 	/** Returns true if the object is a valid option (as object, or string) */
@@ -186,7 +193,7 @@ class OptionsListModel extends AbstractListModel {
 			}
 			if (stringContent != null) {
 				if (stringContent == content) {
-					// this menas that content contains only Strings. 
+					// this means that content contains only Strings. 
 					// We need to ensure now that the addedContent is all 
 					// Strings, otherwise we have to create a separate content 
 					// for stringContent
@@ -216,7 +223,8 @@ class OptionsListModel extends AbstractListModel {
 	private void addStringContent(String s) {
 		int position = 0;
 		for (Object o : stringContent) {
-			int compare = ((String) o).compareTo(s);
+			String os = (String)o;
+			int compare = ignoreCase? os.compareToIgnoreCase(s) : os.compareTo(s);
 			if (compare == 0) {
 				return;
 			}
