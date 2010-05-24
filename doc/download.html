@@ -15,45 +15,52 @@
   
     <p>
       <span class="mark">TableFilter</span> is open source, under 
-      <a href='#license'>MIT license</a>.
+      <a href='#license'>MIT license</a>. Its latest version, 3.1.2, has been
+      released the 24th May 2010.
     </p>
     
-    <p>
-      Starting with version 3.1, the sources are hosted at 
-      <a href='http://code.google.com/'>Google code</a>, available as the project 
-      <a href='http://code.google.com/p/tablefilter-swing/'>tablefilter-swing</a>
-    </p>
+    <ul>
+    	<li><span class='mark'>Sources</span>:
+	       	<ul>
+	       		<li>Available at Google Code, as the project 
+	       			<a href='http://code.google.com/p/tablefilter-swing/'>tablefilter-swing</a></li>
+	   			<li>Alternatively, they can be downloaded directly as a
+	   				single zip file:<a href='tablefilter-src.zip'>tablefilter-src.zip</a></li>
+	       	</ul>
+       	</li>
+    	<li><span class='mark'>Binaries</span>:
+	    	<ul>
+	    		<li>The binaries are included in the
+	   	  			<a href='http://repo2.maven.org/maven2/net/coderazzi/'>central maven
+	   	  			repository</a>. This means that, on a maven project, it can be used by
+	   	  			adding the dependency to 
+	   	  			<span class='mark'>net.coderazzi.tablefilter-swing</span>, or to
+	   	  			<span class='mark'>net.coderazzi.tablefilter-swing-java5</span>, if 
+	   	  			the version with support for Java 5 is needed.
+	    		</li>
+	    		<li>Outside a maven project, the binaries, (together with sources and 
+			   		javadoc) can be downloaded directly from the maven repository. The
+			   		last versions are hosted at:
+			   		<ul>
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/3.1.2/'>
+			   		 	Version 3.1.2</a></li> 
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/3.1.2/'>
+			   		 	Version 3.1.2 for Java 5</a></li> 
+				    </ul>
+	    		</li>
+	    	</ul>
+    	</li> 
+    	<li><span class='mark'>Previous versions</span>: please note that version 
+    		3.0 is a major rewriting of the library and breaks compatibility 
+    		with previous versions. For this reason, the latest 2.x version 
+    		is still available here:
+ 	        <ul>
+		    	<li><a href='download/tablefilter-v2.2.0.zip'>Version 2.2.0 (obsolete)</a></li>
+		        <li><a href='download/tablefilter5-v2.2.0.zip'>Version 2.2.0 for Java 5 (obsolete)</a></li>
+		    </ul>
+    	</li> 
+    </ul>
     
-    <p>
-      The binaries are included in the
-   	  <a href='http://repo2.maven.org/maven2/net/coderazzi/'>central maven
-   	  repository</a>. This means that, on a maven project, it can be used by
-   	  adding the dependency to 
-   	  <span class='mark'>net.coderazzi.tablefilter-swing</span>, or to
-   	  <span class='mark'>net.coderazzi.tablefilter-swing-java5</span>, if 
-   	  the version with support for Java 5 is needed.
-   	</p>
-   	
-   	<p>Outside a maven project, the binaries, (together with sources and 
-   		javadoc) can be downloaded directly from the maven repository. The
-   		last versions are hosted at:
-   		<ul>
-   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/3.1.1/'>
-   		 	Version 3.1.1</a></li> 
-   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/3.1.1/'>
-   		 	Version 3.1.1 for Java 5</a></li> 
-	    </ul>
-   	</p>
-       
-    <p>
-       Please note that version 3.0 is a major rewriting of the library and 
-       breaks compatibility with previous versions. For this reason, the latest
-       2.x version is still available here:
-       <ul>
-          <li><a href='download/tablefilter-v2.2.0.zip'>Version 2.2.0 (obsolete)</a>
-          <li><a href='download/tablefilter5-v2.2.0.zip'>Version 2.2.0 for Java 5 (obsolete)</a>
-       </ul>
-    </p>
     
 
   <h2><a name="license">License</a></h2>
@@ -101,6 +108,16 @@ THE SOFTWARE.</pre>
     </p>
 
   <h2><a name="history">History</a></h2>
+    <h3>Version 3.1.2 ( 24th May 2010 ) </h3>
+    	<ul>
+    		<li>
+    		    Solved bug: ignore case not properly handled in the options
+    		    displayed in the list inside a filter. Additionally, the
+    		    autocompletion would provide incorrect proposals on ignore case
+    		    scenarios.     			
+    		</li>
+		</ul>
+
     <h3>Version 3.1.1 ( 13th May 2010 ) </h3>
     	<ul>
     		<li>
