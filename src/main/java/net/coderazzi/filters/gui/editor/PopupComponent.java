@@ -52,7 +52,7 @@ import net.coderazzi.filters.gui.FilterSettings;
 
 
 /**
- * Internal editor component, resposible to handle the popup menu,
+ * Internal editor component, responsible to handle the popup menu,
  * which contains the history and the options list.
  */
 abstract class PopupComponent implements PopupMenuListener{
