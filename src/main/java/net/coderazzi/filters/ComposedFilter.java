@@ -89,7 +89,8 @@ abstract public class ComposedFilter extends BaseFilter implements IFilterObserv
     /**
      * @see  IFilterObserver#filterUpdated(IFilter)
      */
-    public void filterUpdated(IFilter producer) {
+    @Override
+	public void filterUpdated(IFilter producer) {
         reportFilterUpdatedToObservers();
     }
 

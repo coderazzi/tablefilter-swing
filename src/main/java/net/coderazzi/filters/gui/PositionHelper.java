@@ -124,6 +124,7 @@ class PositionHelper implements PropertyChangeListener{
     /**
      * PropertyChangeListener interface
      */
+	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		//the table has changed containment. clean up status and prepare again, 
 		//if possible; however, do nothing if the current setup is fine

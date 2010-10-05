@@ -110,6 +110,7 @@ public class FilterEditor extends JComponent{
 		};
 		downButton.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				triggerPopup(downButton);
 			}
@@ -449,12 +450,14 @@ public class FilterEditor extends JComponent{
 	private void setupComponent(JComponent component){
 		component.addFocusListener(new FocusListener() {
 
+			@Override
 			public void focusLost(FocusEvent e) {
 				editor.focusGained(false);
 				popup.hide();
 				filter.checkChanges();
 			}
 
+			@Override
 			public void focusGained(FocusEvent e) {
 				if (isEnabled() && editor.focusGained(true)){
 					showOptions();
@@ -519,6 +522,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = 6926912268574067920L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (popup.isPopupFocused()) {
 					popupSelection(popup.getSelection());
@@ -544,6 +548,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = -4351240441578952476L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				popup.hide();
 				if (e.getSource() instanceof JTextField){
@@ -563,6 +568,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = -2777729244353281164L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!popup.isPopupFocused() || !popup.selectLast(false)) {
 					if (e.getSource() instanceof JTextField){
@@ -583,6 +589,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = 1945871436968682881L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				//if focus is on the popup: select the very last item on the 
 				//popup, changing probably from the history list to the option 
@@ -608,6 +615,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = 3916227645612863334L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				//if focus is on the popup: select the very first item on the 
 				//popup, changing probably from the option list to the history 
@@ -641,6 +649,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = -1583258893221830664L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!popup.isPopupFocused() || !popup.selectFirst(false)) {
 					if (e.getSource() instanceof JTextField){
@@ -661,6 +670,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = -1187830005921916553L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				//without moving the focus, move down one page on the popup menu, 
 				//probably jumping to options list
@@ -684,6 +694,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = 6590487133211390977L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				//without moving the focus, move up one page on the popup menu, 
 				//probably jumping to history list
@@ -705,6 +716,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = 746565926592574009L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				//if focus is on the popup: move from options to history, and, 
 				//being already on history, up to text field.
@@ -727,6 +739,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = 4555560696351340571L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				//if popup is not visible, just make it visible.
 				//if popup has not the focus, pass it the focus
@@ -753,6 +766,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = -8075976293862885060L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				//if popup is not visible, make it visible
 				//if popup has not the focus, pass it the focus
@@ -780,6 +794,7 @@ public class FilterEditor extends JComponent{
 
 			private static final long serialVersionUID = -4133513199725709434L;
 
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				//if popup is not visible, just make it visible.
 				//if popup has not the focus, pass it the focus

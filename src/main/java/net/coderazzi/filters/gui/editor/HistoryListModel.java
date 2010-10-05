@@ -72,6 +72,7 @@ class HistoryListModel extends AbstractListModel {
 		return false;
 	}
 
+	@Override
 	public Object getElementAt(int index) {
 		return history.get(index);
 	}
@@ -108,6 +109,7 @@ class HistoryListModel extends AbstractListModel {
 		}
 	}
 
+	@Override
 	public int getSize() {
 		return history.size();
 	}

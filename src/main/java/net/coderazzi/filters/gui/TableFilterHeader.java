@@ -810,12 +810,14 @@ public class TableFilterHeader extends JPanel {
         }
 
         /** {@link TableColumnModelListener} interface */
-        public void columnMarginChanged(ChangeEvent e) {
+        @Override
+		public void columnMarginChanged(ChangeEvent e) {
             placeComponents();
         }
 
         /** {@link TableColumnModelListener} interface */
-        public void columnMoved(TableColumnModelEvent e) {
+        @Override
+		public void columnMoved(TableColumnModelEvent e) {
 
             if (e.getFromIndex() != e.getToIndex()) {
                 FilterColumnPanel fcp = columns.remove(e.getFromIndex());
@@ -825,7 +827,8 @@ public class TableFilterHeader extends JPanel {
         }
 
         /** {@link TableColumnModelListener} interface */
-        public void columnAdded(TableColumnModelEvent e) {
+        @Override
+		public void columnAdded(TableColumnModelEvent e) {
 
             //when adding or removing columns to the table model, or, in
             //general, when fireTableStructureChanged() is invoked on a
@@ -847,7 +850,8 @@ public class TableFilterHeader extends JPanel {
         }
 
         /** {@link TableColumnModelListener} interface */
-        public void columnRemoved(TableColumnModelEvent e) {
+        @Override
+		public void columnRemoved(TableColumnModelEvent e) {
 
             //see the comment on columnAdded
             filtersHandler.enableNotifications(false);
@@ -859,7 +863,8 @@ public class TableFilterHeader extends JPanel {
         }
 
         /** {@link TableColumnModelListener} interface */
-        public void columnSelectionChanged(ListSelectionEvent e) {
+        @Override
+		public void columnSelectionChanged(ListSelectionEvent e) {
         	//nothing needed here
         }
         
@@ -878,7 +883,8 @@ public class TableFilterHeader extends JPanel {
         	}
         }
 
-        public void run() {
+        @Override
+		public void run() {
 
             //see the comment on columnAdded
             if (--autoRun == 0 && table != null)
@@ -999,7 +1005,8 @@ public class TableFilterHeader extends JPanel {
             }
 
             /** Listening for changes on the width of the table' column */
-            public void propertyChange(PropertyChangeEvent evt) {
+            @Override
+			public void propertyChange(PropertyChangeEvent evt) {
                 int newW = tc.getWidth();
 
                 if (w != newW) {

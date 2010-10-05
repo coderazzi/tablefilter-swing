@@ -82,10 +82,12 @@ public class OptionsListModel extends AbstractListModel {
 		this.stringContent = content;
 	}
 
+	@Override
 	public int getSize() {
 		return stringContent == null ? content.size() : stringContent.size();
 	}
 
+	@Override
 	public Object getElementAt(int i) {
 		return stringContent == null ? content.get(i) : stringContent.get(i);
 	}

@@ -148,15 +148,18 @@ public class TestTableModel extends AbstractTableModel {
         return -1;
     }
 
-    public int getColumnCount() {
+    @Override
+	public int getColumnCount() {
         return changedModel ? columnNames.length : 5;
     }
 
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return data.size();
     }
 
-    public Object getValueAt(int rowIndex,
+    @Override
+	public Object getValueAt(int rowIndex,
                              int columnIndex) {
         TestData td = data.get(rowIndex);
 

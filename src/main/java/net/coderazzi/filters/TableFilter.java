@@ -99,7 +99,8 @@ public class TableFilter extends AndFilter {
         // create an observer instance to notify the associated table when there
         // are filter changes.
         addFilterObserver(new IFilterObserver() {
-                public void filterUpdated(IFilter obs) {
+                @Override
+				public void filterUpdated(IFilter obs) {
                     notifyUpdatedFilter(false);
                 }
             });

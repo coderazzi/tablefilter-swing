@@ -162,7 +162,8 @@ interface EditorComponent {
             //if the user moves the cursor on the editor, the focus passes 
             //automatically back to the editor (from the popup)
             textField.addCaretListener(new CaretListener() {
-                    public void caretUpdate(CaretEvent e) {
+                    @Override
+					public void caretUpdate(CaretEvent e) {
                         popup.setPopupFocused(false);
                     }
                 });
@@ -427,17 +428,20 @@ interface EditorComponent {
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
-        public void changedUpdate(DocumentEvent e) {
+        @Override
+		public void changedUpdate(DocumentEvent e) {
             // no need to handle updates
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
-        public void removeUpdate(DocumentEvent e) {
+        @Override
+		public void removeUpdate(DocumentEvent e) {
             getProposalOnEdition(textField.getText(), false);
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
-        public void insertUpdate(DocumentEvent e) {
+        @Override
+		public void insertUpdate(DocumentEvent e) {
             getProposalOnEdition(textField.getText(), false);
         }
 

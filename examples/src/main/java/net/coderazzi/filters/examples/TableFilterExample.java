@@ -403,6 +403,7 @@ public class TableFilterExample extends JFrame {
     
     private JRadioButtonMenuItem createFontSizeMenuItem(final int size){
     	return new JRadioButtonMenuItem(new AbstractAction(String.valueOf(size)) {			
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				filterHeader.setFont(
 						filterHeader.getFont().deriveFont((float)(size)));

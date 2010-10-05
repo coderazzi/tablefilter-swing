@@ -53,7 +53,8 @@ abstract public class BaseFilter extends RowFilter implements IFilter {
     /**
      * @see  IFilter#addFilterObserver(IFilterObserver)
      */
-    public void addFilterObserver(IFilterObserver observer) {
+    @Override
+	public void addFilterObserver(IFilterObserver observer) {
         filterObservers.add(observer);
         reportFilterUpdatedToObservers();
     }
@@ -61,7 +62,8 @@ abstract public class BaseFilter extends RowFilter implements IFilter {
     /**
      * @see  IFilter#removeFilterObserver(IFilterObserver)
      */
-    public void removeFilterObserver(IFilterObserver observer) {
+    @Override
+	public void removeFilterObserver(IFilterObserver observer) {
         filterObservers.remove(observer);
     }
 

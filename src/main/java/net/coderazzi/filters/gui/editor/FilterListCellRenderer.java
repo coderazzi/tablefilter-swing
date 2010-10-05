@@ -105,6 +105,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		return userRenderer==defaultRenderer? null : userRenderer;
 	}
 
+	@Override
 	public Component getListCellRendererComponent(JList list, Object value, 
 			int index, boolean isSelected, boolean cellHasFocus) {
 		setupRenderer(list, value, index, 
