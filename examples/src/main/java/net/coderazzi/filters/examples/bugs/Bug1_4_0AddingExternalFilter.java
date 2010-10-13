@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import net.coderazzi.filters.BaseFilter;
+import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.TableFilterHeader;
 
@@ -21,7 +21,7 @@ public class Bug1_4_0AddingExternalFilter extends JPanel{
 	
 	private static final long serialVersionUID = 9084957648913273935L;
 	TestTableModel model = TestTableModel.createTestTableModel();
-	BaseFilter addedFilter = new BaseFilter(){
+	Filter addedFilter = new Filter(){
 		@Override
 		public boolean include(Entry entry) {
 			return -1!=entry.getStringValue(
@@ -43,9 +43,9 @@ public class Bug1_4_0AddingExternalFilter extends JPanel{
 			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				filterHeader.getTableFilter().removeFilter(addedFilter);					
+				filterHeader.removeFilter(addedFilter);					
 				if (e.getStateChange()==ItemEvent.SELECTED){
-					filterHeader.getTableFilter().addFilter(addedFilter);
+					filterHeader.addFilter(addedFilter);
 				} 
 			}
 		});

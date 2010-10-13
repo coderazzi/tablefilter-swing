@@ -36,7 +36,7 @@ import java.util.Set;
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
-abstract public class ComposedFilter extends BaseFilter implements IFilterObserver {
+abstract public class ComposedFilter extends Filter implements IFilterObserver {
 
     /** Set of associated IFilters */
     protected Set<IFilter> filters = new HashSet<IFilter>();
@@ -47,14 +47,6 @@ abstract public class ComposedFilter extends BaseFilter implements IFilterObserv
      */
     protected ComposedFilter(IFilter... observables) {
         addFilter(observables);
-    }
-
-    /**
-     * Detaches the instance from any observer
-     */
-    @Override public void detach() {
-        super.detach();
-        filters.clear();
     }
 
     /**
@@ -75,6 +67,7 @@ abstract public class ComposedFilter extends BaseFilter implements IFilterObserv
      */
     public void removeFilter(IFilter filter) {
         if (filters.remove(filter)) {
+        	filter.removeFilterObserver(this);
             reportFilterUpdatedToObservers();
         }
     }

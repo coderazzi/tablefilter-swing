@@ -49,7 +49,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import net.coderazzi.filters.UserFilter;
+import net.coderazzi.filters.Filter;
+import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.examples.utils.CenteredRenderer;
 import net.coderazzi.filters.examples.utils.EventsWindow;
 import net.coderazzi.filters.examples.utils.FlagRenderer;
@@ -243,7 +244,7 @@ public class TableFilterExample extends JFrame {
     
     private JMenu createMiscellaneousMenu(){
     	
-		final UserFilter userFilter = new UserFilter(filterHeader){
+		final IFilter userFilter = new Filter() {
 			int nameColumn=tableModel.getColumn(TestTableModel.NAME);
 			@Override
 			public boolean include(Entry entry) {
@@ -251,18 +252,18 @@ public class TableFilterExample extends JFrame {
 			}
 		};
 		
-		userFilter.setEnabled(false);
-
 		JCheckBoxMenuItem enableUserFilter=new JCheckBoxMenuItem(
 				new AbstractAction("enable user filter") {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
-				userFilter.setEnabled(source.isSelected());
-				if (source.isSelected()){
+				if(source.isSelected()){
+					filterHeader.addFilter(userFilter);
 					JOptionPane.showMessageDialog(TableFilterExample.this, 
 							"Filtering out any row where the name does not "+
 							"contain a lower case 'e'");
+				} else {
+					filterHeader.removeFilter(userFilter);					
 				}
 			}
 		});

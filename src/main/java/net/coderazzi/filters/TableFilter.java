@@ -44,15 +44,7 @@ import net.coderazzi.filters.gui.FilterSettings;
  * which updates the table when there are changes in any of the composed 
  * sub filters.</p>
  *
- * <p>Users require instancing TableFilter instances only when managing their 
- * own filter editors.
- * Note that the {@link net.coderazzi.filters.gui.TableFilterHeader} already 
- * handles its own TableFilter, and keeps track of any table changes, 
- * updating automatically the editors.</p>
- * </p>
- *
- * <p>When users instanciate directly TableFilter objects, care must be taken 
- * to update the associated editors when the table model changes.</p>
+ * <p>Users have, after version 3.2, no direct use for this class</p>
  *
  * <p>In Java 6, a filter is automatically associated to a 
  * {@link javax.swing.RowSorter}, so {@link javax.swing.JTable} instances with 

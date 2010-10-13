@@ -62,7 +62,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import net.coderazzi.filters.BaseFilter;
+import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterTextParser;
 
@@ -84,7 +84,7 @@ public class FilterEditor extends JComponent{
 	private PropertyChangeListener textParserListener;
 	private EditorBorder border = new EditorBorder();
 	FilterArrowButton downButton = new FilterArrowButton();
-    Filter filter = new Filter();
+    EditorFilter filter = new EditorFilter();
 	EditorComponent editor;
 	PopupComponent popup;
 
@@ -890,7 +890,7 @@ public class FilterEditor extends JComponent{
      * ensuring some added functionality (like auto-adding to the 
      * history list when the filter changes) 
      */
-    final class Filter extends BaseFilter {
+    final class EditorFilter extends Filter {
 		RowFilter delegateFilter;
     	@Override
     	public boolean include(RowFilter.Entry entry) {

@@ -256,24 +256,14 @@ public class TableFilterHeader extends JPanel {
         return table;
     }
 
-    /** Returns the TableFilter; additional filters can be then attached */
-    public TableFilter getTableFilter() {
-        return filtersHandler;
+    /** Adds a filter -user specified- to the filter header */
+    public void addFilter(IFilter filter) {
+        filtersHandler.addFilter(filter);
     }
 
-    /**
-     * <p>Sets a new table filter.</p>
-     *
-     * <p>The filters associated to the initial {@link TableFilter} 
-     * are transferred to the new one.</p>
-     */
-    public void setTableFilter(TableFilter filter) {
-        for (IFilter obs : filtersHandler.getFilterObservables()) {
-            filter.addFilter(obs);
-        }
-        filter.setTable(filtersHandler.getTable());
-        filtersHandler.detach();
-        filtersHandler = filter;
+    /** Adds a filter -user specified- to the filter header */
+    public void removeFilter(IFilter filter) {
+        filtersHandler.removeFilter(filter);
     }
 
     /**

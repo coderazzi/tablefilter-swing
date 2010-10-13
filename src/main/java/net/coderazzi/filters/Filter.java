@@ -38,17 +38,10 @@ import javax.swing.RowFilter;
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
-abstract public class BaseFilter extends RowFilter implements IFilter {
+abstract public class Filter extends RowFilter implements IFilter {
 
     /** The set of currently subscribed observers */
     protected Set<IFilterObserver> filterObservers = new HashSet<IFilterObserver>();
-
-    /**
-     * Detaches the instance from any observer
-     */
-    public void detach() {
-        filterObservers.clear();
-    }
 
     /**
      * @see  IFilter#addFilterObserver(IFilterObserver)
