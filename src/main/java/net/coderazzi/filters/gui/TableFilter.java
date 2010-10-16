@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package net.coderazzi.filters;
+package net.coderazzi.filters.gui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -34,7 +34,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 
-import net.coderazzi.filters.gui.FilterSettings;
+import net.coderazzi.filters.AndFilter;
+import net.coderazzi.filters.IFilter;
+import net.coderazzi.filters.IFilterObserver;
 
 
 /**
@@ -96,14 +98,6 @@ public class TableFilter extends AndFilter {
                     notifyUpdatedFilter(false);
                 }
             });
-    }
-
-    /**
-     * Basic constructor, setting directly the controlled table
-     */
-    public TableFilter(JTable table) {
-        this();
-        setTable(table);
     }
 
     /**

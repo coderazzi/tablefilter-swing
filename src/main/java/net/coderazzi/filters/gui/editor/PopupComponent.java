@@ -129,7 +129,9 @@ abstract class PopupComponent implements PopupMenuListener{
 		int width = editor.getParent().getWidth()-1;
 		configurePaneSize(optionsScrollPane, width);
 		configurePaneSize(historyScrollPane, width);
-		popup.show(editor, -editor.getLocation().x-1, editor.getHeight());
+		if (editor.isValid()){
+			popup.show(editor, -editor.getLocation().x-1, editor.getHeight());
+		}
 		// Not yet knowing the focus, but the call to select (immediately after,
 		// always), takes care of it
 		focusedList = historyList;

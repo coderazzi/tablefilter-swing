@@ -29,7 +29,6 @@ import java.awt.Color;
 
 import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.gui.TableFilterHeader.Position;
-import net.coderazzi.filters.gui.editor.FilterEditor;
 import net.coderazzi.filters.parser.FilterTextParser;
 import net.coderazzi.filters.parser.Types;
 
@@ -87,19 +86,6 @@ public class FilterSettings {
      */
     public static Class<? extends IFilterTextParser> filterTextParserClass;
 
-    /** The class implementing the {@link FilterEditor} */
-    public static Class<? extends FilterEditor> filterEditorClass;
-
-    /** Creates a FilterEditor as defined by default */
-    public static FilterEditor newFilterEditor() {
-        try {
-        	return filterEditorClass.newInstance();
-        } catch (Exception ex) {
-            throw new RuntimeException("Error creating filter editor of type "
-                                       + filterEditorClass, ex);
-        }
-    }
-
     /** Creates a TextParser as defined by default */
     public static IFilterTextParser newTextParser() {
         try {
@@ -128,21 +114,6 @@ public class FilterSettings {
                 throw new RuntimeException(
                 		"Filter text parser of class " + cl
                         + " is not a valid IFilterTextParser class");
-            }
-        }
-        filterEditorClass = FilterEditor.class;
-        cl = getString("FilterEditor.class", null);
-        if (cl != null) {
-            try {
-            	filterEditorClass = (Class<? extends FilterEditor>) 
-            	                    Class.forName(cl);
-            } catch (ClassNotFoundException cne) {
-                throw new RuntimeException(
-                		"Error finding filter editor of class " + cl, cne);
-            } catch (ClassCastException cce) {
-                throw new RuntimeException(
-                		"Filter editor of class " + cl
-                        + " is not a valid FilterEditor class");
             }
         }
     }

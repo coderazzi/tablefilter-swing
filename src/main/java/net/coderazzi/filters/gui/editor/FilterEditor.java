@@ -65,6 +65,7 @@ import javax.swing.table.TableModel;
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterTextParser;
+import net.coderazzi.filters.gui.TableFilter;
 
 /**
  * Custom component to handle the filter' editors<br>
@@ -80,6 +81,7 @@ import net.coderazzi.filters.IFilterTextParser;
 public class FilterEditor extends JComponent{
 
 	private static final long serialVersionUID = 6908400421021655278L;
+	private TableFilter filtersHandler;
 	private AutoOptionsHandler autoOptionsHandler;
 	private PropertyChangeListener textParserListener;
 	private EditorBorder border = new EditorBorder();
@@ -88,7 +90,9 @@ public class FilterEditor extends JComponent{
 	EditorComponent editor;
 	PopupComponent popup;
 
-	public FilterEditor() {
+	public FilterEditor(TableFilter filtersHandler, int filterPosition) {
+		this.filtersHandler = filtersHandler;
+		
 		setLayout(new BorderLayout());
 		setBorder(border);
 		
@@ -123,6 +127,8 @@ public class FilterEditor extends JComponent{
 		setBackground(editor.getComponent().getBackground());
 		setForeground(editor.getForeground());
 		setDisabledForeground(Color.lightGray);
+
+		editor.setPosition(filterPosition);
 	}
 	
 	/** 
@@ -298,15 +304,6 @@ public class FilterEditor extends JComponent{
     	return editor.getTextParser();
     }
     
-    /** 
-     * Defines the filter position associated to this editor.<br> 
-     * It corresponds to the table's model column
-     **/
-	public void setFilterPosition(int filterPosition) {
-		editor.setPosition(filterPosition);
-		filter.checkChanges();
-	}
-
     /** Returns the filter position associated to this editor*/
 	public int getFilterPosition() {
 		return editor.getPosition();

@@ -55,7 +55,6 @@ import javax.swing.table.TableColumnModel;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterObserver;
 import net.coderazzi.filters.IFilterTextParser;
-import net.coderazzi.filters.TableFilter;
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
 
@@ -73,7 +72,7 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
  * <p>The editor associated to each column has the type {@link FilterEditor}, 
  * and can be manipulated separately.</p>
  *
- * <p>The implementation relies on the {@link net.coderazzi.filters.TableFilter} 
+ * <p>The implementation relies on the {@link net.coderazzi.filters.gui.TableFilter} 
  * class, please read its documentation to understand the requirements on the 
  * table and its model, and how it is affected by this filter</p>
  * 
@@ -113,9 +112,6 @@ public class TableFilterHeader extends JPanel {
     /** whether the user has explicitly provided colors/font */
     private boolean backgroundSet, foregroundSet, disabledSet, fontSet;
     
-    /** Whether the component is enabled (cannot be delegated to the parent **/
-    private boolean enabled=true;
-
     /** 
      * If true, filter editors will automatically extract 
      * their content from the table's content 
@@ -125,6 +121,9 @@ public class TableFilterHeader extends JPanel {
     /** The helper to handle the location of the filter in the table header */
     private PositionHelper positionHelper = new PositionHelper(this);
         
+    /** Whether the component is enabled (cannot be delegated to the parent **/
+    boolean enabled=true;
+
 	/** This is the total max number of visible rows (history PLUS options) */
 	int maxVisibleRows = FilterSettings.maxVisiblePopupRows;
     
@@ -410,11 +409,10 @@ public class TableFilterHeader extends JPanel {
     /** Creates an editor for the given column, customized to the associated type */
     FilterEditor createEditor(int modelColumn) {
         
-        FilterEditor ret = FilterSettings.newFilterEditor();
+        FilterEditor ret = new FilterEditor(filtersHandler, modelColumn);
         ret.setFormat(getTextParser().getFormat(
         		table.getModel().getColumnClass(modelColumn)));
         ret.setTextParser(getTextParser());
-        ret.setFilterPosition(modelColumn);
         
         if (!populateBasicEditorOptions(ret, true) && autoOptions){
         	ret.setAutoOptions(table.getModel());
@@ -679,7 +677,7 @@ public class TableFilterHeader extends JPanel {
             add(column);
         }
 
-        /** Detachs the current instance from any registered listeners */
+        /** Detaches the current instance from any registered listeners */
         public void detach() {
 
             for (FilterColumnPanel column : columns)
@@ -951,6 +949,7 @@ public class TableFilterHeader extends JPanel {
                 }
                 this.editor = editor;
                 add(this.editor, BorderLayout.CENTER);
+                editor.setEnabled(enabled);
                 h = getPreferredSize().height;
             	editor.getFilter().addFilterObserver(this);
                 for (IFilterHeaderObserver observer : observers){
