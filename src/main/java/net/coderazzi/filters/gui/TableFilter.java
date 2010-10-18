@@ -136,19 +136,6 @@ public class TableFilter extends AndFilter {
     }
 
     /**
-     * <p>Method to force the sending of notifications, even if they are 
-     * currently temporarily disabled.</p>
-     *
-     * <p>Note that, in any case, the update notification is only sent if 
-     * there is any pending notifications.</p>
-     */
-    public void sendPendingNotifications() {
-        if (pendingNotifications) {
-            notifyUpdatedFilter(true);
-        }
-    }
-
-    /**
      * <p>Sets the autoselection mode</p>
      *
      * <p>if autoSelection is true, if there is only one possible 
