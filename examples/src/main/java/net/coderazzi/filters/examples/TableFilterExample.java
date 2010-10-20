@@ -462,7 +462,7 @@ public class TableFilterExample extends JFrame {
             		table.convertColumnIndexToView(countryColumn)).
             		setCellRenderer(new FlagRenderer());
 
-        	filterHeader.getFilterEditor(countryColumn).setAutoOptions(tableModel);
+        	filterHeader.getFilterEditor(countryColumn).setAutoOptions(true);
         	filterHeader.setTableCellRenderer(countryColumn, new FlagRenderer());
         }
 

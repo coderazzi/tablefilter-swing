@@ -112,12 +112,6 @@ public class TableFilterHeader extends JPanel {
     /** whether the user has explicitly provided colors/font */
     private boolean backgroundSet, foregroundSet, disabledSet, fontSet;
     
-    /** 
-     * If true, filter editors will automatically extract 
-     * their content from the table's content 
-     **/
-    private boolean autoOptions=FilterSettings.autoOptions;
-
     /** The helper to handle the location of the filter in the table header */
     private PositionHelper positionHelper = new PositionHelper(this);
         
@@ -406,20 +400,6 @@ public class TableFilterHeader extends JPanel {
 		return maxVisibleRows;
 	}
 
-    /** Creates an editor for the given column, customized to the associated type */
-    FilterEditor createEditor(int modelColumn) {
-        
-        FilterEditor ret = new FilterEditor(filtersHandler, modelColumn);
-        ret.setFormat(getTextParser().getFormat(
-        		table.getModel().getColumnClass(modelColumn)));
-        ret.setTextParser(getTextParser());
-        
-        if (!populateBasicEditorOptions(ret, true) && autoOptions){
-        	ret.setAutoOptions(table.getModel());
-        }
-        return ret;
-    }
-
     /** Customizes the editor, can be overridden for custom appearance */
     protected void customizeEditor(FilterEditor editor) {
         editor.setForeground(getForeground());
@@ -435,36 +415,6 @@ public class TableFilterHeader extends JPanel {
         	editor.setErrorForeground(color);
         }
         editor.setFont(getFont());
-    }
-
-    /**
-     * Populates basic editor options (boolean, enums).<br>
-     * Returns false if the editor is not a boolean or enumeration
-     */
-    boolean populateBasicEditorOptions(FilterEditor editor, 
-    		                           boolean fixMaxHistory) {
-        
-        Class<?> c = table.getModel().getColumnClass(editor.getFilterPosition());
-        List<Object> options;
-        if (c.equals(Boolean.class)){
-        	options = new ArrayList<Object>(3);
-        	options.add(true);
-        	options.add(false);
-        } else if (c.isEnum()){
-        	Object[] enums = c.getEnumConstants();
-        	options = new ArrayList<Object>(enums.length+1);
-        	for (Object each : enums){
-        		options.add(each);
-        	}
-        } else {
-        	return false;
-        }
-    	editor.setOptions(options);
-    	editor.setEditable(false);
-    	if (fixMaxHistory && (options.size() <= 8)){
-    		editor.setMaxHistory(0);
-    	}
-    	return true;
     }
 
     /** Returns the filter editor for the given column in the table model */
@@ -553,19 +503,12 @@ public class TableFilterHeader extends JPanel {
 	 * -and updated as the table is updated-.
 	 */
 	public void setAutoOptions(boolean set){
-		if (autoOptions!=set){
-			autoOptions=set;
-	        if (columnsController != null) {
-	            filtersHandler.enableNotifications(false);
-	            columnsController.setAutoOptions(set);
-	            filtersHandler.enableNotifications(true);
-	        }
-		}
+		filtersHandler.setAutoOptions(set);
 	}
 	
 	/** Returns the auto options flag */
 	public boolean isAutoOptions(){
-		return autoOptions;
+		return filtersHandler.isAutoOptions();
 	}
 	
     /** Enables/Disables the filters */
@@ -667,7 +610,6 @@ public class TableFilterHeader extends JPanel {
         private void createColumn(int columnView) {
             int columnModel = table.convertColumnIndexToModel(columnView);
             FilterEditor editor = createEditor(columnModel);
-            filtersHandler.addFilter(editor.getFilter());
 
             FilterColumnPanel column = new FilterColumnPanel(
             		tableColumnModel.getColumn(columnView), editor);
@@ -675,6 +617,17 @@ public class TableFilterHeader extends JPanel {
             column.updateHeight();
             columns.add(column);
             add(column);
+        }
+
+        /** Creates an editor for the given column */
+        private FilterEditor createEditor(int modelColumn) {
+            
+            FilterEditor ret = new FilterEditor(filtersHandler, modelColumn);
+            ret.setFormat(getTextParser().getFormat(
+            		table.getModel().getColumnClass(modelColumn)));
+            ret.setTextParser(getTextParser());            
+            filtersHandler.addFilterEditor(ret);
+            return ret;
         }
 
         /** Detaches the current instance from any registered listeners */
@@ -714,16 +667,10 @@ public class TableFilterHeader extends JPanel {
             }
         }
 
-        /**
-         * Invokes resetFilter on all the editors.<br?
-         * This does not only implies invoking 
-         * {@link FilterEditor#resetFilter()}, as it tries to reset the 
-         * original editor options for enums and boolean types 
-		 */
+        /** Invokes resetFilter on all the editors. */
         public void resetFilters() {
             for (FilterColumnPanel column : columns) {
                 column.editor.resetFilter();
-                populateBasicEditorOptions(column.editor, false);
             }
         }
         
@@ -733,21 +680,6 @@ public class TableFilterHeader extends JPanel {
                 column.editor.setMaxVisibleRows(maxVisibleRows);
             }
     	}
-
-        /** 
-         * Sets the auto options flag, 
-         * but not on editors associated to boolean/enumerations 
-         **/
-        public void setAutoOptions(boolean set) {
-        	
-            for (FilterColumnPanel column : columns) {
-                Class<?> c = table.getModel().getColumnClass(
-                		column.editor.getFilterPosition());
-                if (!c.equals(Boolean.class) && !c.isEnum()){
-                	column.editor.setAutoOptions(set? table.getModel() : null);
-                }
-            }
-        }
 
         @Override public void setFont(Font font) {
             super.setFont(font);
@@ -926,27 +858,6 @@ public class TableFilterHeader extends JPanel {
                 super(new BorderLayout());
                 this.tc = tc;
                 w = tc.getWidth();
-                setFilterEditor(editor);
-                tc.addPropertyChangeListener(this);
-            }
-
-            /**
-             * Performs any cleaning required before removing this component
-             */
-            public void detach() {
-
-                if (this.editor != null) {
-                    filtersHandler.removeFilter(this.editor.getFilter());
-                    removeEditor(this.editor);
-                }
-
-                tc.removePropertyChangeListener(this);
-            }
-
-            public void setFilterEditor(FilterEditor editor) {
-                if (this.editor != null) {
-                	removeEditor(this.editor);
-                }
                 this.editor = editor;
                 add(this.editor, BorderLayout.CENTER);
                 editor.setEnabled(enabled);
@@ -956,17 +867,24 @@ public class TableFilterHeader extends JPanel {
                 	observer.tableFilterEditorCreated(TableFilterHeader.this, 
 	                          editor);
                 }            	
-                repaint();
+                tc.addPropertyChangeListener(this);
             }
-            
-            private void removeEditor(FilterEditor editorToRemove){
-                remove(this.editor);
-                editorToRemove.detach();
-            	editorToRemove.getFilter().removeFilterObserver(this);
-                for (IFilterHeaderObserver observer : observers){
-                	observer.tableFilterEditorExcluded(TableFilterHeader.this, 
-                			                           editorToRemove);
-                }            	
+
+            /**
+             * Performs any cleaning required before removing this component
+             */
+            public void detach() {
+
+                if (editor != null) {
+                    filtersHandler.removeFilterEditor(editor);
+                    remove(editor);
+                    editor.getFilter().removeFilterObserver(this);
+                    for (IFilterHeaderObserver observer : observers){
+                    	observer.tableFilterEditorExcluded(TableFilterHeader.this, 
+                    			editor);
+                    }            	
+                }
+                tc.removePropertyChangeListener(this);
             }
 
             @Override public void setFont(Font font) {

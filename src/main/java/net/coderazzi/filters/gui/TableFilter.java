@@ -37,6 +37,7 @@ import javax.swing.event.RowSorterListener;
 import net.coderazzi.filters.AndFilter;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterObserver;
+import net.coderazzi.filters.gui.editor.FilterEditor;
 
 
 /**
@@ -63,7 +64,8 @@ import net.coderazzi.filters.IFilterObserver;
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
-public class TableFilter extends AndFilter {
+public class TableFilter extends AndFilter implements FilterEditor.OptionsManager
+{
 
     /**
      * sendNotifications is used internally as a semaphore to disable 
@@ -81,6 +83,9 @@ public class TableFilter extends AndFilter {
 
     /** The class performing the autoselection, and following sorter changes * */
     private AutoSelector autoSelector = new AutoSelector();
+
+    /** class to handle the options **/
+    private OptionsManager optionsManager = new OptionsManager();
 
     /** The associated table, if any. */
     JTable table;
@@ -108,13 +113,24 @@ public class TableFilter extends AndFilter {
         JTable oldTable = this.table;
         this.table = table;
         autoSelector.replacedTable(oldTable, table);
+        optionsManager.setTable(table);
     }
 
-    /**
-     * Returns the associated table
-     */
+    /** Returns the associated table */
     public JTable getTable() {
         return table;
+    }
+    
+    /** Adds a new filter editor */
+    public void addFilterEditor(FilterEditor editor) {
+    	super.addFilter(editor.getFilter());
+    	optionsManager.addFilterEditor(editor);
+    }
+
+    /** Removes an existing editor */
+    public void removeFilterEditor(FilterEditor editor) {
+    	super.removeFilter(editor.getFilter());
+    	optionsManager.removeFilterEditor(editor);
     }
 
     /**
@@ -134,7 +150,32 @@ public class TableFilter extends AndFilter {
 
         return sendNotifications >= 0;
     }
+    
+    @Override
+    public boolean isAutoOptions(FilterEditor editor) {
+    	return optionsManager.isAutoOptions(editor);
+    }
+    
+    @Override
+    public void setOptions(FilterEditor editor, boolean autoOptions) {
+    	optionsManager.setOptions(editor, autoOptions);
+    }
+    
+	/** Sets/unsets the auto options flag */
+    public void setAutoOptions(boolean set){
+    	if (set!=isAutoOptions()){
+	        enableNotifications(false);
+	    	optionsManager.setAutoOptions(set);
+	        enableNotifications(true);
+    	}
+    }
+    
 
+	/** Returns the auto options flag */
+	public boolean isAutoOptions(){
+		return optionsManager.isAutoOptions();
+	}
+	
     /**
      * <p>Sets the autoselection mode</p>
      *

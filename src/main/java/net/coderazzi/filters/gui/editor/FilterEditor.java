@@ -45,9 +45,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.Format;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -58,14 +56,11 @@ import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.RowFilter;
 import javax.swing.border.Border;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterTextParser;
-import net.coderazzi.filters.gui.TableFilter;
 
 /**
  * Custom component to handle the filter' editors<br>
@@ -81,8 +76,7 @@ import net.coderazzi.filters.gui.TableFilter;
 public class FilterEditor extends JComponent{
 
 	private static final long serialVersionUID = 6908400421021655278L;
-	private TableFilter filtersHandler;
-	private AutoOptionsHandler autoOptionsHandler;
+	private OptionsManager optionsManager;
 	private PropertyChangeListener textParserListener;
 	private EditorBorder border = new EditorBorder();
 	FilterArrowButton downButton = new FilterArrowButton();
@@ -90,8 +84,8 @@ public class FilterEditor extends JComponent{
 	EditorComponent editor;
 	PopupComponent popup;
 
-	public FilterEditor(TableFilter filtersHandler, int filterPosition) {
-		this.filtersHandler = filtersHandler;
+	public FilterEditor(OptionsManager optionsManager, int filterPosition) {
+		this.optionsManager = optionsManager;
 		
 		setLayout(new BorderLayout());
 		setBorder(border);
@@ -253,29 +247,20 @@ public class FilterEditor extends JComponent{
 		}
 	}
 	
-	/** Diposes the editor, not to be used again */
-	public void detach() {
-		unsetAutoOptions();
-	}
-	
 	/**
 	 * Resets the filter, which implies:<ul>
 	 * <li>Content set to empty</li>
-	 * <li>If it has autooptions, they are recreated</li>
-	 * <li>Without autooptions, if there is a renderer, nothing else is done</li>
-	 * <li>Without autoptions, and with no renderer:<ul>
 	 * <li>History is lost<li>
-	 * <li>Options are removed</li>
-	 * <li>It becomes editable</li></ul></li>
+	 * <li>Options are reset</li>
+	 * <li>It becomes editable -unless there is a cell renderer-</li></ul></li>
 	 * </ul>
 	 */
 	public void resetFilter() {
 		setEditorContent(EditorComponent.EMPTY_FILTER);
-		if (autoOptionsHandler!=null){
-			TableModel model = autoOptionsHandler.tableModel;
-			setAutoOptions(model);
-		} else if (getListCellRenderer()==null){
-			clearOptions();
+		boolean autoOptions = optionsManager.isAutoOptions(this);
+		//reset now the options. Even if autoOptions is false
+		optionsManager.setOptions(this, autoOptions);
+		if (!autoOptions && getListCellRenderer()==null){
 			setEditable(true);
 		}
 	}
@@ -332,6 +317,11 @@ public class FilterEditor extends JComponent{
 		popup.addOptions(options);
 		downButton.setCanPopup(popup.hasContent());
 	}
+	
+	/** Returns the current options */
+	public Collection<?> getOptions(){
+		return popup.getOptions();
+	}
 
 	/** Clears any options currently defined, including the current history */
 	public void clearOptions() {
@@ -383,26 +373,14 @@ public class FilterEditor extends JComponent{
 	/**
 	 * Using autoOptions, the options displayed on the popup menu are 
 	 * automatically extracted from the associated {@link TableModel}.
-	 * @param tableModel can be set to null unset the flag
 	 */
-	public void setAutoOptions(TableModel tableModel){
-		unsetAutoOptions();
-		if (tableModel!=null){
-			autoOptionsHandler=new AutoOptionsHandler(tableModel);
-		}
+	public void setAutoOptions(boolean set){
+		optionsManager.setOptions(this, set);
 	}
 
 	/** Returns true if the editor is using autoOptions */
 	public boolean isAutoOptions(){
-		return autoOptionsHandler!=null;
-	}
-	
-	/** Unsets the autoOptions flag */
-	public void unsetAutoOptions(){
-		if (autoOptionsHandler!=null){
-			autoOptionsHandler.detach();
-			autoOptionsHandler=null;
-		}
+		return optionsManager.isAutoOptions(this);
 	}
 	
 	private void setupEditorComponent(ListCellRenderer renderer){
@@ -413,7 +391,7 @@ public class FilterEditor extends JComponent{
 			}
 		} else if (!(editor instanceof EditorComponent.Rendered)){
 			newComponent = popup.createRenderedEditorComponent();
-			//trigger popup when the user clicks on the componnet itself
+			//trigger popup when the user clicks on the component itself
 			newComponent.getComponent().addMouseListener(new MouseAdapter() {
             	@Override public void mouseClicked(MouseEvent e) {
             		if (isEnabled()){
@@ -457,8 +435,9 @@ public class FilterEditor extends JComponent{
 			@Override
 			public void focusGained(FocusEvent e) {
 				if (isEnabled() && editor.focusGained(true)){
-					showOptions();
-					popup.setPopupFocused(true);
+					if (showOptions()){
+						popup.setPopupFocused(true);
+					}
 				}
 			}
 		});
@@ -489,19 +468,23 @@ public class FilterEditor extends JComponent{
 	}
 
 	/** Shows the popup menu, preselecting the best match */
-	void showOptions() {
+	boolean showOptions() {
 		if (!popup.isVisible()) {
-			popup.display(editor.getComponent());
+			if (!popup.display(editor.getComponent())){
+				return false;
+			}
 			popup.selectBestMatch(editor.getContent(), false);
 		}
+		return true;
 	}
 	
 	/** triggers the popup for an operation starting on the source component */
 	void triggerPopup(Object source){
 		if (!popup.isMenuCanceledForMouseEvent(source)){
 			editor.getComponent().requestFocus();
-			showOptions();
-			popup.setPopupFocused(true);
+			if (showOptions()){
+				popup.setPopupFocused(true);
+			}
 		}		
 	}
 	
@@ -946,51 +929,20 @@ public class FilterEditor extends JComponent{
 			return new Insets(0, 1, 1, 1);
 		}
 	}
-
+	
 	/**
-	 * Class to automatically extract the content from the table model, 
-	 * used when the filter editor is defined with autoOptions flag.
+	 * Internal library interface to handle filter editors
 	 */
-	final class AutoOptionsHandler implements TableModelListener{
-		TableModel tableModel;
-		public AutoOptionsHandler(TableModel tableModel) {
-			this.tableModel=tableModel;
-			extractFilterContentsFromModel();
-			tableModel.addTableModelListener(this);
-		}
-		
-		public void detach(){
-			tableModel.removeTableModelListener(this);			
-		}
-		
-		@Override public void tableChanged(TableModelEvent e) {
-			int r = e.getFirstRow();			
-			if (r == TableModelEvent.HEADER_ROW){				
-				extractFilterContentsFromModel();
-			} else if (e.getType()!=TableModelEvent.DELETE){				
-				int c = e.getColumn(); 				
-				if (c == TableModelEvent.ALL_COLUMNS || c == getFilterPosition()){					
-					extendFilterContentsFromModel(r, e.getLastRow());
-				}
-			}
-		}
-		
-	    private void extractFilterContentsFromModel() {
-	    	clearOptions();
-	    	extendFilterContentsFromModel(0, tableModel.getRowCount()-1);
-	    }
-	    
-	    private void extendFilterContentsFromModel(int firstRow, int lastRow){
-	    	List<Object> all = new ArrayList<Object>();
-            int column = getFilterPosition();
+	public interface OptionsManager {
 
-            lastRow = Math.min(tableModel.getRowCount() - 1, lastRow);
-
-            while (lastRow >= firstRow) {
-                all.add(tableModel.getValueAt(firstRow++, column));
-            }
-            addOptions(all);
-	    }
-	    
+		/** Returns true if the editor defines auto options */
+		public boolean isAutoOptions(FilterEditor editor);
+		
+		/**
+		 * Enables/disables the auto options feature and sets the options
+		 * for the given editor
+		 */
+		public void setOptions(FilterEditor editor, boolean autoOptions);		
 	}
+
 }

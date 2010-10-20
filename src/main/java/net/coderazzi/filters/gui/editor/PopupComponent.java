@@ -352,6 +352,13 @@ abstract class PopupComponent implements PopupMenuListener{
 		reconfigureGui();
 	}
 
+	/** 
+	 * Returns the current options
+	 */
+	public Collection<?> getOptions(){
+		return optionsModel.getOptions();
+	}
+
 	/**
 	 * Selects the first element in the focused list. If it is already on the
 	 * first element, or forceJump is true, selects the first element on the

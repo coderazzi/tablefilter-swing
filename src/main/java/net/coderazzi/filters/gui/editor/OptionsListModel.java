@@ -181,6 +181,13 @@ public class OptionsListModel extends AbstractListModel {
 	}
 
 	/** 
+	 * Returns the current options
+	 */
+	public Collection<?> getOptions(){
+		return new ArrayList(content);
+	}
+
+	/** 
 	 * Adds additional options.<br>
 	 * If the content is text-based, the options are converted into Strings, 
 	 * and sorted.<br>
