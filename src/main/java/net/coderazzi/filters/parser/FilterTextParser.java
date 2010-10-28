@@ -16,6 +16,7 @@ import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
 
 import net.coderazzi.filters.IFilterTextParser;
+import net.coderazzi.filters.gui.FilterSettings;
 
 
 /**
@@ -73,6 +74,7 @@ public class FilterTextParser implements IFilterTextParser {
     Map<Class<?>, Format> formatters = new HashMap<Class<?>, Format>();
     Map<Class<?>, Comparator<?>> comparators = 
     	new HashMap<Class<?>, Comparator<?>>();
+	Format defaultFormatter; 
     boolean ignoreCase;
     private IOperand defaultOperand;
     private String defaultOperandString = "~";
@@ -118,6 +120,19 @@ public class FilterTextParser implements IFilterTextParser {
                 }
             });
         defaultOperand = operands.get(defaultOperandString);
+        setFormat(String.class, null);
+    }
+    
+    @Override
+    public FilterTextParser clone(){
+    	FilterTextParser ret = new FilterTextParser();
+    	ret.model=model;
+    	ret.ignoreCase=ignoreCase;
+    	ret.formatters.putAll(formatters);
+    	ret.comparators.putAll(comparators);
+    	ret.defaultFormatter=defaultFormatter;
+    	ret.setDefaultOperator(defaultOperandString);
+    	return ret;
     }
 
     @Override 
@@ -133,7 +148,8 @@ public class FilterTextParser implements IFilterTextParser {
     @Override public void setTableModel(TableModel model) {
         TableModel oldModel = model;
         this.model = model;
-        propertiesHandler.firePropertyChange("tableModel", oldModel, model);
+        propertiesHandler.firePropertyChange(TABLE_MODEL_PROPERTY, 
+        		oldModel, model);
     }
 
     @Override public String getDefaultOperator() {
@@ -141,12 +157,15 @@ public class FilterTextParser implements IFilterTextParser {
     }
 
     @Override public void setDefaultOperator(String s) {
-        String old = defaultOperandString;
         IOperand op = operands.get(s);
-        if (op != null) {
-            defaultOperand = op;
-            propertiesHandler.firePropertyChange("defaultOperand", old, s);
+        if (op == null) {
+        	throw new IllegalArgumentException(s);
         }
+        defaultOperand = op;
+        String old = defaultOperandString;
+        defaultOperandString = s;
+        propertiesHandler.firePropertyChange(DEFAULT_OPERATOR_PROPERTY, 
+        		old, s);
     }
 
     @Override public Format getFormat(Class<?> c) {
@@ -161,8 +180,15 @@ public class FilterTextParser implements IFilterTextParser {
      */
     @Override public void setFormat(Class<?> c,
                           Format format) {
+        if (c==String.class){
+        	if (format==null){
+        		format = FilterSettings.getDefaultFormat();
+        	}
+        	defaultFormatter=format;
+        }
         Format old = formatters.put(c, format);
-        propertiesHandler.firePropertyChange("format", old, format);
+        propertiesHandler.firePropertyChange(FORMAT_PROPERTY, 
+        		old==null? null : c, c);
         if (Date.class.isAssignableFrom(c) && (format != null)) {
             Comparator<?> comparator = getComparator(c);
             if ((comparator == null) || (comparator instanceof DateComparator)){
@@ -174,7 +200,8 @@ public class FilterTextParser implements IFilterTextParser {
     @Override public void setComparator(Class<?> c,
                               Comparator<?> cmp) {
         Comparator<?> old = comparators.put(c, cmp);
-        propertiesHandler.firePropertyChange("comparator", old, cmp);
+        propertiesHandler.firePropertyChange(COMPARATOR_PROPERTY, 
+        		old==null? null : c, c);
     }
 
     @Override public Comparator<?> getComparator(Class<?> c) {
@@ -185,7 +212,8 @@ public class FilterTextParser implements IFilterTextParser {
         if (ignore != this.ignoreCase) {
             boolean old = this.ignoreCase;
             this.ignoreCase = ignore;
-            propertiesHandler.firePropertyChange("ignoreCase", old, ignore);
+            propertiesHandler.firePropertyChange(IGNORE_CASE_PROPERTY, 
+            		old, ignore);
         }
     }
 
@@ -425,18 +453,17 @@ public class FilterTextParser implements IFilterTextParser {
         StringRowFilter(int modelPosition,
                         Format formatter) {
             this.modelPosition = modelPosition;
-            this.formatter = formatter;
+            this.formatter = formatter==null? defaultFormatter : formatter;
 
         }
 
         @Override public boolean include(Entry entry) {
             Object o = entry.getValue(modelPosition);
-            String left = (o == null) ? "" : 
-            	((formatter == null) ? o.toString() : formatter.format(o));
+            String left = formatter.format(o);
             return include(left);
         }
 
         abstract boolean include(String left);
     }
-
+   
 }

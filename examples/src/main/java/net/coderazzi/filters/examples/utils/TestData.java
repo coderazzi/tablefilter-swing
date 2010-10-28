@@ -27,6 +27,7 @@ package net.coderazzi.filters.examples.utils;
 import java.io.ByteArrayOutputStream;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -101,11 +102,53 @@ public class TestData {
         Lions,
         Phi
     }
+    
+    /** Custom type */
+    public static class Tutor implements Comparable<Tutor>{
+    	String surname;
+    	String firstName;
+    	String name;
+    	Tutor(){
+    		surname = name= "";
+    	}
+    	Tutor(String firstName, String surname){
+    		this.firstName=firstName;
+    		this.surname=surname;
+    		this.name=firstName + " " + surname;
+    	}
+    	@Override
+    	public int hashCode() {
+    		return name.hashCode();
+    	}
+    	@Override
+    	public boolean equals(Object obj) {
+    		return (obj instanceof Tutor) && ((Tutor)obj).name.equals(name);
+    	}
+    	@Override
+    	public String toString() {
+    		return name;
+    	}
+    	@Override
+    	public int compareTo(Tutor o) {
+    		return o==null? 1 : name.compareTo(o.name);
+    	}
+    }
+    
+    /** Specific Tutor comparator using the surname */
+    public static class TutorComparator implements Comparator<Tutor>{
+    	@Override
+    	public int compare(Tutor o1, Tutor o2) {
+    		if (o1==null){
+    			return o2==null? 0 : 1;
+    		}
+    		return o2==null? -1 : o1.firstName.compareTo(o2.firstName);
+    	}
+    }
 
     public String name, firstName;
     public Integer age;
     public Boolean male;
-    public String tutor;
+    public Tutor tutor;
     public Icon flag;
     public Club club;
     public Date date;
@@ -115,9 +158,15 @@ public class TestData {
         male = random.nextBoolean();
         firstName = getFirstName(male);
         name = getName(firstName);
-        while ((tutor == null) || tutor.equals(name)) {
-            tutor = (random.nextBoolean() || random.nextBoolean() || 
-            		random.nextBoolean()) ? getName(random.nextBoolean()) : "";
+        //1 out of 4 can be null
+        if (random.nextBoolean() || random.nextBoolean()){
+        	//1 out of 4 can be empty
+            if (random.nextBoolean() && random.nextBoolean()){
+        		tutor = new Tutor();
+        	} else {
+        		tutor = new Tutor(getFirstName(random.nextBoolean()),
+        				          getSurname());
+        	}
         }
         flag = getFlag();
         club = getClub();
@@ -176,15 +225,12 @@ public class TestData {
     }
 
     private String getName(String firstName) {
-        return firstName + " " 
-        	+ familyNames[random.nextInt(familyNames.length - 1)];
+        return firstName + " " + getSurname();
     }
 
-    private String getName(boolean male) {
-        String[] source = male ? maleNames : femaleNames;
-
-        return source[random.nextInt(source.length - 1)] + " "
-            + familyNames[random.nextInt(familyNames.length - 1)];
+    private String getSurname() {
+    	
+        return familyNames[random.nextInt(familyNames.length - 1)];
     }
 
     private Club getClub() {

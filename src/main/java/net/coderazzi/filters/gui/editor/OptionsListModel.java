@@ -26,13 +26,14 @@
 package net.coderazzi.filters.gui.editor;
 
 import java.text.Format;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ListCellRenderer;
+
+import net.coderazzi.filters.gui.FilterSettings;
 
 
 /**
@@ -53,33 +54,13 @@ public class OptionsListModel extends AbstractListModel {
 	 * This list is null if the content is considered non-text 
 	 */
 	private List stringContent;
-	private Format formatter = defaultFormatter;
+	private Format formatter;
 	private boolean ignoreCase;
 	
-	/** 
-	 * Basic implementation, to convert any Object to String 
-	 * using its defined toString method 
-	 **/
-	private static Format defaultFormatter = new Format(){
-		private static final long serialVersionUID = 3313449946741441248L;
-		@Override
-		public Object parseObject(String source) throws ParseException {
-			return source.toString();
-		}
-		@Override
-		public StringBuffer format(Object obj, StringBuffer toAppendTo, 
-				java.text.FieldPosition pos) {
-			return toAppendTo.append(obj.toString());
-		}
-		@Override
-		public Object parseObject(String source, java.text.ParsePosition pos) {
-			return source;
-		}
-	};
-
 	public OptionsListModel() {
 		this.content = new ArrayList();
 		this.stringContent = content;
+		this.formatter = FilterSettings.getDefaultFormat();
 	}
 
 	@Override
@@ -111,10 +92,15 @@ public class OptionsListModel extends AbstractListModel {
 		}
 	}
 
-	/** Specifies the format used to convert Objects to Strings */
+	/** 
+	 * Specifies the format used to convert Objects to Strings
+	 * Cannot be null 
+	 **/
 	public void setFormat(Format format) {
-		this.formatter = format==null? defaultFormatter : format;
-		ensureRightStringContent();
+		if (format != this.formatter){
+			this.formatter = format;
+			ensureRightStringContent();
+		}
 	}
 	
 	/** 

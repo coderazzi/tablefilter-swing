@@ -72,13 +72,17 @@ public class Types{
     }
     
     /** Returns the {@link Format} for the given class */
-    public Format getFormat(Class<?> c){
+    public final Format getFormat(Class<?> c){
     	return formatters.get(c);
     }
 
     /** Defines the {@link Format} for the given class */
-    public void setFormat(Class<?> c, Format format){
-    	formatters.put(c, format);
+    public final void setFormat(Class<?> c, Format format){
+    	//the formatter for the String class can never be null
+    	if (format==null && String.class==c){
+    		throw new IllegalArgumentException();
+    	}
+   		formatters.put(c, format);
     }
     
     /** Returns the {@link Comparator} for the given class */
@@ -121,7 +125,7 @@ public class Types{
 		@Override
     	public StringBuffer format(Object obj, StringBuffer toAppendTo, 
     			FieldPosition pos) {
-        	return toAppendTo.append(obj);
+        	return toAppendTo.append(obj==null? FilterSettings.nullText : obj);
     	}
     	@Override
     	public Object parseObject(String source) throws ParseException {

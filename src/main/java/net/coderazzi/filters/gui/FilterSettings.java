@@ -26,6 +26,7 @@
 package net.coderazzi.filters.gui;
 
 import java.awt.Color;
+import java.text.Format;
 
 import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.gui.TableFilterHeader.Position;
@@ -39,6 +40,10 @@ import net.coderazzi.filters.parser.Types;
  * (which could be not available, anyway)
  */
 public class FilterSettings {
+	
+	/** Properties must be defined with this prefix */
+	public final static String PROPERTIES_PREFIX="net.coderazzi.filters.";
+	
     /**
      * Set to true to perform automatically the selection of a row that is 
      * uniquely identified by the existing filter. It is true by default.
@@ -53,6 +58,16 @@ public class FilterSettings {
     /** Whether to ignore case or not, false by default (case sensitive) */
     public static boolean ignoreCase = 
     	Boolean.parseBoolean(getString("IgnoreCase", "false"));
+
+    /** 
+     * The default null representation (empty string by default)<br>
+     * This value is only used in the default formatters defined in the
+     * library. If the user defines customized formats, is its responsibility
+     * to respect this representation.<br>
+     * The default representation (empty string) is so chosen as to match
+     * the default table format for null values
+     */
+    public static String nullText = getString("NullText", "");
 
     /** The header position, {@link Position#INLINE} by default. */
     public static Position headerPosition = 
@@ -79,6 +94,14 @@ public class FilterSettings {
     /** The types used by default on the parser */
     public static Types types = new Types();
 
+    /** 
+     * Returns the default format - the format for String types, 
+     * that will be used to format types without registered Formats 
+     **/
+    public static Format getDefaultFormat(){
+    	return types.getFormat(String.class);
+    }
+    
     /**
      * The class to handle the text parsing by default.<br>
      * It must have a default constructor. <br>
@@ -121,7 +144,7 @@ public class FilterSettings {
     private static String getString(String name,
                                     String defaultValue) {
         try {
-            return System.getProperty(name, defaultValue);
+            return System.getProperty(PROPERTIES_PREFIX + name, defaultValue);
         } catch (Exception ex) {
             return defaultValue;
         }
@@ -129,7 +152,7 @@ public class FilterSettings {
     
     private static int getInteger(String name, int defaultValue) {
 		try {
-			return Integer.valueOf(System.getProperty(name));
+			return Integer.valueOf(System.getProperty(PROPERTIES_PREFIX + name));
 		} catch (Exception ex) {
 			return defaultValue;
 		}

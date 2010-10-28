@@ -51,9 +51,8 @@ public class TestTableModel extends AbstractTableModel {
             NAME, AGE, MALE, TUTOR, COUNTRY, CLUB, LCNAME, DATE
         };
     private static final Class<?>[] columnTypes = {
-            String.class, Integer.class, Boolean.class, String.class, Icon.class,
-            TestData.Club.class,
-            String.class, Date.class
+            String.class, Integer.class, Boolean.class, TestData.Tutor.class, 
+            Icon.class, TestData.Club.class, String.class, Date.class
         };
 
 

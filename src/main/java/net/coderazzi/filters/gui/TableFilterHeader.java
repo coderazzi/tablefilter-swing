@@ -622,10 +622,9 @@ public class TableFilterHeader extends JPanel {
         /** Creates an editor for the given column */
         private FilterEditor createEditor(int modelColumn) {
             
-            FilterEditor ret = new FilterEditor(filtersHandler, modelColumn);
-            ret.setFormat(getTextParser().getFormat(
-            		table.getModel().getColumnClass(modelColumn)));
-            ret.setTextParser(getTextParser());            
+            FilterEditor ret = new FilterEditor(filtersHandler, modelColumn,
+            		table.getModel().getColumnClass(modelColumn));
+            ret.setTextParser(getTextParser());
             filtersHandler.addFilterEditor(ret);
             return ret;
         }

@@ -83,9 +83,12 @@ public class FilterEditor extends JComponent{
     EditorFilter filter = new EditorFilter();
 	EditorComponent editor;
 	PopupComponent popup;
+	Class<?> editorClass;
 
-	public FilterEditor(OptionsManager optionsManager, int filterPosition) {
+	public FilterEditor(OptionsManager optionsManager, int filterPosition,
+			Class<?> associatedClass) {
 		this.optionsManager = optionsManager;
+		this.editorClass = associatedClass;
 		
 		setLayout(new BorderLayout());
 		setBorder(border);
@@ -94,9 +97,15 @@ public class FilterEditor extends JComponent{
 		textParserListener = new PropertyChangeListener() {
 			
 			@Override public void propertyChange(PropertyChangeEvent evt) {
-				popup.setIgnoreCase(((IFilterTextParser)evt.getSource())
-						.isIgnoreCase());
-				filter.update();
+				String prop = evt.getPropertyName();
+				if (IFilterTextParser.IGNORE_CASE_PROPERTY==prop){
+					popup.setIgnoreCase(((IFilterTextParser)evt.getSource())
+							.isIgnoreCase());
+					filter.update();
+				} else if (IFilterTextParser.FORMAT_PROPERTY==prop &&
+						editorClass == evt.getNewValue()){
+					updateFormat((IFilterTextParser)evt.getSource());
+				}
 			}
 		};
 		popup = new PopupComponent() {
@@ -270,11 +279,27 @@ public class FilterEditor extends JComponent{
 	 * {@link ListCellRenderer}, a parser is mandatory 
 	 */
     public void setTextParser(IFilterTextParser parser){
+    	if (parser==null){
+    		throw new IllegalArgumentException();
+    	}
     	releaseTextParser();
     	parser.addPropertyChangeListener(textParserListener);
 		popup.setIgnoreCase(parser.isIgnoreCase());
-    	editor.setTextParser(parser);
+    	editor.setTextParser(parser);    	
+		updateFormat(parser);
     	filter.checkChanges();
+    }
+    
+    void updateFormat(IFilterTextParser parser){
+    	popup.setFormat(getFormat(parser));
+    }
+    
+    private Format getFormat(IFilterTextParser parser){
+    	Format format = parser.getFormat(editorClass);
+    	if (format==null){
+    		format = parser.getFormat(String.class);
+    	}
+    	return format;
     }
     
     private void releaseTextParser(){
@@ -294,14 +319,6 @@ public class FilterEditor extends JComponent{
 		return editor.getPosition();
 	}
 	
-	/** 
-	 * Defines the format, used in the options list to convert content 
-	 * into strings (if / when needed)
-	 **/
-	public void setFormat(Format format){
-		popup.setFormat(format);
-	}
-
 	/** Sets the available options, shown on the popup menu */
 	public void setOptions(Collection<?> options) {
 		popup.clear();
