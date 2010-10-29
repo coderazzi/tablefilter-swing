@@ -264,7 +264,7 @@ public class FilterTextParser implements IFilterTextParser {
         protected Comparator defaultComparator;
 
         abstract boolean matches(int comparison);
-
+        
         @Override public RowFilter create(String right,
                                 Class<?> c,
                                 int modelPosition) throws ParseException {
@@ -285,16 +285,18 @@ public class FilterTextParser implements IFilterTextParser {
                     comparator = defaultComparator;
                 }
             }
-            Object o = format.parseObject(right);
-            if (o == null) {
-                throw new ParseException("", 0);
-            }
+            Object o = right.length()==0? null : format.parseObject(right);
             return createOperator(o, comparator, modelPosition);
         }
 
         protected RowFilter createOperator(final Object right,
                                            final Comparator comparator,
-                                           final int modelPosition) {
+                                           final int modelPosition) 
+        	throws ParseException
+        {
+            if (right==null){
+                throw new ParseException("", 0);
+            }
             return new RowFilter() {
                     @SuppressWarnings("unchecked")
                     @Override public boolean include(Entry entry) {
@@ -305,7 +307,7 @@ public class FilterTextParser implements IFilterTextParser {
                 };
         }
 
-        protected RowFilter createStringOperator(final String right,
+        private RowFilter createStringOperator(final String right,
                                                  Format formatter,
                                                  int modelPosition) {
             return new StringRowFilter(modelPosition, formatter) {
@@ -329,12 +331,27 @@ public class FilterTextParser implements IFilterTextParser {
         @Override public boolean matches(int comparison) {
             return equals == (comparison == 0);
         }
+        
+        @Override
+        protected RowFilter createOperator(Object right, Comparator comparator,
+        		final int modelPosition) throws ParseException {
+        	if (right==null){
+                return new RowFilter() {
+                    @SuppressWarnings("unchecked")
+                    @Override public boolean include(Entry entry) {
+                        Object left = entry.getValue(modelPosition);
+                        return equals == (left == null);
+                    }
+                };        		
+        	}
+        	return super.createOperator(right, comparator, modelPosition);
+        }
 
         @Override public int compare(Object o1,
                            Object o2) {
-            // o1 is never null
+            if (o1==null) return o2==null? 0 : 1;
             return o1.equals(o2) ? 0 : 1;
-        }
+        }                
     }
 
     class REOperand implements IOperand {

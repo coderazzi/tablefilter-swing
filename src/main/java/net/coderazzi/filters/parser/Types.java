@@ -119,18 +119,19 @@ public class Types{
 		return DateFormat.getDateInstance(DateFormat.SHORT);
 	}
 
-	static class TypeFormat extends Format {
+	static abstract class TypeFormat extends Format {
 		private static final long serialVersionUID = -6161901343218446716L;
 
 		@Override
     	public StringBuffer format(Object obj, StringBuffer toAppendTo, 
     			FieldPosition pos) {
-        	return toAppendTo.append(obj==null? FilterSettings.nullText : obj);
+			if (obj!=null){
+				toAppendTo.append(obj);
+			}
+        	return toAppendTo;
     	}
     	@Override
-    	public Object parseObject(String source) throws ParseException {
-    		return null;
-    	}
+    	public abstract Object parseObject(String source) throws ParseException;
     	
     	@Override
     	public Object parseObject(String source, ParsePosition pos) {

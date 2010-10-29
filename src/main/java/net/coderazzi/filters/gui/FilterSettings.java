@@ -59,16 +59,6 @@ public class FilterSettings {
     public static boolean ignoreCase = 
     	Boolean.parseBoolean(getString("IgnoreCase", "false"));
 
-    /** 
-     * The default null representation (empty string by default)<br>
-     * This value is only used in the default formatters defined in the
-     * library. If the user defines customized formats, is its responsibility
-     * to respect this representation.<br>
-     * The default representation (empty string) is so chosen as to match
-     * the default table format for null values
-     */
-    public static String nullText = getString("NullText", "");
-
     /** The header position, {@link Position#INLINE} by default. */
     public static Position headerPosition = 
     	Position.valueOf(getString("Header.Position", "INLINE"));

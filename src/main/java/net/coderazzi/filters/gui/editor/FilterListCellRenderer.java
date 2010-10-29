@@ -86,7 +86,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	}
 
 	/** 
-	 * Indicates that the focus is currenly on the list.<br>
+	 * Indicates that the focus is currently on the list.<br>
 	 * Selected cells are selected-focused cells
 	 **/
 	public void setFocusOnList(boolean set) {

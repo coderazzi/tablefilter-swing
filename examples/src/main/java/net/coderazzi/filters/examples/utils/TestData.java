@@ -154,7 +154,12 @@ public class TestData {
     public Date date;
 
     public TestData() {
-        age = 17 + random.nextInt(random.nextBoolean() ? 10 : 25);
+        //1 out of 64 can be with unknown age (null)
+        if (random.nextBoolean() || random.nextBoolean() 
+        		|| random.nextBoolean() || random.nextBoolean()
+        		|| random.nextBoolean() || random.nextBoolean() ){
+            age = 17 + random.nextInt(random.nextBoolean() ? 10 : 25);
+        }
         male = random.nextBoolean();
         firstName = getFirstName(male);
         name = getName(firstName);
@@ -168,7 +173,11 @@ public class TestData {
         				          getSurname());
         	}
         }
-        flag = getFlag();
+        //1 out of 16 can be without flag
+        if (random.nextBoolean() || random.nextBoolean() 
+        		|| random.nextBoolean() || random.nextBoolean()){
+        	flag = getFlag();
+        }
         club = getClub();
         // date is not exact (not everybody can be born at 00:00!)
         date = new GregorianCalendar(random.nextInt(50) + 1940, 

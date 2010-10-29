@@ -99,7 +99,7 @@ public class OptionsListModel extends AbstractListModel {
 	public void setFormat(Format format) {
 		if (format != this.formatter){
 			this.formatter = format;
-			ensureRightStringContent();
+			reformatContent();
 		}
 	}
 	
@@ -110,11 +110,11 @@ public class OptionsListModel extends AbstractListModel {
 	public void setIgnoreCase(boolean set){
 		if (ignoreCase!=set){
 			ignoreCase = set;
-			ensureRightStringContent();
+			reformatContent();
 		}
 	}
 	
-	private void ensureRightStringContent(){
+	private void reformatContent(){
 		if (stringContent != null) {
 			List oldContent = content;
 			List oldStringContent = stringContent;
