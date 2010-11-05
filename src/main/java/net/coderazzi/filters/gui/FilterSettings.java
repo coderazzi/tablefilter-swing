@@ -66,9 +66,6 @@ public class FilterSettings {
     /** The default date format, used on the default text parser */
     public static String dateFormat = getString("DateFormat", null);
 
-    /** The default operator used on the text parser */
-    public static String defaultOperator = getString("DefaultOperator", "~");
-    
     /** The maximum number of visible tows on the popup menus */
     public static int maxVisiblePopupRows = getInteger("Popup.maxVisibleRows", 8);
     
@@ -104,7 +101,6 @@ public class FilterSettings {
         try {
             IFilterTextParser ret = filterTextParserClass.newInstance();
             ret.setIgnoreCase(ignoreCase);
-            ret.setDefaultOperator(defaultOperator);
             types.configure(ret);
             return ret;
         } catch (Exception ex) {

@@ -47,9 +47,6 @@ public interface IFilterTextParser {
 	/** Property fired when the ignore case value changes */
 	final public static String IGNORE_CASE_PROPERTY = "ignoreCase"; 
 
-	/** Property fired when the default operator value changes */
-	final public static String DEFAULT_OPERATOR_PROPERTY = "defaultOperator"; 
-
 	/** Property fired when the table model value changes */
 	final public static String TABLE_MODEL_PROPERTY = "tableModel"; 
 
@@ -92,20 +89,6 @@ public interface IFilterTextParser {
      * Returns true if it ignores case
      */
     public boolean isIgnoreCase();
-
-    /**
-     * Defines the default operator when the user specifies none<br>
-     * The parameter must be a valid operator for the parser<br>
-	 * Changing this value fires the property 
-	 * {@link IFilterTextParser#DEFAULT_OPERATOR_PROPERTY},
-	 * with a String value associated.
-     */
-    public void setDefaultOperator(String s);
-
-    /**
-     * Returns the default operator
-     */
-    public String getDefaultOperator();
 
     /**
      * <p>Sets a specific comparator for a given class, that should override 
@@ -155,6 +138,9 @@ public interface IFilterTextParser {
     
     /** Clones the parser */
     public IFilterTextParser clone();
+    
+    /** Escapes a given expression to avoid any matching operator */
+    public String escape(String s);
 
     /**
      * Adds a {@link PropertyChangeListener}. <br>

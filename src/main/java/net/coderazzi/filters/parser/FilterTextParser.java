@@ -76,11 +76,10 @@ public class FilterTextParser implements IFilterTextParser {
     	new HashMap<Class<?>, Comparator<?>>();
 	Format defaultFormatter; 
     boolean ignoreCase;
-    private IOperand defaultOperand;
-    private String defaultOperandString = "~";
     private TableModel model;
     private Pattern expressionMatcher;
     private Map<String, IOperand> operands;
+    private IOperand equalOperand, matchOperand;
     private PropertyChangeSupport propertiesHandler = new PropertyChangeSupport(this);
 
     public FilterTextParser() {
@@ -88,11 +87,11 @@ public class FilterTextParser implements IFilterTextParser {
         	Pattern.compile("^(>=|<=|<>|!=|!~|~~|==|>|<|=|~|!)?\\s*(.*)$");
         operands = new HashMap<String, IOperand>();
         operands.put("~~", new REOperand(true));
-        operands.put("~", new SimpleREOperand(true));
+        operands.put("~", matchOperand = new SimpleREOperand(true));
         operands.put("!~", new SimpleREOperand(false));
         operands.put("!", new EqualOperand(false));
         operands.put("!=", new EqualOperand(false));
-        operands.put("=", new EqualOperand(true));
+        operands.put("=", equalOperand = new EqualOperand(true));
         operands.put("==", new EqualOperand(true));
         operands.put(">=", new ComparisonOperand() {
                 @Override boolean matches(int comparison) {
@@ -119,7 +118,6 @@ public class FilterTextParser implements IFilterTextParser {
                     return comparison != 0;
                 }
             });
-        defaultOperand = operands.get(defaultOperandString);
         setFormat(String.class, null);
     }
     
@@ -131,7 +129,6 @@ public class FilterTextParser implements IFilterTextParser {
     	ret.formatters.putAll(formatters);
     	ret.comparators.putAll(comparators);
     	ret.defaultFormatter=defaultFormatter;
-    	ret.setDefaultOperator(defaultOperandString);
     	return ret;
     }
 
@@ -150,22 +147,6 @@ public class FilterTextParser implements IFilterTextParser {
         this.model = model;
         propertiesHandler.firePropertyChange(TABLE_MODEL_PROPERTY, 
         		oldModel, model);
-    }
-
-    @Override public String getDefaultOperator() {
-        return defaultOperandString;
-    }
-
-    @Override public void setDefaultOperator(String s) {
-        IOperand op = operands.get(s);
-        if (op == null) {
-        	throw new IllegalArgumentException(s);
-        }
-        defaultOperand = op;
-        String old = defaultOperandString;
-        defaultOperandString = s;
-        propertiesHandler.firePropertyChange(DEFAULT_OPERATOR_PROPERTY, 
-        		old, s);
     }
 
     @Override public Format getFormat(Class<?> c) {
@@ -220,22 +201,36 @@ public class FilterTextParser implements IFilterTextParser {
     @Override public boolean isIgnoreCase() {
         return ignoreCase;
     }
+    
+    @Override public String escape(String expression) {
+        Matcher matcher = expressionMatcher.matcher(expression);
+        if (matcher.matches()) {
+            // all expressions match!
+            IOperand op = operands.get(matcher.group(1));
+            if (op!=null && op!=equalOperand){
+            	return "= "+expression;
+            }
+        }
+        return expression;
+    }
 
-    @Override public RowFilter parseText(String expression,
+	@Override public RowFilter parseText(String expression,
                                int modelPosition) throws ParseException {
         Class<?> c = model.getColumnClass(modelPosition);
         Matcher matcher = expressionMatcher.matcher(expression);
         if (matcher.matches()) {
             // all expressions match!
             IOperand op = operands.get(matcher.group(1));
-            if (op == null) {
-                op = defaultOperand;
-            }
+            String content = matcher.group(2).trim();
+            IOperand use = op==null? 
+            		c==String.class? matchOperand : equalOperand : op;
             try {
-                return op.create(matcher.group(2).trim(), c, modelPosition);
+                return use.create(content, c, modelPosition);
             } catch (ParseException pex) {
-                throw new ParseException("", 
-                		pex.getErrorOffset() + matcher.start(2));
+            	if (op==null && use!=matchOperand){
+            		return matchOperand.create(content, c, modelPosition);
+            	}
+                throw pex;
             }
         }
         return null;
