@@ -176,36 +176,45 @@ public class OptionsListModel extends AbstractListModel {
 	 * discarded
 	 */
 	public void addContent(Collection addedContent) {
-		if (!addedContent.isEmpty()){
-			if (isEmpty()){
+		int originalSize = getSize();
+		if (stringContent != null) {
+			if (stringContent == content) {
+				// this means that content contains only Strings. 
+				// We need to ensure now that the addedContent is all 
+				// Strings, otherwise we have to create a separate content 
+				// for stringContent
+				for (Object o : addedContent) {
+					if (o!=null && !(o instanceof String)) {
+						stringContent = new ArrayList(content);
+						break;
+					}
+				}
+			}
+			for (Object o : addedContent) {
+				String s = o==null? null : formatter.format(o);
+				if (s!=null){
+					addStringContent(s);
+				}
+			}
+		}
+		if (stringContent != content) {
+			for (Object o : addedContent) {
+				if (o!=null && !content.contains(o)) {
+					content.add(o);
+				}
+			}
+		}
+		int newSize = getSize();
+		if (originalSize != newSize){
+			if (originalSize==0){
 				//it is needed to always have the null/empty filter
-				content.add(EditorComponent.EMPTY_FILTER);
-			}
-			if (stringContent != null) {
-				if (stringContent == content) {
-					// this means that content contains only Strings. 
-					// We need to ensure now that the addedContent is all 
-					// Strings, otherwise we have to create a separate content 
-					// for stringContent
-					for (Object o : addedContent) {
-						if (!(o instanceof String)) {
-							stringContent = new ArrayList(content);
-							break;
-						}
-					}
+				content.add(0, EditorComponent.EMPTY_FILTER);
+				if (stringContent!=null && stringContent!=content){
+					stringContent.add(0, EditorComponent.EMPTY_FILTER);					
 				}
-				for (Object o : addedContent) {
-					addStringContent(formatter.format(o));
-				}
+				newSize+=1;
 			}
-			if (stringContent != content) {
-				for (Object o : addedContent) {
-					if (!content.contains(o)) {
-						content.add(o);
-					}
-				}
-			}
-			fireContentsChanged(this, 0, getSize());
+			fireContentsChanged(this, 0, newSize);
 		}
 	}
 
