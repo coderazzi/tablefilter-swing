@@ -271,11 +271,6 @@ abstract class PopupComponent implements PopupMenuListener{
 		optionsModel.setFormat(format);
 	}
 	
-	/** Convenient method, to use the same format from the option list*/
-	public String format(Object object){
-		return optionsModel.format(object);
-	}
-	
 	/** Returns true if the passed object matches an existing option */
 	public boolean isValidOption(Object object){
 		return optionsModel.isValidOption(object);		

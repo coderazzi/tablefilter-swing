@@ -182,11 +182,23 @@ public class FilterEditor extends JComponent{
 			setEditorContent(EditorComponent.EMPTY_FILTER);
 		} else if (isEditable()){
 			//we need to use, eventually, the provided formatter
-			setEditorContent(popup.format(content));
+			setEditorContent(format(content));
 		} else if (popup.isValidOption(content)){
 			//the content must be a valid option
-			setEditorContent(popup.format(content));			
+			setEditorContent(format(content));			
 		}
+	}
+	
+	/** formats an object using the current class's format */
+	private String format(Object o){
+		if (o instanceof String){
+			return (String) o;
+		}
+		Format f = editor.getTextParser().getFormat(editorClass);
+		if (f==null){
+			f = editor.getTextParser().getFormat(String.class);
+		}
+		return f.format(o);
 	}
 	
 	/** Sets the content, updating the filter -and propagating any changes- */

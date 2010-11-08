@@ -137,11 +137,6 @@ public class OptionsListModel extends AbstractListModel {
 							stringContent.contains(o));
 	}
 	
-	/** Commodity method to format objects using the current {@link Format} */
-	public String format(Object o){
-		return (o instanceof String)? (String)o : formatter.format(o);
-	}
-
 	/** @see PopupComponent#selectBestMatch(Object, boolean) */
 	public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
 		if (stringContent == null) {

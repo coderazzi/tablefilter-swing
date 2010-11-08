@@ -79,19 +79,18 @@ public class FilterTextParser implements IFilterTextParser {
     private TableModel model;
     private Pattern expressionMatcher;
     private Map<String, IOperand> operands;
-    private IOperand equalOperand, matchOperand;
     private PropertyChangeSupport propertiesHandler = new PropertyChangeSupport(this);
+    private IOperand nullOperand;
 
     public FilterTextParser() {
         expressionMatcher = 
         	Pattern.compile("^(>=|<=|<>|!=|!~|~~|==|>|<|=|~|!)?\\s*(.*)$");
         operands = new HashMap<String, IOperand>();
         operands.put("~~", new REOperand(true));
-        operands.put("~", matchOperand = new SimpleREOperand(true));
         operands.put("!~", new SimpleREOperand(false));
         operands.put("!", new EqualOperand(false));
         operands.put("!=", new EqualOperand(false));
-        operands.put("=", equalOperand = new EqualOperand(true));
+        operands.put("=", new EqualOperand(true));
         operands.put("==", new EqualOperand(true));
         operands.put(">=", new ComparisonOperand() {
                 @Override boolean matches(int comparison) {
@@ -118,6 +117,33 @@ public class FilterTextParser implements IFilterTextParser {
                     return comparison != 0;
                 }
             });
+        final SimpleREOperand matchOperand = new SimpleREOperand(true);
+        operands.put("~", matchOperand);
+
+        //nullOperand is used when the user enters no operator. It treats
+        //the input as a match operand (~) if handled as a String or when
+        //it is not possible to parse the given expression (for example,
+        //entering '5*' on a Integer column
+        nullOperand = new EqualOperand(true){
+        	@Override
+			protected RowFilter createStringOperator(String right, 
+        			Format formatter, int modelPosition) throws ParseException
+        	{
+        		return matchOperand.create(right, modelPosition, formatter);
+        	}
+        	@Override
+			protected RowFilter createOperator(String right, Format format, 
+        			Comparator comparator, int modelPosition) 
+        	throws ParseException 
+        	{
+        		try{
+        			return super.createOperator(right, format, comparator, 
+        					modelPosition);
+        		} catch (ParseException pex){
+            		return matchOperand.create(right, modelPosition, format);        			
+        		}
+        	}
+        };
         setFormat(String.class, null);
     }
     
@@ -206,8 +232,8 @@ public class FilterTextParser implements IFilterTextParser {
         Matcher matcher = expressionMatcher.matcher(expression);
         if (matcher.matches()) {
             // all expressions match!
-            IOperand op = operands.get(matcher.group(1));
-            if (op!=null && op!=equalOperand){
+        	String operand = matcher.group(1);
+            if (operand!=null && operand!="="){
             	return "= "+expression;
             }
         }
@@ -221,17 +247,11 @@ public class FilterTextParser implements IFilterTextParser {
         if (matcher.matches()) {
             // all expressions match!
             IOperand op = operands.get(matcher.group(1));
-            String content = matcher.group(2).trim();
-            IOperand use = op==null? 
-            		c==String.class? matchOperand : equalOperand : op;
-            try {
-                return use.create(content, c, modelPosition);
-            } catch (ParseException pex) {
-            	if (op==null && use!=matchOperand){
-            		return matchOperand.create(content, c, modelPosition);
-            	}
-                throw pex;
+            if (op==null){
+            	op = nullOperand;
             }
+            String content = matcher.group(2).trim();
+            return op.create(content, c, modelPosition);
         }
         return null;
     }
@@ -280,31 +300,41 @@ public class FilterTextParser implements IFilterTextParser {
                     comparator = defaultComparator;
                 }
             }
-            Object o = right.length()==0? null : format.parseObject(right);
-            return createOperator(o, comparator, modelPosition);
+            return createOperator(right, format, comparator, modelPosition);
         }
 
-        protected RowFilter createOperator(final Object right,
-                                           final Comparator comparator,
+        protected RowFilter createOperator(String right,
+                                           Format format,
+                                           final Comparator comparator, 
                                            final int modelPosition) 
         	throws ParseException
         {
-            if (right==null){
-                throw new ParseException("", 0);
+            final Object o = right.length()==0? null : format.parseObject(right);
+            if (o ==null){
+            	return createNullOperator(modelPosition);
             }
             return new RowFilter() {
                     @SuppressWarnings("unchecked")
                     @Override public boolean include(Entry entry) {
                         Object left = entry.getValue(modelPosition);
                         return (left != null) && 
-                        	matches(comparator.compare(left, right));
+                        	matches(comparator.compare(left, o));
                     }
                 };
         }
+        
+        protected RowFilter createNullOperator(int modelPosition) 
+        	throws ParseException
+        {
+            throw new ParseException("", 0);        	
+        }
 
-        private RowFilter createStringOperator(final String right,
+        @SuppressWarnings("unused")
+		protected RowFilter createStringOperator(final String right,
                                                  Format formatter,
-                                                 int modelPosition) {
+                                                 int modelPosition)
+        	throws ParseException
+        {
             return new StringRowFilter(modelPosition, formatter) {
                     @Override public boolean include(String left) {
                         return matches(ignoreCase ? 
@@ -328,18 +358,16 @@ public class FilterTextParser implements IFilterTextParser {
         }
         
         @Override
-        protected RowFilter createOperator(Object right, Comparator comparator,
-        		final int modelPosition) throws ParseException {
-        	if (right==null){
-                return new RowFilter() {
-                    @SuppressWarnings("unchecked")
-                    @Override public boolean include(Entry entry) {
-                        Object left = entry.getValue(modelPosition);
-                        return equals == (left == null);
-                    }
-                };        		
-        	}
-        	return super.createOperator(right, comparator, modelPosition);
+        protected RowFilter createNullOperator(final int modelPosition) 
+        	throws ParseException 
+        {
+            return new RowFilter() {
+                @SuppressWarnings("unchecked")
+                @Override public boolean include(Entry entry) {
+                    Object left = entry.getValue(modelPosition);
+                    return equals == (left == null);
+                }
+            };        		
         }
 
         @Override public int compare(Object o1,
@@ -358,15 +386,21 @@ public class FilterTextParser implements IFilterTextParser {
 
         @Override public RowFilter create(String right,
                                 Class<?> c,
-                                final int modelPosition) throws ParseException {
-            final Pattern pattern = getPattern(right);
-            Format format = String.class.equals(c) ? null : formatters.get(c);
-            return new StringRowFilter(modelPosition, format) {
+                                int modelPosition) throws ParseException {
+        	return create(right, modelPosition, 
+        					String.class.equals(c) ? null : formatters.get(c));
+        }
 
-                    @Override boolean include(String left) {
-                        return equals == pattern.matcher(left).matches();
-                    }
-                };
+        public RowFilter create(String right,
+        		final int modelPosition, 
+        		Format format) throws ParseException {
+        	final Pattern pattern = getPattern(right);
+        	return new StringRowFilter(modelPosition, format) {
+
+        		@Override boolean include(String left) {
+        			return equals == pattern.matcher(left).matches();
+        		}
+        	};
         }
 
         protected Pattern getPattern(String right) throws ParseException {
