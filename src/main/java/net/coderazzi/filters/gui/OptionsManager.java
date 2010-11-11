@@ -60,6 +60,11 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 	private JTable table;
 	private TableModel listenedModel;
 	
+	@Override
+	public JTable getTable() {
+		return table;
+	}
+	
 	/** Returns true if the editor defines auto options */
 	@Override
 	public boolean isAutoOptions(FilterEditor editor){

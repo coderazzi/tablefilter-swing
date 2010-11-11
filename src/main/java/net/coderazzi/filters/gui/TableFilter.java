@@ -117,7 +117,8 @@ public class TableFilter extends AndFilter implements FilterEditor.OptionsManage
     }
 
     /** Returns the associated table */
-    public JTable getTable() {
+    @Override
+	public JTable getTable() {
         return table;
     }
     

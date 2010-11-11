@@ -27,7 +27,6 @@ package net.coderazzi.filters.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ComponentAdapter;
@@ -39,8 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -48,7 +45,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -422,36 +418,6 @@ public class TableFilterHeader extends JPanel {
         return (columnsController == null) ? null : 
         	columnsController.getFilterEditor(
         			table.convertColumnIndexToView(modelColumn));
-    }
-
-    /**
-     * <p>Sets as renderer for the editor a generic {@link TableCellRenderer}, 
-     * as used by the {@link JTable}</p>
-     *
-     * <p>This method allows reusing a renderer already written for a table 
-     * as the editor's renderer, but it has an important restriction: it only 
-     * works if the renderer does not depend on the cell coordinates</p>
-     */
-    public void setTableCellRenderer(final int modelColumn, 
-                                     final TableCellRenderer renderer) {
-    	getFilterEditor(modelColumn).setListCellRenderer(
-    			new DefaultListCellRenderer() {
-
-    		private static final long serialVersionUID = -5990815893475331934L;
-
-			@Override public Component getListCellRendererComponent(JList list, 
-					Object value, int index, boolean isSelected, 
-					boolean cellHasFocus) {
-
-				Component ret =  renderer.getTableCellRendererComponent(table, 
-						value, isSelected, cellHasFocus, 1, modelColumn);
-				if (!isSelected){
-					ret.setBackground(list.getBackground());
-					ret.setForeground(list.getForeground());
-				}
-				return ret;
-            }
-        });
     }
 
     /**

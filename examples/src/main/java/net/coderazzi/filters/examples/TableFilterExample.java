@@ -28,6 +28,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.text.Format;
 import java.util.Date;
@@ -72,6 +74,7 @@ public class TableFilterExample extends JFrame {
     JPanel tablePanel;    
     JPanel filterHeaderPanel;
     TableFilterHeader filterHeader;
+    JCheckBoxMenuItem useFlagRenderer;
     
     
     public TableFilterExample() {
@@ -268,6 +271,15 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	
+		useFlagRenderer=new JCheckBoxMenuItem("country flags as icons -in options-", true);
+		useFlagRenderer.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				setCountryEditorRenderer();
+			}
+		});
+    	
     	JMenuItem events = new JMenuItem(new AbstractAction("events window") {
     		EventsWindow window;
 			@Override
@@ -287,6 +299,7 @@ public class TableFilterExample extends JFrame {
     	ret.add(events);
     	ret.addSeparator();
     	ret.add(enableUserFilter);
+    	ret.add(useFlagRenderer);
     	return ret;
     }
     
@@ -454,6 +467,15 @@ public class TableFilterExample extends JFrame {
 		});
     }
     
+    void setCountryEditorRenderer(){
+        int countryColumn = tableModel.getColumn(TestTableModel.COUNTRY);
+        boolean set = useFlagRenderer.isSelected();
+        if (tableModel!=null && tableModel.getColumnCount() > countryColumn) {
+        	filterHeader.getFilterEditor(countryColumn).setListCellRenderer(
+        			set? new FlagRenderer() : null);
+        }
+    }
+    
     void customizeTable() {
         int countryColumn = tableModel.getColumn(TestTableModel.COUNTRY);
 
@@ -463,7 +485,7 @@ public class TableFilterExample extends JFrame {
             		setCellRenderer(new FlagRenderer());
 
         	filterHeader.getFilterEditor(countryColumn).setAutoOptions(true);
-        	filterHeader.setTableCellRenderer(countryColumn, new FlagRenderer());
+        	setCountryEditorRenderer();
         }
 
         int agesColumn = tableModel.getColumn(TestTableModel.AGE);

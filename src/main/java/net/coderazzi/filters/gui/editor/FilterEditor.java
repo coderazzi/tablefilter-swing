@@ -49,13 +49,17 @@ import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.RowFilter;
 import javax.swing.border.Border;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import net.coderazzi.filters.Filter;
@@ -76,9 +80,9 @@ import net.coderazzi.filters.IFilterTextParser;
 public class FilterEditor extends JComponent{
 
 	private static final long serialVersionUID = 6908400421021655278L;
-	private OptionsManager optionsManager;
 	private PropertyChangeListener textParserListener;
 	private EditorBorder border = new EditorBorder();
+	OptionsManager optionsManager;
 	FilterArrowButton downButton = new FilterArrowButton();
     EditorFilter filter = new EditorFilter();
 	EditorComponent editor;
@@ -370,7 +374,39 @@ public class FilterEditor extends JComponent{
 		editor.getComponent().setBackground(getBackground());
 		editor.setForeground(getForeground());
 		editor.getComponent().setFont(getFont());
+		filter.update();
 	}
+
+    /**
+     * <p>Sets as renderer for the editor a generic {@link TableCellRenderer}, 
+     * as used by the {@link JTable}</p>
+     *
+     * <p>This method allows reusing a renderer already written for a table 
+     * as the editor's renderer, but it has an important restriction: it only 
+     * works if the renderer does not depend on the cell coordinates</p>
+     */
+    public void setListCellRenderer(final TableCellRenderer renderer) {
+    	setListCellRenderer(renderer==null? null :
+    			new DefaultListCellRenderer() {
+
+    		private static final long serialVersionUID = -5990815893475331934L;
+    		private JTable table = optionsManager.getTable();
+    		private int position = getFilterPosition();
+
+			@Override public Component getListCellRendererComponent(JList list, 
+					Object value, int index, boolean isSelected, 
+					boolean cellHasFocus) {
+
+				Component ret =  renderer.getTableCellRendererComponent(table, 
+						value, isSelected, cellHasFocus, 1, position);
+				if (!isSelected){
+					ret.setBackground(list.getBackground());
+					ret.setForeground(list.getForeground());
+				}
+				return ret;
+            }
+        });
+    }
 
 	/** Returns the associated {@link ListCellRenderer} */
 	public ListCellRenderer getListCellRenderer(){
@@ -446,7 +482,7 @@ public class FilterEditor extends JComponent{
 			editor = newComponent;
 			setupComponent(editor.getComponent());
 			add(editor.getComponent(), BorderLayout.CENTER);
-			invalidate();
+			revalidate();
 		}		
 		setEnabled(isEnabled());
 	}
@@ -924,8 +960,10 @@ public class FilterEditor extends JComponent{
     		}
     	}
     	private void checkChanges(boolean forceUpdate){
-    		if (editor.checkFilterUpdate(forceUpdate)){
-    			delegateFilter = editor.getFilter();
+    		RowFilter oldFilter = editor.getFilter();
+    		RowFilter newFilter = editor.checkFilterUpdate(forceUpdate);
+    		if (newFilter != delegateFilter || oldFilter !=delegateFilter){
+    			delegateFilter = newFilter;
     			reportFilterUpdatedToObservers();
     		}
     	}
@@ -971,7 +1009,13 @@ public class FilterEditor extends JComponent{
 		 * Enables/disables the auto options feature and sets the options
 		 * for the given editor
 		 */
-		public void setOptions(FilterEditor editor, boolean autoOptions);		
+		public void setOptions(FilterEditor editor, boolean autoOptions);	
+		
+		/**
+		 * Returns the attached table
+		 * @return
+		 */
+		public JTable getTable();
 	}
 
 }

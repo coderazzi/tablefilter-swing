@@ -68,9 +68,9 @@ interface EditorComponent {
      * has been updated. 
      * @param forceUpdate set to true if the filter must been updated, 
      *   even when the editor's content is not
-     * @return true if the filter was updated  
+     * @return the new filter  
      */
-    public boolean checkFilterUpdate(boolean forceUpdate);
+    public RowFilter checkFilterUpdate(boolean forceUpdate);
 
     /**
      * Returns the filter associated to the current content.<br> 
@@ -173,15 +173,13 @@ interface EditorComponent {
             return textField;
         }
 
-        @Override public boolean checkFilterUpdate(boolean forceUpdate) {
+        @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
             String content = textField.getText().trim();
-            if (!forceUpdate && content.equals(cachedContent)) {
-                return false;
+            if (forceUpdate || !content.equals(cachedContent)) {
+	            cachedContent = content;
+	            cachedFilter = parseText(content);
             }
-            RowFilter old = cachedFilter;
-            cachedContent = content;
-            cachedFilter = parseText(content);
-            return cachedFilter != old;
+            return cachedFilter;
         }
         
         @Override public RowFilter getFilter() {
@@ -472,26 +470,24 @@ interface EditorComponent {
             return this;
         }
 
-        @Override public boolean checkFilterUpdate(boolean forceUpdate) {
+        @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
             Object currentContent = getContent();
-            if (!forceUpdate && (currentContent == cachedContent)) {
-                return false;
+            if (forceUpdate || (currentContent != cachedContent)) {
+	            cachedContent = currentContent;
+	            if (EMPTY_FILTER.equals(cachedContent)) {
+	                filter = null;
+	            } else {
+	                filter = new RowFilter() {
+	                        @Override
+	                        public boolean include(RowFilter.Entry entry) {
+	                            Object val = entry.getValue(filterPosition);
+	                            return (val == null) ? (cachedContent == null) 
+	                            		: val.equals(cachedContent);
+	                        }
+	                    };
+	            }
             }
-            cachedContent = currentContent;
-            RowFilter old = filter;
-            if (EMPTY_FILTER.equals(cachedContent)) {
-                filter = null;
-            } else {
-                filter = new RowFilter() {
-                        @Override
-                        public boolean include(RowFilter.Entry entry) {
-                            Object val = entry.getValue(filterPosition);
-                            return (val == null) ? (cachedContent == null) 
-                            		: val.equals(cachedContent);
-                        }
-                    };
-            }
-            return old != filter;
+            return filter;
         }
 
         @Override public RowFilter getFilter() {
