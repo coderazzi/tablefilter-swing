@@ -67,6 +67,9 @@ public interface IFilterTextParser {
 	 * same as defined in the table / filter header<br>
 	 */
     public void setTableModel(TableModel model);
+    
+    /** Returns the associated table model */
+    public TableModel getTableModel();
 
     /**
      * Parses the text, corresponding to a column in the table model<br>
@@ -139,8 +142,11 @@ public interface IFilterTextParser {
     /** Clones the parser */
     public IFilterTextParser clone();
     
-    /** Escapes a given expression to avoid any matching operator */
-    public String escape(String s);
+    /** 
+     * Escapes a given expression, such that, when parsed, the parser will
+     * make no character/operator substitutions.  
+     */
+    public String escape(String s, int modelPosition);
 
     /**
      * Adds a {@link PropertyChangeListener}. <br>

@@ -75,7 +75,7 @@ public class TableFilterExample extends JFrame {
     JPanel filterHeaderPanel;
     TableFilterHeader filterHeader;
     JCheckBoxMenuItem useFlagRenderer;
-    
+    JCheckBoxMenuItem tutorEditable;
     
     public TableFilterExample() {
         super("Table Filter Example");
@@ -280,6 +280,15 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	
+		tutorEditable = new JCheckBoxMenuItem("tutor column editable", true);
+		tutorEditable.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				customizeTutorColumn();
+			}
+		});
+
     	JMenuItem events = new JMenuItem(new AbstractAction("events window") {
     		EventsWindow window;
 			@Override
@@ -299,7 +308,9 @@ public class TableFilterExample extends JFrame {
     	ret.add(events);
     	ret.addSeparator();
     	ret.add(enableUserFilter);
+    	ret.add(events);
     	ret.add(useFlagRenderer);
+    	ret.add(tutorEditable);
     	return ret;
     }
     
@@ -473,7 +484,15 @@ public class TableFilterExample extends JFrame {
         if (tableModel!=null && tableModel.getColumnCount() > countryColumn) {
         	filterHeader.getFilterEditor(countryColumn).setListCellRenderer(
         			set? new FlagRenderer() : null);
+        	filterHeader.getFilterEditor(countryColumn).setEditable(false);
         }
+    }
+    
+    void customizeTutorColumn(){
+        int column = tableModel.getColumn(TestTableModel.TUTOR);
+        if (tableModel!=null && tableModel.getColumnCount() > column) {
+        	filterHeader.getFilterEditor(column).setEditable(tutorEditable.isSelected());
+        }    	
     }
     
     void customizeTable() {
@@ -519,8 +538,8 @@ public class TableFilterExample extends JFrame {
             						value, isSelected, hasFocus, row, column);
             			}			
             		});
-        }
-
+        }        
+        customizeTutorColumn();
     }
 
     void addTestData(boolean male) {

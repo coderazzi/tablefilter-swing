@@ -45,6 +45,7 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.Format;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
@@ -87,12 +88,10 @@ public class FilterEditor extends JComponent{
     EditorFilter filter = new EditorFilter();
 	EditorComponent editor;
 	PopupComponent popup;
-	Class<?> editorClass;
 
 	public FilterEditor(OptionsManager optionsManager, int filterPosition,
 			Class<?> associatedClass) {
 		this.optionsManager = optionsManager;
-		this.editorClass = associatedClass;
 		
 		setLayout(new BorderLayout());
 		setBorder(border);
@@ -105,14 +104,15 @@ public class FilterEditor extends JComponent{
 				if (IFilterTextParser.IGNORE_CASE_PROPERTY==prop){
 					popup.setIgnoreCase(((IFilterTextParser)evt.getSource())
 							.isIgnoreCase());
+					resetOptions();
 					filter.update();
 				} else if (IFilterTextParser.FORMAT_PROPERTY==prop &&
-						editorClass == evt.getNewValue()){
+						getAssociatedClass() == evt.getNewValue()){
 					updateFormat((IFilterTextParser)evt.getSource());
 				}
 			}
 		};
-		popup = new PopupComponent() {
+		popup = new PopupComponent(associatedClass) {
 
 			@Override
 			protected void optionSelected(Object selection) {
@@ -183,13 +183,13 @@ public class FilterEditor extends JComponent{
 	/** Sets the content, adapted to the editors' type */
 	public void setContent(Object content){
 		if (content==null){
-			setEditorContent(EditorComponent.EMPTY_FILTER);
+			setEditorContent(CustomChoice.MATCH_ALL, false);
 		} else if (isEditable()){
 			//we need to use, eventually, the provided formatter
-			setEditorContent(format(content));
+			setEditorContent(format(content), true);
 		} else if (popup.isValidOption(content)){
 			//the content must be a valid option
-			setEditorContent(format(content));			
+			setEditorContent(format(content), true);			
 		}
 	}
 	
@@ -198,16 +198,21 @@ public class FilterEditor extends JComponent{
 		if (o instanceof String){
 			return (String) o;
 		}
-		Format f = editor.getTextParser().getFormat(editorClass);
+		Format f = editor.getTextParser().getFormat(getAssociatedClass());
 		if (f==null){
 			f = editor.getTextParser().getFormat(String.class);
 		}
 		return f.format(o);
 	}
 	
-	/** Sets the content, updating the filter -and propagating any changes- */
-	private void setEditorContent(Object content) {
-		editor.setContent(content);
+	/** 
+	 * Sets the content, updating the filter -and propagating any changes-<br>
+	 * The parameters escapeIt must be true if the content could require
+	 * escaping (otherwise, it will be always treated literally). <br>
+	 * Escaping only applies, anyway, to editable columns (Strings) 
+	 */
+	private void setEditorContent(Object content, boolean escapeIt) {
+		editor.setContent(content, escapeIt);
 		filter.checkChanges();
 	}
 	
@@ -281,7 +286,7 @@ public class FilterEditor extends JComponent{
 	 * </ul>
 	 */
 	public void resetFilter() {
-		setEditorContent(EditorComponent.EMPTY_FILTER);
+		setEditorContent(null, false);
 		boolean autoOptions = optionsManager.isAutoOptions(this);
 		//reset now the options. Even if autoOptions is false
 		optionsManager.setOptions(this, autoOptions);
@@ -308,14 +313,23 @@ public class FilterEditor extends JComponent{
     
     void updateFormat(IFilterTextParser parser){
     	popup.setFormat(getFormat(parser));
+    	resetOptions();
+    }
+    
+    void resetOptions(){
+    	optionsManager.setOptions(this, optionsManager.isAutoOptions(this));    	
     }
     
     private Format getFormat(IFilterTextParser parser){
-    	Format format = parser.getFormat(editorClass);
+    	Format format = parser.getFormat(getAssociatedClass());
     	if (format==null){
     		format = parser.getFormat(String.class);
     	}
     	return format;
+    }
+    
+    Class getAssociatedClass(){
+    	return popup.getAssociatedClass();
     }
     
     private void releaseTextParser(){
@@ -347,13 +361,13 @@ public class FilterEditor extends JComponent{
 	 * stringfied and sorted.<br>
 	 */
 	public void addOptions(Collection<?> options) {
-		popup.addOptions(options);
+		editor.reportCustomChoices(popup.addOptions(options));
 		downButton.setCanPopup(popup.hasContent());
 	}
 	
 	/** Returns the current options */
 	public Collection<?> getOptions(){
-		return popup.getOptions();
+		return new ArrayList(popup.getOptions());
 	}
 
 	/** Clears any options currently defined, including the current history */
@@ -375,6 +389,7 @@ public class FilterEditor extends JComponent{
 		editor.setForeground(getForeground());
 		editor.getComponent().setFont(getFont());
 		filter.update();
+		resetOptions();
 	}
 
     /**
@@ -528,7 +543,9 @@ public class FilterEditor extends JComponent{
 	/** Method called when an element in the options menu is selected */
 	void popupSelection(Object selection) {
 		if (selection != null) {
-			setEditorContent(selection);
+			//the selection must be escaped if it is a String which does
+			//not belong to the history.
+			setEditorContent(selection, !popup.isHistorySelection());
 		}
 	}
 
@@ -945,7 +962,7 @@ public class FilterEditor extends JComponent{
     		if (isEnabled()){
 	    		checkChanges(false);
 	    		Object content = editor.getContent();
-	    		if (!EditorComponent.EMPTY_FILTER.equals(content)){
+	    		if (!(content instanceof CustomChoice)){
 	    			popup.addHistory(content);
 	    			downButton.setCanPopup(popup.hasContent());
 	    		}

@@ -87,8 +87,8 @@ abstract class PopupComponent implements PopupMenuListener{
 	JList historyList;
 
 
-	public PopupComponent() {
-		optionsModel = new OptionsListModel();
+	public PopupComponent(Class associatedClass) {
+		optionsModel = new OptionsListModel(associatedClass);
 		historyModel = new HistoryListModel();
 		setMaxHistory(maxHistory);
 		createGui();
@@ -97,6 +97,11 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Invoked when the user select an element in the option or history lists*/
 	protected abstract void optionSelected(Object selection);
 	
+	/** Returns the class associated to the list model */
+	public Class getAssociatedClass(){
+		return optionsModel.getAssociatedClass();
+	}
+
 	/** 
 	 * Creates an EditorComponent that can display content with 
 	 * the same renderer used to display the options
@@ -108,6 +113,11 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Returns the current selection -can be history or and option-*/
 	public Object getSelection() {
 		return focusedList.getSelectedValue();
+	}
+	
+	/** Returns true if the current selection belongs to the history*/
+	public boolean isHistorySelection(){
+		return focusedList==historyList;
 	}
 
 	/** Returns true if the popup is currently visible */
@@ -179,6 +189,9 @@ abstract class PopupComponent implements PopupMenuListener{
 					Object ret = optionsModel.getElementAt(match.index);
 					if (ret instanceof String){
 						return (String) ret;
+					} 
+					if (ret instanceof CustomChoice){
+						return ((CustomChoice)ret).getRepresentation();
 					}
 				}
 				return null;
@@ -269,6 +282,9 @@ abstract class PopupComponent implements PopupMenuListener{
 	 **/
 	public void setFormat(Format format){
 		optionsModel.setFormat(format);
+		if (format!=null && getListCellRenderer()==null){
+			optionsModel.setStringContent(true);
+		}
 	}
 	
 	/** Returns true if the passed object matches an existing option */
@@ -341,15 +357,14 @@ abstract class PopupComponent implements PopupMenuListener{
 	 * If there is no {@link ListCellRenderer} defined,
 	 * the content is stringfied and sorted -so duplicates are removed-
 	 */
-	public void addOptions(Collection<?> options) {
-		optionsModel.addContent(options);
+	public Collection<CustomChoice>  addOptions(Collection<?> options) {
+		Collection<CustomChoice>  ret = optionsModel.addContent(options);
 		fixMaxHistory();
 		reconfigureGui();
+		return ret;
 	}
 
-	/** 
-	 * Returns the current options
-	 */
+	/** Returns the current options */
 	public Collection<?> getOptions(){
 		return optionsModel.getOptions();
 	}
@@ -667,7 +682,7 @@ abstract class PopupComponent implements PopupMenuListener{
 		boolean exact;
 
 		public Match() {
-			//defualt constructor, required
+			//default constructor, required
 		}
 
 		public Match(int index) {

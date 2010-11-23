@@ -2,6 +2,7 @@ package net.coderazzi.filters.parser;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.text.Collator;
 import java.text.Format;
 import java.text.ParseException;
 import java.util.Comparator;
@@ -76,15 +77,22 @@ public class FilterTextParser implements IFilterTextParser {
     	new HashMap<Class<?>, Comparator<?>>();
 	Format defaultFormatter; 
     boolean ignoreCase;
+    Collator stringComparator;
     private TableModel model;
-    private Pattern expressionMatcher;
     private Map<String, IOperand> operands;
     private PropertyChangeSupport propertiesHandler = new PropertyChangeSupport(this);
     private IOperand nullOperand;
+    private static Pattern expressionMatcher =
+    	Pattern.compile("^(>=|<=|<>|!=|!~|~~|==|>|<|=|~|!)?\\s*(.*)$");
+    
 
     public FilterTextParser() {
-        expressionMatcher = 
-        	Pattern.compile("^(>=|<=|<>|!=|!~|~~|==|>|<|=|~|!)?\\s*(.*)$");
+    	this(false);
+    }
+    
+    public FilterTextParser(boolean ignoreCase) {
+    	stringComparator = Collator.getInstance();
+    	internalSetIgnoreCase(ignoreCase);
         operands = new HashMap<String, IOperand>();
         operands.put("~~", new REOperand(true));
         operands.put("!~", new SimpleREOperand(false));
@@ -149,9 +157,8 @@ public class FilterTextParser implements IFilterTextParser {
     
     @Override
     public FilterTextParser clone(){
-    	FilterTextParser ret = new FilterTextParser();
+    	FilterTextParser ret = new FilterTextParser(ignoreCase);
     	ret.model=model;
-    	ret.ignoreCase=ignoreCase;
     	ret.formatters.putAll(formatters);
     	ret.comparators.putAll(comparators);
     	ret.defaultFormatter=defaultFormatter;
@@ -174,6 +181,10 @@ public class FilterTextParser implements IFilterTextParser {
         propertiesHandler.firePropertyChange(TABLE_MODEL_PROPERTY, 
         		oldModel, model);
     }
+    
+    @Override public TableModel getTableModel() {
+    	return model;
+    }
 
     @Override public Format getFormat(Class<?> c) {
         return formatters.get(c);
@@ -189,7 +200,7 @@ public class FilterTextParser implements IFilterTextParser {
                           Format format) {
         if (c==String.class){
         	if (format==null){
-        		format = FilterSettings.getDefaultFormat();
+        		format = FilterSettings.types.getFormat(String.class);
         	}
         	defaultFormatter=format;
         }
@@ -216,30 +227,23 @@ public class FilterTextParser implements IFilterTextParser {
     }
 
     @Override public void setIgnoreCase(boolean ignore) {
+    	boolean old =this.ignoreCase;
         if (ignore != this.ignoreCase) {
-            boolean old = this.ignoreCase;
-            this.ignoreCase = ignore;
+        	internalSetIgnoreCase(ignore);
             propertiesHandler.firePropertyChange(IGNORE_CASE_PROPERTY, 
             		old, ignore);
         }
+    }
+
+    private void internalSetIgnoreCase(boolean ignore) {
+        this.ignoreCase = ignore;
+        stringComparator.setStrength(ignore? Collator.PRIMARY : Collator.TERTIARY);
     }
 
     @Override public boolean isIgnoreCase() {
         return ignoreCase;
     }
     
-    @Override public String escape(String expression) {
-        Matcher matcher = expressionMatcher.matcher(expression);
-        if (matcher.matches()) {
-            // all expressions match!
-        	String operand = matcher.group(1);
-            if (operand!=null && operand!="="){
-            	return "= "+expression;
-            }
-        }
-        return expression;
-    }
-
 	@Override public RowFilter parseText(String expression,
                                int modelPosition) throws ParseException {
         Class<?> c = model.getColumnClass(modelPosition);
@@ -254,6 +258,105 @@ public class FilterTextParser implements IFilterTextParser {
             return op.create(content, c, modelPosition);
         }
         return null;
+    }
+	
+
+    @Override public String escape(String expression, int modelPosition) {
+    	boolean needs=true;
+    	expression = expression.trim();
+        Matcher matcher = expressionMatcher.matcher(expression);
+        if (matcher.matches()) {
+            // all expressions match!
+        	String operand = matcher.group(1);
+        	if (operand==null){
+        		//if there is no operand, and class is String, or there
+        		//is no associated formatter, or the formatter does not
+        		//validate the given text, the string will be handled
+        		//with the match operator (~).
+                Class<?> c = model.getColumnClass(modelPosition);
+                if (! String.class.equals(c)) {
+	                Format format = formatters.get(c);
+	                try{
+	                	if (format!=null && format.parseObject(expression)!=null){
+	                		needs=false;
+	                	}
+	                } catch (ParseException pex){
+	                	//invalid expression, needs remains true
+	                }
+                }
+                needs=needs && !expression.equals(
+                		convertWilcardExpressionToRegularExpression(expression));
+        	} else {
+        		needs=true;
+        	}
+        }
+        return needs? "= "+expression : expression;
+    }
+
+    String convertWilcardExpressionToRegularExpression(String s) {
+        StringBuilder sb = new StringBuilder();
+        boolean escaped = false;
+
+        for (char c : s.toCharArray()) {
+
+            switch (c) {
+
+                case '\\':
+
+                    if (escaped)
+                        sb.append("\\");
+
+                    escaped = !escaped;
+
+                    break;
+
+                case '[':
+                case ']':
+                case '^':
+                case '$':
+                case '+':
+                case '{':
+                case '}':
+                case '|':
+                case '(':
+                case ')':
+                case '.':
+                    sb.append('\\').append(c);
+                    escaped = false;
+
+                    break;
+
+                case '*':
+
+                    if (escaped) {
+                        sb.append("\\*");
+                        escaped = false;
+                    } else {
+                        sb.append(".*");
+                    }
+
+                    break;
+
+                case '?':
+
+                    if (escaped) {
+                        sb.append("\\?");
+                        escaped = false;
+                    } else {
+                        sb.append(".");
+                    }
+
+                    break;
+
+                default:
+                    sb.append(c);
+                    escaped = false;
+
+                    break;
+            }
+        }
+
+        return sb.toString();
     }
 
     /** Basic {@link Comparator} using {@link Comparable} instances */
@@ -337,9 +440,7 @@ public class FilterTextParser implements IFilterTextParser {
         {
             return new StringRowFilter(modelPosition, formatter) {
                     @Override public boolean include(String left) {
-                        return matches(ignoreCase ? 
-                        		left.compareToIgnoreCase(right) 
-                        		: left.compareTo(right));
+                        return matches(stringComparator.compare(left, right));
                     }
                 };
         }
@@ -423,72 +524,6 @@ public class FilterTextParser implements IFilterTextParser {
         protected Pattern getPattern(String right) throws ParseException {
             return super.getPattern(
             		convertWilcardExpressionToRegularExpression(right));
-        }
-
-        private String convertWilcardExpressionToRegularExpression(String s) {
-            StringBuilder sb = new StringBuilder();
-            boolean escaped = false;
-
-            for (char c : s.toCharArray()) {
-
-                switch (c) {
-
-                    case '\\':
-
-                        if (escaped)
-                            sb.append("\\");
-
-                        escaped = !escaped;
-
-                        break;
-
-                    case '[':
-                    case ']':
-                    case '^':
-                    case '$':
-                    case '+':
-                    case '{':
-                    case '}':
-                    case '|':
-                    case '(':
-                    case ')':
-                    case '.':
-                        sb.append('\\').append(c);
-                        escaped = false;
-
-                        break;
-
-                    case '*':
-
-                        if (escaped) {
-                            sb.append("\\*");
-                            escaped = false;
-                        } else {
-                            sb.append(".*");
-                        }
-
-                        break;
-
-                    case '?':
-
-                        if (escaped) {
-                            sb.append("\\?");
-                            escaped = false;
-                        } else {
-                            sb.append(".");
-                        }
-
-                        break;
-
-                    default:
-                        sb.append(c);
-                        escaped = false;
-
-                        break;
-                }
-            }
-
-            return sb.toString();
         }
     }
 

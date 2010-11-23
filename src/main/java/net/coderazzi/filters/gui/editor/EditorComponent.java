@@ -32,6 +32,8 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
+import java.util.Collection;
+import java.util.Collections;
 
 import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
@@ -57,8 +59,6 @@ import net.coderazzi.filters.IFilterTextParser;
  * a {@link ListCellRenderer} component.<br>
  */
 interface EditorComponent {
-
-    public static final String EMPTY_FILTER = "";
 
     /** Returns the swing component associated to the editor */
     public JComponent getComponent();
@@ -93,11 +93,18 @@ interface EditorComponent {
     /** Return the associated {@link IFilterTextParser}*/
     public IFilterTextParser getTextParser();
 
-    /** Sets the content of the editor */
-    public void setContent(Object content);
+	/** 
+	 * Sets the editor content<br>
+	 * The parameters escapeIt must be true if the content could require
+	 * escaping (otherwise, it will be always treated literally). <br>
+	 */
+    public void setContent(Object content, boolean escapeIt);
 
     /** Returns the definition associated to the current editor */
     public Object getContent();
+    
+    /** Reports the existing custom choices */
+    public void reportCustomChoices(Collection<CustomChoice> customChoices);
     
     /** 
      * Defines the filter position associated to this editor.<br>
@@ -142,13 +149,14 @@ interface EditorComponent {
         private JTextField textField = new JTextField(15);
         private IFilterTextParser parser;
         private RowFilter cachedFilter;
-        private String cachedContent;
+        private Object cachedContent;
         private int filterPosition;
         private boolean editable;
         private boolean enabled;
         private Color errorColor = Color.red;
         private Color foreground;
         private Color disabledColor;
+        private Collection<CustomChoice> customChoices = Collections.EMPTY_LIST;
         PopupComponent popup;
         /** 
          * This variable is set to true if the content is being set from inside, 
@@ -173,11 +181,45 @@ interface EditorComponent {
             return textField;
         }
 
+        @Override 
+        public void reportCustomChoices(Collection<CustomChoice> customChoices) {
+        	this.customChoices = customChoices;
+        }
+
         @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
             String content = textField.getText().trim();
-            if (forceUpdate || !content.equals(cachedContent)) {
-	            cachedContent = content;
-	            cachedFilter = parseText(content);
+            if (forceUpdate || !content.equals(cachedContent) || (
+            		(cachedContent instanceof CustomChoice) &&
+            			((CustomChoice)cachedContent).getRepresentation().
+            			equals(content))){
+	            cachedFilter = null;
+                Color color = getForeground();
+                if (content.length() != 0) {
+                	boolean ignoreCase = parser.isIgnoreCase();
+                	for (CustomChoice cc : customChoices){
+                		if (cc.matchesFilterText(content, ignoreCase)){
+                			cachedContent = cc;
+                			cachedFilter = cc.getFilter(parser, filterPosition);
+                			break;
+                		}
+                	}
+                	if (cachedFilter==null){
+    	                try {
+    	    	            cachedContent = content;
+    	    	            if (!isEditable()){
+    	    	            	//for editable columns, the text was already
+    	    	            	//escaped when the content was defined
+    	    	            	//(see setContent)
+    	    	            	content = parser.escape(content, filterPosition);
+    	    	            }
+    	                	cachedFilter = parser.parseText(content, 
+    	                						filterPosition);
+    	                } catch (ParseException pex) {
+    	                    color = getErrorForeground();
+    	                }
+                	}
+                }
+                textField.setForeground(color);
             }
             return cachedFilter;
         }
@@ -211,10 +253,24 @@ interface EditorComponent {
             return parser;
         }
 
-        @Override public void setContent(Object content) {
+        @Override public void setContent(Object content, boolean escapeIt) {
+            String text;
+            if (content instanceof CustomChoice){
+            	//never escape custom choices
+            	text = ((CustomChoice) content).getRepresentation();
+            } else if (content instanceof String){
+            	text = (String) content;
+            	if (escapeIt && isEditable()){
+            		//if no editable, the options is directly handled, no need
+            		//to escape it. When the text is parsed, on no editable
+            		//columns, it will be then escaped.
+            		text = parser.escape(text, filterPosition);
+            	}
+            } else {
+            	text = null;
+            }
             setControlledSet();
-            // the filterEditor verifies already that the content is a string
-            textField.setText((String) content);
+            textField.setText(text);
         }
 
         @Override public void setPosition(int position) {
@@ -226,7 +282,8 @@ interface EditorComponent {
         }
 
         @Override public Object getContent() {
-            return textField.getText();
+        	checkFilterUpdate(false);
+            return cachedContent;
         }
 
         @Override public void setEditable(boolean set) {
@@ -244,7 +301,9 @@ interface EditorComponent {
                 // ensure that the text contains something okay
                 String proposal = getProposalOnEdition(textField.getText(), 
                 		                               false);
-                textField.setText((proposal == null) ? EMPTY_FILTER : proposal);
+                textField.setText((proposal == null) ? 
+                		CustomChoice.MATCH_ALL.getRepresentation() 
+                		: proposal);
                 ((AbstractDocument) textField.getDocument()).
                 	setDocumentFilter(this);
             }
@@ -285,31 +344,10 @@ interface EditorComponent {
         /** Ensures that the correct foreground is on use*/
         private void ensureCorrectForegroundColor(){
         	if (enabled){
-        		parseText(textField.getText());
+        		checkFilterUpdate(true);
         	} else {
         		textField.setForeground(disabledColor);
         	}
-        }
-
-        /** 
-         * Returns the filter associated to the current content, 
-         * and sets the foreground color -showing errors, if existing-
-         **/
-        private RowFilter parseText(String content) {
-        	RowFilter ret;
-            Color color = getForeground();
-            if (content.length() == 0) {
-                ret = null;
-            } else {
-                try {
-                    ret = parser.parseText(cachedContent, filterPosition);
-                } catch (ParseException pex) {
-                    ret = null;
-                    color = getErrorForeground();
-                }
-            }
-            textField.setForeground(color);
-            return ret;
         }
 
         /** defines that the content is being set from inside */
@@ -452,7 +490,7 @@ interface EditorComponent {
 
         private static final long serialVersionUID = -7162028817569553287L;
 
-        private Object content = EMPTY_FILTER;
+        private Object content = CustomChoice.MATCH_ALL;
         private FilterListCellRenderer renderer;
         private CellRendererPane painter = new CellRendererPane();
         private IFilterTextParser parser;
@@ -469,13 +507,18 @@ interface EditorComponent {
         @Override public JComponent getComponent() {
             return this;
         }
+        
+        @Override 
+        public void reportCustomChoices(Collection<CustomChoice> customChoices) {
+        	//a renderer does not need to know about these choices
+        }
 
         @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
             Object currentContent = getContent();
             if (forceUpdate || (currentContent != cachedContent)) {
 	            cachedContent = currentContent;
-	            if (EMPTY_FILTER.equals(cachedContent)) {
-	                filter = null;
+	            if (cachedContent instanceof CustomChoice) {
+	                filter = ((CustomChoice)cachedContent).getFilter(parser, filterPosition);
 	            } else {
 	                filter = new RowFilter() {
 	                        @Override
@@ -511,8 +554,8 @@ interface EditorComponent {
             return parser;
         }
       
-        @Override public void setContent(Object content) {
-            this.content = (content == null) ? EMPTY_FILTER : content;
+        @Override public void setContent(Object content, boolean escapeIt) {
+            this.content = (content == null) ? CustomChoice.MATCH_ALL : content;
             repaint();
         }
 

@@ -35,8 +35,10 @@ import java.awt.RenderingHints;
 import javax.swing.CellRendererPane;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.SwingConstants;
 
 /**
  * Special renderer used on the history and options list, 
@@ -128,15 +130,33 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 
 	private void setupRenderer(JList list, Object value, int index, 
 			boolean isSelected, boolean cellHasFocus) {
-		try {
-			inner = userRenderer.getListCellRendererComponent(list, value, 
-					index, isSelected, cellHasFocus);
-		} catch (Exception ex) {
-			inner = null;
+		boolean align;
+		int hAlign = SwingConstants.LEFT;
+		if (value instanceof CustomChoice){
+			CustomChoice cf = (CustomChoice) value;
+			inner = null;			
+			value = cf.getIcon();
+			if (value==null){
+				value=cf.getRepresentation();
+			} else {
+				hAlign = SwingConstants.CENTER;
+			}
+			align=true;
+		} else {
+			align=userRenderer == defaultRenderer;
+			try {
+				inner = userRenderer.getListCellRendererComponent(list, value, 
+						index, isSelected, cellHasFocus);
+			} catch (Exception ex) {
+				inner = null;
+			}
 		}
 		if (inner == null) {
 			inner = defaultRenderer.getListCellRendererComponent(list, value, 
 					index, isSelected, cellHasFocus);
+		}
+		if (align){
+			((JLabel)inner).setHorizontalAlignment(hAlign);			
 		}
 		inner.setFont(list.getFont());
 		inner.setEnabled(isEnabled());

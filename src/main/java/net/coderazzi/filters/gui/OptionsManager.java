@@ -77,9 +77,15 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 	 */
 	@Override
 	public void setOptions(FilterEditor editor, boolean autoOptions){
-		fillOptions(editor, autoOptions);
-		if (!autoOptions){
-			unsetAutoOptions(editor);
+		//this check is needed to avoid setting the options for the
+		//same column multiple times when is created. The creation of
+		//a filter editor is initially done, then the parser is set,
+		//and both operations would trigger this operation
+		if (editors.contains(editor)){
+			fillOptions(editor, autoOptions);
+			if (!autoOptions){
+				unsetAutoOptions(editor);
+			}
 		}
 	}
 	

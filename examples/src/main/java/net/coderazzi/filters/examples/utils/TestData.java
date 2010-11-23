@@ -52,7 +52,7 @@ public class TestData {
             "edward", "Elton", "Fletcher", "forrester", "Gary",
             "Harley", "Harold", "Hugh", "James", "Keane", "Kenneth", 
             "Landon", ">Lee", "Lincoln", "Maxwell", "Miller", "Nash", "Nelson", 
-            "Norman", "Oswald", "Perry", "Prentice", "Ralph", "Raymond", 
+            "Norman", "Oswald", "Perry", "Prentice", "=Ralph", "Raymond", 
             "Richard", "Robert", "Scott", "Spencer", "Stanley", "Sutton", 
             "Taylor", "Thorne", "Truman", "Tyler", "Wallace",
         };

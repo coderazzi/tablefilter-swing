@@ -26,7 +26,9 @@
 package net.coderazzi.filters.gui;
 
 import java.awt.Color;
-import java.text.Format;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.gui.TableFilterHeader.Position;
@@ -57,7 +59,7 @@ public class FilterSettings {
 
     /** Whether to ignore case or not, false by default (case sensitive) */
     public static boolean ignoreCase = 
-    	Boolean.parseBoolean(getString("IgnoreCase", "false"));
+    	Boolean.parseBoolean(getString("IgnoreCase", "true"));
 
     /** The header position, {@link Position#INLINE} by default. */
     public static Position headerPosition = 
@@ -81,14 +83,18 @@ public class FilterSettings {
     /** The types used by default on the parser */
     public static Types types = new Types();
 
+    /** The default icon used to represent null/empty values */
+    public static Icon matchEmptyFilterIcon = new ImageIcon( 
+    	IFilterTextParser.class.getResource("resources/matchEmptyIcon.png"));
+
     /** 
-     * Returns the default format - the format for String types, 
-     * that will be used to format types without registered Formats 
-     **/
-    public static Format getDefaultFormat(){
-    	return types.getFormat(String.class);
-    }
-    
+     * The default string associated to a nop operation.<p>
+     * It is chosen as = because that is the expression that the default
+     * text parser can use to find null/empty values. If any other parse
+     * is chosen, it could be meaningful to update this string. 
+     */
+    public static String matchEmptyFilterString = "=";
+
     /**
      * The class to handle the text parsing by default.<br>
      * It must have a default constructor. <br>

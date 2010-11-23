@@ -25,15 +25,16 @@
 
 package net.coderazzi.filters.gui.editor;
 
+import java.text.Collator;
 import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ListCellRenderer;
-
-import net.coderazzi.filters.gui.FilterSettings;
 
 
 /**
@@ -47,30 +48,34 @@ public class OptionsListModel extends AbstractListModel {
 
 	private static final long serialVersionUID = 3523952153693100563L;
 	private List content;
-	/** 
-	 * content, converted to Strings. If the content's list is already Strings, 
-	 * stringContent merely references the content's list 
-	 * (i.e., stringContent = content).<br>
-	 * This list is null if the content is considered non-text 
-	 */
-	private List stringContent;
 	private Format formatter;
+	private boolean useFormatter;
 	private boolean ignoreCase;
+	private int customChoices;
+	private Class associatedClass;
+	private Comparator comparator;
+	private Comparator userComparator;
 	
-	public OptionsListModel() {
+	public OptionsListModel(Class associatedClass) {
 		this.content = new ArrayList();
-		this.stringContent = content;
-		this.formatter = FilterSettings.getDefaultFormat();
+		this.associatedClass = associatedClass;
+		this.useFormatter = associatedClass==String.class;
+		fixComparator();
 	}
-
+	
 	@Override
 	public int getSize() {
-		return stringContent == null ? content.size() : stringContent.size();
+		return content.size();
 	}
 
 	@Override
 	public Object getElementAt(int i) {
-		return stringContent == null ? content.get(i) : stringContent.get(i);
+		return content.get(i);
+	}
+
+	/** Returns the class associated to the list model */
+	public Class getAssociatedClass(){
+		return associatedClass;
 	}
 
 	/**
@@ -79,27 +84,29 @@ public class OptionsListModel extends AbstractListModel {
 	 * -and displayed and searched as strings-. 
 	 */
 	public void setStringContent(boolean set) {
-		if (set == false) {
-			if (stringContent != null) {
-				stringContent = null;
-				fireContentsChanged(this, 0, getSize());
-			}
-		} else if (stringContent == null) {
-			List oldContent = content;
-			content = new ArrayList();
-			stringContent = content;
-			addContent(oldContent);
-		}
+		if (useFormatter!=set){
+			useFormatter=set;
+			fixComparator();
+			clearContent();
+		} 
 	}
 
-	/** 
-	 * Specifies the format used to convert Objects to Strings
-	 * Cannot be null 
-	 **/
+	/** Specifies the format used to convert Objects to Strings */
 	public void setFormat(Format format) {
-		if (format != this.formatter){
+		if (format != this.formatter && String.class!=associatedClass){
 			this.formatter = format;
-			reformatContent();
+			if (useFormatter){
+				clearContent();
+			}
+		}
+	}
+	
+	/** Specifies the comparator to sort the content on the list */
+	public void setComparator(Comparator comparator) {
+		if (userComparator!=comparator){
+			userComparator = comparator;
+			fixComparator();
+			clearContent();
 		}
 	}
 	
@@ -110,49 +117,28 @@ public class OptionsListModel extends AbstractListModel {
 	public void setIgnoreCase(boolean set){
 		if (ignoreCase!=set){
 			ignoreCase = set;
-			reformatContent();
+			fixComparator();
+			clearContent();
 		}
-	}
-	
-	private void reformatContent(){
-		if (stringContent != null) {
-			List oldContent = content;
-			List oldStringContent = stringContent;
-			content = new ArrayList();
-			if (oldContent == oldStringContent) {
-				stringContent = content;
-			} else {
-				stringContent = new ArrayList();
-			}
-			addContent(oldContent);
-		}					
 	}
 	
 	/** Returns true if the object is a valid option (as object, or string) */
 	public boolean isValidOption(Object o){
-		return (content.contains(o)) || 
-					(stringContent!=null && 
-							stringContent!=content && 
-							(o instanceof String) && 
-							stringContent.contains(o));
+		return content.contains(o);
 	}
 	
 	/** @see PopupComponent#selectBestMatch(Object, boolean) */
 	public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
-		if (stringContent == null) {
-			return new PopupComponent.Match(content.indexOf(hint));
-		}
-		return (hint instanceof String)? 
-				findOnSortedContent((String)hint, exact) : null;
+		return (useFormatter && (hint instanceof String))? 
+				findOnSortedContent((String)hint, exact) : 
+					new PopupComponent.Match(content.indexOf(hint));
 	}
 
 	public void clearContent() {
 		int size = getSize();
 		if (size > 0) {
+			customChoices = 0;
 			content.clear();
-			if (stringContent!=null){
-				stringContent=content;
-			}
 			fireIntervalRemoved(this, 0, size);
 		}
 	}
@@ -161,11 +147,9 @@ public class OptionsListModel extends AbstractListModel {
 		return content.isEmpty();
 	}
 
-	/** 
-	 * Returns the current options
-	 */
+	/** Returns the current options */
 	public Collection<?> getOptions(){
-		return new ArrayList(content);
+		return content;
 	}
 
 	/** 
@@ -174,92 +158,103 @@ public class OptionsListModel extends AbstractListModel {
 	 * and sorted.<br>
 	 * Otherwise, no sorting is performed, although duplicates are still
 	 * discarded
+	 * @return the list of subchoices in the whole content
 	 */
-	public void addContent(Collection addedContent) {
-		int originalSize = getSize();
-		if (stringContent != null) {
-			if (stringContent == content) {
-				// this means that content contains only Strings. 
-				// We need to ensure now that the addedContent is all 
-				// Strings, otherwise we have to create a separate content 
-				// for stringContent
-				for (Object o : addedContent) {
-					if (o!=null && !(o instanceof String)) {
-						stringContent = new ArrayList(content);
+	@SuppressWarnings("null")
+	public Collection<CustomChoice> addContent(Collection addedContent) {
+		ListIterator it=null;
+		Object onIt=null;
+		int cmp=-1;
+		boolean changed=false;
+		for (Object o : addedContent){
+			boolean custom = o instanceof CustomChoice;
+			if (!custom){
+				if (o!=null && useFormatter){
+					o = formatter==null? o.toString() : formatter.format(o);				
+				}
+				if (o==null || "".equals(o)){
+					o=CustomChoice.MATCH_EMPTY;
+					custom=true;
+				}				
+			}
+			if (custom){
+				if (addCustomChoice((CustomChoice)o, customChoices)){
+					changed=true;
+					onIt=null;
+					cmp=-1;
+				}
+			} else {
+				if (onIt==null || (cmp=comparator.compare(onIt, o))>=0){
+					if (cmp==0){
+						continue;
+					} 
+					it=content.listIterator(customChoices);
+				}
+				while (it.hasNext()){
+					cmp = comparator.compare(it.next(), o);
+					if (cmp==0){
+						break;
+					} else if (cmp>0){
+						it.previous();
 						break;
 					}
 				}
-			}
-			for (Object o : addedContent) {
-				String s = o==null? null : formatter.format(o);
-				if (s!=null){
-					addStringContent(s);
+				if (cmp!=0){
+					it.add(o);
+					changed=true;
 				}
+				onIt=o;									
 			}
 		}
-		if (stringContent != content) {
-			for (Object o : addedContent) {
-				if (o!=null && !content.contains(o)) {
-					content.add(o);
-				}
-			}
+		if (changed){
+			addCustomChoice(CustomChoice.MATCH_ALL, 0);
+			fireContentsChanged(this, 0, getSize());
 		}
-		int newSize = getSize();
-		if (originalSize != newSize){
-			if (originalSize==0){
-				//it is needed to always have the null/empty filter
-				content.add(0, EditorComponent.EMPTY_FILTER);
-				if (stringContent!=null && stringContent!=content){
-					stringContent.add(0, EditorComponent.EMPTY_FILTER);					
-				}
-				newSize+=1;
-			}
-			fireContentsChanged(this, 0, newSize);
-		}
+		return content.subList(0, customChoices);
 	}
-
-	/** Adds an string into the proper place (order) */
-	private void addStringContent(String s) {
-		int position = 0;
-		for (Object o : stringContent) {
-			String os = (String)o;
-			int compare = ignoreCase? os.compareToIgnoreCase(s) : os.compareTo(s);
-			if (compare == 0) {
-				return;
+	
+	private boolean addCustomChoice(CustomChoice cf, int limit){
+		ListIterator li = content.listIterator();
+		while (limit-->0){
+			if (li.next().equals(cf)){
+				return false;
 			}
-			if (compare > 0) {
-				stringContent.add(position, s);
-				return;
-			}
-			position++;
 		}
-		stringContent.add(s);
+		li.add(cf);
+		customChoices+=1;
+		return true;
 	}
 
 	/** Creation of the Match, for text based, sorted content */
 	private PopupComponent.Match findOnSortedContent(String strStart, 
 			                                         boolean fullMatch) {
 		PopupComponent.Match ret = new PopupComponent.Match();
-		if (stringContent.isEmpty()) {
+		if (content.isEmpty()) {
 			ret.index = -1;
 		} else {
 			ret.len = strStart.length();
 			ret.exact = ret.len == 0;
 			int originalLen = ret.len;
 			while (ret.len > 0) {
-				for (Object o : stringContent) {
-					String os = (String) o;
-					int osLength = os.length();
-					if (osLength >= ret.len) {
-						String cmpStr = os.substring(0, ret.len); 
-						int cmp = ignoreCase? 
-								cmpStr.compareToIgnoreCase(strStart) 
-								: cmpStr.compareTo(strStart);
-						if (cmp == 0) {
-							ret.exact = osLength == originalLen;
-							return ret;
-						} else if (cmp > 0) {
-							break;
+				for (Object o : content) {
+					String os;
+					boolean customFilter = o instanceof CustomChoice; 
+					if (customFilter){
+						os = ((CustomChoice) o).getRepresentation();
+					} else {
+						os = (String) o;
+					}
+					if (os!=null){
+						int osLength = os.length();
+						if (osLength >= ret.len) {
+							String cmpStr = os.substring(0, ret.len); 
+							int cmp = comparator.compare(cmpStr, strStart); 
+							if (cmp == 0) {
+								ret.exact = osLength == originalLen;
+								return ret;
+							} else if (cmp > 0 && !customFilter) {
+								break;
+							}
 						}
 					}
 					++ret.index;
@@ -274,4 +269,49 @@ public class OptionsListModel extends AbstractListModel {
 		}
 		return ret;
 	}
+	
+	/** Ensures that comparator variable has a meaningful content */
+	private void fixComparator(){
+		if (useFormatter){
+			//string based, user comparator won't be used
+			Collator collator = Collator.getInstance();
+	        collator.setStrength(ignoreCase? Collator.PRIMARY : Collator.TERTIARY);
+	        comparator = collator;
+		} else {
+			//ignore case not used
+			if (userComparator==null){
+		        if (Comparable.class.isAssignableFrom(associatedClass)) {
+		            comparator = DEFAULT_COMPARABLE_COMPARATOR;
+		        } else {
+		        	comparator = DEFAULT_COMPARATOR;
+		        }				
+			} else {
+				comparator = userComparator;
+			}
+		}
+	}
+	
+	private static Comparator DEFAULT_COMPARATOR = new Comparator() {
+		@Override
+		public int compare(Object o1, Object o2) {
+			//on a JTable, sorting will use the string representation
+			int ret = o1.toString().compareTo(o2.toString());
+			if (ret==0 && !o1.equals(o2)){
+				ret = o1.hashCode()-o2.hashCode();
+				if (ret==0){
+					ret=System.identityHashCode(o1)-System.identityHashCode(o2);
+				}
+			}
+			return ret;
+		}
+	};
+
+	private static Comparator DEFAULT_COMPARABLE_COMPARATOR = 
+		new Comparator<Comparable>() {
+
+		@Override
+		public int compare(Comparable o1, Comparable o2) {
+			return o1.compareTo(o2);
+		}
+	};	
 }
