@@ -154,12 +154,12 @@ interface EditorComponent {
         private int filterPosition;
         private boolean editable;
         private Color errorColor = Color.red;
-        private Color foreground;
-        private Color disabledColor;
         private RowFilter filter;
         /*the source of the filter. Or a String, or a CustomChoice*/
         Object content; 
         PopupComponent popup;
+        Color foreground;
+        Color disabledColor;
         boolean enabled;
         /** 
          * This variable is set to true if the content is being set from inside, 
@@ -201,6 +201,7 @@ interface EditorComponent {
         			icon = ((CustomChoice)content).getIcon();
         			if (icon!=null){
 	            		trackedText=getText();
+	            		super.setForeground(disabledColor);
 	            		repaint();
 	            		return true;
         			}
@@ -214,9 +215,18 @@ interface EditorComponent {
         	/** Deactivates the custom decoration */
         	public void deactivateCustomDecoration(){
         		if (icon!=null){
+            		super.setForeground(foreground);
         			trackedText=null;
         			icon=null;
         			repaint();
+        		}
+        	}
+        	
+        	@Override
+        	public void setForeground(Color fg) {
+        		//if icon is not null, we have already specific management on place
+        		if (icon==null){
+        			super.setForeground(fg);
         		}
         	}
         	
