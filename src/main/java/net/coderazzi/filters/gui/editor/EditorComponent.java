@@ -36,10 +36,12 @@ import java.util.Collection;
 import java.util.Collections;
 
 import javax.swing.CellRendererPane;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.RowFilter;
+import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -82,7 +84,7 @@ interface EditorComponent {
      * Informs that the editor has received the focus.
      * @return true if the associated popup should be shown 
      */
-    public boolean focusGained(boolean gained);
+    public boolean focusMoved(boolean gained);
     
     /** Enables/disables the editor */
     public void setEnabled(boolean enabled);
@@ -146,35 +148,142 @@ interface EditorComponent {
     static final class Text extends DocumentFilter 
     		implements DocumentListener, EditorComponent {
 
-        private JTextField textField = new JTextField(15);
+        private TextEditor textField = new TextEditor();
+        private Collection<CustomChoice> customChoices = Collections.EMPTY_LIST;
         private IFilterTextParser parser;
-        private RowFilter cachedFilter;
-        private Object cachedContent;
         private int filterPosition;
         private boolean editable;
-        private boolean enabled;
         private Color errorColor = Color.red;
         private Color foreground;
         private Color disabledColor;
-        private Collection<CustomChoice> customChoices = Collections.EMPTY_LIST;
+        private RowFilter filter;
+        /*the source of the filter. Or a String, or a CustomChoice*/
+        Object content; 
         PopupComponent popup;
+        boolean enabled;
         /** 
          * This variable is set to true if the content is being set from inside, 
          * to avoid raising some events 
          **/
         private boolean controlledSet;
 
+        
+        /**
+         * Specific JTextField to be able to represent CustomChoices,
+         * painting their associated icon on the background
+         */
+        class TextEditor extends JTextField implements CaretListener{
+        	
+			private static final long serialVersionUID = 3827985723062383846L;
+			
+			private Icon icon;
+			private String trackedText;
+        	
+        	public TextEditor() {
+        		super(15); //created with 15 columns
+        		addCaretListener(this);
+			}
+        	
+        	@Override
+        	public void setText(String t) {
+        		String tmp = trackedText;
+        		trackedText = null; //avoid any checks on the caret listener 
+        		super.setText(t);
+        		trackedText = tmp;
+        	}
+        	
+        	/**
+        	 * Activates, if possible, the custom decoration, that is,
+        	 * if the content is a CustomChoice and has an associated icon
+        	 */
+        	public boolean activateCustomDecoration(){
+        		if (content instanceof CustomChoice){
+        			icon = ((CustomChoice)content).getIcon();
+        			if (icon!=null){
+	            		trackedText=getText();
+	            		repaint();
+	            		return true;
+        			}
+        		} else {
+        			icon=null;
+        		}
+        		trackedText=null;
+        		return false;
+        	}
+        	
+        	/** Deactivates the custom decoration */
+        	public void deactivateCustomDecoration(){
+        		if (icon!=null){
+        			trackedText=null;
+        			icon=null;
+        			repaint();
+        		}
+        	}
+        	
+        	/**
+        	 * Reports that the textfield has been enabled or not. Do not
+        	 * call directly setEnabled().<br>
+        	 * It sets the component as focusable, and 
+        	 */
+        	public void setEnabledState(boolean enabled){
+        		//if enabled, there is already a check on the filter, so
+        		//the activation / deactivation of decoration will
+        		//work on its own
+        		if (!enabled && activateCustomDecoration()){
+			    	icon = UIManager.getLookAndFeel().getDisabledIcon(this, icon);     
+			    	trackedText = null; //do not track text changes
+    			}
+            	setFocusable(enabled);
+        	}
+        	
+            public void focusMoved(boolean gained) {
+        		trackedText = null; // do not track changes (gain or not, not yet)
+        		setCaretPosition(0);
+            	if (gained){
+            		moveCaretPosition(getText().length());
+            	} 
+            	//whether we lose or gain focus, we try to reactivate the
+            	//decoration -listeners only required if gaining it
+            	//without focus, there is no need to check for changes on
+            	//the text when painting the decoration, so set text to null
+        		if (activateCustomDecoration() && !gained){
+        			trackedText=null;
+        		}
+            }
+        	
+        	@Override
+        	public void caretUpdate(CaretEvent e) {
+                //if the user moves the cursor on the editor, the focus passes 
+                //automatically back to the editor (from the popup)
+        		if (enabled){
+	                popup.setPopupFocused(false);
+	                if (trackedText!=null){
+	                	//if text is not null, there is decoration, remove it
+	                	//(there can be decoration if text is null, but in that 
+	                	// case the focus is not on the component, no need to
+	                	// modify any decoration)
+	                	deactivateCustomDecoration();
+	                }
+        		}
+        	}
+        	
+			@Override protected void paintComponent(Graphics g) {
+        		super.paintComponent(g);
+        		if (icon!=null){
+        			if (trackedText==null || trackedText.equals(getText())){
+        			    int x=(getWidth()-icon.getIconWidth())/2;
+        			    int y=(getHeight()-icon.getIconHeight())/2;    
+    			    	icon.paintIcon(this, g, x, y);
+        			} else {
+        				deactivateCustomDecoration();
+        			}
+        		}
+        	}
+        }
+
         public Text(PopupComponent popupComponent) {
             this.popup = popupComponent;
             setEditable(true);
-            //if the user moves the cursor on the editor, the focus passes 
-            //automatically back to the editor (from the popup)
-            textField.addCaretListener(new CaretListener() {
-                    @Override
-					public void caretUpdate(CaretEvent e) {
-                        popup.setPopupFocused(false);
-                    }
-                });
         }
 
         @Override public JComponent getComponent() {
@@ -187,59 +296,68 @@ interface EditorComponent {
         }
 
         @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
-            String content = textField.getText().trim();
-            if (forceUpdate || !content.equals(cachedContent) || (
-            		(cachedContent instanceof CustomChoice) &&
-            			((CustomChoice)cachedContent).getRepresentation().
-            			equals(content))){
-	            cachedFilter = null;
-                Color color = getForeground();
-                if (content.length() != 0) {
-                	boolean ignoreCase = parser.isIgnoreCase();
-                	for (CustomChoice cc : customChoices){
-                		if (cc.matchesFilterText(content, ignoreCase)){
-                			cachedContent = cc;
-                			cachedFilter = cc.getFilter(parser, filterPosition);
-                			break;
-                		}
-                	}
-                	if (cachedFilter==null){
-    	                try {
-    	    	            cachedContent = content;
-    	    	            if (!isEditable()){
-    	    	            	//for editable columns, the text was already
-    	    	            	//escaped when the content was defined
-    	    	            	//(see setContent)
-    	    	            	content = parser.escape(content, filterPosition);
-    	    	            }
-    	                	cachedFilter = parser.parseText(content, 
-    	                						filterPosition);
-    	                } catch (ParseException pex) {
-    	                    color = getErrorForeground();
-    	                }
-                	}
-                }
-                textField.setForeground(color);
+            String text = textField.getText().trim();
+            if (forceUpdate){
+            	updateFilter(text);
+            } else if (content instanceof CustomChoice){
+    			if (!((CustomChoice)content).getRepresentation().equals(text)){
+                	updateFilter(text);
+    			}
+            } else if (!text.equals(content)){
+            	updateFilter(text);            	
             }
-            return cachedFilter;
+            return filter;
+        }
+        
+        /** Updates the filter */
+        private void updateFilter(String text) {
+            content = text;
+            filter = null;
+            textField.deactivateCustomDecoration();
+            Color color = getForeground();
+            if (text.length() != 0) {
+            	boolean ignoreCase = parser.isIgnoreCase();
+            	for (CustomChoice cc : customChoices){
+            		if (cc.matchesFilterText(text, ignoreCase)){
+            			content = cc;
+            			textField.activateCustomDecoration();
+            			filter = cc.getFilter(parser, filterPosition);
+            			break;
+            		}
+            	}
+            	if (filter==null){
+	                try {
+	    	            if (!isEditable()){
+	    	            	//for editable columns, the text was already
+	    	            	//escaped when the content was defined
+	    	            	//(see setContent)
+	    	            	text = parser.escape(text, filterPosition);
+	    	            }
+	                	filter = parser.parseText(text, 
+	                						filterPosition);
+	                } catch (ParseException pex) {
+	                    color = getErrorForeground();
+	                }
+            	}
+            }
+            textField.setForeground(color);
         }
         
         @Override public RowFilter getFilter() {
-            return cachedFilter;
+            return filter;
         }
 
-        @Override public boolean focusGained(boolean gained) {
-    		textField.setCaretPosition(0);
-        	if (gained){
-        		textField.moveCaretPosition(textField.getText().length());
-        	}
+        @Override public boolean focusMoved(boolean gained) {
+    		textField.focusMoved(gained);
             return !editable;
         }
 
         @Override public void setEnabled(boolean enabled) {
         	this.enabled=enabled;
-        	textField.setFocusable(enabled);
-        	ensureCorrectForegroundColor();
+        	textField.setEnabledState(enabled);
+        	if (!enabled){
+        		ensureCorrectForegroundColor();
+        	}
         }
 
         @Override public void setTextParser(IFilterTextParser parser) {
@@ -283,7 +401,7 @@ interface EditorComponent {
 
         @Override public Object getContent() {
         	checkFilterUpdate(false);
-            return cachedContent;
+            return content;
         }
 
         @Override public void setEditable(boolean set) {
@@ -537,7 +655,7 @@ interface EditorComponent {
             return filter;
         }
 
-        @Override public boolean focusGained(boolean gained) {
+        @Override public boolean focusMoved(boolean gained) {
             return true;
         }
 

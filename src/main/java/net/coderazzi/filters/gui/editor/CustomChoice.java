@@ -82,15 +82,22 @@ public class CustomChoice {
 	private Icon icon;
 	private String str;
 	
+	/**
+	 * Creates a custom choice without associated icon, to be handled
+	 * exclusively as text
+	 */
 	public CustomChoice(String representation){
 		this(representation, null);
 	}
 
+	/**
+	 * Creates a custom choice with associated icon
+	 */
 	public CustomChoice(String representation, Icon icon){
 		this.icon = icon;
 		this.str = representation;
 	}
-
+	
 	/**
 	 * Return an icon associated to this filter.<br>
 	 * It can be null if there is no associated graphic representation for this
@@ -116,9 +123,7 @@ public class CustomChoice {
 			getRepresentation().equals(trimmedFilterText);
 	}
 	
-	/**
-	 * Returns the associated filter
-	 */
+	/** Returns the associated filter */
 	public RowFilter getFilter(IFilterTextParser parser,
 			int modelPosition) {
 		try{
@@ -128,9 +133,6 @@ public class CustomChoice {
 		}
 	}
 	
-	/**
-	 * Returns the string representation of this filter.<br>
-	 */
 	@Override
 	public String toString() {
 		return getRepresentation();

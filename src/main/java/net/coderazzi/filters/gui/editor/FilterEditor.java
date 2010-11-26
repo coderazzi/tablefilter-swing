@@ -507,14 +507,17 @@ public class FilterEditor extends JComponent{
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				editor.focusGained(false);
 				popup.hide();
 				filter.checkChanges();
+				//important: call focusMoved AFTER checking changes, to
+				//ensure that any changes on decoration (custom choice)
+				//are not lost
+				editor.focusMoved(false);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (isEnabled() && editor.focusGained(true)){
+				if (isEnabled() && editor.focusMoved(true)){
 					if (showOptions()){
 						popup.setPopupFocused(true);
 					}

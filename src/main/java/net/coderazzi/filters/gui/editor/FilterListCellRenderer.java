@@ -132,6 +132,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			boolean isSelected, boolean cellHasFocus) {
 		boolean align;
 		int hAlign = SwingConstants.LEFT;
+		String text=null;
 		if (value instanceof CustomChoice){
 			CustomChoice cf = (CustomChoice) value;
 			inner = null;			
@@ -139,6 +140,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			if (value==null){
 				value=cf.getRepresentation();
 			} else {
+				text=cf.getRepresentation();
 				hAlign = SwingConstants.CENTER;
 			}
 			align=true;
@@ -154,6 +156,12 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		if (inner == null) {
 			inner = defaultRenderer.getListCellRendererComponent(list, value, 
 					index, isSelected, cellHasFocus);
+			if (text!=null){
+				((JLabel)inner).setText(text);
+				((JLabel)inner).setForeground(Color.LIGHT_GRAY);
+				((JLabel)inner).setHorizontalTextPosition(SwingConstants.LEFT);
+				hAlign=SwingConstants.LEFT;
+			}
 		}
 		if (align){
 			((JLabel)inner).setHorizontalAlignment(hAlign);			
