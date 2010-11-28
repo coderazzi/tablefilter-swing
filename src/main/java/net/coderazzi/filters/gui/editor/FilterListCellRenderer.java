@@ -38,6 +38,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 
 /**
  * Special renderer used on the history and options list, 
@@ -79,6 +80,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private int width;
 	
 	Color disabledColor;
+	boolean addSeparator;
 	ListCellRenderer userRenderer;
 
 	/**
@@ -107,6 +109,11 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 				} else {
 					value = null;
 				}
+				ListModel lm = list.getModel();
+				//a separator is added to delimit the custom choices
+				//unless there is only one custom choice (MATCH_ALL) 
+				addSeparator = index>0 && lm.getSize()>(index+2) 
+					&& !(lm.getElementAt(index+1) instanceof CustomChoice);
 			} else {
 				icon = null;
 			}
@@ -186,6 +193,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 
 	private void setupRenderer(JList list, Object value, int index, 
 			boolean isSelected, boolean cellHasFocus) {
+		addSeparator = false;
 		try {
 			inner = userRenderer.getListCellRendererComponent(list, value, 
 					index, isSelected, cellHasFocus);
@@ -195,7 +203,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		if (inner == null) {
 			inner = defaultRenderer.getListCellRendererComponent(list, value, 
 					index, isSelected, cellHasFocus);
-		}
+		} 
 		inner.setFont(list.getFont());
 		inner.setEnabled(isEnabled());
 		arrowColor = list.getSelectionBackground();
@@ -221,6 +229,11 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		} 
 		g.translate(xDelta, -yDelta);
 		painter.paintComponent(g, inner, this, 0, 0, width-xDeltaBase, height);
+		if (addSeparator){
+			g.translate(-xDelta, 0);
+			g.setColor(disabledColor);
+			g.drawLine(0, getHeight()-1, getWidth(), getHeight()-1);
+		}
 	}
 
 	@Override

@@ -321,39 +321,47 @@ interface EditorComponent {
             return filter;
         }
         
-        /** Updates the filter */
+        /** Updates the filter / text is expected trimmed */
         private void updateFilter(String text) {
-            content = text;
-            filter = null;
-            textField.deactivateCustomDecoration();
             Color color = getForeground();
-            if (text.length() != 0) {
-            	Comparator<String> chooser = 
-            		FilterSettings.getStringComparator(parser.isIgnoreCase());
-            	for (CustomChoice cc : customChoices){
-            		if (0==chooser.compare(text, cc.getRepresentation())){
-            			content = cc;
-            			textField.activateCustomDecoration();
-            			filter = cc.getFilter(parser, filterPosition);
-            			break;
-            		}
-            	}
-            	if (filter==null){
-	                try {
-	    	            if (!isEditable()){
-	    	            	//for editable columns, the text was already
-	    	            	//escaped when the content was defined
-	    	            	//(see setContent)
-	    	            	text = parser.escape(text, filterPosition);
-	    	            }
-	                	filter = parser.parseText(text, 
-	                						filterPosition);
-	                } catch (ParseException pex) {
-	                    color = getErrorForeground();
-	                }
-            	}
+            CustomChoice cc = getCustomChoice(text);
+            if (cc!=null){
+    			content = cc;
+    			textField.activateCustomDecoration();
+    			filter = cc.getFilter(parser, filterPosition);            	
+            } else {
+                content = text;
+                filter = null;
+                textField.deactivateCustomDecoration();
+                try {
+    	            if (!isEditable()){
+    	            	//for editable columns, the text was already
+    	            	//escaped when the content was defined
+    	            	//(see setContent)
+    	            	text = parser.escape(text, filterPosition);
+    	            }
+                	filter = parser.parseText(text, 
+                						filterPosition);
+                } catch (ParseException pex) {
+                    color = getErrorForeground();
+                }            	
             }
             textField.setForeground(color);
+        }
+        
+        /** Returns the CustomChoice matching the text (trimmed) */
+        private CustomChoice getCustomChoice(String text) {
+        	if (text.length()==0){
+        		return CustomChoice.MATCH_ALL;
+        	}
+        	Comparator<String> chooser = 
+        		FilterSettings.getStringComparator(parser.isIgnoreCase());
+        	for (CustomChoice cc : customChoices){
+        		if (0==chooser.compare(text, cc.getRepresentation())){
+        			return cc;
+        		}
+        	}
+        	return null;
         }
         
         @Override public RowFilter getFilter() {
