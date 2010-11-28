@@ -257,6 +257,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Sets the disabled color, used for many things, like border, separator */
 	public void setDisabledColor(Color color){
 		popup.setBorder(BorderFactory.createLineBorder(color, 1));
+		listRenderer.setDisabledColor(color);
 		separator.setForeground(color);
 	}
 	

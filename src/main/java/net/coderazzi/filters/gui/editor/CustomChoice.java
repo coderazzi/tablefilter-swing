@@ -55,7 +55,7 @@ public class CustomChoice {
 		}
 	};
 	
-	/** Nop filter, returns all entries with null or empty values*/
+	/** Special empty filter, returns all entries with null or empty values*/
 	public final static CustomChoice MATCH_EMPTY = new CustomChoice(
 			FilterSettings.matchEmptyFilterString,
 			FilterSettings.matchEmptyFilterIcon){
@@ -110,6 +110,17 @@ public class CustomChoice {
 	/** Returns the string representation of the filter */
 	public String getRepresentation(){
 		return str;
+	}
+	
+	/** 
+	 * Returns true if the text should be displayed on the options, when
+	 * there is an icon present<br>
+	 * This method is only called if an icon is available.
+	 * @param userRendererSet set to true if the user has specified any 
+	 *    special render for the associated column
+	 */
+	public boolean renderTextInOptions(boolean userRendererSet){
+		return !userRendererSet;
 	}
 	
 	/**

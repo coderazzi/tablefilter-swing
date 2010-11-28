@@ -34,11 +34,10 @@ import java.awt.RenderingHints;
 
 import javax.swing.CellRendererPane;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import javax.swing.SwingConstants;
 
 /**
  * Special renderer used on the history and options list, 
@@ -69,8 +68,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private final static int X[] = { 0, WIDTH_ARROW, 0 };
 	private final static int Y[] = { 0, HEIGHT_ARROW / 2, HEIGHT_ARROW };
 
-	private ListCellRenderer userRenderer;
-	private ListCellRenderer defaultRenderer = new DefaultListCellRenderer();
+	private ListCellRenderer defaultRenderer = new TableFilterCellRenderer();
 	private CellRendererPane painter = new CellRendererPane();
 	private JList referenceList;
 	private Component inner;
@@ -80,13 +78,68 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private boolean focusOnList;
 	private int xDeltaBase;
 	private int width;
+	
+	Color disabledColor;
+	ListCellRenderer userRenderer;
+
+	/**
+	 * Specific renderer for the TableFilter, taking care of
+	 * {@see CustomChoice} components
+	 */
+	class TableFilterCellRenderer extends DefaultListCellRenderer {
+
+		private static final long serialVersionUID = -5732510534272252233L;
+		private Icon icon;
+
+		@Override
+		public Component getListCellRendererComponent(JList list, Object value,
+				int index, boolean isSelected, boolean cellHasFocus) {
+			//In all the cases, we return THIS
+			//By default, is is render the text of the CustomChoice (or choice)
+			// and, if there is also an icon, it is displayed afterwards,
+			// centered
+			boolean setColor=false;
+			if (value instanceof CustomChoice){
+				CustomChoice cc = (CustomChoice) value;
+				icon = cc.getIcon();
+				if (icon==null || cc.renderTextInOptions(userRenderer!=this)){
+					value = cc.getRepresentation();
+					setColor = true;
+				} else {
+					value = null;
+				}
+			} else {
+				icon = null;
+			}
+			super.getListCellRendererComponent(list, value, index, 
+					isSelected, cellHasFocus);
+			if (setColor){
+				setForeground(disabledColor);
+			}
+			return this;
+		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			if (icon!=null){
+			    int x=(getWidth()-icon.getIconWidth())/2;
+			    int y=(getHeight()-icon.getIconHeight())/2;    
+		    	icon.paintIcon(this, g, x, y);				
+			}
+		}
+	}
 
 	public FilterListCellRenderer(JList mainList) {
 		setUserRenderer(null);
 		setDoubleBuffered(true);
 		this.referenceList = mainList;
 	}
-
+	
+	public void setDisabledColor(Color color){
+		this.disabledColor = color;
+	}
+	
 	/** 
 	 * Indicates that the focus is currently on the list.<br>
 	 * Selected cells are selected-focused cells
@@ -130,41 +183,15 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 
 	private void setupRenderer(JList list, Object value, int index, 
 			boolean isSelected, boolean cellHasFocus) {
-		boolean align;
-		int hAlign = SwingConstants.LEFT;
-		String text=null;
-		if (value instanceof CustomChoice){
-			CustomChoice cf = (CustomChoice) value;
-			inner = null;			
-			value = cf.getIcon();
-			if (value==null){
-				value=cf.getRepresentation();
-			} else {
-				text=cf.getRepresentation();
-				hAlign = SwingConstants.CENTER;
-			}
-			align=true;
-		} else {
-			align=userRenderer == defaultRenderer;
-			try {
-				inner = userRenderer.getListCellRendererComponent(list, value, 
-						index, isSelected, cellHasFocus);
-			} catch (Exception ex) {
-				inner = null;
-			}
+		try {
+			inner = userRenderer.getListCellRendererComponent(list, value, 
+					index, isSelected, cellHasFocus);
+		} catch (Exception ex) {
+			inner = null;
 		}
 		if (inner == null) {
 			inner = defaultRenderer.getListCellRendererComponent(list, value, 
 					index, isSelected, cellHasFocus);
-			if (text!=null){
-				((JLabel)inner).setText(text);
-				((JLabel)inner).setForeground(Color.LIGHT_GRAY);
-				((JLabel)inner).setHorizontalTextPosition(SwingConstants.LEFT);
-				hAlign=SwingConstants.LEFT;
-			}
-		}
-		if (align){
-			((JLabel)inner).setHorizontalAlignment(hAlign);			
 		}
 		inner.setFont(list.getFont());
 		inner.setEnabled(isEnabled());
