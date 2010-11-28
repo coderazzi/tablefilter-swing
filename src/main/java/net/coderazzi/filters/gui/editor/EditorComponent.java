@@ -34,6 +34,7 @@ import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 
 import javax.swing.CellRendererPane;
 import javax.swing.Icon;
@@ -52,6 +53,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 import net.coderazzi.filters.IFilterTextParser;
+import net.coderazzi.filters.gui.FilterSettings;
 
 
 /**
@@ -326,9 +328,10 @@ interface EditorComponent {
             textField.deactivateCustomDecoration();
             Color color = getForeground();
             if (text.length() != 0) {
-            	boolean ignoreCase = parser.isIgnoreCase();
+            	Comparator<String> chooser = 
+            		FilterSettings.getStringComparator(parser.isIgnoreCase());
             	for (CustomChoice cc : customChoices){
-            		if (cc.matchesFilterText(text, ignoreCase)){
+            		if (0==chooser.compare(text, cc.getRepresentation())){
             			content = cc;
             			textField.activateCustomDecoration();
             			filter = cc.getFilter(parser, filterPosition);

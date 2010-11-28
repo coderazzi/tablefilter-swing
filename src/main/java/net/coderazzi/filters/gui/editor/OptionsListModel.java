@@ -25,7 +25,6 @@
 
 package net.coderazzi.filters.gui.editor;
 
-import java.text.Collator;
 import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +34,8 @@ import java.util.ListIterator;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ListCellRenderer;
+
+import net.coderazzi.filters.gui.FilterSettings;
 
 
 /**
@@ -274,9 +275,7 @@ public class OptionsListModel extends AbstractListModel {
 	private void fixComparator(){
 		if (useFormatter){
 			//string based, user comparator won't be used
-			Collator collator = Collator.getInstance();
-	        collator.setStrength(ignoreCase? Collator.PRIMARY : Collator.TERTIARY);
-	        comparator = collator;
+	        comparator = FilterSettings.getStringComparator(ignoreCase);
 		} else {
 			//ignore case not used
 			if (userComparator==null){

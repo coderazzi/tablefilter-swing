@@ -123,17 +123,6 @@ public class CustomChoice {
 		return !userRendererSet;
 	}
 	
-	/**
-	 * Returns true if the user filter matches the given filter text,
-	 * which is provided without side spaces.
-	 */
-	public boolean matchesFilterText(String trimmedFilterText, 
-			boolean ignoreCase){
-		return ignoreCase? 
-			getRepresentation().equalsIgnoreCase(trimmedFilterText) : 
-			getRepresentation().equals(trimmedFilterText);
-	}
-	
 	/** Returns the associated filter */
 	public RowFilter getFilter(IFilterTextParser parser,
 			int modelPosition) {

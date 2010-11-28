@@ -2,7 +2,6 @@ package net.coderazzi.filters.parser;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.text.Collator;
 import java.text.Format;
 import java.text.ParseException;
 import java.util.Comparator;
@@ -77,7 +76,7 @@ public class FilterTextParser implements IFilterTextParser {
     	new HashMap<Class<?>, Comparator<?>>();
 	Format defaultFormatter; 
     boolean ignoreCase;
-    Collator stringComparator;
+    Comparator<String> stringComparator;
     private TableModel model;
     private Map<String, IOperand> operands;
     private PropertyChangeSupport propertiesHandler = new PropertyChangeSupport(this);
@@ -91,7 +90,6 @@ public class FilterTextParser implements IFilterTextParser {
     }
     
     public FilterTextParser(boolean ignoreCase) {
-    	stringComparator = Collator.getInstance();
     	internalSetIgnoreCase(ignoreCase);
         operands = new HashMap<String, IOperand>();
         operands.put("~~", new REOperand(true));
@@ -237,7 +235,7 @@ public class FilterTextParser implements IFilterTextParser {
 
     private void internalSetIgnoreCase(boolean ignore) {
         this.ignoreCase = ignore;
-        stringComparator.setStrength(ignore? Collator.PRIMARY : Collator.TERTIARY);
+        stringComparator = FilterSettings.getStringComparator(ignore);
     }
 
     @Override public boolean isIgnoreCase() {

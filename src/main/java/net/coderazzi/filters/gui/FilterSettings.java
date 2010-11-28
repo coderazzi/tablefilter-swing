@@ -26,6 +26,8 @@
 package net.coderazzi.filters.gui;
 
 import java.awt.Color;
+import java.text.Collator;
+import java.util.Comparator;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -114,6 +116,31 @@ public class FilterSettings {
                                        + filterTextParserClass, ex);
         }
     }
+    
+    /** Internal TableFilter method to get the appropriated String comparator*/
+    public static Comparator<String> getStringComparator(boolean ignoreCase){
+    	Comparator<String> ret;
+    	if (ignoreCase){
+    		if (icCollator==null){
+    			icCollator=createStringComparator(true);
+    		}
+    		ret=icCollator;
+    	} else {
+    		if (collator==null){
+    			collator=createStringComparator(false);
+    		}
+    		ret=collator;    		
+    	}
+    	return ret;
+    }
+    
+    private static Comparator<String> createStringComparator(boolean ignoreCase){
+    	Collator ret=Collator.getInstance();
+    	ret.setStrength(ignoreCase? Collator.PRIMARY : Collator.TERTIARY);    			
+    	return (Comparator) ret;
+    }
+    
+    private static Comparator<String> collator, icCollator; 
 
     static {
         filterTextParserClass = FilterTextParser.class;
