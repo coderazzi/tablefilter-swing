@@ -68,7 +68,6 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private final static int X[] = { 0, WIDTH_ARROW, 0 };
 	private final static int Y[] = { 0, HEIGHT_ARROW / 2, HEIGHT_ARROW };
 
-	private ListCellRenderer defaultRenderer = new TableFilterCellRenderer();
 	private CellRendererPane painter = new CellRendererPane();
 	private JList referenceList;
 	private Component inner;
@@ -86,7 +85,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	 * Specific renderer for the TableFilter, taking care of
 	 * {@see CustomChoice} components
 	 */
-	class TableFilterCellRenderer extends DefaultListCellRenderer {
+	private ListCellRenderer defaultRenderer = new DefaultListCellRenderer() {
 
 		private static final long serialVersionUID = -5732510534272252233L;
 		private Icon icon;
@@ -128,7 +127,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		    	icon.paintIcon(this, g, x, y);				
 			}
 		}
-	}
+	};
 
 	public FilterListCellRenderer(JList mainList) {
 		setUserRenderer(null);
@@ -136,6 +135,10 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		this.referenceList = mainList;
 	}
 	
+	/**
+	 * Reports the disabled color, which will be used to display the text
+	 * on {@see CustomChoice} instances
+	 */
 	public void setDisabledColor(Color color){
 		this.disabledColor = color;
 	}
