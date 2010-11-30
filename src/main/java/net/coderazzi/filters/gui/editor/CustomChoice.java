@@ -37,7 +37,6 @@ import net.coderazzi.filters.gui.FilterSettings;
 /**
  * Class to specify a custom filter in the options list
  * @author Luismi
- *
  */
 public class CustomChoice {
 	
@@ -84,14 +83,20 @@ public class CustomChoice {
 	
 	/**
 	 * Creates a custom choice without associated icon, to be handled
-	 * exclusively as text
+	 * exclusively as text.<br>
+	 * Unless the method {@see #getFilter(IFilterTextParser, int)}
+	 * is implemented, the associated filter is the parser' handling of
+	 * the passed representation. 
 	 */
 	public CustomChoice(String representation){
 		this(representation, null);
 	}
 
 	/**
-	 * Creates a custom choice with associated icon
+	 * Creates a custom choice with associated icon<br>
+	 * Unless the method {@see #getFilter(IFilterTextParser, int)}
+	 * is implemented, the associated filter is the parser' handling of
+	 * the passed representation.
 	 */
 	public CustomChoice(String representation, Icon icon){
 		this.icon = icon;
@@ -123,7 +128,11 @@ public class CustomChoice {
 		return !userRendererSet;
 	}
 	
-	/** Returns the associated filter */
+	/** 
+	 * Returns the associated filter<br>
+	 * By default, is the parser' handling of the textual representation
+	 * associated to this choice. 
+	 */
 	public RowFilter getFilter(IFilterTextParser parser,
 			int modelPosition) {
 		try{

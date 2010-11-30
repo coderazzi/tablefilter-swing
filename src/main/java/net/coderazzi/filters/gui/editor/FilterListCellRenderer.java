@@ -109,11 +109,13 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 				} else {
 					value = null;
 				}
-				ListModel lm = list.getModel();
-				//a separator is added to delimit the custom choices
-				//unless there is only one custom choice (MATCH_ALL) 
-				addSeparator = index>0 && lm.getSize()>(index+2) 
-					&& !(lm.getElementAt(index+1) instanceof CustomChoice);
+				if (icon==null && index>0){
+					ListModel lm = list.getModel();
+					//a separator is added to delimit the custom choices
+					//unless there is only one custom choice (MATCH_ALL) 
+					addSeparator = lm.getSize()>(index+2) 
+						&& !(lm.getElementAt(index+1) instanceof CustomChoice);					
+				}
 			} else {
 				icon = null;
 			}

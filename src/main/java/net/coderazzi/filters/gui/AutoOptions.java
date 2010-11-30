@@ -32,6 +32,6 @@ package net.coderazzi.filters.gui;
 public enum AutoOptions {
     DISABLED, // no auto options
     BASIC,    // enums and booleans automatically handled
-    STATIC,   // options extracted from the model. If the model changes, new entries are added
-    DYNAMIC   // options extracted from the model. If the model changes, entries are added/removed dynamically
+    DYNAMIC,  // options extracted from the model. If the model changes, new entries are added
+    EXACT     // options extracted from the model. If the model changes, entries are added/removed dynamically
 }

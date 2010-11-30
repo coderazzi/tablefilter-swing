@@ -214,6 +214,11 @@ public class OptionsListModel extends AbstractListModel {
 		return content.subList(0, customChoices);
 	}
 	
+	/**
+	 * Adds a CustomChoice, if not yet present. Only the first options
+	 * -as specified in parameter limit- are used, so the given choice can
+	 * be added, at latest, at the given limit position.
+	 */
 	private boolean addCustomChoice(CustomChoice cf, int limit){
 		ListIterator li = content.listIterator();
 		while (limit-->0){
