@@ -254,6 +254,28 @@ abstract class PopupComponent implements PopupMenuListener{
 		historyList.setForeground(color);
 	}
 	
+	/** Sets the list's selected background color */
+	public void setSelectionBackground(Color color){
+		optionsList.setSelectionBackground(color);
+		historyList.setSelectionBackground(color);
+	}
+	
+	/** Sets the list's selected foreground color */
+	public void setSelectionForeground(Color color){
+		optionsList.setSelectionForeground(color);
+		historyList.setSelectionForeground(color);
+	}
+	
+	/** Gets the list's selected background color */
+	public Color getSelectionBackground(){
+		return optionsList.getSelectionBackground();
+	}
+	
+	/** Gets the list's selected foreground color */
+	public Color getSelectionForeground(){
+		return optionsList.getSelectionForeground();
+	}
+	
 	/** Sets the disabled color, used for many things, like border, separator */
 	public void setDisabledColor(Color color){
 		popup.setBorder(BorderFactory.createLineBorder(color, 1));

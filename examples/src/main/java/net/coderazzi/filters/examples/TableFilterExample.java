@@ -405,6 +405,28 @@ public class TableFilterExample extends JFrame {
 				}
 			}
 		}));
+    	ret.add(new JMenuItem(new AbstractAction("selection color ...") {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
+						"Select header's selection color", 
+						filterHeader.getSelectionForeground());
+				if (ret!=null){
+					filterHeader.setSelectionForeground(ret);
+				}
+			}
+		}));
+    	ret.add(new JMenuItem(new AbstractAction("selection background ...") {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
+						"Select header's selection background", 
+						filterHeader.getSelectionBackground());
+				if (ret!=null){
+					filterHeader.setSelectionBackground(ret);
+				}
+			}
+		}));
     	ret.addSeparator();
     	ret.add(createFontSizeMenu());			
     	return ret;

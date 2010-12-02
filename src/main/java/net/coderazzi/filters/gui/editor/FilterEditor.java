@@ -134,6 +134,8 @@ public class FilterEditor extends JComponent{
 		setBackground(editor.getComponent().getBackground());
 		setForeground(editor.getForeground());
 		setDisabledForeground(Color.lightGray);
+		setSelectionBackground(popup.getSelectionBackground());
+		setSelectionForeground(popup.getSelectionForeground());
 
 		editor.setPosition(filterPosition);
 	}
@@ -258,6 +260,30 @@ public class FilterEditor extends JComponent{
     /** Returns the color used to represent disabled state */
     public Color getDisabledForeground(){
     	return editor.getDisabledForeground();
+    }
+    
+    /** Sets the foreground color used to represent selected state */
+    public void setSelectionForeground(Color fg){
+    	editor.setSelectionForeground(fg);
+    	downButton.setSelectionForeground(fg);
+    	popup.setSelectionForeground(fg);
+    }
+
+    /** Returns the foreground color used to represent selected state */
+    public Color getSelectionForeground(){
+    	return popup.getSelectionForeground();
+    }
+    
+    /** Sets the background color used to represent selected state */
+    public void setSelectionBackground(Color bg){
+    	editor.setSelectionBackground(bg);
+    	downButton.setSelectionBackground(bg);
+    	popup.setSelectionBackground(bg);
+    }
+
+    /** Returns the color used to represent disabled state */
+    public Color getSelectionBackground(){
+    	return popup.getSelectionBackground();
     }
     
 	@Override public void setForeground(Color fg) {
@@ -513,14 +539,14 @@ public class FilterEditor extends JComponent{
 				//ensure that any changes on decoration (custom choice)
 				//are not lost
 				editor.focusMoved(false);
+				downButton.setFocused(false);
 			}
 
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (isEnabled() && editor.focusMoved(true)){
-					if (showOptions()){
-						popup.setPopupFocused(true);
-					}
+				downButton.setFocused(true);
+				if (isEnabled()){
+					editor.focusMoved(true);
 				}
 			}
 		});
@@ -592,7 +618,9 @@ public class FilterEditor extends JComponent{
 				if (popup.isPopupFocused()) {
 					popupSelection(popup.getSelection());
 				} else {
-					filter.checkChanges();
+					//use update instead of checkChanges, in case it
+					//is needed to reset the icon of a CustomChoice
+					filter.update();
 				}
 				popup.hide();
 			}
@@ -895,18 +923,39 @@ public class FilterEditor extends JComponent{
 		private final static int MIN_X = 6;
 		private final static int MIN_Y = 6;
 		
+		private boolean focus;
 		private boolean canPopup=true;
 		private boolean enabled=true;
 		private Color disabledColor;
+		private Color selectionForeground, selectionBackground;
 		
 		public void setCanPopup(boolean full){
 			this.canPopup=full;
 			super.setEnabled(full && enabled);
 		}
 		
+		public void setFocused(boolean focus){
+			this.focus=focus;
+			repaint();
+		}
+		
 		public void setDisabledColor(Color color){
 			disabledColor=color;
 			if (!isEnabled()){
+				repaint();
+			}
+		}
+		
+		public void setSelectionForeground(Color color){
+			selectionForeground=color;
+			if (focus){
+				repaint();
+			}
+		}
+		
+		public void setSelectionBackground(Color color){
+			selectionBackground=color;
+			if (focus){
 				repaint();
 			}
 		}
@@ -923,14 +972,14 @@ public class FilterEditor extends JComponent{
 			int height = getHeight();
 			int width = getWidth();
 
-			g.setColor(getBackground());
+			g.setColor(enabled && focus? selectionBackground: getBackground());
 			g.fillRect(0, 0, width, height);
 
 			width = (width - MIN_X) / 2;
 			height = Math.min(height / 2, height - MIN_Y);
 			g.translate(width, height);
 			if (enabled && canPopup){
-				g.setColor(getForeground());
+				g.setColor(focus? selectionForeground : getForeground());
 			} else {
 				g.setColor(disabledColor);
 			}

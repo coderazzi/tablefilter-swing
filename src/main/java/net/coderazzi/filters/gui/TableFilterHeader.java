@@ -104,6 +104,9 @@ public class TableFilterHeader extends JPanel {
 
     /** Colors for the filters */
     private Color errorColor, disabledForeground = Color.lightGray;
+    
+    /** Colors for selections on filter editors */
+    private Color selectionBackground, selectionForeground;
 
     /** whether the user has explicitly provided colors/font */
     private boolean backgroundSet, foregroundSet, disabledSet, fontSet;
@@ -356,6 +359,42 @@ public class TableFilterHeader extends JPanel {
     /** Sets the color used for disabled fields */
     public Color getDisabledForeground() {
     	return disabledForeground;
+    }
+
+    /** Sets the foreground color used to represent selected state */
+    public void setSelectionForeground(Color fg) {
+        this.selectionForeground = fg;
+
+        if (columnsController != null)
+            columnsController.setSelectionForeground(fg);
+    }
+
+    /**
+     * <p>Returns the color set by default as foreground on selected filters</p>
+     *
+     * <p>Note that the color of each specific editor can be different, 
+     * if the user customizes it directly</p>
+     */
+    public Color getSelectionForeground() {
+        return selectionForeground;
+    }
+
+    /** Sets the background color used to represent selected state */
+    public void setSelectionBackground(Color bg) {
+        this.selectionBackground = bg;
+
+        if (columnsController != null)
+            columnsController.setSelectionBackground(bg);
+    }
+
+    /**
+     * <p>Returns the color set by default as foreground on selected filters</p>
+     *
+     * <p>Note that the color of each specific editor can be different, 
+     * if the user customizes it directly</p>
+     */
+    public Color getSelectionBackground() {
+        return selectionBackground;
     }
 
     /**
@@ -666,10 +705,24 @@ public class TableFilterHeader extends JPanel {
                     panel.editor.setBackground(bg);
         }
 
+        public void setSelectionBackground(Color bg) {
+        	super.setBackground(bg);
+
+            if (columns != null)
+                for (FilterColumnPanel panel : this.columns)
+                    panel.editor.setSelectionBackground(bg);
+        }
+
         public void setDisabledForeground(Color bg) {
             if (columns != null)
                 for (FilterColumnPanel panel : this.columns)
                     panel.editor.setDisabledForeground(bg);
+        }
+
+        public void setSelectionForeground(Color fg) {
+            if (columns != null)
+                for (FilterColumnPanel panel : this.columns)
+                    panel.editor.setSelectionForeground(fg);
         }
 
         @Override public void setForeground(Color fg) {

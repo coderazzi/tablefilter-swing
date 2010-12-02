@@ -185,8 +185,9 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	}
 
 	/** Method used to render the content on the rendered editor */
-	public Component getCellRendererComponent(Object value, int finalWidth) {
-		setupRenderer(referenceList, value, -1, false, false);
+	public Component getCellRendererComponent(Object value, int finalWidth,
+			boolean focused) {
+		setupRenderer(referenceList, value, -1, focused, false);
 		width = finalWidth;
 		selected = false;
 		xDeltaBase = 0;
