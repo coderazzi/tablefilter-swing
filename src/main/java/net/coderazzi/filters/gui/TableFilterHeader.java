@@ -103,13 +103,15 @@ public class TableFilterHeader extends JPanel {
     }
 
     /** Colors for the filters */
-    private Color errorColor, disabledForeground = Color.lightGray;
+    private Color errorColor, gridColor, disabledForeground;
     
     /** Colors for selections on filter editors */
     private Color selectionBackground, selectionForeground;
 
     /** whether the user has explicitly provided colors/font */
-    private boolean backgroundSet, foregroundSet, disabledSet, fontSet;
+    private boolean backgroundSet, foregroundSet, disabledColorSet;
+    private boolean selectionBackgroundSet, selectionForegroundSet;
+    private boolean gridColorSet, errorColorSet, fontSet;
     
     /** The helper to handle the location of the filter in the table header */
     private PositionHelper positionHelper = new PositionHelper(this);
@@ -197,52 +199,16 @@ public class TableFilterHeader extends JPanel {
         this.table = table;
         if (table==null){
             removeController();
+            revalidate();
         }
         else{
-            if (!backgroundSet){
-            	setBackground(suggestBackground());
-            	backgroundSet=false;
-            }
-            if (!foregroundSet){
-            	Color foreground = FilterSettings.headerForeground;
-            	if (foreground==null){
-            		foreground =table.getTableHeader().getForeground(); 
-            	}
-            	setForeground(foreground);
-            	foregroundSet=false;
-            }
-            if (!disabledSet){
-            	Color color = table.getGridColor();
-            	if (color.equals(getBackground())){
-            		color=Color.lightGray;
-            	}
-            	setDisabledForeground(color);
-            	disabledSet=false;
-            }
-            if (!fontSet){
-            	Font header=table.getTableHeader().getFont();
-            	setFont(header.deriveFont(header.getSize()*.9f));
-            	fontSet=false;
-            }
+        	updateAppearance();
             recreateController();
             this.table.addComponentListener(resizer);
             getTextParser().setTableModel(table.getModel());
         }
     }
     
-    /** Suggests a background color, unless there is already one defined **/
-    private Color suggestBackground(){
-    	Color background = FilterSettings.headerBackground;
-    	if (background==null){
-    		Color header = table.getTableHeader().getBackground();
-    		Color cells = table.getBackground();
-    		background = new Color((header.getRed() + cells.getRed())/2,
-    				(header.getGreen() + cells.getGreen())/2,
-    				(header.getBlue() + cells.getBlue())/2);
-    	}
-    	return background;
-    }
-
     /** Returns the table currently attached */
     public JTable getTable() {
         return table;
@@ -336,6 +302,28 @@ public class TableFilterHeader extends JPanel {
         }
     }
 
+    /** Updates the background on all components */
+    @Override public Color getBackground(){
+		Color c;
+		if (backgroundSet){
+			c=super.getBackground();
+		} else {
+			c = FilterSettings.backgroundColor;
+			if (c==null){
+				if (table==null){
+					c=super.getBackground();
+				} else {
+			    	Color background = table.getBackground();
+		    		Color header = table.getTableHeader().getBackground();
+		    		c = new Color((header.getRed() + background.getRed())/2,
+		    				(header.getGreen() + background.getGreen())/2,
+		    				(header.getBlue() + background.getBlue())/2);
+				}
+			}
+		}
+		return c;
+    }
+    
     /** Sets the foreground color used by the editors. */
     @Override public void setForeground(Color fg) {
     	super.setForeground(fg);
@@ -349,7 +337,7 @@ public class TableFilterHeader extends JPanel {
     /** Sets the color used for disabled fields */
     public void setDisabledForeground(Color dfg) {
     	disabledForeground = dfg;
-    	disabledSet = true;
+    	disabledColorSet = true;
 
         if (columnsController != null){
             columnsController.setDisabledForeground(dfg);
@@ -364,6 +352,7 @@ public class TableFilterHeader extends JPanel {
     /** Sets the foreground color used to represent selected state */
     public void setSelectionForeground(Color fg) {
         this.selectionForeground = fg;
+        this.selectionForegroundSet = true;
 
         if (columnsController != null)
             columnsController.setSelectionForeground(fg);
@@ -382,7 +371,8 @@ public class TableFilterHeader extends JPanel {
     /** Sets the background color used to represent selected state */
     public void setSelectionBackground(Color bg) {
         this.selectionBackground = bg;
-
+        this.selectionBackgroundSet = true;
+        
         if (columnsController != null)
             columnsController.setSelectionBackground(bg);
     }
@@ -403,6 +393,7 @@ public class TableFilterHeader extends JPanel {
      */
     public void setErrorForeground(Color fg) {
         this.errorColor = fg;
+        this.errorColorSet = true;
 
         if (columnsController != null)
             columnsController.setErrorForeground(fg);
@@ -417,6 +408,22 @@ public class TableFilterHeader extends JPanel {
      */
     public Color getErrorForeground() {
         return errorColor;
+    }
+
+    /** Sets the color used to draw the header's grid */
+    public void setGridColor(Color c) {
+        this.gridColor = c;
+        this.gridColorSet = true;
+
+        if (columnsController != null)
+            columnsController.setGridColor(c);
+    }
+
+    /**
+     * <p>Returns the color set by default for the header's grid</p>
+     */
+    public Color getGridColor() {
+        return gridColor;
     }
 
 	/** 
@@ -439,21 +446,17 @@ public class TableFilterHeader extends JPanel {
     protected void customizeEditor(FilterEditor editor) {
         editor.setForeground(getForeground());
         editor.setBackground(getBackground());
+        editor.setErrorForeground(getErrorForeground());
         editor.setDisabledForeground(getDisabledForeground());
+    	editor.setSelectionBackground(getSelectionBackground());
+    	editor.setSelectionForeground(getSelectionForeground());
+    	editor.setGridColor(getGridColor());
         editor.setMaxVisibleRows(maxVisibleRows);
-        Color color =  getDisabledForeground();
-        if (color!=null){
-        	editor.setDisabledForeground(color);
-        }
-        color = getErrorForeground();
-        if (color!=null){
-        	editor.setErrorForeground(color);
-        }
         editor.setFont(getFont());
     }
 
     /** Returns the filter editor for the given column in the table model */
-    public FilterEditor getFilterEditor(int modelColumn) {
+    public IFilterEditor getFilterEditor(int modelColumn) {
         return (columnsController == null) ? null : 
         	columnsController.getFilterEditor(
         			table.convertColumnIndexToView(modelColumn));
@@ -555,6 +558,166 @@ public class TableFilterHeader extends JPanel {
     	observers.remove(observer);
     }
     
+    @Override public void updateUI() {
+    	super.updateUI();
+    	if (columnsController!=null){
+    		SwingUtilities.invokeLater(new Runnable() {				
+				@Override
+				public void run() {
+					updateAppearance();
+				}
+			});
+    	}
+    }
+    
+    /** Updates the whole appearance: colors and font*/
+    void updateAppearance(){
+    	updateBackground();
+    	updateForeground();
+    	updateSelectionBackground();
+    	updateSelectionForeground();
+    	updateDisabledForeground();
+    	updateErrorForeground();
+    	updateGridColor();
+    	updateFont();
+    }
+    
+    /** Updates the font on all components */
+    private void updateFont(){
+		boolean set = fontSet;
+		Font f;
+		if (set){
+			f=getFont();
+		} else {
+			f = FilterSettings.font;
+			if (f==null){
+        		f=table.getTableHeader().getFont();
+        		f = f.deriveFont(f.getSize()*.9f);
+			}
+		}
+		setFont(f);
+		fontSet=set;
+    }
+    
+    /** Updates the background on all components */
+    private void updateBackground(){
+		boolean set = backgroundSet;
+		Color c;
+		if (set){
+			c=getBackground();
+		} else {
+			c = FilterSettings.backgroundColor;
+			if (c==null){
+		    	Color background = table.getBackground();
+	    		Color header = table.getTableHeader().getBackground();
+	    		c = new Color((header.getRed() + background.getRed())/2,
+	    				(header.getGreen() + background.getGreen())/2,
+	    				(header.getBlue() + background.getBlue())/2);    				
+			}
+		}
+		setBackground(c);
+		backgroundSet=set;
+    }
+    
+    /** Updates the foreground on all components */
+    private void updateForeground(){
+		boolean set = foregroundSet;
+		Color c;
+		if (set){
+			c=getForeground();
+		} else {
+			c = FilterSettings.foregroundColor;
+			if (c==null){
+				c = table.getForeground();
+			}
+		}
+		setForeground(c);
+		foregroundSet=set;
+    }
+    
+    /** Updates the selection background on all components */
+    private void updateSelectionBackground(){
+		boolean set = selectionBackgroundSet;
+		Color c;
+		if (set){
+			c=getSelectionBackground();
+		} else {
+			c = FilterSettings.selectionBackgroundColor;
+			if (c==null){
+				c = table.getSelectionBackground();
+			}
+		}
+		setSelectionBackground(c);
+		selectionBackgroundSet=set;
+    }
+
+    /** Updates the selection foreground on all components */
+    private void updateSelectionForeground(){
+		boolean set = selectionForegroundSet;
+		Color c;
+		if (set){
+			c=getSelectionForeground();
+		} else {
+			c = FilterSettings.selectionForegroundColor;
+			if (c==null){
+				c = table.getSelectionForeground();
+			}
+		}
+		setSelectionForeground(c);
+		selectionForegroundSet=set;
+    }
+    
+    /** Updates the disabled foreground on all components */
+    private void updateDisabledForeground(){
+		boolean set = disabledColorSet;
+		Color c;
+		if (set){
+			c=getDisabledForeground();
+		} else {
+			c = FilterSettings.disabledColor;
+			if (c==null){
+				c = table.getGridColor();
+	        	if (c.equals(getBackground())){
+	        		c=Color.lightGray;
+	        	}
+			}
+		}
+		setDisabledForeground(c);
+		disabledColorSet=set;
+    }
+
+    /** Updates the grid color on all components */
+    private void updateGridColor(){
+		boolean set = gridColorSet;
+		Color c;
+		if (set){
+			c=getGridColor();
+		} else {
+			c = FilterSettings.gridColor;
+			if (c==null){
+				c = table.getGridColor();
+			}
+		}
+		setGridColor(c);
+		gridColorSet=set;
+    }
+
+    /** Updates the error foreground on all components */
+    private void updateErrorForeground(){
+		boolean set = errorColorSet;
+		Color c;
+		if (set){
+			c=getErrorForeground();
+		} else {
+			c = FilterSettings.errorColor;
+			if (c==null){
+        		c=Color.red;
+			}
+		}
+		setErrorForeground(c);
+		errorColorSet=set;
+    }
+    
     /**
      * Class setting up together all the column filters<br>
      * Note that, while the TableFilterHeader handles columns using their 
@@ -647,7 +810,7 @@ public class TableFilterHeader extends JPanel {
          * Returns the editor for the given column, 
          * or null if such column does not exist 
          **/
-        public FilterEditor getFilterEditor(int viewColumn) {
+        public IFilterEditor getFilterEditor(int viewColumn) {
             return (columns.size() > viewColumn) ? columns.get(viewColumn).editor : null;
         }
 
@@ -738,6 +901,13 @@ public class TableFilterHeader extends JPanel {
             if (columns != null)
                 for (FilterColumnPanel panel : this.columns)
                 	panel.editor.setErrorForeground(fg);
+        }
+
+        public void setGridColor(Color c) {
+
+            if (columns != null)
+                for (FilterColumnPanel panel : this.columns)
+                	panel.editor.setGridColor(c);
         }
 
         @Override public void setEnabled(boolean enabled) {

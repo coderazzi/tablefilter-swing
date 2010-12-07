@@ -276,11 +276,20 @@ abstract class PopupComponent implements PopupMenuListener{
 		return optionsList.getSelectionForeground();
 	}
 	
-	/** Sets the disabled color, used for many things, like border, separator */
+	/** Sets the disabled color, used on the CustomChoices' text */
 	public void setDisabledColor(Color color){
-		popup.setBorder(BorderFactory.createLineBorder(color, 1));
 		listRenderer.setDisabledColor(color);
+	}
+	
+	/** Sets the disabled color, used for many things, like border, separator */
+	public void setGridColor(Color color){
+		popup.setBorder(BorderFactory.createLineBorder(color, 1));
 		separator.setForeground(color);
+	}
+	
+	/** Return the grid color*/
+	public Color getGridColor(){
+		return separator.getForeground();
 	}
 	
 	/** Sets the list's font color */

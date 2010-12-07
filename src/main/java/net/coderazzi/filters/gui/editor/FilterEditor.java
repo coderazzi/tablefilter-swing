@@ -61,11 +61,11 @@ import javax.swing.ListCellRenderer;
 import javax.swing.RowFilter;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterTextParser;
+import net.coderazzi.filters.gui.IFilterEditor;
 
 /**
  * Custom component to handle the filter' editors<br>
@@ -78,7 +78,7 @@ import net.coderazzi.filters.IFilterTextParser;
  * Mixing therefore different editors under the same filter header
  * should keep the look and feel consistency.
  */
-public class FilterEditor extends JComponent{
+public class FilterEditor extends JComponent implements IFilterEditor{
 
 	private static final long serialVersionUID = 6908400421021655278L;
 	private PropertyChangeListener textParserListener;
@@ -130,60 +130,55 @@ public class FilterEditor extends JComponent{
 		
 		add(downButton, BorderLayout.EAST);
 		setupEditorComponent(null);
-		setFont(editor.getComponent().getFont());
-		setBackground(editor.getComponent().getBackground());
-		setForeground(editor.getForeground());
-		setDisabledForeground(Color.lightGray);
-		setSelectionBackground(popup.getSelectionBackground());
-		setSelectionForeground(popup.getSelectionForeground());
-
 		editor.setPosition(filterPosition);
 	}
 	
-	/** 
-	 * Sets the maximum number of visible rows in the popup menu<br>
-	 * A minimum is always enforced
-	 **/
-	public void setMaxVisibleRows(int maxVisibleRows) {
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setMaxVisibleRows(int)
+	 */
+	@Override public void setMaxVisibleRows(int maxVisibleRows) {
 		popup.setMaxVisibleRows(maxVisibleRows);
 	}
 
-	/** Returns the maximum number of visible rows in the popup menu*/
-	public int getMaxVisibleRows() {
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getMaxVisibleRows()
+	 */
+	@Override public int getMaxVisibleRows() {
 		return popup.getMaxVisibleRows();
 	}
 
-	/**
-	 * Limits the history size. <br>
-	 * This limit is only used when the popup contains also options. Otherwise, 
-	 * the maximum history size is to the maximum number of visible rows<br>
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setMaxHistory(int)
 	 */
-	public void setMaxHistory(int size) {
+	@Override public void setMaxHistory(int size) {
 		popup.setMaxHistory(size);
 	}
 
-	/** 
-	 * Returns the maximum history size, as defined by the user.<br>
-	 * This is not the real maximum history size, as it depends on the max 
-	 * number of visible rows and whether the popup contains only history
-	 * or also options 
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getMaxHistory()
 	 */
-	public int getMaxHistory() {
+	@Override public int getMaxHistory() {
 		return popup.getMaxHistory();
 	}
 	
-	/** Returns the {@link IFilter} associated to the editor's content */
-	public IFilter getFilter() {
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getFilter()
+	 */
+	@Override public IFilter getFilter() {
 		return filter;
 	}	
 	
-	/** Returns the current editor's content */
-	public Object getContent() {
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getContent()
+	 */
+	@Override public Object getContent() {
 		return editor.getContent();
 	}
 	
-	/** Sets the content, adapted to the editors' type */
-	public void setContent(Object content){
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setContent(java.lang.Object)
+	 */
+	@Override public void setContent(Object content){
 		if (content==null){
 			setEditorContent(CustomChoice.MATCH_ALL, false);
 		} else if (isEditable()){
@@ -218,7 +213,9 @@ public class FilterEditor extends JComponent{
 		filter.checkChanges();
 	}
 	
-	/** Enabled/Disables the editor, and the associate filter */
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setEnabled(boolean)
+	 */
 	@Override public void setEnabled(boolean enabled) {
 		super.setEnabled(enabled);
 		if (filter!=null){
@@ -229,6 +226,9 @@ public class FilterEditor extends JComponent{
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setBackground(java.awt.Color)
+	 */
 	@Override public void setBackground(Color bg) {
 		super.setBackground(bg);
 		if (editor!=null){
@@ -239,53 +239,79 @@ public class FilterEditor extends JComponent{
 		}
 	}
 	
-    /** Sets the color used to show filter's errors (invalid syntax) */
-    public void setErrorForeground(Color fg) {
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setGridColor(java.awt.Color)
+	 */
+	public void setGridColor(Color c) {
+    	popup.setGridColor(c);
+    	border.setColor(c);
+    }
+
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setErrorForeground(java.awt.Color)
+	 */
+    @Override public void setErrorForeground(Color fg) {
     	editor.setErrorForeground(fg);
     }
 
-    /** Returns the color used to show filter's errors */
-    public Color getErrorForeground() {
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getErrorForeground()
+	 */
+    @Override public Color getErrorForeground() {
     	return editor.getErrorForeground();
     }
 
-    /** Sets the color used to represent disabled state */
-    public void setDisabledForeground(Color fg){
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setDisabledForeground(java.awt.Color)
+	 */
+    @Override public void setDisabledForeground(Color fg){
     	editor.setDisabledForeground(fg);
     	downButton.setDisabledColor(fg);
     	popup.setDisabledColor(fg);
-    	border.setColor(fg);
     }
 
-    /** Returns the color used to represent disabled state */
-    public Color getDisabledForeground(){
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getDisabledForeground()
+	 */
+    @Override public Color getDisabledForeground(){
     	return editor.getDisabledForeground();
     }
     
-    /** Sets the foreground color used to represent selected state */
-    public void setSelectionForeground(Color fg){
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setSelectionForeground(java.awt.Color)
+	 */
+    @Override public void setSelectionForeground(Color fg){
     	editor.setSelectionForeground(fg);
     	downButton.setSelectionForeground(fg);
     	popup.setSelectionForeground(fg);
     }
 
-    /** Returns the foreground color used to represent selected state */
-    public Color getSelectionForeground(){
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getSelectionForeground()
+	 */
+    @Override public Color getSelectionForeground(){
     	return popup.getSelectionForeground();
     }
     
-    /** Sets the background color used to represent selected state */
-    public void setSelectionBackground(Color bg){
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setSelectionBackground(java.awt.Color)
+	 */
+    @Override public void setSelectionBackground(Color bg){
     	editor.setSelectionBackground(bg);
     	downButton.setSelectionBackground(bg);
     	popup.setSelectionBackground(bg);
     }
 
-    /** Returns the color used to represent disabled state */
-    public Color getSelectionBackground(){
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getSelectionBackground()
+	 */
+    @Override public Color getSelectionBackground(){
     	return popup.getSelectionBackground();
     }
     
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setForeground(java.awt.Color)
+	 */
 	@Override public void setForeground(Color fg) {
 		super.setForeground(fg);
 		if (editor!=null){
@@ -295,6 +321,9 @@ public class FilterEditor extends JComponent{
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setFont(java.awt.Font)
+	 */
 	@Override public void setFont(Font font) {
 		super.setFont(font);
 		if (editor!=null){
@@ -303,15 +332,10 @@ public class FilterEditor extends JComponent{
 		}
 	}
 	
-	/**
-	 * Resets the filter, which implies:<ul>
-	 * <li>Content set to empty</li>
-	 * <li>History is lost<li>
-	 * <li>Options are reset</li>
-	 * <li>It becomes editable -unless there is a cell renderer-</li></ul></li>
-	 * </ul>
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#resetFilter()
 	 */
-	public void resetFilter() {
+	@Override public void resetFilter() {
 		setEditorContent(null, false);
 		boolean autoOptions = optionsManager.isAutoOptions(this);
 		//reset now the options. Even if autoOptions is false
@@ -321,11 +345,10 @@ public class FilterEditor extends JComponent{
 		}
 	}
 	
-	/** 
-	 * Sets the {@link IFilterTextParser}; if the editor does not have a
-	 * {@link ListCellRenderer}, a parser is mandatory 
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setTextParser(net.coderazzi.filters.IFilterTextParser)
 	 */
-    public void setTextParser(IFilterTextParser parser){
+    @Override public void setTextParser(IFilterTextParser parser){
     	if (parser==null){
     		throw new IllegalArgumentException();
     	}
@@ -365,50 +388,55 @@ public class FilterEditor extends JComponent{
     	}
     }
 
-    /**Returns the associated {@link IFilterTextParser} */
-    public IFilterTextParser getTextParser(){
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getTextParser()
+	 */
+    @Override public IFilterTextParser getTextParser(){
     	return editor.getTextParser();
     }
     
-    /** Returns the filter position associated to this editor*/
-	public int getFilterPosition() {
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getFilterPosition()
+	 */
+	@Override public int getFilterPosition() {
 		return editor.getPosition();
 	}
 	
-	/** Sets the available options, shown on the popup menu */
-	public void setOptions(Collection<?> options) {
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setOptions(java.util.Collection)
+	 */
+	@Override public void setOptions(Collection<?> options) {
 		popup.clear();
 		addOptions(options);
 	}
 
-	/** 
-	 * Adds the options to the current set, removing any duplicates.<br>
-	 * If there is no {@link ListCellRenderer} defined, the content is 
-	 * stringfied and sorted.<br>
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#addOptions(java.util.Collection)
 	 */
-	public void addOptions(Collection<?> options) {
+	@Override public void addOptions(Collection<?> options) {
 		editor.reportCustomChoices(popup.addOptions(options));
 		downButton.setCanPopup(popup.hasContent());
 	}
 	
-	/** Returns the current options */
-	public Collection<?> getOptions(){
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getOptions()
+	 */
+	@Override public Collection<?> getOptions(){
 		return new ArrayList(popup.getOptions());
 	}
 
-	/** Clears any options currently defined, including the current history */
-	public void clearOptions() {
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#clearOptions()
+	 */
+	@Override public void clearOptions() {
 		popup.clear();
 		downButton.setCanPopup(popup.hasContent());
 	}
 
-	/**
-	 * Sets the {@link ListCellRenderer} for the options / history.<p>
-	 * It also affectes to how the content is rendered<br>
-	 * If not null, the content cannot be text-edited anymore
-	 * @param renderer
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setListCellRenderer(javax.swing.ListCellRenderer)
 	 */
-	public void setListCellRenderer(ListCellRenderer renderer){
+	@Override public void setListCellRenderer(ListCellRenderer renderer){
 		popup.setListCellRenderer(renderer);
 		setupEditorComponent(renderer);
 		editor.getComponent().setBackground(getBackground());
@@ -418,15 +446,10 @@ public class FilterEditor extends JComponent{
 		resetOptions();
 	}
 
-    /**
-     * <p>Sets as renderer for the editor a generic {@link TableCellRenderer}, 
-     * as used by the {@link JTable}</p>
-     *
-     * <p>This method allows reusing a renderer already written for a table 
-     * as the editor's renderer, but it has an important restriction: it only 
-     * works if the renderer does not depend on the cell coordinates</p>
-     */
-    public void setListCellRenderer(final TableCellRenderer renderer) {
+    /* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setListCellRenderer(javax.swing.table.TableCellRenderer)
+	 */
+    @Override public void setListCellRenderer(final TableCellRenderer renderer) {
     	setListCellRenderer(renderer==null? null :
     			new DefaultListCellRenderer() {
 
@@ -437,10 +460,12 @@ public class FilterEditor extends JComponent{
 			@Override public Component getListCellRendererComponent(JList list, 
 					Object value, int index, boolean isSelected, 
 					boolean cellHasFocus) {
-
 				Component ret =  renderer.getTableCellRendererComponent(table, 
 						value, isSelected, cellHasFocus, 1, position);
-				if (!isSelected){
+				if (isSelected){
+					ret.setBackground(list.getSelectionBackground());
+					ret.setForeground(list.getSelectionForeground());
+				}else {
 					ret.setBackground(list.getBackground());
 					ret.setForeground(list.getForeground());
 				}
@@ -449,17 +474,17 @@ public class FilterEditor extends JComponent{
         });
     }
 
-	/** Returns the associated {@link ListCellRenderer} */
-	public ListCellRenderer getListCellRenderer(){
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getListCellRenderer()
+	 */
+	@Override public ListCellRenderer getListCellRenderer(){
 		return popup.getListCellRenderer();
 	}
 
-	/**
-	 * Defines the editor, if text based -i.e., without associated 
-	 * {@link ListCellRenderer}, as editable: this flag means that the user 
-	 * can enter any text, not being limited to the existing options
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setEditable(boolean)
 	 */
-	public void setEditable(boolean enable) {
+	@Override public void setEditable(boolean enable) {
 		if (!popup.hasOptions()){
 			enable=true;
 		}
@@ -468,24 +493,24 @@ public class FilterEditor extends JComponent{
 		}
 	}
 
-	/** 
-	 * Returns the editable flag
-	 * @see #setEditable(boolean)
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#isEditable()
 	 */
-	public boolean isEditable() {
+	@Override public boolean isEditable() {
 		return editor.isEditable();
 	}
 	
-	/**
-	 * Using autoOptions, the options displayed on the popup menu are 
-	 * automatically extracted from the associated {@link TableModel}.
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setAutoOptions(boolean)
 	 */
-	public void setAutoOptions(boolean set){
+	@Override public void setAutoOptions(boolean set){
 		optionsManager.setOptions(this, set);
 	}
 
-	/** Returns true if the editor is using autoOptions */
-	public boolean isAutoOptions(){
+	/* (non-Javadoc)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#isAutoOptions()
+	 */
+	@Override public boolean isAutoOptions(){
 		return optionsManager.isAutoOptions(this);
 	}
 	
@@ -551,7 +576,6 @@ public class FilterEditor extends JComponent{
 			}
 		});
 
-		component.setBorder(null);
 		component.setFocusable(true);
 		component.setEnabled(isEnabled());
 		
@@ -1072,7 +1096,7 @@ public class FilterEditor extends JComponent{
 	public interface OptionsManager {
 
 		/** Returns true if the editor defines auto options */
-		public boolean isAutoOptions(FilterEditor editor);
+		public boolean isAutoOptions(IFilterEditor editor);
 		
 		/**
 		 * Enables/disables the auto options feature and sets the options

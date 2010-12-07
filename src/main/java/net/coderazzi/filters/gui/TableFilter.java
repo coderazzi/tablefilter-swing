@@ -129,7 +129,7 @@ public class TableFilter extends AndFilter implements FilterEditor.OptionsManage
     }
 
     /** Removes an existing editor */
-    public void removeFilterEditor(FilterEditor editor) {
+    public void removeFilterEditor(IFilterEditor editor) {
     	super.removeFilter(editor.getFilter());
     	optionsManager.removeFilterEditor(editor);
     }
@@ -153,7 +153,7 @@ public class TableFilter extends AndFilter implements FilterEditor.OptionsManage
     }
     
     @Override
-    public boolean isAutoOptions(FilterEditor editor) {
+    public boolean isAutoOptions(IFilterEditor editor) {
     	return optionsManager.isAutoOptions(editor);
     }
     

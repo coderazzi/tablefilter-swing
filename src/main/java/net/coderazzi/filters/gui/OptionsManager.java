@@ -67,7 +67,7 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 	
 	/** Returns true if the editor defines auto options */
 	@Override
-	public boolean isAutoOptions(FilterEditor editor){
+	public boolean isAutoOptions(IFilterEditor editor){
 		return autoEditors.containsValue(editor);
 	}
 	
@@ -120,12 +120,12 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 	}
 
 	/** Removes an existing editor */
-	public void removeFilterEditor(FilterEditor editor){
+	public void removeFilterEditor(IFilterEditor editor){
 		unsetAutoOptions(editor);
 		editors.remove(editor);
 	}
 	
-	private void unsetAutoOptions(FilterEditor editor){
+	private void unsetAutoOptions(IFilterEditor editor){
 		if (null!=autoEditors.remove(editor.getFilterPosition())){
 			resetOptionColumsn();
 		}
@@ -208,11 +208,11 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 				e.getType()!=TableModelEvent.DELETE){				
 			int c = e.getColumn(); 				
 			if (c == TableModelEvent.ALL_COLUMNS){
-				for (FilterEditor editor : autoEditors.values()){
+				for (IFilterEditor editor : autoEditors.values()){
 					extendFilterContentsFromModel(editor, r, e.getLastRow());
 				}
 			} else {
-				FilterEditor editor = autoEditors.get(c);
+				IFilterEditor editor = autoEditors.get(c);
 				if (editor!=null){					
 					extendFilterContentsFromModel(editor, r, e.getLastRow());
 				}
@@ -220,12 +220,12 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 		}
 	}
 	
-    private void extractFilterContentsFromModel(FilterEditor editor) {
+    private void extractFilterContentsFromModel(IFilterEditor editor) {
     	editor.clearOptions();
     	extendFilterContentsFromModel(editor, 0, table.getModel().getRowCount()-1);
     }
     
-    private void extendFilterContentsFromModel(FilterEditor editor, 
+    private void extendFilterContentsFromModel(IFilterEditor editor, 
     		                                   int firstRow, 
     		                                   int lastRow){
     	List<Object> all = new ArrayList<Object>();

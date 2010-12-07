@@ -26,6 +26,7 @@
 package net.coderazzi.filters.gui;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.text.Collator;
 import java.util.Comparator;
 
@@ -76,12 +77,6 @@ public class FilterSettings {
     /** The maximum size of the history when no options are present */
     public static int maxPopupHistory = getInteger("Popup.maxHistory", 2);
     
-    /** The color of the header background */
-    public static Color headerBackground = null;
-
-    /** The color of the header foreground */
-    public static Color headerForeground = null;
-
     /** The types used by default on the parser */
     public static Types types = new Types();
 
@@ -96,6 +91,32 @@ public class FilterSettings {
      * is chosen, it could be meaningful to update this string. 
      */
     public static String matchEmptyFilterString = "=";
+
+    /** Header's background color*/
+    public  static Color backgroundColor = getColor("backgroundColor", null);
+    
+    /** Header's foreground color*/
+    public  static Color foregroundColor = getColor("foregroundColor", null);
+    
+    /** Header's error color*/
+    public  static Color errorColor = getColor("errorColor", Color.red);
+    
+    /** Header's grid color*/
+    public  static Color gridColor = getColor("gridColor", null);
+    
+    /** Header's disabled color*/
+    public  static Color disabledColor = getColor("disabledColor", null);
+    
+    /** Header's selection background color*/
+    public  static Color selectionBackgroundColor  =    	
+    	getColor("selectionBackgroundColor", null);
+    
+    /** Header's selection foreground color*/
+    public  static Color selectionForegroundColor = 
+    	getColor("selectionForegroundColor", null);
+    
+    /** Header's font*/
+    public static Font font;
 
     /**
      * The class to handle the text parsing by default.<br>
@@ -142,7 +163,13 @@ public class FilterSettings {
     
     private static Comparator<String> collator, icCollator; 
 
+
     static {
+    	try{
+    		font=Font.decode(getString("font"));
+    	} catch(Exception ex){
+    		//font remains null
+    	}
         filterTextParserClass = FilterTextParser.class;
         String cl = getString("TextParser.class", null);
         if (cl != null) {
@@ -159,22 +186,43 @@ public class FilterSettings {
             }
         }
     }
-
+    
     private static String getString(String name,
                                     String defaultValue) {
-        try {
-            return System.getProperty(PROPERTIES_PREFIX + name, defaultValue);
-        } catch (Exception ex) {
-            return defaultValue;
-        }
+    	String ret = getString(name);
+    	return ret==null? defaultValue : ret;
     }
     
-    private static int getInteger(String name, int defaultValue) {
-		try {
-			return Integer.valueOf(System.getProperty(PROPERTIES_PREFIX + name));
+    private static String getString(String name) {
+    	try {
+    		return System.getProperty(PROPERTIES_PREFIX + name);
 		} catch (Exception ex) {
-			return defaultValue;
+			return null;
 		}
     }
-       
+
+    private static int getInteger(String name, int defaultValue) {
+    	String ret = getString(name);
+    	if (ret!=null){
+			try {
+				return Integer.valueOf(ret);
+			} catch (Exception ex) {
+				//return defaultValue
+			}
+    	}
+    	return defaultValue;
+    }
+      
+    private static Color getColor(String name, Color defaultValue) {
+    	String prop = getString(name);
+    	if (prop!=null){
+    		try{
+    			return Color.decode(prop);
+    		} catch(Exception ex){
+    			//return defaultValue
+    		}
+    	}
+    	return defaultValue;
+    }
+  
 }

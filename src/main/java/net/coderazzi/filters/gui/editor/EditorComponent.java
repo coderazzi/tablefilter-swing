@@ -47,6 +47,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.TextUI;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -182,7 +183,7 @@ interface EditorComponent {
 			
 			private Icon icon;
 			private String trackedText;
-	        private Color errorColor = Color.red;
+	        private Color errorColor;
 	        private Color foreground, background;
 	        private Color disabledColor;
 	        private Color selectionBackground, selectionForeground;
@@ -195,8 +196,13 @@ interface EditorComponent {
         		addCaretListener(this);
 			}
         	
-        	@Override
-        	public void setText(String t) {
+        	@Override public void setUI(TextUI ui) {
+        		super.setUI(ui);
+        		//whatever the LookAndFeel, display no border
+        		setBorder(null);
+        	}
+        	
+        	@Override public void setText(String t) {
         		String tmp = trackedText;
         		trackedText = null; //avoid any checks on the caret listener 
         		super.setText(t);
