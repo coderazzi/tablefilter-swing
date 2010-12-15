@@ -33,6 +33,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
+import javax.swing.table.TableRowSorter;
 
 import net.coderazzi.filters.AndFilter;
 import net.coderazzi.filters.IFilter;
@@ -238,19 +239,17 @@ public class TableFilter extends AndFilter implements FilterEditor.OptionsManage
 		public void replacedTable(JTable oldTable,
                                   JTable newTable) {
             if (oldTable != null) {
-                oldTable.removePropertyChangeListener("rowSorter", this);
+                oldTable.removePropertyChangeListener(this);
             }
             if (newTable == null) {
                 setSorter(null);
             } else {
                 newTable.addPropertyChangeListener("rowSorter", this);
-                // next sentence can cause a class cast exception.
-                // that is okay, there is no sense on using the filter
-                // if the row sorter does not admit filtering
-                setSorter((DefaultRowSorter) newTable.getRowSorter());
-                if (sorter == null) {
-                    newTable.setAutoCreateRowSorter(true);
-                }
+                newTable.addPropertyChangeListener("model", this);
+                setSorter(newTable);
+//                if (sorter == null) {
+//                    newTable.setAutoCreateRowSorter(true);
+//                }
             }
         }
 
@@ -259,22 +258,34 @@ public class TableFilter extends AndFilter implements FilterEditor.OptionsManage
             // next sentence can cause a class cast exception.
             // that is okay, there is no sense on using the filter
             // if the row sorter does not admit filtering
-            setSorter((DefaultRowSorter) evt.getNewValue());
+            setSorter((JTable) evt.getSource());
         }
 
-        private void setSorter(DefaultRowSorter<?, ?> sorter) {
+        private void setSorter(JTable table) {
             if (this.sorter != null) {
                 this.sorter.removeRowSorterListener(this);
                 this.sorter.setRowFilter(null);
+                this.sorter=null;
             }
-            this.sorter = sorter;
-            if (sorter != null) {
-                if (sendNotifications >= 0) {
-                    sorter.setRowFilter(TableFilter.this);
-                }
-                if (autoSelection) {
-                    sorter.addRowSorterListener(this);
-                }
+            DefaultRowSorter sorter;
+            try{
+            	sorter = table==null? null : (DefaultRowSorter) table.getRowSorter();
+            } catch (ClassCastException ccex){
+            	throw new RuntimeException("Invalid RowSorter on JTable: filter header requires a DefaultRowSorter class");
+            }
+            if (table!=null && (sorter==null || sorter.getModel()!=table.getModel())){
+            	table.setRowSorter(new TableRowSorter(table.getModel()));
+            }
+            else {
+            	this.sorter = sorter;
+            	if (sorter != null) {
+	                if (sendNotifications >= 0) {
+	                    sorter.setRowFilter(TableFilter.this);
+	                }
+	                if (autoSelection) {
+	                    sorter.addRowSorterListener(this);
+	                }
+            	}
             }
         }
 
