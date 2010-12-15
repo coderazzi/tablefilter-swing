@@ -57,8 +57,7 @@ public class FilterSettings {
     	Boolean.parseBoolean(getString("AutoSelection", "true"));
 
     /** Whether to automatically fill with content the editor field's options */
-    public static boolean autoOptions = 
-    	Boolean.parseBoolean(getString("AutoOptions", "false"));
+    public static AutoOptions autoOptions;
 
     /** Whether to ignore case or not, false by default (case sensitive) */
     public static boolean ignoreCase = 
@@ -169,6 +168,11 @@ public class FilterSettings {
     		font=Font.decode(getString("font"));
     	} catch(Exception ex){
     		//font remains null
+    	}
+    	try{
+        	autoOptions = AutoOptions.valueOf(getString("AutoOptions", "BASIC"));
+    	} catch(Exception ex){
+    		autoOptions = AutoOptions.BASIC;
     	}
         filterTextParserClass = FilterTextParser.class;
         String cl = getString("TextParser.class", null);

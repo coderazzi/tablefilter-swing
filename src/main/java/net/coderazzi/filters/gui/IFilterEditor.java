@@ -156,9 +156,9 @@ public interface IFilterEditor {
 	 * Using autoOptions, the options displayed on the popup menu are 
 	 * automatically extracted from the associated {@link TableModel}.
 	 */
-	public abstract void setAutoOptions(boolean set);
+	public abstract void setAutoOptions(AutoOptions mode);
 
-	/** Returns true if the editor is using autoOptions */
-	public abstract boolean isAutoOptions();
+	/** Returns the autoOptions mode*/
+	public abstract AutoOptions getAutoOptions();
 
 }

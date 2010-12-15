@@ -456,7 +456,7 @@ public class TableFilterHeader extends JPanel {
     }
 
     /** Returns the filter editor for the given column in the table model */
-    public IFilterEditor getFilterEditor(int modelColumn) {
+    public FilterEditor getFilterEditor(int modelColumn) {
         return (columnsController == null) ? null : 
         	columnsController.getFilterEditor(
         			table.convertColumnIndexToView(modelColumn));
@@ -510,13 +510,13 @@ public class TableFilterHeader extends JPanel {
 	 * populated with options extracted from the table's content 
 	 * -and updated as the table is updated-.
 	 */
-	public void setAutoOptions(boolean set){
+	public void setAutoOptions(AutoOptions set){
 		filtersHandler.setAutoOptions(set);
 	}
 	
 	/** Returns the auto options flag */
-	public boolean isAutoOptions(){
-		return filtersHandler.isAutoOptions();
+	public AutoOptions getAutoOptions(){
+		return filtersHandler.getAutoOptions();
 	}
 	
     /** Enables/Disables the filters */
@@ -810,7 +810,7 @@ public class TableFilterHeader extends JPanel {
          * Returns the editor for the given column, 
          * or null if such column does not exist 
          **/
-        public IFilterEditor getFilterEditor(int viewColumn) {
+        public FilterEditor getFilterEditor(int viewColumn) {
             return (columns.size() > viewColumn) ? columns.get(viewColumn).editor : null;
         }
 

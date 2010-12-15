@@ -25,6 +25,8 @@
 
 package net.coderazzi.filters.gui;
 
+import net.coderazzi.filters.gui.editor.FilterEditor;
+
 
 /**
  * <p>A ITableFilterHeaderObserver instance receives notifications when the 
@@ -42,7 +44,7 @@ public interface IFilterHeaderObserver {
 	 * @param editor
 	 */
 	public void tableFilterEditorCreated(TableFilterHeader header, 
-			                             IFilterEditor editor);
+			                             FilterEditor editor);
 
 	/**
 	 * <p>Informs the observer than an existing filter editor has been
@@ -51,7 +53,7 @@ public interface IFilterHeaderObserver {
 	 * @param editor
 	 */
 	public void tableFilterEditorExcluded(TableFilterHeader header, 
-			                              IFilterEditor editor);
+			                              FilterEditor editor);
 
     /**
      * <p>Notification made by the 
@@ -61,5 +63,5 @@ public interface IFilterHeaderObserver {
      * @param editor the observable instance
      */
     public void tableFilterUpdated(TableFilterHeader header, 
-    		                       IFilterEditor editor);
+    		                       FilterEditor editor);
 }

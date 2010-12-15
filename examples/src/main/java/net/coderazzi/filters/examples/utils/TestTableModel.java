@@ -62,7 +62,7 @@ public class TestTableModel extends AbstractTableModel {
 
 
     public static TestTableModel createTestTableModel() {
-        return createTestTableModel(1000);
+        return createTestTableModel(10);
     }
 
     public static TestTableModel createTestTableModel(int elements) {

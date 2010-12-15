@@ -65,6 +65,7 @@ import javax.swing.table.TableCellRenderer;
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterTextParser;
+import net.coderazzi.filters.gui.AutoOptions;
 import net.coderazzi.filters.gui.IFilterEditor;
 
 /**
@@ -337,10 +338,10 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	 */
 	@Override public void resetFilter() {
 		setEditorContent(null, false);
-		boolean autoOptions = optionsManager.isAutoOptions(this);
+		AutoOptions autoOptions = optionsManager.getAutoOptions(this);
 		//reset now the options. Even if autoOptions is false
 		optionsManager.setOptions(this, autoOptions);
-		if (!autoOptions && getListCellRenderer()==null){
+		if (autoOptions==AutoOptions.DISABLED && getListCellRenderer()==null){
 			setEditable(true);
 		}
 	}
@@ -366,7 +367,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     }
     
     void resetOptions(){
-    	optionsManager.setOptions(this, optionsManager.isAutoOptions(this));    	
+    	optionsManager.setOptions(this, optionsManager.getAutoOptions(this));    	
     }
     
     private Format getFormat(IFilterTextParser parser){
@@ -501,17 +502,17 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	}
 	
 	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setAutoOptions(boolean)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setAutoOptions(AutoOptions)
 	 */
-	@Override public void setAutoOptions(boolean set){
-		optionsManager.setOptions(this, set);
+	@Override public void setAutoOptions(AutoOptions autoOptions){
+		optionsManager.setOptions(this, autoOptions);
 	}
 
 	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#isAutoOptions()
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getAutoOptions()
 	 */
-	@Override public boolean isAutoOptions(){
-		return optionsManager.isAutoOptions(this);
+	@Override public AutoOptions getAutoOptions(){
+		return optionsManager.getAutoOptions(this);
 	}
 	
 	private void setupEditorComponent(ListCellRenderer renderer){
@@ -1095,14 +1096,14 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	 */
 	public interface OptionsManager {
 
-		/** Returns true if the editor defines auto options */
-		public boolean isAutoOptions(IFilterEditor editor);
+		/** Returns the auto options mode for the given editor*/
+		public AutoOptions getAutoOptions(FilterEditor editor);
 		
 		/**
 		 * Enables/disables the auto options feature and sets the options
 		 * for the given editor
 		 */
-		public void setOptions(FilterEditor editor, boolean autoOptions);	
+		public void setOptions(FilterEditor editor, AutoOptions autoOptions);	
 		
 		/**
 		 * Returns the attached table

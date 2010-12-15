@@ -62,6 +62,7 @@ import net.coderazzi.filters.examples.utils.EventsWindow;
 import net.coderazzi.filters.examples.utils.FlagRenderer;
 import net.coderazzi.filters.examples.utils.TestData;
 import net.coderazzi.filters.examples.utils.TestTableModel;
+import net.coderazzi.filters.gui.AutoOptions;
 import net.coderazzi.filters.gui.FilterSettings;
 import net.coderazzi.filters.gui.TableFilterHeader;
 import net.coderazzi.filters.gui.TableFilterHeader.Position;
@@ -207,15 +208,6 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	
-    	JCheckBoxMenuItem autoOptions=new JCheckBoxMenuItem(
-    			new AbstractAction("auto options") {			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
-				filterHeader.setAutoOptions(source.isSelected());				
-			}
-		});
-    	
     	JCheckBoxMenuItem enabled=new JCheckBoxMenuItem(
     			new AbstractAction("enabled") {			
 			@Override
@@ -243,7 +235,6 @@ public class TableFilterExample extends JFrame {
     	onUse.setSelected(true);
     	ignoreCase.setMnemonic(KeyEvent.VK_C);
     	ignoreCase.setSelected(filterHeader.getTextParser().isIgnoreCase());
-    	autoOptions.setSelected(filterHeader.isAutoOptions());
     	enabled.setSelected(filterHeader.isEnabled());
     	visible.setSelected(filterHeader.isVisible());
 
@@ -252,7 +243,7 @@ public class TableFilterExample extends JFrame {
     	ret.add(onUse);
     	ret.addSeparator();
     	ret.add(ignoreCase);
-    	ret.add(autoOptions);
+    	ret.add(createAutoOptionsMenu());
     	ret.add(enabled);
     	ret.addSeparator();
     	ret.add(visible);
@@ -266,6 +257,62 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
+    private JMenu createAutoOptionsMenu(){
+    	JRadioButtonMenuItem disabled = new JRadioButtonMenuItem(
+    			new AbstractAction("disabled") {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				filterHeader.setAutoOptions(AutoOptions.DISABLED);
+			}
+		});
+    	JRadioButtonMenuItem basic = new JRadioButtonMenuItem(
+    			new AbstractAction("basic") {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				filterHeader.setAutoOptions(AutoOptions.BASIC);
+			}
+		});
+    	JRadioButtonMenuItem extended = new JRadioButtonMenuItem(
+    			new AbstractAction("extended") {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				filterHeader.setAutoOptions(AutoOptions.EXTENDED);
+			}
+		});
+    	JRadioButtonMenuItem exact = new JRadioButtonMenuItem(
+    			new AbstractAction("exact") {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				filterHeader.setAutoOptions(AutoOptions.EXACT);
+			}
+		});
+    	ButtonGroup group = new ButtonGroup();
+    	group.add(disabled);
+    	group.add(basic);
+    	group.add(extended);
+    	group.add(exact);
+    	switch(filterHeader.getAutoOptions()){
+    		case DISABLED: 
+    			disabled.setSelected(true);
+    			break;
+    		case BASIC: 
+    			basic.setSelected(true);
+    			break;
+    		case EXTENDED: 
+    			extended.setSelected(true);
+    			break;
+    		case EXACT: 
+    			exact.setSelected(true);
+    			break;
+    	}
+    	JMenu ret = new JMenu("auto options");
+    	ret.add(disabled);
+    	ret.add(basic);
+    	ret.add(extended);
+    	ret.add(exact);
+    	return ret;
+    }
+        	
     private JMenu createlLookAndFeelMenu(){
     	JMenu ret = new JMenu("Look And Feel");
     	ButtonGroup group = new ButtonGroup();
@@ -591,7 +638,7 @@ public class TableFilterExample extends JFrame {
 	            		table.convertColumnIndexToView(countryColumn)).
 	            		setCellRenderer(new FlagRenderer());
 	
-	        	filterHeader.getFilterEditor(countryColumn).setAutoOptions(true);
+	        	filterHeader.getFilterEditor(countryColumn).setAutoOptions(AutoOptions.EXACT);
 	        	setCountryEditorRenderer();
 	        }
 	
@@ -663,7 +710,7 @@ public class TableFilterExample extends JFrame {
 //		} catch (Exception ex) {
 //			ex.printStackTrace();
 //		}
-    	FilterSettings.autoOptions=true;
+    	FilterSettings.autoOptions=AutoOptions.EXTENDED;
         TableFilterExample frame = new TableFilterExample();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();

@@ -129,7 +129,7 @@ public class TableFilter extends AndFilter implements FilterEditor.OptionsManage
     }
 
     /** Removes an existing editor */
-    public void removeFilterEditor(IFilterEditor editor) {
+    public void removeFilterEditor(FilterEditor editor) {
     	super.removeFilter(editor.getFilter());
     	optionsManager.removeFilterEditor(editor);
     }
@@ -152,29 +152,26 @@ public class TableFilter extends AndFilter implements FilterEditor.OptionsManage
         return sendNotifications >= 0;
     }
     
-    @Override
-    public boolean isAutoOptions(IFilterEditor editor) {
-    	return optionsManager.isAutoOptions(editor);
+    @Override public AutoOptions getAutoOptions(FilterEditor editor) {
+    	return optionsManager.getAutoOptions(editor);
     }
     
-    @Override
-    public void setOptions(FilterEditor editor, boolean autoOptions) {
+    @Override public void setOptions(FilterEditor editor, AutoOptions autoOptions) {
     	optionsManager.setOptions(editor, autoOptions);
     }
     
 	/** Sets/unsets the auto options flag */
-    public void setAutoOptions(boolean set){
-    	if (set!=isAutoOptions()){
+    public void setAutoOptions(AutoOptions mode){
+    	if (mode!=getAutoOptions()){
 	        enableNotifications(false);
-	    	optionsManager.setAutoOptions(set);
+	    	optionsManager.setAutoOptions(mode);
 	        enableNotifications(true);
     	}
     }
     
-
-	/** Returns the auto options flag */
-	public boolean isAutoOptions(){
-		return optionsManager.isAutoOptions();
+	/** Returns the auto options mode */
+	public AutoOptions getAutoOptions(){
+		return optionsManager.getAutoOptions();
 	}
 	
     /**

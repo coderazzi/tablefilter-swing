@@ -15,9 +15,9 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.IFilterHeaderObserver;
 import net.coderazzi.filters.gui.TableFilterHeader;
+import net.coderazzi.filters.gui.editor.FilterEditor;
 
 @SuppressWarnings("serial")
 public class EventsWindow extends JDialog implements IFilterHeaderObserver{
@@ -114,7 +114,7 @@ public class EventsWindow extends JDialog implements IFilterHeaderObserver{
 	
 	@Override
 	public void tableFilterEditorCreated(TableFilterHeader header, 
-			IFilterEditor editor) {
+			FilterEditor editor) {
 		Event event = new Event();
 		event.name=CREATED;
 		event.column=editor.getFilterPosition();
@@ -123,7 +123,7 @@ public class EventsWindow extends JDialog implements IFilterHeaderObserver{
 	
 	@Override
 	public void tableFilterEditorExcluded(TableFilterHeader header, 
-			IFilterEditor editor) {
+			FilterEditor editor) {
 		Event event = new Event();
 		event.name=EXCLUDED;
 		event.column=editor.getFilterPosition();
@@ -132,7 +132,7 @@ public class EventsWindow extends JDialog implements IFilterHeaderObserver{
 	
 	@Override
 	public void tableFilterUpdated(TableFilterHeader header, 
-			IFilterEditor editor) {
+			FilterEditor editor) {
 		Event event = new Event();
 		event.name="Updated";
 		event.column=editor.getFilterPosition();

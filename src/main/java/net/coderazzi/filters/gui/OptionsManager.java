@@ -26,11 +26,11 @@
 package net.coderazzi.filters.gui;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
@@ -42,8 +42,6 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
 
 /**
  * <p>Helper class to handle options in the filters</p>
- *
- * @author  Luis M Pena - lu@coderazzi.net
  */
 class OptionsManager implements TableModelListener, FilterEditor.OptionsManager 
 {	
@@ -51,12 +49,10 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
      * If true, filter editors will automatically extract 
      * their content from the table's content 
      **/
-	private boolean autoOptions=FilterSettings.autoOptions;
+	private AutoOptions autoOptions=FilterSettings.autoOptions;
 
-	private int autoOptionColumns[]=new int[0];
-	private Map<Integer, FilterEditor> autoEditors = 
-		new TreeMap<Integer, FilterEditor>();
-	private Set<FilterEditor> editors = new HashSet<FilterEditor>();
+	private Map<FilterEditor, AutoOptions> autoEditors =  new HashMap<FilterEditor, AutoOptions>();
+	private Map<Integer, FilterEditor> editors = new HashMap<Integer, FilterEditor>();
 	private JTable table;
 	private TableModel listenedModel;
 	
@@ -66,9 +62,9 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 	}
 	
 	/** Returns true if the editor defines auto options */
-	@Override
-	public boolean isAutoOptions(IFilterEditor editor){
-		return autoEditors.containsValue(editor);
+	@Override public AutoOptions getAutoOptions(FilterEditor editor){
+		AutoOptions ret = autoEditors.get(editor);
+		return ret==null? AutoOptions.DISABLED : ret;
 	}
 	
 	/**
@@ -76,21 +72,19 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 	 * for the given editor
 	 */
 	@Override
-	public void setOptions(FilterEditor editor, boolean autoOptions){
+	public void setOptions(FilterEditor editor, AutoOptions autoOptions){
 		//this check is needed to avoid setting the options for the
 		//same column multiple times when is created. The creation of
 		//a filter editor is initially done, then the parser is set,
 		//and both operations would trigger this operation
-		if (editors.contains(editor)){
-			fillOptions(editor, autoOptions);
-			if (!autoOptions){
-				unsetAutoOptions(editor);
-			}
+		if (editor==editors.get(editor.getFilterPosition())){
+			autoOptions=fillOptions(editor, autoOptions);
+			updateAutoEditors(editor, autoOptions);
 		}
 	}
 	
-	/** Returns true if there are auto options defined at global level*/
-	public boolean isAutoOptions(){
+	/** Returns the autoOptions mode*/
+	public AutoOptions getAutoOptions(){
 		return autoOptions;
 	}
 	
@@ -98,9 +92,12 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 	 * Enables/disables the auto options feature at global level. It resets
 	 * all filters.
 	 */
-	public void setAutoOptions(boolean autoOptions){
+	public void setAutoOptions(AutoOptions autoOptions){
 		this.autoOptions=autoOptions;
-		for (FilterEditor editor : editors){
+		for (FilterEditor editor : editors.values()){			
+			//it is probably not really needed to set it to null
+			//a better solution would be verifying if the current content
+			//matches any of the options
 			editor.setContent(null);
 			setOptions(editor, autoOptions);
 		}
@@ -112,25 +109,18 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 	 * boolean or enum, or autoOptions is defined
 	 */
 	public void addFilterEditor(FilterEditor editor){
-		editors.add(editor);
-		if (fillOptions(editor, isAutoOptions() && 
-				editor.getOptions().size()<=8)){
-    		editor.setMaxHistory(0);			
-		}
+		editors.put(editor.getFilterPosition(), editor);
+		setOptions(editor, autoOptions);
 	}
 
 	/** Removes an existing editor */
-	public void removeFilterEditor(IFilterEditor editor){
-		unsetAutoOptions(editor);
-		editors.remove(editor);
-	}
-	
-	private void unsetAutoOptions(IFilterEditor editor){
-		if (null!=autoEditors.remove(editor.getFilterPosition())){
-			resetOptionColumsn();
+	public void removeFilterEditor(FilterEditor editor){
+		if (editor==editors.get(editor.getFilterPosition())){
+			updateAutoEditors(editor, AutoOptions.DISABLED);
+			editors.remove(editor.getFilterPosition());
 		}
 	}
-
+	
 	/** 
 	 * Sets the table for the model.<br>
 	 * It must be called before adding any editor.<br>
@@ -140,92 +130,119 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
 	public void setTable(JTable table) {
 		editors.clear();
 		autoEditors.clear();
-		resetOptionColumsn();
+		if (listenedModel!=null){
+			listenedModel.removeTableModelListener(this);
+			listenedModel = null;
+		}
 		this.table=table;
 	}
 	
-	private void resetOptionColumsn(){
-		boolean attached = autoOptionColumns.length>0;
-		autoOptionColumns = new int[autoEditors.size()];
-		int n = 0;
-		for (int i : autoEditors.keySet()){
-			autoOptionColumns[n++]=i;
-		}
-		if (table!=null){
-			//Note: if the table changes its model, all editors are
-			//removed and then recreated. This means that we need to
-			// 'remember' the original table model to be able to free it
-			if (attached && n==0){
+	private void updateAutoEditors(FilterEditor editor, AutoOptions newMode){
+		if (newMode==AutoOptions.DISABLED){
+			autoEditors.remove(editor);
+			if (listenedModel!=null && !requiresListener()){
 				listenedModel.removeTableModelListener(this);
-			} else if (!attached && n>0){
+				listenedModel = null;				
+			}
+		} else {
+			autoEditors.put(editor, newMode);
+			if (listenedModel==null && table!=null && requiresListener(newMode)){
 				listenedModel = table.getModel();
-				listenedModel.addTableModelListener(this);
+				listenedModel.addTableModelListener(this);				
 			}
 		}
 	}
 	
+	private boolean requiresListener(){
+		for (AutoOptions mode : autoEditors.values()){
+			if (requiresListener(mode)){
+				return true;
+			}			
+		}
+		return false;
+	}
+	
+	private boolean requiresListener(AutoOptions mode){
+		return mode==AutoOptions.EXACT || mode==AutoOptions.EXTENDED;
+	}
+	
 	/**
-	 * Fills the options in the given editor, if the associated class is
-	 * a boolean or enum, returning then true<br>
-	 * If that is not the case, and autoOptions is set to true, it adds
-	 * options as extracted from the table model, in a dynamic mode.
-	 * @param editor
-	 * @param autoOptions
-	 * @return
+	 * Fills the options in the given editor, using the provided AutoOptions
+	 * mode<br>
+	 * It is returned the real options mode set (it only changes for
+	 * enumerations and booleans, where setting EXTENDED is equivalent to BASIC)
 	 */
-	private boolean fillOptions(FilterEditor editor, boolean autoOptions){
-        Class<?> c = table.getModel().getColumnClass(editor.getFilterPosition());
+	private AutoOptions fillOptions(FilterEditor editor, AutoOptions autoOptions){
         List<Object> options;
-        if (c.equals(Boolean.class)){
-        	options = new ArrayList<Object>(3);
-        	options.add(true);
-        	options.add(false);
-        } else if (c.isEnum()){
-        	Object[] enums = c.getEnumConstants();
-        	options = new ArrayList<Object>(enums.length+1);
-        	for (Object each : enums){
-        		options.add(each);
-        	}
+        if (autoOptions==AutoOptions.DISABLED){
+        	options=Collections.emptyList();
+        } else if (autoOptions==AutoOptions.EXACT){
+        	options = getModelContents(editor);
         } else {
-    		if (autoOptions){
-    			autoEditors.put(editor.getFilterPosition(), editor);
-    			resetOptionColumsn();
-    			extractFilterContentsFromModel(editor);
-    		} else {
-    			editor.clearOptions();
-    		}
-        	return false;
+            Class<?> c = table.getModel().getColumnClass(editor.getFilterPosition());
+            if (c.equals(Boolean.class)){
+            	autoOptions=AutoOptions.BASIC;
+            	options = new ArrayList<Object>(3);
+            	options.add(true);
+            	options.add(false);
+            } else if (c.isEnum()){
+            	autoOptions=AutoOptions.BASIC;
+            	Object[] enums = c.getEnumConstants();
+            	options = new ArrayList<Object>(enums.length+1);
+            	for (Object each : enums){
+            		options.add(each);
+            	}
+            } else if (autoOptions==AutoOptions.BASIC){
+            	options=Collections.emptyList();
+            	autoOptions = AutoOptions.DISABLED;
+            } else {
+            	options = getModelContents(editor);
+            }        	
         }
-    	editor.setOptions(options);
-    	editor.setEditable(false);
-    	return true;
+        editor.setOptions(options);
+        if (autoOptions==AutoOptions.BASIC){
+        	editor.setEditable(false);
+        	if (options.size()<=8){
+        		editor.setMaxHistory(0);
+        	}
+        }
+    	return autoOptions;
 	}
 	
 	/** TableModelListener interface */
 	@Override public void tableChanged(TableModelEvent e) {
-		int r = e.getFirstRow();			
-		if (r != TableModelEvent.HEADER_ROW && 
-				e.getType()!=TableModelEvent.DELETE){				
-			int c = e.getColumn(); 				
+		int firstRow = e.getFirstRow();		
+		if (firstRow != TableModelEvent.HEADER_ROW){
+			int lastRow = e.getLastRow();
+			int c = e.getColumn();
 			if (c == TableModelEvent.ALL_COLUMNS){
-				for (IFilterEditor editor : autoEditors.values()){
-					extendFilterContentsFromModel(editor, r, e.getLastRow());
+				for (Entry<FilterEditor, AutoOptions> entry : autoEditors.entrySet()){
+					updateColumn(entry.getKey(), entry.getValue(), firstRow, lastRow, e.getType());
 				}
 			} else {
-				IFilterEditor editor = autoEditors.get(c);
-				if (editor!=null){					
-					extendFilterContentsFromModel(editor, r, e.getLastRow());
+				FilterEditor editor = editors.get(c);
+				if (editor!=null){
+					updateColumn(editor, autoEditors.get(editor), firstRow, lastRow, e.getType());
 				}
 			}
 		}
 	}
 	
-    private void extractFilterContentsFromModel(IFilterEditor editor) {
-    	editor.clearOptions();
-    	extendFilterContentsFromModel(editor, 0, table.getModel().getRowCount()-1);
+	private void updateColumn(FilterEditor editor, AutoOptions mode, int firstRow, int lastRow, int eventType){
+		if (mode!=AutoOptions.BASIC){
+			if (eventType==TableModelEvent.INSERT || (eventType==TableModelEvent.UPDATE && mode==AutoOptions.EXTENDED)){
+				editor.addOptions(getModelContents(editor, firstRow, lastRow));
+			} else if (mode==AutoOptions.EXACT){
+				editor.setOptions(getModelContents(editor));
+			}
+		}
+	}
+	
+    private List<Object> getModelContents(FilterEditor editor){
+    	return getModelContents(editor, 0, table.getModel().getRowCount()-1);
     }
     
-    private void extendFilterContentsFromModel(IFilterEditor editor, 
+    private List<Object> getModelContents(FilterEditor editor, 
     		                                   int firstRow, 
     		                                   int lastRow){
     	List<Object> all = new ArrayList<Object>();
@@ -237,7 +254,7 @@ class OptionsManager implements TableModelListener, FilterEditor.OptionsManager
         while (lastRow >= firstRow) {
             all.add(regModel.getValueAt(firstRow++, column));
         }
-        editor.addOptions(all);
+        return all;
     }
 }
 
