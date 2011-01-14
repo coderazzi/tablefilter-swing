@@ -24,8 +24,8 @@
  */
 package net.coderazzi.filters.examples.utils;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -89,7 +88,7 @@ public class TestData {
             "Bryant", "Alexander", "Russell", "Griffin", "Diaz", "Hayes"
         };
 
-    static List<Icon> served = new ArrayList<Icon>(), allIcons;
+    static List<Flag> served = new ArrayList<Flag>(), allIcons;
 
     static {
         getAllIcons();
@@ -105,15 +104,11 @@ public class TestData {
     
     /** Custom type */
     public static class Tutor implements Comparable<Tutor>{
-    	String surname;
-    	String firstName;
     	String name;
     	Tutor(){
-    		surname = name= "";
+    		name= "";
     	}
     	Tutor(String firstName, String surname){
-    		this.firstName=firstName;
-    		this.surname=surname;
     		this.name=firstName + " " + surname;
     	}
     	@Override
@@ -134,22 +129,54 @@ public class TestData {
     	}
     }
     
-    /** Specific Tutor comparator using the surname */
-    public static class TutorComparator implements Comparator<Tutor>{
+    public static class Flag extends ImageIcon {
+		private static final long serialVersionUID = 1242769439980562528L;
+		private Double redAmount;
+
+		Flag(byte[] array){
+    		super(array);
+    	}
+		
+		public double getRedAmount(){
+			if (redAmount==null){
+				//Graphics g = getImage().getR();
+				int w = getIconWidth();
+				int h = getIconHeight();
+				if (w>0 && h>0){
+					BufferedImage buffImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+				    buffImage.getGraphics().drawImage(this.getImage(), 0, 0, null);
+				    int up=0;
+					for (int i=0; i<w ;i++){
+						for (int j=0; j<h; j++){
+							int c=buffImage.getRGB(i, j);
+							int  red   = (c & 0x00ff0000) >> 16;
+					    	int  green = (c & 0x0000ff00) >> 8;
+					    	int  blue  =  c & 0x000000ff;
+					    	if (red>green && red>blue){
+					    		up++;
+					    	}
+						}
+					}
+					redAmount = ((double)up) / (h*w);
+				}
+			}
+			return redAmount;
+		}
+    }
+    
+    public static class RedComparator implements Comparator<Flag>{
     	@Override
-    	public int compare(Tutor o1, Tutor o2) {
-    		if (o1==null){
-    			return o2==null? 0 : 1;
-    		}
-    		return o2==null? -1 : o1.firstName.compareTo(o2.firstName);
+    	public int compare(Flag o1, Flag o2) {
+    		double d = o1.getRedAmount()-o2.getRedAmount(); 
+    		return d==0? 0 : d<0? -1: 1;
     	}
     }
-
+    
     public String name, firstName;
     public Integer age;
     public Boolean male;
     public Tutor tutor;
-    public Icon flag;
+    public Flag flag;
     public Club club;
     public Date date;
 
@@ -185,7 +212,7 @@ public class TestData {
     }
 
     static void getAllIcons() {
-        allIcons = new ArrayList<Icon>();
+        allIcons = new ArrayList<Flag>();
         try {
             Pattern p = Pattern.compile("gif/(.+)\\.gif");
             ZipInputStream zip = new ZipInputStream(
@@ -206,7 +233,7 @@ public class TestData {
                         baos.write(buffer, 0, read);
                     }
 
-                    ImageIcon ic = new ImageIcon(baos.toByteArray());
+                    Flag ic = new Flag(baos.toByteArray());
                     ic.setDescription(m.group(1));
                     allIcons.add(ic);
                 }
@@ -248,16 +275,16 @@ public class TestData {
         return clubs[random.nextInt(clubs.length)];
     }
 
-    private Icon getFlag() {
+    private Flag getFlag() {
 
-        for (Icon ic : served) {
+        for (Flag ic : served) {
 
             if (random.nextBoolean())
                 return ic;
         }
 
         if (!allIcons.isEmpty()) {
-            Icon ret = allIcons.remove(random.nextInt(allIcons.size()));
+        	Flag ret = allIcons.remove(random.nextInt(allIcons.size()));
             served.add(ret);
 
             return ret;

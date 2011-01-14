@@ -45,12 +45,15 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.Format;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -67,6 +70,7 @@ import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.gui.AutoOptions;
 import net.coderazzi.filters.gui.IFilterEditor;
+import net.coderazzi.filters.gui.TableFilter;
 
 /**
  * Custom component to handle the filter' editors<br>
@@ -84,15 +88,18 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	private static final long serialVersionUID = 6908400421021655278L;
 	private PropertyChangeListener textParserListener;
 	private EditorBorder border = new EditorBorder();
-	OptionsManager optionsManager;
+	private Set<CustomChoice> customChoices;
+	private AutoOptions autoOptions;
+	
+	TableFilter tableFilter;
 	FilterArrowButton downButton = new FilterArrowButton();
     EditorFilter filter = new EditorFilter();
 	EditorComponent editor;
 	PopupComponent popup;
 
-	public FilterEditor(OptionsManager optionsManager, int filterPosition,
+	public FilterEditor(TableFilter tableFilter, int filterPosition,
 			Class<?> associatedClass) {
-		this.optionsManager = optionsManager;
+		this.tableFilter = tableFilter;
 		
 		setLayout(new BorderLayout());
 		setBorder(border);
@@ -105,11 +112,13 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 				if (IFilterTextParser.IGNORE_CASE_PROPERTY==prop){
 					popup.setIgnoreCase(((IFilterTextParser)evt.getSource())
 							.isIgnoreCase());
-					resetOptions();
+					requestOptions();
 					filter.update();
 				} else if (IFilterTextParser.FORMAT_PROPERTY==prop &&
 						getAssociatedClass() == evt.getNewValue()){
-					updateFormat((IFilterTextParser)evt.getSource());
+			    	popup.setFormat(getFormat());
+			    	requestOptions();
+					filter.update();
 				}
 			}
 		};
@@ -122,8 +131,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		};
 		downButton.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				triggerPopup(downButton);
 			}
 		});	
@@ -202,7 +210,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		}
 		return f.format(o);
 	}
-	
+
 	/** 
 	 * Sets the content, updating the filter -and propagating any changes-<br>
 	 * The parameters escapeIt must be true if the content could require
@@ -338,9 +346,8 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	 */
 	@Override public void resetFilter() {
 		setEditorContent(null, false);
-		AutoOptions autoOptions = optionsManager.getAutoOptions(this);
-		//reset now the options. Even if autoOptions is false
-		optionsManager.setOptions(this, autoOptions);
+		this.customChoices=null;
+		requestOptions();		
 		if (autoOptions==AutoOptions.DISABLED && getListCellRenderer()==null){
 			setEditable(true);
 		}
@@ -356,18 +363,18 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     	releaseTextParser();
     	parser.addPropertyChangeListener(textParserListener);
 		popup.setIgnoreCase(parser.isIgnoreCase());
+    	popup.setFormat(getFormat(parser));
     	editor.setTextParser(parser);    	
-		updateFormat(parser);
+    	requestOptions();
     	filter.checkChanges();
     }
     
-    void updateFormat(IFilterTextParser parser){
-    	popup.setFormat(getFormat(parser));
-    	resetOptions();
+    void requestOptions(){
+    	tableFilter.updatedEditorOptions(this);
     }
     
-    void resetOptions(){
-    	optionsManager.setOptions(this, optionsManager.getAutoOptions(this));    	
+    public Format getFormat(){
+    	return getFormat(getTextParser());
     }
     
     private Format getFormat(IFilterTextParser parser){
@@ -378,7 +385,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     	return format;
     }
     
-    Class getAssociatedClass(){
+    public Class getAssociatedClass(){
     	return popup.getAssociatedClass();
     }
     
@@ -397,43 +404,64 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     }
     
     /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getFilterPosition()
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getModelPosition()
 	 */
-	@Override public int getFilterPosition() {
+	@Override public int getModelPosition() {
 		return editor.getPosition();
 	}
 	
 	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setOptions(java.util.Collection)
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setCustomChoices(java.util.Set)
 	 */
-	@Override public void setOptions(Collection<?> options) {
+	@Override public void setCustomChoices(Set<CustomChoice> options) {
+		if (options==null || options.isEmpty()){
+			this.customChoices=null;
+		} else {
+			this.customChoices = new HashSet<CustomChoice>(options);
+		}
+		requestOptions();
+	}
+	
+	public void setOptions(Collection<?> options){
 		popup.clear();
-		addOptions(options);
+		addOptions(options);		
+	}
+	
+	public Collection<?> getOptions(){
+		return popup.getOptions();
 	}
 
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#addOptions(java.util.Collection)
-	 */
-	@Override public void addOptions(Collection<?> options) {
+	public void addOptions(Collection<?> options) {
 		editor.reportCustomChoices(popup.addOptions(options));
 		downButton.setCanPopup(popup.hasContent());
 	}
 	
 	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getOptions()
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getCustomChoices()
 	 */
-	@Override public Collection<?> getOptions(){
-		return new ArrayList(popup.getOptions());
+	@Override public Set<CustomChoice> getCustomChoices(){
+		return customChoices==null? new HashSet<CustomChoice>() : new HashSet<CustomChoice>(customChoices); 
 	}
 
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#clearOptions()
+	/**
+	 * Sets the comparator associated to the renderer, to ensure a certain
+	 * order on the options list.<br>
+	 * It is also set on the underlying table, that will display the 
+	 * associated column -if sorted-, using this comparator.
 	 */
-	@Override public void clearOptions() {
-		popup.clear();
-		downButton.setCanPopup(popup.hasContent());
-	}
-
+    public void setRendererComparator(Comparator comparator){
+    	popup.setRendererComparator(comparator);
+    	JTable table = tableFilter.getTable();
+    	if (table!=null && (table.getRowSorter() instanceof DefaultRowSorter)){
+    		((DefaultRowSorter) table.getRowSorter()).setComparator(getModelPosition(), comparator);
+    	}
+    }
+    
+    /** Returns the comparator defined for the renderer, if any */
+    public Comparator getRendererComparator(){
+    	return popup.getRendererComparator();
+    }
+    
 	/* (non-Javadoc)
 	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setListCellRenderer(javax.swing.ListCellRenderer)
 	 */
@@ -444,7 +472,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		editor.setForeground(getForeground());
 		editor.getComponent().setFont(getFont());
 		filter.update();
-		resetOptions();
+		requestOptions();
 	}
 
     /* (non-Javadoc)
@@ -455,8 +483,8 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     			new DefaultListCellRenderer() {
 
     		private static final long serialVersionUID = -5990815893475331934L;
-    		private JTable table = optionsManager.getTable();
-    		private int position = getFilterPosition();
+    		private JTable table = tableFilter.getTable();
+    		private int position = getModelPosition();
 
 			@Override public Component getListCellRendererComponent(JList list, 
 					Object value, int index, boolean isSelected, 
@@ -505,14 +533,17 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setAutoOptions(AutoOptions)
 	 */
 	@Override public void setAutoOptions(AutoOptions autoOptions){
-		optionsManager.setOptions(this, autoOptions);
+		if (autoOptions!=null && autoOptions!=this.autoOptions){
+			this.autoOptions=autoOptions;
+			requestOptions();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getAutoOptions()
 	 */
 	@Override public AutoOptions getAutoOptions(){
-		return optionsManager.getAutoOptions(this);
+		return autoOptions;
 	}
 	
 	private void setupEditorComponent(ListCellRenderer renderer){
@@ -557,8 +588,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	private void setupComponent(JComponent component){
 		component.addFocusListener(new FocusListener() {
 
-			@Override
-			public void focusLost(FocusEvent e) {
+			@Override public void focusLost(FocusEvent e) {
 				popup.hide();
 				filter.checkChanges();
 				//important: call focusMoved AFTER checking changes, to
@@ -568,8 +598,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 				downButton.setFocused(false);
 			}
 
-			@Override
-			public void focusGained(FocusEvent e) {
+			@Override public void focusGained(FocusEvent e) {
 				downButton.setFocused(true);
 				if (isEnabled()){
 					editor.focusMoved(true);
@@ -638,8 +667,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = 6926912268574067920L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				if (popup.isPopupFocused()) {
 					popupSelection(popup.getSelection());
 				} else {
@@ -666,8 +694,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = -4351240441578952476L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				popup.hide();
 				if (e.getSource() instanceof JTextField){
 					JTextField textField=(JTextField)e.getSource();
@@ -686,8 +713,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = -2777729244353281164L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				if (!popup.isPopupFocused() || !popup.selectLast(false)) {
 					if (e.getSource() instanceof JTextField){
 						JTextField textField=(JTextField)e.getSource();
@@ -707,8 +733,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = 1945871436968682881L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				//if focus is on the popup: select the very last item on the 
 				//popup, changing probably from the history list to the option 
 				//list;  if the item is already on the very last element, or the 
@@ -733,8 +758,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = 3916227645612863334L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				//if focus is on the popup: select the very first item on the 
 				//popup, changing probably from the option list to the history 
 				//list;  if the item is already on the very first element, or 
@@ -788,8 +812,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = -1187830005921916553L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				//without moving the focus, move down one page on the popup menu, 
 				//probably jumping to options list
 				if (popup.isVisible()) {
@@ -834,8 +857,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = 746565926592574009L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				//if focus is on the popup: move from options to history, and, 
 				//being already on history, up to text field.
 				if (popup.isPopupFocused()) {
@@ -857,8 +879,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = 4555560696351340571L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				//if popup is not visible, just make it visible.
 				//if popup has not the focus, pass it the focus
 				//else: move up!
@@ -884,8 +905,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = -8075976293862885060L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				//if popup is not visible, make it visible
 				//if popup has not the focus, pass it the focus
 				//else: move to the first visible element in the options
@@ -912,8 +932,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = -4133513199725709434L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				//if popup is not visible, just make it visible.
 				//if popup has not the focus, pass it the focus
 				//else: move down!
@@ -1091,25 +1110,4 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		}
 	}
 	
-	/**
-	 * Internal library interface to handle filter editors
-	 */
-	public interface OptionsManager {
-
-		/** Returns the auto options mode for the given editor*/
-		public AutoOptions getAutoOptions(FilterEditor editor);
-		
-		/**
-		 * Enables/disables the auto options feature and sets the options
-		 * for the given editor
-		 */
-		public void setOptions(FilterEditor editor, AutoOptions autoOptions);	
-		
-		/**
-		 * Returns the attached table
-		 * @return
-		 */
-		public JTable getTable();
-	}
-
 }

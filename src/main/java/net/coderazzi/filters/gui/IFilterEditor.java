@@ -2,7 +2,7 @@ package net.coderazzi.filters.gui;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.Collection;
+import java.util.Set;
 
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
@@ -11,6 +11,7 @@ import javax.swing.table.TableModel;
 
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterTextParser;
+import net.coderazzi.filters.gui.editor.CustomChoice;
 
 public interface IFilterEditor {
 
@@ -100,23 +101,13 @@ public interface IFilterEditor {
 	public abstract IFilterTextParser getTextParser();
 
 	/** Returns the filter position associated to this editor*/
-	public abstract int getFilterPosition();
+	public abstract int getModelPosition();
 
 	/** Sets the available options, shown on the popup menu */
-	public abstract void setOptions(Collection<?> options);
-
-	/** 
-	 * Adds the options to the current set, removing any duplicates.<br>
-	 * If there is no {@link ListCellRenderer} defined, the content is 
-	 * stringfied and sorted.<br>
-	 */
-	public abstract void addOptions(Collection<?> options);
+	public abstract void setCustomChoices(Set<CustomChoice> options);
 
 	/** Returns the current options */
-	public abstract Collection<?> getOptions();
-
-	/** Clears any options currently defined, including the current history */
-	public abstract void clearOptions();
+	public abstract Set<CustomChoice> getCustomChoices();
 
 	/**
 	 * Sets the {@link ListCellRenderer} for the options / history.<p>

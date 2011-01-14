@@ -59,6 +59,10 @@ public class FilterSettings {
     /** Whether to automatically fill with content the editor field's options */
     public static AutoOptions autoOptions;
 
+    /** Whether to enable adaptive options, true by default */
+    public static boolean adaptiveOptions = 
+    	Boolean.parseBoolean(getString("AdaptiveOptions", "true"));
+
     /** Whether to ignore case or not, false by default (case sensitive) */
     public static boolean ignoreCase = 
     	Boolean.parseBoolean(getString("IgnoreCase", "true"));
@@ -170,9 +174,9 @@ public class FilterSettings {
     		//font remains null
     	}
     	try{
-        	autoOptions = AutoOptions.valueOf(getString("AutoOptions", "BASIC"));
+        	autoOptions = AutoOptions.valueOf(getString("AutoOptions", "ENUMS"));
     	} catch(Exception ex){
-    		autoOptions = AutoOptions.BASIC;
+    		autoOptions = AutoOptions.ENUMS;
     	}
         filterTextParserClass = FilterTextParser.class;
         String cl = getString("TextParser.class", null);

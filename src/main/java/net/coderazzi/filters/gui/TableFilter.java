@@ -27,14 +27,14 @@ package net.coderazzi.filters.gui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import javax.swing.DefaultRowSorter;
 import javax.swing.JTable;
+import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
@@ -73,11 +73,8 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
-public class TableFilter extends AndFilter implements TableModelListener, FilterEditor.OptionsManager
+public class TableFilter extends AndFilter
 {
-
-    /** The associated table, if any. */
-    JTable table;
 
     /**
      * sendNotifications is used internally as a semaphore to disable 
@@ -93,6 +90,9 @@ public class TableFilter extends AndFilter implements TableModelListener, Filter
      */
     private boolean pendingNotifications;
 
+	/**  The autoOptions mode **/
+	private AutoOptions autoOptions=FilterSettings.autoOptions;
+	
     /** 
      * The class performing the autoSelection, and following sorter changes.<br>
      * Note that autoSelection has no relationship with autoOptions, it is
@@ -100,73 +100,122 @@ public class TableFilter extends AndFilter implements TableModelListener, Filter
      * out all the rows but one. 
      **/
     private AutoSelector autoSelector = new AutoSelector();
+    
+	/** Instance to handle model changes */
+	private OptionsSupport optionsSupport = new OptionsSupport();
 
-    /** 
-     * The listened model. Note: even if table<>null, this model can be null if
-     * there is not need to listen for model changes (no auto options)
-     **/
-	private TableModel listenedModel;
-
-	/**  The autoOptions mode **/
-	private AutoOptions autoOptions=FilterSettings.autoOptions;
-
-	/** editors with not DISABLED autoOptions */
-	private Map<FilterEditor, AutoOptions> autoEditors =  new HashMap<FilterEditor, AutoOptions>();
-	
+	/** Instance to support adaptive options */
+    AdaptiveOptionsSupport adaptiveSupport;
+    
 	/** All the editors, mapped by their filter position */
-	private Map<Integer, FilterEditor> editors = new HashMap<Integer, FilterEditor>();
+	Map<Integer, FilterEditor> editors=new HashMap<Integer, FilterEditor>();
 	
-    /**
-     * Default constructor
-     */
-    public TableFilter() {
+    /** The associated table. */
+	JTable table;
+	
+	/** support for adaptive filtering */
+    boolean adaptiveSupportEnabled=FilterSettings.adaptiveOptions;
 
-        // create an observer instance to notify the associated table when there
+    /**
+     * Only constructor
+     */
+    TableFilter() {
+    	// create an observer instance to notify the associated table when there
         // are filter changes.
         addFilterObserver(new IFilterObserver() {
                 @Override public void filterUpdated(IFilter obs) {
-                    notifyUpdatedFilter(false);
+                    notifyUpdatedFilter();
                 }
             });
     }
-
+    
     /**
      * Method to set the associated table. If the table had not defined its own
      * {@link javax.swing.RowSorter}, the default one is automatically created.
      */
     public void setTable(JTable table) {
-        JTable oldTable = this.table;
-        this.table = table;
+		optionsSupport.detach();
+		JTable oldTable = this.table;
+		this.table = table;
         autoSelector.replacedTable(oldTable, table);
-		editors.clear();
-		autoEditors.clear();
-		if (listenedModel!=null){
-			listenedModel.removeTableModelListener(this);
-			listenedModel = null;
-		}
     }
 
     /** Returns the associated table */
-    @Override public JTable getTable() {
+    public JTable getTable() {
         return table;
     }
     
-    /** Adds a new filter editor */
-    public void addFilterEditor(FilterEditor editor) {
-    	super.addFilter(editor.getFilter());
-		editors.put(editor.getFilterPosition(), editor);
-		setOptions(editor, autoOptions);
+	/** Sets/unsets the auto options flag */
+    public void setAutoOptions(AutoOptions mode){
+    	if (mode!=autoOptions){
+    		enableNotifications(false);
+			this.autoOptions=mode;
+			for (FilterEditor editor : editors.values()){			
+				editor.setAutoOptions(mode);
+			}
+    		enableNotifications(true);
+    	}
     }
-
-    /** Removes an existing editor */
-    public void removeFilterEditor(FilterEditor editor) {
-    	super.removeFilter(editor.getFilter());
-		if (editor==editors.get(editor.getFilterPosition())){
-			updateAutoEditors(editor, AutoOptions.DISABLED);
-			editors.remove(editor.getFilterPosition());
+    
+	/** Returns the auto options mode */
+	public AutoOptions getAutoOptions(){
+		return autoOptions;
+	}
+	
+	/**
+	 * Method invoked by the FilterEditor when its autoOptions mode OR 
+	 * userOptions change; in return, it will set the proper options on
+	 * the specified editor. 
+	 */
+	public void updatedEditorOptions(FilterEditor editor){
+		if (editors.containsValue(editor) && isEnabled()){
+			optionsSupport.updated(editor);
 		}
     }
-
+	
+    @Override public void filterUpdated(IFilter producer) {
+    	if (adaptiveSupport!=null){
+    		adaptiveSupport.update(producer);
+    	}
+    	super.filterUpdated(producer);
+    }
+    
+    @Override public void addFilter(IFilter... filtersToAdd) {
+    	enableNotifications(false);
+    	super.addFilter(filtersToAdd);
+    	enableNotifications(true);
+    }
+    
+    @Override public void removeFilter(IFilter... filtersToRemove) {
+    	enableNotifications(false);
+    	super.removeFilter(filtersToRemove);
+    	enableNotifications(true);
+    }
+    
+    /** Adds a new filter editor */
+    public void addFilterEditor(FilterEditor editor){
+    	super.addFilter(editor.getFilter());
+    	editors.put(editor.getModelPosition(), editor);
+    	editor.setAutoOptions(autoOptions);
+    }
+    
+    /** Removes an existing editor */
+    public void removeFilterEditor(FilterEditor editor){
+    	super.removeFilter(editor.getFilter());
+    	editors.remove(editor.getModelPosition());
+    }
+    
+    /** Enables/Disables the filtering */
+    public void setEnabled(boolean enabled) {
+    	optionsSupport.setEnabled(enabled);
+    	enableNotifications(enabled);
+    }
+    
+    /** Returns the current enable status */
+    public boolean isEnabled() {
+    	return optionsSupport.isEnabled();
+    }
+    
     /**
      * <p>Temporarily enable/disable notifications to the observers, including 
      * the registered {@link javax.swing.JTable}.</p>
@@ -178,51 +227,56 @@ public class TableFilter extends AndFilter implements TableModelListener, Filter
      */
     public boolean enableNotifications(boolean enable) {
         sendNotifications += enable ? 1 : -1;
-        if (enable && (sendNotifications == 0) && pendingNotifications) {
-            notifyUpdatedFilter(false);
+        if (enable){
+	        if (sendNotifications == 0) {
+	        	//adding/removing filter editors is not done as separate processes
+	        	//when the user sets/changes the TableModel, all columns are
+	        	//removed and then recreated.
+	        	//At the beginning of the process, there are calls to 
+	        	//enableNotifications(false)/(true) than only balance out when the
+	        	//whole model is setup. In that moment, we build the 
+	        	//AdaptiveOptionsSupport, if needed. 
+	        	//We use the same mechanism whenever it would be needed to
+	        	//recreate the adaptive support or because it could be more 
+	        	//efficient doing so.
+	        	if (adaptiveSupportEnabled && table!=null){
+	        		adaptiveSupport = optionsSupport.createAdaptiveOptionsSupport(editors.values());
+	        		updateRowFilter();
+	        	} 
+	        	else if (pendingNotifications){
+	        		updateRowFilter();
+	        	} 
+	        }
+        } else if (adaptiveSupport!=null){
+        	adaptiveSupport = null;        	
+    		updateRowFilter();
         }
-
         return sendNotifications >= 0;
     }
     
-	/** Returns editor' auto options mode*/
-    @Override public AutoOptions getAutoOptions(FilterEditor editor) {
-		AutoOptions ret = autoEditors.get(editor);
-		return ret==null? AutoOptions.DISABLED : ret;
-    }
-    
-    @Override public void setOptions(FilterEditor editor, AutoOptions autoOptions) {
-		//this check is needed to avoid setting the options for the
-		//same column multiple times when is created. The creation of
-		//a filter editor is initially done, then the parser is set,
-		//and both operations would trigger this operation
-		if (editor==editors.get(editor.getFilterPosition())){
-			autoOptions=fillOptions(editor, autoOptions);
-			updateAutoEditors(editor, autoOptions);
-		}
-    }
-    
-	/** Sets/unsets the auto options flag */
-    public void setAutoOptions(AutoOptions mode){
-    	if (mode!=autoOptions){
-	        enableNotifications(false);
-			this.autoOptions=mode;
-			for (FilterEditor editor : editors.values()){			
-				//it is probably not really needed to set it to null
-				//a better solution would be verifying if the current content
-				//matches any of the options
-				editor.setContent(null);
-				setOptions(editor, mode);
-			}
-	        enableNotifications(true);
+    /**
+     * Sets the adaptive options mode
+     */
+    public void setAdaptiveOptions(boolean enable) {
+    	if (enable!=adaptiveSupportEnabled){
+    		adaptiveSupportEnabled=enable;
+    		if (isEnabled()){
+	    		enableNotifications(false);
+	    		for (FilterEditor editor : editors.values()){
+	    			optionsSupport.updated(editor);
+	    		}
+	    		enableNotifications(true);
+    		}
     	}
     }
     
-	/** Returns the auto options mode */
-	public AutoOptions getAutoOptions(){
-		return autoOptions;
-	}
-	
+    /**
+     * Returns the adaptive options mode
+     */
+    public boolean isAdaptiveOptions() {
+        return adaptiveSupportEnabled;
+    }
+
     /**
      * <p>Sets the autoselection mode</p>
      *
@@ -246,147 +300,25 @@ public class TableFilter extends AndFilter implements TableModelListener, Filter
      * Internal method to send a notification to the observers, verifying 
      * first if the notifications are currently enabled.
      */
-    void notifyUpdatedFilter(boolean forced) {
-        if (forced || (sendNotifications < 0)) {
+    void notifyUpdatedFilter() {
+        if (sendNotifications < 0) {
             pendingNotifications = true;
-
-            return;
-        }
-        pendingNotifications = sendFilterUpdateNotification();
-    }
-
-    /**
-     * Internal method to send without further checks a notification 
-     * to the observers.
-     */
-    private boolean sendFilterUpdateNotification() {
-        if (autoSelector.sorter == null) {
-            return true;
-        }
-        //To reapply the filtering, it is enough to invoke again setRowFilter. 
-        //Alternatively, it could just be invoked sort()
-        autoSelector.sorter.setRowFilter(this);
-        return false;
-    }
-    
-	private void updateAutoEditors(FilterEditor editor, AutoOptions newMode){
-		if (newMode==AutoOptions.DISABLED){
-			autoEditors.remove(editor);
-			if (listenedModel!=null && !requiresListener()){
-				listenedModel.removeTableModelListener(this);
-				listenedModel = null;				
-			}
-		} else {
-			autoEditors.put(editor, newMode);
-			if (listenedModel==null && table!=null && requiresListener(newMode)){
-				listenedModel = table.getModel();
-				listenedModel.addTableModelListener(this);				
-			}
-		}
-	}
-	
-	private boolean requiresListener(){
-		for (AutoOptions mode : autoEditors.values()){
-			if (requiresListener(mode)){
-				return true;
-			}			
-		}
-		return false;
-	}
-	
-	private boolean requiresListener(AutoOptions mode){
-		return mode==AutoOptions.EXACT || mode==AutoOptions.EXTENDED;
-	}
-	
-	/**
-	 * Fills the options in the given editor, using the provided AutoOptions
-	 * mode<br>
-	 * It is returned the real options mode set (it only changes for
-	 * enumerations and booleans, where setting EXTENDED is equivalent to BASIC)
-	 */
-	private AutoOptions fillOptions(FilterEditor editor, AutoOptions autoOptions){
-        List<Object> options;
-        if (autoOptions==AutoOptions.DISABLED){
-        	options=Collections.emptyList();
-        } else if (autoOptions==AutoOptions.EXACT){
-        	options = getModelContents(editor);
         } else {
-            Class<?> c = table.getModel().getColumnClass(editor.getFilterPosition());
-            if (c.equals(Boolean.class)){
-            	autoOptions=AutoOptions.BASIC;
-            	options = new ArrayList<Object>(3);
-            	options.add(true);
-            	options.add(false);
-            } else if (c.isEnum()){
-            	autoOptions=AutoOptions.BASIC;
-            	Object[] enums = c.getEnumConstants();
-            	options = new ArrayList<Object>(enums.length+1);
-            	for (Object each : enums){
-            		options.add(each);
-            	}
-            } else if (autoOptions==AutoOptions.BASIC){
-            	options=Collections.emptyList();
-            	autoOptions = AutoOptions.DISABLED;
-            } else {
-            	options = getModelContents(editor);
-            }        	
+        	updateRowFilter();
         }
-        editor.setOptions(options);
-        if (autoOptions==AutoOptions.BASIC){
-        	editor.setEditable(false);
-        	if (options.size()<=8){
-        		editor.setMaxHistory(0);
-        	}
-        }
-    	return autoOptions;
-	}
-	
-	/** TableModelListener interface */
-	@Override public void tableChanged(TableModelEvent e) {
-		int firstRow = e.getFirstRow();		
-		if (firstRow != TableModelEvent.HEADER_ROW){
-			int lastRow = e.getLastRow();
-			int c = e.getColumn();
-			if (c == TableModelEvent.ALL_COLUMNS){
-				for (Map.Entry<FilterEditor, AutoOptions> entry : autoEditors.entrySet()){
-					updateColumn(entry.getKey(), entry.getValue(), firstRow, lastRow, e.getType());
-				}
-			} else {
-				FilterEditor editor = editors.get(c);
-				if (editor!=null){
-					updateColumn(editor, autoEditors.get(editor), firstRow, lastRow, e.getType());
-				}
-			}
-		}
-	}
-	
-	private void updateColumn(FilterEditor editor, AutoOptions mode, int firstRow, int lastRow, int eventType){
-		if (mode!=AutoOptions.BASIC){
-			if (eventType==TableModelEvent.INSERT || (eventType==TableModelEvent.UPDATE && mode==AutoOptions.EXTENDED)){
-				editor.addOptions(getModelContents(editor, firstRow, lastRow));
-			} else if (mode==AutoOptions.EXACT){
-				editor.setOptions(getModelContents(editor));
-			}
-		}
-	}
-	
-    private List<Object> getModelContents(FilterEditor editor){
-    	return getModelContents(editor, 0, table.getModel().getRowCount()-1);
     }
     
-    private List<Object> getModelContents(FilterEditor editor, 
-    		                                   int firstRow, 
-    		                                   int lastRow){
-    	List<Object> all = new ArrayList<Object>();
-        int column = editor.getFilterPosition();
-        TableModel regModel = table.getModel();
-
-        lastRow = Math.min(regModel.getRowCount() - 1, lastRow);
-
-        while (lastRow >= firstRow) {
-            all.add(regModel.getValueAt(firstRow++, column));
-        }
-        return all;
+    /** Internal method to set/update the filtering */
+    private void updateRowFilter() {
+    	pendingNotifications = autoSelector.sorter == null;
+    	if (!pendingNotifications){
+            //To reapply the filtering, it is enough to invoke again setRowFilter.
+    		RowFilter filter = adaptiveSupport;
+    		if (filter==null && !adaptiveSupportEnabled){
+    			filter=this;
+    		}
+            autoSelector.sorter.setRowFilter(filter);
+    	}
     }
 
     /**
@@ -399,7 +331,7 @@ public class TableFilter extends AndFilter implements TableModelListener, Filter
                                   PropertyChangeListener {
 
         /** The associated sorter, if any. */
-        DefaultRowSorter<?, ?> sorter;
+    	TableRowSorter sorter;
         
         /** Autoselection mode * */
         boolean autoSelection = FilterSettings.autoSelection;
@@ -418,8 +350,7 @@ public class TableFilter extends AndFilter implements TableModelListener, Filter
             setSorter(newTable);
         }
 
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
+        @Override public void propertyChange(PropertyChangeEvent evt) {
             setSorter((JTable) evt.getSource());
         }
 
@@ -429,21 +360,20 @@ public class TableFilter extends AndFilter implements TableModelListener, Filter
                 this.sorter.setRowFilter(null);
                 this.sorter=null;
             }
-            DefaultRowSorter sorter;
+            TableRowSorter sorter;
             try{
-            	sorter = table==null? null : (DefaultRowSorter) table.getRowSorter();
+            	sorter = table==null? null : (TableRowSorter) table.getRowSorter();
             } catch (ClassCastException ccex){
-            	throw new RuntimeException("Invalid RowSorter on JTable: filter header requires a DefaultRowSorter class");
+            	throw new RuntimeException("Invalid RowSorter on JTable: filter header requires a TableRowSorter class");
             }
             if (table!=null && (sorter==null || sorter.getModel()!=table.getModel())){
-            	table.setRowSorter(new TableRowSorter(table.getModel()));
+            	this.sorter=new TableRowSorter(table.getModel());
+            	table.setRowSorter(this.sorter);
             }
             else {
             	this.sorter = sorter;
             	if (sorter != null) {
-	                if (sendNotifications >= 0) {
-	                    sorter.setRowFilter(TableFilter.this);
-	                }
+            		notifyUpdatedFilter();
 	                if (autoSelection) {
 	                    sorter.addRowSorterListener(this);
 	                }
@@ -462,15 +392,13 @@ public class TableFilter extends AndFilter implements TableModelListener, Filter
             autoSelection = enable;
         }
 
-        @Override
-        public void run() {
+        @Override public void run() {
             if ((sorter != null) && (sorter.getViewRowCount() == 1)) {
                 table.getSelectionModel().setSelectionInterval(0, 0);
             }
         }
 
-        @Override
-        public void sorterChanged(RowSorterEvent e) {
+        @Override public void sorterChanged(RowSorterEvent e) {
             if ((e.getType() == RowSorterEvent.Type.SORTED) && 
             	(e.getSource().getViewRowCount() == 1)) {
                 SwingUtilities.invokeLater(this);
@@ -478,4 +406,185 @@ public class TableFilter extends AndFilter implements TableModelListener, Filter
         }
     }
 
+    /** Helper class to follow model changes */
+	class OptionsSupport implements TableModelListener {
+
+		/** If any model is being listened, this variable holds it*/
+		private TableModel listenedModel;
+
+	    /** Whether the filtering is enabled */
+	    boolean enabled=true;
+	    
+	    public AdaptiveOptionsSupport createAdaptiveOptionsSupport(Collection<FilterEditor> editors){
+	    	AdaptiveOptionsSupport adaptiveSupport = new AdaptiveOptionsSupport(table.getModel(),
+        				editors.toArray(new FilterEditor[editors.size()]),
+        				getFilterObservables());
+        	attach();
+        	return adaptiveSupport;
+	    }
+
+	    /** Enables/Disables the filtering */
+	    public void setEnabled(boolean enabled) {
+	    	this.enabled=enabled;
+	    	if (enabled){
+	    		if (!adaptiveSupportEnabled){
+	    			//next call ensures attaching he listener, if needed,
+	    			//and resetting the options -perhaps modified-
+		    		for (FilterEditor editor : editors.values()){
+		    			updated(editor);
+		    		}
+	    		}
+	    	} else {
+	    		detach();
+	    	}
+	    }
+	    
+	    /** Returns the current enable status */
+	    public boolean isEnabled() {
+	    	return enabled;
+	    }
+	    
+		/** 
+		 * Handles an update on the editor properties, requiring a 
+		 * reinitialization of its options  
+		 */
+		public void updated(FilterEditor editor) {
+			if (adaptiveSupportEnabled) {
+				if (adaptiveSupport != null) {
+					attach();
+					adaptiveSupport.editorUpdated(editor);
+				}
+			} else if (enabled){
+				initOptions(editor);
+				for (FilterEditor ed : editors.values()){
+					if (ed.getAutoOptions()==AutoOptions.ENABLED){
+						attach();
+						return;
+					}
+				}
+				detach();
+			}
+		}
+		
+		/** Detachs the helper from listening to table events*/
+		public void detach() {
+			if (listenedModel != null) {
+				listenedModel.removeTableModelListener(this);
+				listenedModel = null;
+			}
+		}
+
+		/** 
+		 * attachs the instance to listen to changes on the current table<br>
+		 * It can be called multiple times, on the same or different models.
+		 */
+		private void attach() {
+			if (table != null) {
+				if (listenedModel != null) {
+					if (listenedModel == table.getModel()) {
+						return;
+					}
+					detach();
+				}
+				listenedModel = table.getModel();
+				listenedModel.addTableModelListener(this);
+			}
+		}
+
+		@Override public void tableChanged(TableModelEvent e) {
+			int firstRow = e.getFirstRow();
+			if (firstRow != TableModelEvent.HEADER_ROW) {
+				TableModel model = (TableModel) e.getSource();
+				int lastRow = Math.min(model.getRowCount() - 1, e.getLastRow());
+				int column = e.getColumn();
+				if (adaptiveSupportEnabled){
+					if (adaptiveSupport!=null){
+						adaptiveSupport.tableChanged(e.getType(), firstRow, lastRow, column);
+					}
+				} else {
+					if (column != TableModelEvent.ALL_COLUMNS) {
+						//a change in ONE column is always handled as an update
+						//(every update is handled by re-extracting the options
+						FilterEditor editor = editors.get(column);
+						if (editor != null) {
+							setOptionsFromModel(editor, model);
+						}
+					} else {
+						for (FilterEditor editor : editors.values()) {
+							if (AutoOptions.ENABLED == editor.getAutoOptions()) {
+								//insert events can be handled by adding the
+								//new model's values.
+								//updates/deletes require reparsing the whole
+								//table to obtain again the available options
+								if (e.getType() == TableModelEvent.INSERT) {
+									editor.addOptions(modelExtract(editor, model,
+											firstRow, lastRow, new HashSet<Object>()));
+								} else {
+									setOptionsFromModel(editor, model);
+								}
+							}
+						}
+					}					
+				}
+			} 
+		}
+
+		/**
+		 * Initializes the options in the given editor.<br>
+		 * It can update the mode of the editor, from ENABLED to ENUMS (in case
+		 * of enumerations), and from ENUMS to DISABLED (for no enumerations)
+		 */
+		public void initOptions(FilterEditor editor) {
+			AutoOptions autoOptions = editor.getAutoOptions();
+			if (autoOptions == AutoOptions.DISABLED) {
+				editor.setOptions(editor.getCustomChoices());
+			} else {
+				TableModel model = table.getModel();
+				Class<?> c = model.getColumnClass(editor.getModelPosition());
+				boolean asEnum = c.equals(Boolean.class) || c.isEnum();
+				if (asEnum && autoOptions != AutoOptions.ENUMS) {
+					editor.setAutoOptions(AutoOptions.ENUMS);
+				} else if (!asEnum && autoOptions == AutoOptions.ENUMS) {
+					editor.setAutoOptions(AutoOptions.DISABLED);
+				} else if (asEnum) {
+					Set options = editor.getCustomChoices();
+					if (c.equals(Boolean.class)) {
+						options.add(true);
+						options.add(false);
+					} else {
+						for (Object each : c.getEnumConstants()) {
+							options.add(each);
+						}
+					}
+					editor.setOptions(options);
+					editor.setEditable(false);
+					if (options.size() <= 8) {
+						editor.setMaxHistory(0);
+					}
+				} else {
+					setOptionsFromModel(editor, model);
+				}
+			}
+		}
+
+		/** Sets the content for the given editor from the model's values */
+		private void setOptionsFromModel(FilterEditor editor, TableModel model) {
+			editor.setOptions(modelExtract(editor, model,
+					0, model.getRowCount() - 1, editor.getCustomChoices()));
+		}
+
+		/** 
+		 * Extract content from the given range of rows in the model, adding
+		 * the results to the provided Set, which is then returned 
+		 */
+		private Set modelExtract(FilterEditor editor, TableModel model, 
+				int firstRow, int lastRow, Set fill) {
+			int column = editor.getModelPosition();
+			for (; lastRow >= firstRow; firstRow++) {
+				fill.add(model.getValueAt(firstRow, column));
+			}
+			return fill;
+		}
+	}
+    
 }

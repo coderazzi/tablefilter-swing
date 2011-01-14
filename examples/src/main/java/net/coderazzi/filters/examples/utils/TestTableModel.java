@@ -29,9 +29,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import javax.swing.Icon;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+
+import net.coderazzi.filters.examples.utils.TestData.Flag;
 
 
 public class TestTableModel extends AbstractTableModel {
@@ -52,7 +53,7 @@ public class TestTableModel extends AbstractTableModel {
         };
     private static final Class<?>[] columnTypes = {
             String.class, Integer.class, Boolean.class, TestData.Tutor.class, 
-            Icon.class, TestData.Club.class, String.class, Date.class
+            Flag.class, TestData.Club.class, String.class, Date.class
         };
 
 
@@ -62,7 +63,7 @@ public class TestTableModel extends AbstractTableModel {
 
 
     public static TestTableModel createTestTableModel() {
-        return createTestTableModel(10);
+        return createTestTableModel(1000);
     }
 
     public static TestTableModel createTestTableModel(int elements) {

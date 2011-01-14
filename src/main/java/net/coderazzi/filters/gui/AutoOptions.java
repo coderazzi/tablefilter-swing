@@ -30,19 +30,17 @@ package net.coderazzi.filters.gui;
  * on each separated filter editor
  */
 public enum AutoOptions {
-	/** No auto options, any options must be explicitly inserted */
+	/** 
+	 * No auto options, any options must be explicitly inserted 
+	 */
     DISABLED, 
-    /** Enumerations and booleans automatically handled */
-    BASIC,    
     /** 
-     * Options extracted from the model, and new options added when the
-     * model changes; removal of model's values do not guarantee the removal
-     * of entries in the filter' options. 
+     * Enumerations and booleans automatically handled 
      */
-    EXTENDED,  
+    ENUMS,    
     /**
      * Options extracted from the model, it is guaranteed that the options
      * include all the model's values, and only those.
      */
-    EXACT
+    ENABLED
 }

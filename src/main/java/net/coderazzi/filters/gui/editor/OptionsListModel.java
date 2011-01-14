@@ -28,6 +28,7 @@ package net.coderazzi.filters.gui.editor;
 import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -103,12 +104,17 @@ public class OptionsListModel extends AbstractListModel {
 	}
 	
 	/** Specifies the comparator to sort the content on the list */
-	public void setComparator(Comparator comparator) {
+	public void setRendererComparator(Comparator comparator) {
 		if (userComparator!=comparator){
 			userComparator = comparator;
 			fixComparator();
 			clearContent();
 		}
+	}
+	
+	/** Returns the renderer comparator, if defined */ 
+	public Comparator getRendererComparator(){
+		return userComparator;
 	}
 	
 	/** 
@@ -161,50 +167,33 @@ public class OptionsListModel extends AbstractListModel {
 	 * discarded
 	 * @return the list of subchoices in the whole content
 	 */
-	@SuppressWarnings("null")
 	public Collection<CustomChoice> addContent(Collection addedContent) {
-		ListIterator it=null;
-		Object onIt=null;
-		int cmp=-1;
 		boolean changed=false;
+		List choices = null;
 		for (Object o : addedContent){
 			boolean custom = o instanceof CustomChoice;
 			if (!custom){
 				if (o!=null && useFormatter){
-					o = formatter==null? o.toString() : formatter.format(o);				
+					String s = formatter==null? o.toString() : formatter.format(o);	
+					o = s.length()==0? null : s;
 				}
-				if (o==null || "".equals(o)){
+				if (o==null){
 					o=CustomChoice.MATCH_EMPTY;
-					custom=true;
-				}				
-			}
-			if (custom){
-				if (addCustomChoice((CustomChoice)o, customChoices)){
-					changed=true;
-					onIt=null;
-					cmp=-1;
-				}
-			} else {
-				if (onIt==null || (cmp=comparator.compare(onIt, o))>=0){
-					if (cmp==0){
-						continue;
-					} 
-					it=content.listIterator(customChoices);
-				}
-				while (it.hasNext()){
-					cmp = comparator.compare(it.next(), o);
-					if (cmp==0){
-						break;
-					} else if (cmp>0){
-						it.previous();
-						break;
+				} else {
+					if (choices==null){
+						choices = content.subList(customChoices, content.size());
 					}
+					int pos = Collections.binarySearch(choices, o, comparator);
+					if (pos<0){
+						choices.add(-1-pos, o);
+						changed=true;
+					}
+					continue;
 				}
-				if (cmp!=0){
-					it.add(o);
-					changed=true;
-				}
-				onIt=o;									
+			}
+			if (addCustomChoice((CustomChoice)o, customChoices)){
+				choices=null;
+				changed=true;
 			}
 		}
 		if (changed){
@@ -298,7 +287,9 @@ public class OptionsListModel extends AbstractListModel {
 	private static Comparator DEFAULT_COMPARATOR = new Comparator() {
 		@Override
 		public int compare(Object o1, Object o2) {
-			//on a JTable, sorting will use the string representation
+			//on a JTable, sorting will use the string representation, but here
+			//is not enough to distinguish on string representation, as it is
+			//only used for cases where the content is not converted to String
 			int ret = o1.toString().compareTo(o2.toString());
 			if (ret==0 && !o1.equals(o2)){
 				ret = o1.hashCode()-o2.hashCode();

@@ -36,6 +36,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.Format;
 import java.util.Collection;
+import java.util.Comparator;
 
 import javax.swing.BorderFactory;
 import javax.swing.JList;
@@ -317,6 +318,19 @@ abstract class PopupComponent implements PopupMenuListener{
 		if (format!=null && getListCellRenderer()==null){
 			optionsModel.setStringContent(true);
 		}
+	}
+	
+	/** 
+	 * Sets the comparator used on the options list, but only if the content
+	 * is using a given renderer. As Strings, it has no effect
+	 **/
+	public void setRendererComparator(Comparator comparator){
+		optionsModel.setRendererComparator(comparator);
+	}
+	
+	/** Returns the renderer comparator, if defined */ 
+	public Comparator getRendererComparator(){
+		return optionsModel.getRendererComparator();
 	}
 	
 	/** Returns true if the passed object matches an existing option */

@@ -32,6 +32,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.text.Format;
+import java.util.Comparator;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
@@ -81,6 +82,7 @@ public class TableFilterExample extends JFrame {
     TableFilterHeader filterHeader;
     JCheckBoxMenuItem useFlagRenderer;
     JCheckBoxMenuItem tutorEditable;
+    JCheckBoxMenuItem countrySpecialSorter;
     
     public TableFilterExample() {
         super("Table Filter Example");
@@ -164,7 +166,7 @@ public class TableFilterExample extends JFrame {
 		tableMenu.addSeparator();
 		tableMenu.add(autoResize);
 		tableMenu.addSeparator();
-		tableMenu.add(new JMenuItem(new AbstractAction("Change model") {			
+		tableMenu.add(new JMenuItem(new AbstractAction("Change model width") {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				tableModel.changeModel(table);
@@ -208,6 +210,15 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	
+    	JCheckBoxMenuItem adaptiveOptions=new JCheckBoxMenuItem(
+    			new AbstractAction("adaptive options") {			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
+				filterHeader.setAdaptiveOptions(source.isSelected());				
+			}
+		});
+    	
     	JCheckBoxMenuItem enabled=new JCheckBoxMenuItem(
     			new AbstractAction("enabled") {			
 			@Override
@@ -235,6 +246,7 @@ public class TableFilterExample extends JFrame {
     	onUse.setSelected(true);
     	ignoreCase.setMnemonic(KeyEvent.VK_C);
     	ignoreCase.setSelected(filterHeader.getTextParser().isIgnoreCase());
+    	adaptiveOptions.setSelected(filterHeader.isAdaptiveOptions());
     	enabled.setSelected(filterHeader.isEnabled());
     	visible.setSelected(filterHeader.isVisible());
 
@@ -243,6 +255,7 @@ public class TableFilterExample extends JFrame {
     	ret.add(onUse);
     	ret.addSeparator();
     	ret.add(ignoreCase);
+    	ret.add(adaptiveOptions);
     	ret.add(createAutoOptionsMenu());
     	ret.add(enabled);
     	ret.addSeparator();
@@ -258,58 +271,23 @@ public class TableFilterExample extends JFrame {
     }
     
     private JMenu createAutoOptionsMenu(){
-    	JRadioButtonMenuItem disabled = new JRadioButtonMenuItem(
-    			new AbstractAction("disabled") {			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				filterHeader.setAutoOptions(AutoOptions.DISABLED);
-			}
-		});
-    	JRadioButtonMenuItem basic = new JRadioButtonMenuItem(
-    			new AbstractAction("basic") {			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				filterHeader.setAutoOptions(AutoOptions.BASIC);
-			}
-		});
-    	JRadioButtonMenuItem extended = new JRadioButtonMenuItem(
-    			new AbstractAction("extended") {			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				filterHeader.setAutoOptions(AutoOptions.EXTENDED);
-			}
-		});
-    	JRadioButtonMenuItem exact = new JRadioButtonMenuItem(
-    			new AbstractAction("exact") {			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				filterHeader.setAutoOptions(AutoOptions.EXACT);
-			}
-		});
-    	ButtonGroup group = new ButtonGroup();
-    	group.add(disabled);
-    	group.add(basic);
-    	group.add(extended);
-    	group.add(exact);
-    	switch(filterHeader.getAutoOptions()){
-    		case DISABLED: 
-    			disabled.setSelected(true);
-    			break;
-    		case BASIC: 
-    			basic.setSelected(true);
-    			break;
-    		case EXTENDED: 
-    			extended.setSelected(true);
-    			break;
-    		case EXACT: 
-    			exact.setSelected(true);
-    			break;
-    	}
     	JMenu ret = new JMenu("auto options");
-    	ret.add(disabled);
-    	ret.add(basic);
-    	ret.add(extended);
-    	ret.add(exact);
+    	ButtonGroup group = new ButtonGroup();
+    	for (AutoOptions ao : AutoOptions.values()){
+    		final AutoOptions set = ao;
+        	JRadioButtonMenuItem item = new JRadioButtonMenuItem(
+        			new AbstractAction(ao.toString().toLowerCase()) {			
+    			@Override
+    			public void actionPerformed(ActionEvent e) {
+    				filterHeader.setAutoOptions(set);
+    			}
+    		});    		
+        	group.add(item);
+        	if (filterHeader.getAutoOptions()==ao){
+        		item.setSelected(true);
+        	}
+        	ret.add(item);
+    	}
     	return ret;
     }
         	
@@ -389,6 +367,15 @@ public class TableFilterExample extends JFrame {
 			}
 		});
 
+		countrySpecialSorter = new JCheckBoxMenuItem("country column sorted by red proportion", false);
+		countrySpecialSorter.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				setCountryComparator(countrySpecialSorter.isSelected());
+			}
+		});
+
     	JMenuItem events = new JMenuItem(new AbstractAction("events window") {
     		EventsWindow window;
 			@Override
@@ -410,6 +397,7 @@ public class TableFilterExample extends JFrame {
     	ret.add(enableUserFilter);
     	ret.add(useFlagRenderer);
     	ret.add(tutorEditable);
+    	ret.add(countrySpecialSorter);
     	ret.addSeparator();
     	ret.add(createlLookAndFeelMenu());
     	return ret;
@@ -622,6 +610,14 @@ public class TableFilterExample extends JFrame {
         }
     }
     
+    void setCountryComparator(boolean set){
+        int column = tableModel.getColumn(TestTableModel.COUNTRY);
+        if (tableModel!=null && tableModel.getColumnCount() > column) {
+        	Comparator<TestData.Flag> comp = set? new TestData.RedComparator() : null;
+        	filterHeader.getFilterEditor(column).setRendererComparator(comp);
+        }    	    	
+    }
+    
     void customizeTutorColumn(){
         int column = tableModel.getColumn(TestTableModel.TUTOR);
         if (tableModel!=null && tableModel.getColumnCount() > column) {
@@ -638,7 +634,6 @@ public class TableFilterExample extends JFrame {
 	            		table.convertColumnIndexToView(countryColumn)).
 	            		setCellRenderer(new FlagRenderer());
 	
-	        	filterHeader.getFilterEditor(countryColumn).setAutoOptions(AutoOptions.EXACT);
 	        	setCountryEditorRenderer();
 	        }
 	
@@ -675,6 +670,7 @@ public class TableFilterExample extends JFrame {
 	            		});
 	        }        
 	        customizeTutorColumn();
+	        setCountryComparator(countrySpecialSorter.isSelected());
     	}
     }
 
@@ -710,7 +706,7 @@ public class TableFilterExample extends JFrame {
 //		} catch (Exception ex) {
 //			ex.printStackTrace();
 //		}
-    	FilterSettings.autoOptions=AutoOptions.EXTENDED;
+    	FilterSettings.autoOptions=AutoOptions.ENABLED;
         TableFilterExample frame = new TableFilterExample();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();

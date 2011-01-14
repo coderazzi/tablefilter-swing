@@ -35,8 +35,13 @@ import javax.swing.RowFilter;
  */
 public class AndFilter extends ComposedFilter {
 
+    /** Default constructor*/
+    public AndFilter() {
+    	super();
+    }
+
     /**
-     * Constructor built up out of none or more 
+     * Constructor built up out of one or more 
      * {@link net.coderazzi.filters.IFilter} instances
      */
     public AndFilter(IFilter... observables) {

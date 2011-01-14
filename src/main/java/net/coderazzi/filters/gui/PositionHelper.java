@@ -76,7 +76,8 @@ class PositionHelper implements PropertyChangeListener{
      */
     public void setPosition(Position location) {
         this.location = location;
-        changeTable(filterHeader.table, filterHeader.table);
+    	JTable table = filterHeader.getTable();
+        changeTable(table, table);
     }
 
 
@@ -91,9 +92,10 @@ class PositionHelper implements PropertyChangeListener{
      * The associated TableFilterHeader reports a change on its visibility
      */
     public void headerVisibilityChanged(boolean visible){
-		changeTable(filterHeader.table, null);
-    	if (visible && filterHeader.table!=null){
-    		changeTable(null, filterHeader.table);
+    	JTable table = filterHeader.getTable();
+		changeTable(table, null);
+    	if (visible && table!=null){
+    		changeTable(null, table);
     	} 
     }
     
@@ -124,8 +126,7 @@ class PositionHelper implements PropertyChangeListener{
     /**
      * PropertyChangeListener interface
      */
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
+	@Override public void propertyChange(PropertyChangeEvent evt) {
 		//the table has changed containment. clean up status and prepare again, 
 		//if possible; however, do nothing if the current setup is fine
 		if (previousTableViewport!=evt.getNewValue() 

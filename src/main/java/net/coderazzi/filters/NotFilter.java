@@ -34,9 +34,14 @@ import javax.swing.RowFilter;
  * @author  Luis M Pena - lu@coderazzi.net
  */
 public class NotFilter extends AndFilter {
+	
+	/** Default constructor */
+	public NotFilter(){
+		super();
+	}
 
     /**
-     * Constructor built up out of none or more 
+     * Constructor built up out of one or more 
      * {@link net.coderazzi.filters.IFilter} instances
      */
     public NotFilter(IFilter... observables) {

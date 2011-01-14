@@ -117,7 +117,7 @@ public class EventsWindow extends JDialog implements IFilterHeaderObserver{
 			FilterEditor editor) {
 		Event event = new Event();
 		event.name=CREATED;
-		event.column=editor.getFilterPosition();
+		event.column=editor.getModelPosition();
 		tableModel.addEvent(event);
 	}
 	
@@ -126,7 +126,7 @@ public class EventsWindow extends JDialog implements IFilterHeaderObserver{
 			FilterEditor editor) {
 		Event event = new Event();
 		event.name=EXCLUDED;
-		event.column=editor.getFilterPosition();
+		event.column=editor.getModelPosition();
 		tableModel.addEvent(event);
 	}
 	
@@ -135,7 +135,7 @@ public class EventsWindow extends JDialog implements IFilterHeaderObserver{
 			FilterEditor editor) {
 		Event event = new Event();
 		event.name="Updated";
-		event.column=editor.getFilterPosition();
+		event.column=editor.getModelPosition();
 		event.type = editor.getContent().getClass().getCanonicalName();
 		event.content = editor.getContent().toString();
 		tableModel.addEvent(event);

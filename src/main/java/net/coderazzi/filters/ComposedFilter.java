@@ -39,13 +39,19 @@ import java.util.Set;
 abstract public class ComposedFilter extends Filter implements IFilterObserver {
 
     /** Set of associated IFilters */
-    protected Set<IFilter> filters = new HashSet<IFilter>();
+    protected Set<IFilter> filters;
+
+	/** Default constructor */
+    protected ComposedFilter() {
+    	filters = new HashSet<IFilter>();
+    }
 
     /**
-     * Constructor built up out of none or more 
+     * Constructor built up out of one or more 
      * {@link net.coderazzi.filters.IFilter} instances
      */
     protected ComposedFilter(IFilter... observables) {
+    	this();
         addFilter(observables);
     }
 
@@ -62,12 +68,18 @@ abstract public class ComposedFilter extends Filter implements IFilterObserver {
     }
 
     /**
-     * Unsubscribes a {@link net.coderazzi.filters.IFilter} that was previously
-     * subscribed to receive filter events
+     * Unsubscribes one or more {@link net.coderazzi.filters.IFilter}s that were 
+     * previously subscribed to receive filter events
      */
-    public void removeFilter(IFilter filter) {
-        if (filters.remove(filter)) {
-        	filter.removeFilterObserver(this);
+    public void removeFilter(IFilter... filtersToRemove) {
+    	boolean report=false;
+        for (IFilter filter : filtersToRemove) {
+            if (filters.remove(filter)) {
+            	filter.removeFilterObserver(this);
+            	report=true;
+            }
+        }
+        if (report){
             reportFilterUpdatedToObservers();
         }
     }
