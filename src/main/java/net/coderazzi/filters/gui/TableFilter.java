@@ -145,6 +145,17 @@ public class TableFilter extends AndFilter
         return table;
     }
     
+    /** Enables/Disables the filtering */
+    public void setEnabled(boolean enabled) {
+    	optionsSupport.setEnabled(enabled);
+    	enableNotifications(enabled);
+    }
+    
+    /** Returns the current enable status */
+    public boolean isEnabled() {
+    	return optionsSupport.isEnabled();
+    }
+    
 	/** Sets/unsets the auto options flag */
     public void setAutoOptions(AutoOptions mode){
     	if (mode!=autoOptions){
@@ -162,98 +173,6 @@ public class TableFilter extends AndFilter
 		return autoOptions;
 	}
 	
-	/**
-	 * Method invoked by the FilterEditor when its autoOptions mode OR 
-	 * userOptions change; in return, it will set the proper options on
-	 * the specified editor. 
-	 */
-	public void updatedEditorOptions(FilterEditor editor){
-		if (editors.containsValue(editor) && isEnabled()){
-			optionsSupport.updated(editor);
-		}
-    }
-	
-    @Override public void filterUpdated(IFilter producer) {
-    	if (adaptiveSupport!=null){
-    		adaptiveSupport.update(producer);
-    	}
-    	super.filterUpdated(producer);
-    }
-    
-    @Override public void addFilter(IFilter... filtersToAdd) {
-    	enableNotifications(false);
-    	super.addFilter(filtersToAdd);
-    	enableNotifications(true);
-    }
-    
-    @Override public void removeFilter(IFilter... filtersToRemove) {
-    	enableNotifications(false);
-    	super.removeFilter(filtersToRemove);
-    	enableNotifications(true);
-    }
-    
-    /** Adds a new filter editor */
-    public void addFilterEditor(FilterEditor editor){
-    	super.addFilter(editor.getFilter());
-    	editors.put(editor.getModelPosition(), editor);
-    	editor.setAutoOptions(autoOptions);
-    }
-    
-    /** Removes an existing editor */
-    public void removeFilterEditor(FilterEditor editor){
-    	super.removeFilter(editor.getFilter());
-    	editors.remove(editor.getModelPosition());
-    }
-    
-    /** Enables/Disables the filtering */
-    public void setEnabled(boolean enabled) {
-    	optionsSupport.setEnabled(enabled);
-    	enableNotifications(enabled);
-    }
-    
-    /** Returns the current enable status */
-    public boolean isEnabled() {
-    	return optionsSupport.isEnabled();
-    }
-    
-    /**
-     * <p>Temporarily enable/disable notifications to the observers, including 
-     * the registered {@link javax.swing.JTable}.</p>
-     *
-     * <p>Multiple calls to this method can be issued, but the caller must 
-     * ensure that there are as many calls with true parameter as with false 
-     * parameter, as the notifications are only re-enabled when the zero 
-     * balance is reached.</p>
-     */
-    public boolean enableNotifications(boolean enable) {
-        sendNotifications += enable ? 1 : -1;
-        if (enable){
-	        if (sendNotifications == 0) {
-	        	//adding/removing filter editors is not done as separate processes
-	        	//when the user sets/changes the TableModel, all columns are
-	        	//removed and then recreated.
-	        	//At the beginning of the process, there are calls to 
-	        	//enableNotifications(false)/(true) than only balance out when the
-	        	//whole model is setup. In that moment, we build the 
-	        	//AdaptiveOptionsSupport, if needed. 
-	        	//We use the same mechanism whenever it would be needed to
-	        	//recreate the adaptive support or because it could be more 
-	        	//efficient doing so.
-	        	if (adaptiveSupportEnabled && table!=null){
-	        		adaptiveSupport = optionsSupport.createAdaptiveOptionsSupport(editors.values());
-	        		updateRowFilter();
-	        	} 
-	        	else if (pendingNotifications){
-	        		updateRowFilter();
-	        	} 
-	        }
-        } else if (adaptiveSupport!=null){
-        	adaptiveSupport = null;        	
-    		updateRowFilter();
-        }
-        return sendNotifications >= 0;
-    }
-    
     /**
      * Sets the adaptive options mode
      */
@@ -296,6 +215,87 @@ public class TableFilter extends AndFilter
         return autoSelector.autoSelection;
     }
 
+    @Override public void addFilter(IFilter... filtersToAdd) {
+    	enableNotifications(false);
+    	super.addFilter(filtersToAdd);
+    	enableNotifications(true);
+    }
+    
+    @Override public void removeFilter(IFilter... filtersToRemove) {
+    	enableNotifications(false);
+    	super.removeFilter(filtersToRemove);
+    	enableNotifications(true);
+    }
+    
+    /** Adds a new filter editor */
+    public void addFilterEditor(FilterEditor editor){
+    	super.addFilter(editor.getFilter());
+    	editors.put(editor.getModelPosition(), editor);
+    	editor.setAutoOptions(autoOptions);
+    }
+    
+    /** Removes an existing editor */
+    public void removeFilterEditor(FilterEditor editor){
+    	super.removeFilter(editor.getFilter());
+    	editors.remove(editor.getModelPosition());
+    }
+    
+	/**
+	 * Method invoked by the FilterEditor when its autoOptions mode OR 
+	 * userOptions change; in return, it will set the proper options on
+	 * the specified editor. 
+	 */
+	public void updatedEditorOptions(FilterEditor editor){
+		if (editors.containsValue(editor) && isEnabled()){
+			optionsSupport.updated(editor);
+		}
+    }
+	
+    @Override public void filterUpdated(IFilter producer) {
+    	if (adaptiveSupport!=null){
+    		adaptiveSupport.update(producer);
+    	}
+    	super.filterUpdated(producer);
+    }
+    
+    /**
+     * <p>Temporarily enable/disable notifications to the observers, including 
+     * the registered {@link javax.swing.JTable}.</p>
+     *
+     * <p>Multiple calls to this method can be issued, but the caller must 
+     * ensure that there are as many calls with true parameter as with false 
+     * parameter, as the notifications are only re-enabled when the zero 
+     * balance is reached.</p>
+     */
+    public boolean enableNotifications(boolean enable) {
+        sendNotifications += enable ? 1 : -1;
+        if (enable){
+	        if (sendNotifications == 0) {
+	        	//adding/removing filter editors is not done as separate processes
+	        	//when the user sets/changes the TableModel, all columns are
+	        	//removed and then recreated.
+	        	//At the beginning of the process, there are calls to 
+	        	//enableNotifications(false)/(true) than only balance out when the
+	        	//whole model is setup. In that moment, we build the 
+	        	//AdaptiveOptionsSupport, if needed. 
+	        	//We use the same mechanism whenever it would be needed to
+	        	//recreate the adaptive support or because it could be more 
+	        	//efficient doing so.
+	        	if (adaptiveSupportEnabled && table!=null){
+	        		adaptiveSupport = optionsSupport.createAdaptiveOptionsSupport(editors.values());
+	        		updateRowFilter();
+	        	} 
+	        	else if (pendingNotifications){
+	        		updateRowFilter();
+	        	} 
+	        }
+        } else if (adaptiveSupport!=null){
+        	adaptiveSupport = null;        	
+    		updateRowFilter();
+        }
+        return sendNotifications >= 0;
+    }
+    
     /**
      * Internal method to send a notification to the observers, verifying 
      * first if the notifications are currently enabled.
