@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,24 +16,26 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import net.coderazzi.filters.gui.IFilterHeaderObserver;
 import net.coderazzi.filters.gui.TableFilterHeader;
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
 @SuppressWarnings("serial")
-public class EventsWindow extends JDialog implements IFilterHeaderObserver{
+public class EventsWindow extends JDialog 
+	implements IFilterHeaderObserver, PropertyChangeListener{
 	
 	TableModel tableModel;
 	private static final String EXCLUDED = "Excluded";
 	private static final String CREATED = "Created";
-	static String COLUMN_NAMES[]={"Event", "Column", "Content.type", "Content"};
+	static String COLUMN_NAMES[]={"Event", "Column", "{Content|Event}.type", "Value"};
 	static Class<?> COLUMN_CLASSES[]=
-		{String.class, Integer.class, String.class, String.class};
+		{String.class, String.class, String.class, String.class};
 	
 	class Event{
 		String name;
-		int column;
+		String column;
 		String type;
 		String content;
 	}
@@ -110,34 +114,43 @@ public class EventsWindow extends JDialog implements IFilterHeaderObserver{
 				header.removeHeaderObserver(EventsWindow.this);
 			}
 		});
+		header.getTextParser().addPropertyChangeListener(this);
 	}
 	
-	@Override
-	public void tableFilterEditorCreated(TableFilterHeader header, 
-			FilterEditor editor) {
+	@Override public void tableFilterEditorCreated(TableFilterHeader header, 
+			FilterEditor editor, TableColumn tc) {
 		Event event = new Event();
 		event.name=CREATED;
-		event.column=editor.getModelPosition();
+		event.column=tc.getHeaderValue().toString();
 		tableModel.addEvent(event);
 	}
 	
-	@Override
-	public void tableFilterEditorExcluded(TableFilterHeader header, 
-			FilterEditor editor) {
+	@Override public void tableFilterEditorExcluded(TableFilterHeader header, 
+			FilterEditor editor, TableColumn tc) {
 		Event event = new Event();
 		event.name=EXCLUDED;
-		event.column=editor.getModelPosition();
+		event.column=tc.getHeaderValue().toString();
 		tableModel.addEvent(event);
 	}
 	
 	@Override
 	public void tableFilterUpdated(TableFilterHeader header, 
-			FilterEditor editor) {
+			FilterEditor editor, TableColumn tc) {
 		Event event = new Event();
 		event.name="Updated";
-		event.column=editor.getModelPosition();
 		event.type = editor.getContent().getClass().getCanonicalName();
 		event.content = editor.getContent().toString();
+		event.column=tc.getHeaderValue().toString();
+		tableModel.addEvent(event);
+	}
+	
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		Event event = new Event();
+		event.name="Global TextParser";
+		event.column="*";
+		event.type = evt.getPropertyName();
+		event.content = evt.getNewValue().toString();
 		tableModel.addEvent(event);
 	}
 	

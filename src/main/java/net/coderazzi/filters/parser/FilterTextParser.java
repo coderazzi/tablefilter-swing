@@ -174,7 +174,7 @@ public class FilterTextParser implements IFilterTextParser {
     }
 
     @Override public void setTableModel(TableModel model) {
-        TableModel oldModel = model;
+        TableModel oldModel = this.model;
         this.model = model;
         propertiesHandler.firePropertyChange(TABLE_MODEL_PROPERTY, 
         		oldModel, model);

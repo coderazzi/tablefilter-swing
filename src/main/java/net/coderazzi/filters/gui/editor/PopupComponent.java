@@ -44,6 +44,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.PopupMenuEvent;
@@ -402,17 +403,34 @@ abstract class PopupComponent implements PopupMenuListener{
 	 * Adds content to the options list.<br>
 	 * If there is no {@link ListCellRenderer} defined,
 	 * the content is stringfied and sorted -so duplicates are removed-
+	 * @returns true if the operation implies a change
 	 */
-	public Collection<CustomChoice>  addOptions(Collection<?> options) {
-		Collection<CustomChoice>  ret = optionsModel.addContent(options);
-		fixMaxHistory();
-		reconfigureGui();
-		return ret;
+	public boolean addOptions(Collection<?> options) {
+		if (optionsModel.addContent(options)){
+			fixMaxHistory();
+			reconfigureGui();
+			return true;
+		}
+		return false;
+	}
+
+	/** 
+	 * Adds content to the options list.<br>
+	 * If there is no {@link ListCellRenderer} defined,
+	 * the content is stringfied and sorted -so duplicates are removed-
+	 */
+	public Collection<CustomChoice>  getCustomOptions() {
+		return optionsModel.getCustomChoices();
 	}
 
 	/** Returns the current options */
 	public Collection<?> getOptions(){
 		return optionsModel.getOptions();
+	}
+	
+	/** Returns the model associated to the options */
+	public ListModel getOptionsListModel(){
+		return optionsModel;
 	}
 
 	/**

@@ -1051,15 +1051,15 @@ public class TableFilterHeader extends JPanel {
                 super(new BorderLayout());
                 this.tc = tc;
                 w = tc.getWidth();
-                this.editor = editor;
-                add(this.editor, BorderLayout.CENTER);
+                add(editor, BorderLayout.CENTER);
                 editor.setEnabled(TableFilterHeader.this.isEnabled());
                 h = getPreferredSize().height;
             	editor.getFilter().addFilterObserver(this);
                 for (IFilterHeaderObserver observer : observers){
                 	observer.tableFilterEditorCreated(TableFilterHeader.this, 
-	                          editor);
+	                          editor, tc);
                 }            	
+                this.editor = editor;
                 tc.addPropertyChangeListener(this);
             }
 
@@ -1074,7 +1074,7 @@ public class TableFilterHeader extends JPanel {
                     editor.getFilter().removeFilterObserver(this);
                     for (IFilterHeaderObserver observer : observers){
                     	observer.tableFilterEditorExcluded(TableFilterHeader.this, 
-                    			editor);
+                    			editor, tc);
                     }            	
                 }
                 tc.removePropertyChangeListener(this);
@@ -1094,9 +1094,12 @@ public class TableFilterHeader extends JPanel {
             }
             
             @Override public void filterUpdated(IFilter obs) {
-                for (IFilterHeaderObserver observer : observers){
-                	observer.tableFilterUpdated(TableFilterHeader.this, editor);
-                }            	
+            	if (editor!=null){ //avoid sending the first update
+	                for (IFilterHeaderObserver observer : observers){
+	                	observer.tableFilterUpdated(TableFilterHeader.this, 
+	                			editor, tc);
+	                }
+            	}
             }
             
             @Override public void setEnabled(boolean enabled) {

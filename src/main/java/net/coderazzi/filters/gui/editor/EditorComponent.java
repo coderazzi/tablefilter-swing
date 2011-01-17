@@ -33,7 +33,6 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 
 import javax.swing.CellRendererPane;
@@ -47,6 +46,8 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -108,9 +109,6 @@ interface EditorComponent {
     /** Returns the definition associated to the current editor */
     public Object getContent();
     
-    /** Reports the existing custom choices */
-    public void reportCustomChoices(Collection<CustomChoice> customChoices);
-    
     /** 
      * Defines the filter position associated to this editor.<br>
      * It corresponds to the table's model column
@@ -150,15 +148,18 @@ interface EditorComponent {
     /** Returns the foreground color used*/
     public Color getForeground();
 
+    /** Method called when the component is removed */
+    public void detach();
+    
     /**
      * EditorComponent for text edition, backed up with a {@link JTextField}<br>
      * It is editable by default.
      */
     static final class Text extends DocumentFilter 
-    		implements DocumentListener, EditorComponent {
+    		implements DocumentListener, EditorComponent, ListDataListener {
 
         private TextEditor textField = new TextEditor();
-        private Collection<CustomChoice> customChoices = Collections.EMPTY_LIST;
+        private Collection<CustomChoice> customChoices;
         private IFilterTextParser parser;
         private int filterPosition;
         private boolean editable;
@@ -268,8 +269,7 @@ interface EditorComponent {
         		}
             }
         	
-        	@Override
-        	public void caretUpdate(CaretEvent e) {
+        	@Override public void caretUpdate(CaretEvent e) {
                 //if the user moves the cursor on the editor, the focus passes 
                 //automatically back to the editor (from the popup)
         		if (enabled){
@@ -372,6 +372,8 @@ interface EditorComponent {
 
         public Text(PopupComponent popupComponent) {
             this.popup = popupComponent;
+        	popup.getOptionsListModel().addListDataListener(this);
+        	retrieveCustomChoices();
             setEditable(true);
         }
 
@@ -379,9 +381,8 @@ interface EditorComponent {
             return textField;
         }
 
-        @Override 
-        public void reportCustomChoices(Collection<CustomChoice> customChoices) {
-        	this.customChoices = customChoices;
+        @Override public void detach() {
+        	popup.getOptionsListModel().removeListDataListener(this);
         }
 
         @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
@@ -571,8 +572,7 @@ interface EditorComponent {
         }
 
         /** {@link DocumentFilter}: method called if handler is not editable */
-        @Override
-        public void insertString(FilterBypass fb,
+        @Override public void insertString(FilterBypass fb,
                                  int offset,
                                  String string,
                                  AttributeSet attr) {
@@ -582,8 +582,7 @@ interface EditorComponent {
         }
 
         /** {@link DocumentFilter}: method called if handler is not editable */
-        @Override
-        public void replace(FilterBypass fb,
+        @Override public void replace(FilterBypass fb,
                             int offset,
                             int length,
                             String text,
@@ -619,8 +618,7 @@ interface EditorComponent {
         }
 
         /** {@link DocumentFilter}: method called if handler is not editable */
-        @Override
-        public void remove(FilterBypass fb,
+        @Override public void remove(FilterBypass fb,
                            int offset,
                            int length) throws BadLocationException {
             int caret = textField.getCaret().getDot();
@@ -672,23 +670,38 @@ interface EditorComponent {
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
-        @Override
-		public void changedUpdate(DocumentEvent e) {
+        @Override public void changedUpdate(DocumentEvent e) {
             // no need to handle updates
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
-        @Override
-		public void removeUpdate(DocumentEvent e) {
+        @Override public void removeUpdate(DocumentEvent e) {
             getProposalOnEdition(textField.getText(), false);
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
-        @Override
-		public void insertUpdate(DocumentEvent e) {
+        @Override public void insertUpdate(DocumentEvent e) {
             getProposalOnEdition(textField.getText(), false);
         }
-
+        
+        /** {@link ListDataListener}*/
+        @Override public void contentsChanged(ListDataEvent e) {
+        	retrieveCustomChoices();
+        }
+        
+        /** {@link ListDataListener}*/
+        @Override public void intervalAdded(ListDataEvent e) {
+        	retrieveCustomChoices();
+        }
+        
+        /** {@link ListDataListener}*/
+        @Override public void intervalRemoved(ListDataEvent e) {
+        	retrieveCustomChoices();
+        }
+        
+        private void retrieveCustomChoices(){
+        	this.customChoices = popup.getCustomOptions();        	
+        }
     }
 
     /**
@@ -717,9 +730,8 @@ interface EditorComponent {
             return this;
         }
         
-        @Override 
-        public void reportCustomChoices(Collection<CustomChoice> customChoices) {
-        	//a renderer does not need to know about these choices
+        @Override public void detach() {
+        	//no need to perform any changes
         }
 
         @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
@@ -730,8 +742,7 @@ interface EditorComponent {
 	                filter = ((CustomChoice)cachedContent).getFilter(parser, filterPosition);
 	            } else {
 	                filter = new RowFilter() {
-	                        @Override
-	                        public boolean include(RowFilter.Entry entry) {
+	                        @Override public boolean include(RowFilter.Entry entry) {
 	                            Object val = entry.getValue(filterPosition);
 	                            return (val == null) ? (cachedContent == null) 
 	                            		: val.equals(cachedContent);

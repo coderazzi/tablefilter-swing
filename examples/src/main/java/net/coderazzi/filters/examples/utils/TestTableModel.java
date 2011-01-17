@@ -45,7 +45,7 @@ public class TestTableModel extends AbstractTableModel {
     public static final String COUNTRY = "Country";
     public static final String AGE = "Age";
     public static final String CLUB = "Club";
-    public static final String LCNAME = "Kickname";
+    public static final String LCNAME = "Nickname";
     public static final String DATE = "Date";
 
     private static String[] columnNames = {
@@ -148,18 +148,15 @@ public class TestTableModel extends AbstractTableModel {
         return -1;
     }
 
-    @Override
-	public int getColumnCount() {
+    @Override public int getColumnCount() {
         return changedModel ? columnNames.length : 5;
     }
 
-    @Override
-	public int getRowCount() {
+    @Override public int getRowCount() {
         return data.size();
     }
 
-    @Override
-	public Object getValueAt(int rowIndex,
+    @Override public Object getValueAt(int rowIndex,
                              int columnIndex) {
         TestData td = data.get(rowIndex);
 
@@ -193,14 +190,12 @@ public class TestTableModel extends AbstractTableModel {
         return null;
     }
 
-    @Override
-    public boolean isCellEditable(int rowIndex,
+    @Override public boolean isCellEditable(int rowIndex,
                                   int columnIndex) {
         return columnsOrder[columnIndex] == 2;
     }
 
-    @Override
-    public void setValueAt(Object value,
+    @Override public void setValueAt(Object value,
                            int rowIndex,
                            int columnIndex) {
 
@@ -208,13 +203,11 @@ public class TestTableModel extends AbstractTableModel {
         fireTableRowsUpdated(rowIndex, rowIndex);
     }
 
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
+    @Override public Class<?> getColumnClass(int columnIndex) {
         return columnTypes[columnsOrder[columnIndex]];
     }
 
-    @Override
-    public String getColumnName(int column) {
+    @Override public String getColumnName(int column) {
         return columnNames[columnsOrder[column]];
     }
 

@@ -65,13 +65,11 @@ public class OptionsListModel extends AbstractListModel {
 		fixComparator();
 	}
 	
-	@Override
-	public int getSize() {
+	@Override public int getSize() {
 		return content.size();
 	}
 
-	@Override
-	public Object getElementAt(int i) {
+	@Override public Object getElementAt(int i) {
 		return content.get(i);
 	}
 
@@ -159,15 +157,20 @@ public class OptionsListModel extends AbstractListModel {
 		return content;
 	}
 
+	/** Returns the list of subchoices in the whole content */
+	public Collection<CustomChoice> getCustomChoices(){
+		return content.subList(0, customChoices);
+	}
+
 	/** 
 	 * Adds additional options.<br>
 	 * If the content is text-based, the options are converted into Strings, 
 	 * and sorted.<br>
 	 * Otherwise, no sorting is performed, although duplicates are still
 	 * discarded
-	 * @return the list of subchoices in the whole content
+	 * @return true if there are any changes after the operation
 	 */
-	public Collection<CustomChoice> addContent(Collection addedContent) {
+	public boolean addContent(Collection addedContent) {
 		boolean changed=false;
 		List choices = null;
 		for (Object o : addedContent){
@@ -200,7 +203,7 @@ public class OptionsListModel extends AbstractListModel {
 			addCustomChoice(CustomChoice.MATCH_ALL, 0);
 			fireContentsChanged(this, 0, getSize());
 		}
-		return content.subList(0, customChoices);
+		return changed;
 	}
 	
 	/**
@@ -285,8 +288,7 @@ public class OptionsListModel extends AbstractListModel {
 	}
 	
 	private static Comparator DEFAULT_COMPARATOR = new Comparator() {
-		@Override
-		public int compare(Object o1, Object o2) {
+		@Override public int compare(Object o1, Object o2) {
 			//on a JTable, sorting will use the string representation, but here
 			//is not enough to distinguish on string representation, as it is
 			//only used for cases where the content is not converted to String
@@ -304,8 +306,7 @@ public class OptionsListModel extends AbstractListModel {
 	private static Comparator DEFAULT_COMPARABLE_COMPARATOR = 
 		new Comparator<Comparable>() {
 
-		@Override
-		public int compare(Comparable o1, Comparable o2) {
+		@Override public int compare(Comparable o1, Comparable o2) {
 			return o1.compareTo(o2);
 		}
 	};	

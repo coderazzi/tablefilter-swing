@@ -432,8 +432,9 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	}
 
 	public void addOptions(Collection<?> options) {
-		editor.reportCustomChoices(popup.addOptions(options));
-		downButton.setCanPopup(popup.hasContent());
+		if (popup.addOptions(options)){
+			downButton.setCanPopup(popup.hasContent());
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -567,6 +568,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		}
 		if (newComponent!=null){
 			if (editor!=null){
+				editor.detach();
 				remove(editor.getComponent());
 				newComponent.setTextParser(editor.getTextParser());
 				newComponent.setPosition(editor.getPosition());
@@ -791,8 +793,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = -1583258893221830664L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				if (!popup.isPopupFocused() || !popup.selectFirst(false)) {
 					if (e.getSource() instanceof JTextField){
 						JTextField textField=(JTextField)e.getSource();
@@ -835,8 +836,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			private static final long serialVersionUID = 6590487133211390977L;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				//without moving the focus, move up one page on the popup menu, 
 				//probably jumping to history list
 				if (popup.isVisible()) {

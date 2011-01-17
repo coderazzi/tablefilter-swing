@@ -25,6 +25,8 @@
 
 package net.coderazzi.filters.gui;
 
+import javax.swing.table.TableColumn;
+
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
 
@@ -42,18 +44,22 @@ public interface IFilterHeaderObserver {
 	 * <p>Informs the observer than a new filter editor is created</p>
      * @param header the associated table filter header
 	 * @param editor
+	 * @param tableColumn the associated {@link TableColumn}
 	 */
 	public void tableFilterEditorCreated(TableFilterHeader header, 
-			                             FilterEditor editor);
+			                             FilterEditor editor,
+			                             TableColumn tableColumn);
 
 	/**
 	 * <p>Informs the observer than an existing filter editor has been
 	 * excluded from the filter header</p>
      * @param header the associated table filter header
 	 * @param editor
+	 * @param tableColumn the associated {@link TableColumn}
 	 */
 	public void tableFilterEditorExcluded(TableFilterHeader header, 
-			                              FilterEditor editor);
+			                              FilterEditor editor,
+				                          TableColumn tableColumn);
 
     /**
      * <p>Notification made by the 
@@ -61,7 +67,9 @@ public interface IFilterHeaderObserver {
      * when the filter's content is updated</p>
      * @param header the associated table filter header
      * @param editor the observable instance
+	 * @param tableColumn the associated {@link TableColumn}
      */
     public void tableFilterUpdated(TableFilterHeader header, 
-    		                       FilterEditor editor);
+    		                       FilterEditor editor,
+		                           TableColumn tableColumn);
 }
