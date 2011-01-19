@@ -427,6 +427,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	}
 
 	public void addOptions(Collection<?> options) {
+		System.out.println("Editor "+getModelPosition()+": set "+options.size());
 		if (popup.addOptions(options)){
 			downButton.setCanPopup(popup.hasContent());
 		}
@@ -579,7 +580,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 			add(editor.getComponent(), BorderLayout.CENTER);
 			revalidate();
 		}		
-		editor.setEnabled(filter.isEnabled());
+		setEditorEnabled(filter.isEnabled());
 	}
 	
 	private void setupComponent(JComponent component){

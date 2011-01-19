@@ -754,6 +754,15 @@ public class TableFilterHeader extends JPanel {
          * method is going to be invoked from the gui thread
          */
         private int autoRun;
+        
+        /**
+         * When a new model is set, all columns are first removed, and the new
+         * ones then created. While columns are removed, the state of the filter
+         * (filtersHandler) can changed between enabled and not enabled, but
+         * it is needed to remember the state at the start of the cycle, to
+         * create the new editors with the expected enable state.
+         */
+        private Boolean handlerEnabled;
 
         /**
          * Creates the controller for all the columns<br>
@@ -768,11 +777,12 @@ public class TableFilterHeader extends JPanel {
             super.setBackground(background);
             this.tableColumnModel = getTable().getColumnModel();
 
+            boolean enabled=filtersHandler.isEnabled();
             int count = tableColumnModel.getColumnCount();
             columns = new ArrayList<FilterColumnPanel>(count);
 
             for (int i = 0; i < count; i++) {
-                createColumn(i);
+                createColumn(i, enabled);
             }
 
             preferredSize = new Dimension(0, (count == 0) ? 0 : columns.get(0).h);
@@ -781,9 +791,9 @@ public class TableFilterHeader extends JPanel {
         }
 
         /** Creates the FilterColumnPanel for the given column number */
-        private void createColumn(int columnView) {
+        private void createColumn(int columnView, boolean enableIt) {
             int columnModel = getTable().convertColumnIndexToModel(columnView);
-            FilterEditor editor = createEditor(columnModel);
+            FilterEditor editor = createEditor(columnModel, enableIt);
             FilterColumnPanel column = new FilterColumnPanel(
             		tableColumnModel.getColumn(columnView), editor);
             customizeEditor(column.editor);
@@ -793,11 +803,11 @@ public class TableFilterHeader extends JPanel {
         }
 
         /** Creates an editor for the given column */
-        private FilterEditor createEditor(int modelColumn) {            
+        private FilterEditor createEditor(int modelColumn, boolean enableIt) {            
             FilterEditor ret = new FilterEditor(filtersHandler, 
             		modelColumn, getTable().getModel().getColumnClass(modelColumn));
             ret.setTextParser(getTextParser());
-            ret.setEnabled(filtersHandler.isEnabled());
+            ret.getFilter().setEnabled(enableIt);
             filtersHandler.addFilterEditor(ret);
             return ret;
         }
@@ -947,7 +957,10 @@ public class TableFilterHeader extends JPanel {
         	//will happen when all the column modifications have concluded, 
         	//so then it is safe to reactivate the notifications
             filtersHandler.enableNotifications(false);
-            createColumn(e.getToIndex());
+            if (handlerEnabled==null){
+            	handlerEnabled=filtersHandler.isEnabled();
+            }
+            createColumn(e.getToIndex(), handlerEnabled);
             update();
         }
 
@@ -956,6 +969,9 @@ public class TableFilterHeader extends JPanel {
 
             //see the comment on columnAdded
             filtersHandler.enableNotifications(false);
+        	if (handlerEnabled==null){
+        		handlerEnabled = filtersHandler.isEnabled();
+        	}
             FilterColumnPanel fcp = columns.remove(e.getFromIndex());
             fcp.detach();
             remove(fcp);
@@ -985,6 +1001,7 @@ public class TableFilterHeader extends JPanel {
         @Override public void run() {
             //see the comment on columnAdded
             if (--autoRun == 0 && getTable() != null){
+            	handlerEnabled=null;
                 updateHeight();
                 getTextParser().setTableModel(getTable().getModel());
             }

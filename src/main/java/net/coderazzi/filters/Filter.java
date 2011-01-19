@@ -68,7 +68,6 @@ abstract public class Filter extends RowFilter implements IFilter {
      */
     @Override public void addFilterObserver(IFilterObserver observer) {
         filterObservers.add(observer);
-        reportFilterUpdatedToObservers();
     }
 
     /**

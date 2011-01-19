@@ -131,7 +131,7 @@ public class TableFilterExample extends JFrame {
 			
 			@Override public void tableFilterEditorCreated(TableFilterHeader header,
 					FilterEditor editor, TableColumn tableColumn) {
-		    	createFiltersMenu(editor, (String) tableColumn.getHeaderValue());
+		    	addToFiltersMenu(editor, (String) tableColumn.getHeaderValue());
 			}
 		});
 		useFlagRenderer=new JCheckBoxMenuItem("country flags as icons -in options-", true);
@@ -546,7 +546,7 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
-    void createFiltersMenu(final FilterEditor editor, final String name) {
+    void addToFiltersMenu(final FilterEditor editor, final String name) {
     	JMenu menu = (JMenu) getMenu(filtersMenu, name, false);
     	menu.add(createAutoOptionsMenu(editor.getAutoOptions(), new AutoOptionsSet(){
     		@Override public void setAutoOptions(AutoOptions ao) {
@@ -563,7 +563,7 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	menu.add(editable);
-    	JCheckBoxMenuItem enabled = new JCheckBoxMenuItem(ENABLED, editor.isEditable());
+    	JCheckBoxMenuItem enabled = new JCheckBoxMenuItem(ENABLED, editor.isEnabled());
     	enabled.addActionListener(new ActionListener() {			
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
@@ -572,7 +572,7 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	menu.add(enabled);
-    	JCheckBoxMenuItem ignoreCase = new JCheckBoxMenuItem(IGNORE_CASE, editor.isEditable());
+    	JCheckBoxMenuItem ignoreCase = new JCheckBoxMenuItem(IGNORE_CASE, editor.getTextParser().isIgnoreCase());
     	ignoreCase.addActionListener(new ActionListener() {			
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
