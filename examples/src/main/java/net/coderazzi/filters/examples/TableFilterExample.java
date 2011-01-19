@@ -567,7 +567,7 @@ public class TableFilterExample extends JFrame {
     	enabled.addActionListener(new ActionListener() {			
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
-				editor.setEnabled(source.isSelected());
+				editor.getFilter().setEnabled(source.isSelected());
 				allEnabled.setSelected(filterHeader.isEnabled());
 			}
 		});
@@ -618,7 +618,7 @@ public class TableFilterExample extends JFrame {
     void updateFilter(FilterEditor editor, String columnName) {
     	JMenu menu = (JMenu) getMenu(filtersMenu, columnName, false);
     	((JCheckBoxMenuItem) getMenu(menu, EDITABLE, false)).setSelected(editor.isEditable());
-    	((JCheckBoxMenuItem) getMenu(menu, ENABLED, false)).setSelected(editor.isEnabled());
+    	((JCheckBoxMenuItem) getMenu(menu, ENABLED, false)).setSelected(editor.getFilter().isEnabled());
     	((JCheckBoxMenuItem) getMenu(menu, IGNORE_CASE, false)).setSelected(editor.getTextParser().isIgnoreCase());
     	JMenu autoOptionsMenu = (JMenu) getMenu(menu, AUTO_OPTIONS, false);
     	((JRadioButtonMenuItem ) getMenu(autoOptionsMenu, editor.getAutoOptions().toString().toLowerCase(), false)).setSelected(true);

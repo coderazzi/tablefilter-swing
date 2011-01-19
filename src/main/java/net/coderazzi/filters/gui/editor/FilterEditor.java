@@ -222,18 +222,10 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		filter.checkChanges(false);
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setEnabled(boolean)
-	 */
-	@Override public void setEnabled(boolean enabled) {
-		if (filter==null){
-			super.setEnabled(enabled);
-		} else if (isEnabled()!=enabled){
-			super.setEnabled(enabled);
-			downButton.setEnabled(enabled);
-			editor.setEnabled(enabled);
-			filter.setEnabled(enabled);			
-		}
+	void setEditorEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		downButton.setEnabled(enabled);
+		editor.setEnabled(enabled);
 	}
 	
 	/* (non-Javadoc)
@@ -587,7 +579,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 			add(editor.getComponent(), BorderLayout.CENTER);
 			revalidate();
 		}		
-		setEnabled(isEnabled());
+		editor.setEnabled(filter.isEnabled());
 	}
 	
 	private void setupComponent(JComponent component){
@@ -612,7 +604,6 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		});
 
 		component.setFocusable(true);
-		component.setEnabled(isEnabled());
 		
 		setupEnterKey(component);
 		setupEscKey(component);
@@ -1058,8 +1049,8 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     		return delegateFilter==null? true : delegateFilter.include(entry);
     	}
     	@Override public void setEnabled(boolean enable) {
-    		FilterEditor.this.setEnabled(enable);    			
     		if (enable!=isEnabled()){
+    			setEditorEnabled(enable);
         		if (enable){
         			delegateFilter = editor.checkFilterUpdate(true);
         		} else {

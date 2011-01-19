@@ -48,9 +48,6 @@ public interface IFilterEditor {
 	/** Sets the content, adapted to the editors' type */
 	public abstract void setContent(Object content);
 
-	/** Enabled/Disables the editor, and the associate filter */
-	public abstract void setEnabled(boolean enabled);
-
 	public abstract void setBackground(Color bg);
 
 	/** Sets the color used to show filter's errors (invalid syntax) */
