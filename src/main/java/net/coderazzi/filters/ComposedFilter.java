@@ -41,6 +41,9 @@ abstract public class ComposedFilter extends Filter implements IFilterObserver {
     /** Set of associated IFilters */
     protected Set<IFilter> filters;
 
+	/** disabled filters*/
+    private Set<IFilter> disabledFilters = new HashSet<IFilter>();
+	
 	/** Default constructor */
     protected ComposedFilter() {
     	filters = new HashSet<IFilter>();
@@ -60,9 +63,14 @@ abstract public class ComposedFilter extends Filter implements IFilterObserver {
      * receive filter events from this composition filter.
      */
     public void addFilter(IFilter... filtersToAdd) {
-        for (IFilter observable : filtersToAdd) {
-            if (filters.add(observable)) {
-                observable.addFilterObserver(this);
+        for (IFilter filter : filtersToAdd) {
+            if (filters.add(filter)) {
+                filter.addFilterObserver(this);
+                if (filter.isEnabled()){
+                	super.setEnabled(true);
+                } else {
+                	disabledFilters.add(filter);
+                }
             }
         }
     }
@@ -76,27 +84,65 @@ abstract public class ComposedFilter extends Filter implements IFilterObserver {
         for (IFilter filter : filtersToRemove) {
             if (filters.remove(filter)) {
             	filter.removeFilterObserver(this);
+            	disabledFilters.remove(filter);
             	report=true;
             }
         }
         if (report){
-            reportFilterUpdatedToObservers();
+        	if (isEnabled() && !filters.isEmpty() && 
+        		(disabledFilters.size()==filters.size())){
+        		super.setEnabled(false);
+        	} else {
+        		reportFilterUpdatedToObservers();
+        	}
         }
     }
-
+    
     /**
      * Returns all {@link net.coderazzi.filters.IFilter} instances previously added.
      */
-    public Set<IFilter> getFilterObservables() {
+    public Set<IFilter> getFilters() {
         return new HashSet<IFilter>(filters);
     }
 
     /**
      * @see  IFilterObserver#filterUpdated(IFilter)
      */
-    @Override
-	public void filterUpdated(IFilter producer) {
-        reportFilterUpdatedToObservers();
+    @Override public void filterUpdated(IFilter filter) {
+    	boolean enabled=isEnabled();
+    	boolean changeState=false;
+    	if (filter.isEnabled()){
+    		changeState = disabledFilters.remove(filter) && !enabled;
+    	} else {
+    		changeState = disabledFilters.add(filter) && 
+    			disabledFilters.size()==filters.size();
+    	}
+    	if (changeState){
+    		super.setEnabled(!enabled);
+    	} else {
+    		reportFilterUpdatedToObservers();
+    	}
+    }
+
+    /**
+     * @see  IFilter#setEnabled(boolean)
+     */
+    @Override public void setEnabled(boolean enable) {
+		if (filters.isEmpty()){
+			super.setEnabled(enable);
+		} else {
+			//perhaps some filter will not honor the request
+			//super.setEnabled is now only call when the filters report 
+			//its update
+            for (IFilter filter : filters) {
+            	filter.setEnabled(enable);
+            }
+		}
+    }
+    
+    /** Returns true if there is information of this filter as disabled */
+    protected boolean isDisabled(IFilter filter){
+    	return disabledFilters.contains(filter);
     }
 
 }

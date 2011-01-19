@@ -41,13 +41,32 @@ import javax.swing.RowFilter;
 abstract public class Filter extends RowFilter implements IFilter {
 
     /** The set of currently subscribed observers */
-    protected Set<IFilterObserver> filterObservers = new HashSet<IFilterObserver>();
+    private Set<IFilterObserver> filterObservers = new HashSet<IFilterObserver>();
+    
+    /** The enabled state */
+    private boolean enabled=true;    
+    
+    /**
+     * @see  IFilter#isEnabled()
+     */
+    @Override public boolean isEnabled() {
+    	return enabled;
+    }
+    
+    /**
+     * @see  IFilter#setEnabled(boolean)
+     */
+    @Override public void setEnabled(boolean enable) {
+    	if (enable != this.enabled){
+    		this.enabled=enable;
+    		reportFilterUpdatedToObservers();
+    	}
+    }
 
     /**
      * @see  IFilter#addFilterObserver(IFilterObserver)
      */
-    @Override
-	public void addFilterObserver(IFilterObserver observer) {
+    @Override public void addFilterObserver(IFilterObserver observer) {
         filterObservers.add(observer);
         reportFilterUpdatedToObservers();
     }
@@ -55,8 +74,7 @@ abstract public class Filter extends RowFilter implements IFilter {
     /**
      * @see  IFilter#removeFilterObserver(IFilterObserver)
      */
-    @Override
-	public void removeFilterObserver(IFilterObserver observer) {
+    @Override public void removeFilterObserver(IFilterObserver observer) {
         filterObservers.remove(observer);
     }
 

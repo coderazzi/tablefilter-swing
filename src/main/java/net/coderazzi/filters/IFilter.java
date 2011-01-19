@@ -32,16 +32,23 @@ import javax.swing.RowFilter;
  * <p>Interface to be implemented by any instance holding a filter than 
  * can be updated dynamically.</p>
  *
- * <p>Ant change on the filter is propagated to the observers, 
- * in no prefixed order.</p>
+ * <p>Any change on the filter is propagated to the observers, 
+ * in no given order.</p>
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
 public interface IFilter {
 
-    /**
-     * Adds an observer to receive filter change notifications.
-     */
+    /** {@link RowFilter} interface */
+	public boolean include(RowFilter.Entry rowEntry);
+
+    /** Returns true if the filter is enabled */
+	public boolean isEnabled();
+
+    /** Enables/Disables the filter*/
+	public void setEnabled(boolean enable);
+
+	/** Adds an observer to receive filter change notifications. */
     public void addFilterObserver(IFilterObserver observer);
 
     /**
@@ -50,8 +57,4 @@ public interface IFilter {
      */
     public void removeFilterObserver(IFilterObserver observer);
 
-    /**
-     * RowFilter interface
-     */
-	public boolean include(RowFilter.Entry rowEntry);
 }

@@ -70,7 +70,7 @@ import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.gui.AutoOptions;
 import net.coderazzi.filters.gui.IFilterEditor;
-import net.coderazzi.filters.gui.TableFilter;
+import net.coderazzi.filters.gui.FiltersHandler;
 
 /**
  * Custom component to handle the filter' editors<br>
@@ -91,15 +91,15 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	private Set<CustomChoice> customChoices;
 	private AutoOptions autoOptions;
 	
-	TableFilter tableFilter;
+	FiltersHandler filtersHandler;
 	FilterArrowButton downButton = new FilterArrowButton();
     EditorFilter filter = new EditorFilter();
 	EditorComponent editor;
 	PopupComponent popup;
 
-	public FilterEditor(TableFilter tableFilter, int filterPosition,
+	public FilterEditor(FiltersHandler filtersHandler, int filterPosition,
 			Class<?> associatedClass) {
-		this.tableFilter = tableFilter;
+		this.filtersHandler = filtersHandler;
 		
 		setLayout(new BorderLayout());
 		setBorder(border);
@@ -113,12 +113,12 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 					popup.setIgnoreCase(((IFilterTextParser)evt.getSource())
 							.isIgnoreCase());
 					requestOptions();
-					filter.update();
+					filter.checkChanges(true);
 				} else if (IFilterTextParser.FORMAT_PROPERTY==prop &&
 						getAssociatedClass() == evt.getNewValue()){
 			    	popup.setFormat(getFormat());
 			    	requestOptions();
-					filter.update();
+					filter.checkChanges(true);
 				}
 			}
 		};
@@ -219,19 +219,20 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	 */
 	private void setEditorContent(Object content, boolean escapeIt) {
 		editor.setContent(content, escapeIt);
-		filter.checkChanges();
+		filter.checkChanges(false);
 	}
 	
 	/* (non-Javadoc)
 	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setEnabled(boolean)
 	 */
 	@Override public void setEnabled(boolean enabled) {
-		super.setEnabled(enabled);
-		if (filter!=null){
-			//popup.setEnabled(enabled);
+		if (filter==null){
+			super.setEnabled(enabled);
+		} else if (isEnabled()!=enabled){
+			super.setEnabled(enabled);
 			downButton.setEnabled(enabled);
 			editor.setEnabled(enabled);
-			filter.update();
+			filter.setEnabled(enabled);			
 		}
 	}
 	
@@ -366,11 +367,13 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     	popup.setFormat(getFormat(parser));
     	editor.setTextParser(parser);    	
     	requestOptions();
-    	filter.checkChanges();
+    	filter.checkChanges(false);
     }
     
     void requestOptions(){
-    	tableFilter.updatedEditorOptions(this);
+    	if (isEnabled()){
+    		filtersHandler.updatedEditorOptions(this);
+    	}
     }
     
     public Format getFormat(){
@@ -452,7 +455,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	 */
     public void setRendererComparator(Comparator comparator){
     	popup.setRendererComparator(comparator);
-    	JTable table = tableFilter.getTable();
+    	JTable table = filtersHandler.getTable();
     	if (table!=null && (table.getRowSorter() instanceof DefaultRowSorter)){
     		((DefaultRowSorter) table.getRowSorter()).setComparator(getModelPosition(), comparator);
     	}
@@ -472,7 +475,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		editor.getComponent().setBackground(getBackground());
 		editor.setForeground(getForeground());
 		editor.getComponent().setFont(getFont());
-		filter.update();
+		filter.checkChanges(true);
 		requestOptions();
 	}
 
@@ -484,7 +487,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     			new DefaultListCellRenderer() {
 
     		private static final long serialVersionUID = -5990815893475331934L;
-    		private JTable table = tableFilter.getTable();
+    		private JTable table = filtersHandler.getTable();
     		private int position = getModelPosition();
 
 			@Override public Component getListCellRendererComponent(JList list, 
@@ -592,7 +595,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
 			@Override public void focusLost(FocusEvent e) {
 				popup.hide();
-				filter.checkChanges();
+				filter.checkChanges(false);
 				//important: call focusMoved AFTER checking changes, to
 				//ensure that any changes on decoration (custom choice)
 				//are not lost
@@ -675,7 +678,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 				} else {
 					//use update instead of checkChanges, in case it
 					//is needed to reset the icon of a CustomChoice
-					filter.update();
+					filter.checkChanges(true);
 				}
 				popup.hide();
 			}
@@ -1054,30 +1057,30 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     	public boolean include(RowFilter.Entry entry) {
     		return delegateFilter==null? true : delegateFilter.include(entry);
     	}
-    	public void checkChanges(){
+    	@Override public void setEnabled(boolean enable) {
+    		FilterEditor.this.setEnabled(enable);    			
+    		if (enable!=isEnabled()){
+        		if (enable){
+        			delegateFilter = editor.checkFilterUpdate(true);
+        		} else {
+        			delegateFilter = null;
+        		}
+        		super.setEnabled(enable);
+    		}
+    	}
+    	public void checkChanges(boolean forceUpdate){
     		if (isEnabled()){
-	    		checkChanges(false);
+	    		RowFilter oldFilter = editor.getFilter();
+	    		RowFilter newFilter = editor.checkFilterUpdate(forceUpdate);
+	    		if (newFilter != delegateFilter || oldFilter !=delegateFilter){
+	    			delegateFilter = newFilter;
+	    			reportFilterUpdatedToObservers();
+	    		}
 	    		Object content = editor.getContent();
 	    		if (!(content instanceof CustomChoice)){
 	    			popup.addHistory(content);
 	    			downButton.setCanPopup(popup.hasContent());
 	    		}
-    		}
-    	}
-    	public void update(){
-    		if (isEnabled()){
-        		checkChanges(true);    			
-    		} else {
-				delegateFilter=null;
-    			reportFilterUpdatedToObservers();    			
-    		}
-    	}
-    	private void checkChanges(boolean forceUpdate){
-    		RowFilter oldFilter = editor.getFilter();
-    		RowFilter newFilter = editor.checkFilterUpdate(forceUpdate);
-    		if (newFilter != delegateFilter || oldFilter !=delegateFilter){
-    			delegateFilter = newFilter;
-    			reportFilterUpdatedToObservers();
     		}
     	}
     }

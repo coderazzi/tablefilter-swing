@@ -53,7 +53,7 @@ public class AndFilter extends ComposedFilter {
      */
 	@Override public boolean include(RowFilter.Entry rowEntry) {
         for (IFilter filter : filters)
-            if (!filter.include(rowEntry))
+            if (filter.isEnabled() && !filter.include(rowEntry))
                 return false;
 
         return true;

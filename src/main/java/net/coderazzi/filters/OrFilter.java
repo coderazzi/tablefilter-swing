@@ -54,11 +54,13 @@ public class OrFilter extends ComposedFilter {
 	@Override public boolean include(RowFilter.Entry rowEntry) {
         boolean ret = true;
         for (IFilter filter : filters){
-            if (filter.include(rowEntry))
-                return true;
-            ret = false;
+        	if (filter.isEnabled()){
+	            if (filter.include(rowEntry)){
+	                return true;
+	            }
+	            ret = false;
+        	}
         }
-
         return ret;
     }
 }

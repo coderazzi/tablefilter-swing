@@ -68,7 +68,7 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
  * <p>The editor associated to each column has the type {@link FilterEditor}, 
  * and can be manipulated separately.</p>
  *
- * <p>The implementation relies on the {@link net.coderazzi.filters.gui.TableFilter} 
+ * <p>The implementation relies on the {@link net.coderazzi.filters.gui.FiltersHandler} 
  * class, please read its documentation to understand the requirements on the 
  * table and its model, and how it is affected by this filter</p>
  * 
@@ -129,10 +129,10 @@ public class TableFilterHeader extends JPanel {
     IFilterTextParser filterTextParser;
 
     /**
-     * The privately owned instance of TableFilter that conforms the filter 
+     * The privately owned instance of FiltersHandler that conforms the filter 
      * defined by the TableFilterHeader
      */
-    TableFilter tableFilter = new TableFilter();
+    FiltersHandler filtersHandler = new FiltersHandler();
 
     /** The set of currently subscribed observers */
     Set<IFilterHeaderObserver> observers = new HashSet<IFilterHeaderObserver>();
@@ -185,13 +185,13 @@ public class TableFilterHeader extends JPanel {
      * position of each of the columns in the table.</p>
      */
     public void setTable(JTable table) {
-    	tableFilter.enableNotifications(false);
+    	filtersHandler.enableNotifications(false);
     	JTable oldTable = getTable();
     	positionHelper.changeTable(oldTable, table);
         if (oldTable!=null){
         	oldTable.removeComponentListener(resizer);
         }
-        tableFilter.setTable(table);
+        filtersHandler.setTable(table);
         if (table==null){
             removeController();
             revalidate();
@@ -202,22 +202,22 @@ public class TableFilterHeader extends JPanel {
             table.addComponentListener(resizer);
             getTextParser().setTableModel(table.getModel());
         }
-    	tableFilter.enableNotifications(true);    	
+    	filtersHandler.enableNotifications(true);    	
     }
     
     /** Returns the table currently attached */
     public JTable getTable() {
-        return tableFilter==null? null : tableFilter.getTable();
+        return filtersHandler==null? null : filtersHandler.getTable();
     }
 
     /** Adds a filter -user specified- to the filter header */
     public void addFilter(IFilter... filter) {
-        tableFilter.addFilter(filter);
+        filtersHandler.addFilter(filter);
     }
 
     /** Adds a filter -user specified- to the filter header */
     public void removeFilter(IFilter... filter) {
-        tableFilter.removeFilter(filter);
+        filtersHandler.removeFilter(filter);
     }
 
     /**
@@ -245,9 +245,9 @@ public class TableFilterHeader extends JPanel {
     public void resetFilter() {
 
         if (columnsController != null) {
-            tableFilter.enableNotifications(false);
+            filtersHandler.enableNotifications(false);
             columnsController.resetFilters();
-            tableFilter.enableNotifications(true);
+            filtersHandler.enableNotifications(true);
         }
     }
 
@@ -276,15 +276,14 @@ public class TableFilterHeader extends JPanel {
      * creates/recreates the current columnsController
      */
     void recreateController() {
-        tableFilter.enableNotifications(false);
+        filtersHandler.enableNotifications(false);
         removeController();
         columnsController = new FilterColumnsControllerPanel(getFont(), 
         		getForeground(), 
         		getBackground());
-        columnsController.setEnabled(isEnabled());
         add(columnsController, BorderLayout.CENTER);
         revalidate();
-        tableFilter.enableNotifications(true);
+        filtersHandler.enableNotifications(true);
     }
 
     /** Sets the background color used by the parsed-based editors. */
@@ -468,9 +467,9 @@ public class TableFilterHeader extends JPanel {
         filterTextParser = parser;
 
         if (columnsController != null) {
-            tableFilter.enableNotifications(false);
+            filtersHandler.enableNotifications(false);
             columnsController.updateTextParser();
-            tableFilter.enableNotifications(true);
+            filtersHandler.enableNotifications(true);
         }
     }
 
@@ -508,12 +507,12 @@ public class TableFilterHeader extends JPanel {
 	 * -and updated as the table is updated-.
 	 */
 	public void setAutoOptions(AutoOptions set){
-		tableFilter.setAutoOptions(set);
+		filtersHandler.setAutoOptions(set);
 	}
 	
 	/** Returns the auto options flag */
 	public AutoOptions getAutoOptions(){
-		return tableFilter.getAutoOptions();
+		return filtersHandler.getAutoOptions();
 	}
 
     /** Enables/Disables the filters */
@@ -521,35 +520,28 @@ public class TableFilterHeader extends JPanel {
     	//it is not possible to call to super.setEnabled(enabled);
     	//the filter header can embed the the header of the table, which 
     	//would then become also disabled.
-    	if (tableFilter!=null){
-        	if (enabled!=isEnabled()){
-        		tableFilter.enableNotifications(false);
-	        	tableFilter.setEnabled(enabled);
-    	        if (columnsController != null) {
-    	            columnsController.setEnabled(enabled);
-    	        }
-        		tableFilter.enableNotifications(true);
-        	}
+    	if (filtersHandler!=null){
+        	filtersHandler.setEnabled(enabled);
     	}
     }
     
     /** Returns the current enable status */
     @Override public boolean isEnabled() {
-    	return tableFilter==null || tableFilter.isEnabled();
+    	return filtersHandler==null || filtersHandler.isEnabled();
     }
 
     /**
      * Sets the adaptive options mode
      */
     public void setAdaptiveOptions(boolean enable) {
-    	tableFilter.setAdaptiveOptions(enable);
+    	filtersHandler.setAdaptiveOptions(enable);
     }
 
     /**
      * Returns the adaptive options mode
      */
     public boolean isAdaptiveOptions() {
-        return tableFilter.isAdaptiveOptions();
+        return filtersHandler.isAdaptiveOptions();
     }
 
     /** Sets the font used on all the editors. */
@@ -792,7 +784,6 @@ public class TableFilterHeader extends JPanel {
         private void createColumn(int columnView) {
             int columnModel = getTable().convertColumnIndexToModel(columnView);
             FilterEditor editor = createEditor(columnModel);
-            tableFilter.addFilterEditor(editor);
             FilterColumnPanel column = new FilterColumnPanel(
             		tableColumnModel.getColumn(columnView), editor);
             customizeEditor(column.editor);
@@ -803,9 +794,11 @@ public class TableFilterHeader extends JPanel {
 
         /** Creates an editor for the given column */
         private FilterEditor createEditor(int modelColumn) {            
-            FilterEditor ret = new FilterEditor(tableFilter, 
+            FilterEditor ret = new FilterEditor(filtersHandler, 
             		modelColumn, getTable().getModel().getColumnClass(modelColumn));
             ret.setTextParser(getTextParser());
+            ret.setEnabled(filtersHandler.isEnabled());
+            filtersHandler.addFilterEditor(ret);
             return ret;
         }
 
@@ -922,13 +915,6 @@ public class TableFilterHeader extends JPanel {
                 	panel.editor.setGridColor(c);
         }
 
-        @Override public void setEnabled(boolean enabled) {
-            super.setEnabled(enabled);
-
-            for (FilterColumnPanel filter : this.columns)
-                filter.setEnabled(enabled);
-        }
-
         /** {@link TableColumnModelListener} interface */
         @Override public void columnMarginChanged(ChangeEvent e) {
             placeComponents();
@@ -960,7 +946,7 @@ public class TableFilterHeader extends JPanel {
         	//and request to be auto called eventually. This call (run()) 
         	//will happen when all the column modifications have concluded, 
         	//so then it is safe to reactivate the notifications
-            tableFilter.enableNotifications(false);
+            filtersHandler.enableNotifications(false);
             createColumn(e.getToIndex());
             update();
         }
@@ -969,7 +955,7 @@ public class TableFilterHeader extends JPanel {
         @Override public void columnRemoved(TableColumnModelEvent e) {
 
             //see the comment on columnAdded
-            tableFilter.enableNotifications(false);
+            filtersHandler.enableNotifications(false);
             FilterColumnPanel fcp = columns.remove(e.getFromIndex());
             fcp.detach();
             remove(fcp);
@@ -1002,7 +988,7 @@ public class TableFilterHeader extends JPanel {
                 updateHeight();
                 getTextParser().setTableModel(getTable().getModel());
             }
-            tableFilter.enableNotifications(true);
+            filtersHandler.enableNotifications(true);
         }
 
         /**
@@ -1052,7 +1038,6 @@ public class TableFilterHeader extends JPanel {
                 this.tc = tc;
                 w = tc.getWidth();
                 add(editor, BorderLayout.CENTER);
-                editor.setEnabled(TableFilterHeader.this.isEnabled());
                 h = getPreferredSize().height;
             	editor.getFilter().addFilterObserver(this);
                 for (IFilterHeaderObserver observer : observers){
@@ -1069,7 +1054,7 @@ public class TableFilterHeader extends JPanel {
             public void detach() {
 
                 if (editor != null) {
-                    tableFilter.removeFilterEditor(editor);
+                    filtersHandler.removeFilterEditor(editor);
                     remove(editor);
                     editor.getFilter().removeFilterObserver(this);
                     for (IFilterHeaderObserver observer : observers){
@@ -1102,11 +1087,6 @@ public class TableFilterHeader extends JPanel {
             	}
             }
             
-            @Override public void setEnabled(boolean enabled) {
-                super.setEnabled(enabled);
-                editor.setEnabled(enabled);
-            }
-
             /** Listening for changes on the width of the table' column */
             @Override
 			public void propertyChange(PropertyChangeEvent evt) {

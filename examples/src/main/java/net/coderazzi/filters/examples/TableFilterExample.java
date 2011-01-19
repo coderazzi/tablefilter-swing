@@ -46,7 +46,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
@@ -88,9 +87,12 @@ public class TableFilterExample extends JFrame {
     JPanel tablePanel;    
     JPanel filterHeaderPanel;
     TableFilterHeader filterHeader;
-    JMenu columnsMenu;
+    JMenu filtersMenu;
+    JCheckBoxMenuItem allEnabled;
     JCheckBoxMenuItem useFlagRenderer;
     JCheckBoxMenuItem countrySpecialSorter;
+    JCheckBoxMenuItem enableUserFilter;
+    IFilter userFilter;
     
     public TableFilterExample() {
         super("Table Filter Example");
@@ -124,12 +126,26 @@ public class TableFilterExample extends JFrame {
 			
 			@Override public void tableFilterEditorExcluded(TableFilterHeader header,
 					FilterEditor editor, TableColumn tableColumn) {
-		    	getMenu(columnsMenu, (String) tableColumn.getHeaderValue(), true);
+		    	getMenu(filtersMenu, (String) tableColumn.getHeaderValue(), true);
 			}
 			
 			@Override public void tableFilterEditorCreated(TableFilterHeader header,
 					FilterEditor editor, TableColumn tableColumn) {
-		    	createColumnsMenu(editor, (String) tableColumn.getHeaderValue());
+		    	createFiltersMenu(editor, (String) tableColumn.getHeaderValue());
+			}
+		});
+		useFlagRenderer=new JCheckBoxMenuItem("country flags as icons -in options-", true);
+		useFlagRenderer.addItemListener(new ItemListener() {
+			
+			@Override public void itemStateChanged(ItemEvent e) {
+				setCountryEditorRenderer();
+			}
+		});
+    	
+		countrySpecialSorter = new JCheckBoxMenuItem("country column sorted by red proportion", false);
+		countrySpecialSorter.addItemListener(new ItemListener() {			
+			@Override public void itemStateChanged(ItemEvent e) {
+				setCountryComparator(countrySpecialSorter.isSelected());
 			}
 		});
     	return tablePanel;
@@ -139,11 +155,52 @@ public class TableFilterExample extends JFrame {
     	JMenuBar menu = new JMenuBar();
     	menu.add(createTableMenu());
     	menu.add(createHeaderMenu());
-    	columnsMenu = new JMenu("Columns");
-    	columnsMenu.setMnemonic(KeyEvent.VK_C);
-    	menu.add(columnsMenu);
+    	menu.add(createFiltersMenu());
     	menu.add(createMiscellaneousMenu());
     	return menu;
+    }
+    
+    private JMenu createFiltersMenu(){
+    	
+		userFilter = new Filter() {
+			int nameColumn=tableModel.getColumn(TestTableModel.NAME);
+			@Override public boolean include(Entry entry) {
+				return -1!=entry.getStringValue(nameColumn).indexOf('e');
+			}
+		};
+		
+		JCheckBoxMenuItem includeUserFilter=new JCheckBoxMenuItem(
+				new AbstractAction("include in header") {			
+			@Override public void actionPerformed(ActionEvent e) {
+				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
+				if(source.isSelected()){
+					filterHeader.addFilter(userFilter);
+				} else {
+					filterHeader.removeFilter(userFilter);					
+				}
+				enableUserFilter.setSelected(userFilter.isEnabled());
+			}
+		});
+		
+		enableUserFilter=new JCheckBoxMenuItem(
+				new AbstractAction("enable") {			
+			@Override public void actionPerformed(ActionEvent e) {
+				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
+				userFilter.setEnabled(source.isSelected());
+			}
+		});
+		enableUserFilter.setSelected(userFilter.isEnabled());
+		
+    	JMenu menu = new JMenu("User filter (name without 'e')");
+    	menu.add(includeUserFilter);
+    	menu.add(enableUserFilter);
+    	filtersMenu = new JMenu("Filters");
+    	filtersMenu.setMnemonic(KeyEvent.VK_F);
+		filtersMenu.add(menu);		
+		filtersMenu.addSeparator();
+    	
+		return filtersMenu;
+
     }
     
     private JMenu createTableMenu(){
@@ -227,7 +284,7 @@ public class TableFilterExample extends JFrame {
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
 				filterHeader.getTextParser().setIgnoreCase(source.isSelected());	
-				updateAllColumns();
+				updateFiltersInfo();
 			}
 		});
     	
@@ -236,16 +293,16 @@ public class TableFilterExample extends JFrame {
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
 				filterHeader.setAdaptiveOptions(source.isSelected());				
-				updateAllColumns();
+				updateFiltersInfo();
 			}
 		});
     	
-    	JCheckBoxMenuItem enabled=new JCheckBoxMenuItem(
+    	allEnabled=new JCheckBoxMenuItem(
     			new AbstractAction(ENABLED) {			
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
 				filterHeader.setEnabled(source.isSelected());
-				updateAllColumns();
+				updateFiltersInfo();
 			}
 		});
     	
@@ -260,14 +317,14 @@ public class TableFilterExample extends JFrame {
     	JMenuItem reset = new JMenuItem(new AbstractAction("reset") {			
 			@Override public void actionPerformed(ActionEvent e) {
 				filterHeader.resetFilter();
-				updateAllColumns();
+				updateFiltersInfo();
 			}
 		});
     	onUse.setSelected(true);
     	ignoreCase.setMnemonic(KeyEvent.VK_C);
     	ignoreCase.setSelected(filterHeader.getTextParser().isIgnoreCase());
     	adaptiveOptions.setSelected(filterHeader.isAdaptiveOptions());
-    	enabled.setSelected(filterHeader.isEnabled());
+    	allEnabled.setSelected(filterHeader.isEnabled());
     	visible.setSelected(filterHeader.isVisible());
 
     	JMenu ret = new JMenu("Filter Header");
@@ -279,10 +336,10 @@ public class TableFilterExample extends JFrame {
     	ret.add(createAutoOptionsMenu(filterHeader.getAutoOptions(), new AutoOptionsSet() {			
 			@Override public void setAutoOptions(AutoOptions ao) {
 				filterHeader.setAutoOptions(ao);
-				updateAllColumns();
+				updateFiltersInfo();
 			}
 		}));
-    	ret.add(enabled);
+    	ret.add(allEnabled);
     	ret.addSeparator();
     	ret.add(visible);
     	ret.add(createPositionMenu());
@@ -348,43 +405,6 @@ public class TableFilterExample extends JFrame {
         	
     private JMenu createMiscellaneousMenu(){
     	
-		final IFilter userFilter = new Filter() {
-			int nameColumn=tableModel.getColumn(TestTableModel.NAME);
-			@Override public boolean include(Entry entry) {
-				return -1!=entry.getStringValue(nameColumn).indexOf('e');
-			}
-		};
-		
-		JCheckBoxMenuItem enableUserFilter=new JCheckBoxMenuItem(
-				new AbstractAction("enable user filter") {			
-			@Override public void actionPerformed(ActionEvent e) {
-				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
-				if(source.isSelected()){
-					filterHeader.addFilter(userFilter);
-					JOptionPane.showMessageDialog(TableFilterExample.this, 
-							"Filtering out any row where the name does not "+
-							"contain a lower case 'e'");
-				} else {
-					filterHeader.removeFilter(userFilter);					
-				}
-			}
-		});
-    	
-		useFlagRenderer=new JCheckBoxMenuItem("country flags as icons -in options-", true);
-		useFlagRenderer.addItemListener(new ItemListener() {
-			
-			@Override public void itemStateChanged(ItemEvent e) {
-				setCountryEditorRenderer();
-			}
-		});
-    	
-		countrySpecialSorter = new JCheckBoxMenuItem("country column sorted by red proportion", false);
-		countrySpecialSorter.addItemListener(new ItemListener() {			
-			@Override public void itemStateChanged(ItemEvent e) {
-				setCountryComparator(countrySpecialSorter.isSelected());
-			}
-		});
-
     	JMenuItem events = new JMenuItem(new AbstractAction("events window") {
     		EventsWindow window;
 			@Override public void actionPerformed(ActionEvent e) {
@@ -401,10 +421,6 @@ public class TableFilterExample extends JFrame {
     	JMenu ret = new JMenu("Miscellaneous");
     	ret.setMnemonic(KeyEvent.VK_M);
     	ret.add(events);
-    	ret.addSeparator();
-    	ret.add(enableUserFilter);
-    	ret.add(useFlagRenderer);
-    	ret.add(countrySpecialSorter);
     	ret.addSeparator();
     	ret.add(createlLookAndFeelMenu());
     	return ret;
@@ -530,12 +546,12 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
-    void createColumnsMenu(final FilterEditor editor, final String name) {
-    	JMenu menu = (JMenu) getMenu(columnsMenu, name, false);
+    void createFiltersMenu(final FilterEditor editor, final String name) {
+    	JMenu menu = (JMenu) getMenu(filtersMenu, name, false);
     	menu.add(createAutoOptionsMenu(editor.getAutoOptions(), new AutoOptionsSet(){
     		@Override public void setAutoOptions(AutoOptions ao) {
     			editor.setAutoOptions(ao);
-    			updateColumn(editor, name);
+    			updateFilter(editor, name);
     		}
     	}
     	));
@@ -551,7 +567,8 @@ public class TableFilterExample extends JFrame {
     	enabled.addActionListener(new ActionListener() {			
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
-				editor.setEnabled(source.isSelected());				
+				editor.setEnabled(source.isSelected());
+				allEnabled.setSelected(filterHeader.isEnabled());
 			}
 		});
     	menu.add(enabled);
@@ -571,18 +588,35 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	menu.add(ignoreCase);
+    	menu.addSeparator();
+    	if (name.equalsIgnoreCase("country")){
+    		menu.add(useFlagRenderer);
+    		menu.add(countrySpecialSorter);
+    		menu.addSeparator();
+    	}
+
+
+    	menu.add(new JMenuItem(new AbstractAction("Remove this column"){
+    		@Override
+    		public void actionPerformed(ActionEvent e) {
+    			TableColumnModel model = table.getColumnModel();
+    			model.removeColumn(model.getColumn(model.getColumnIndex(name)));
+    		}
+    	}));
     }
     
-    void updateAllColumns() {
+    void updateFiltersInfo() {
 		TableColumnModel model = table.getColumnModel();
     	int n = model.getColumnCount();
     	while (n-->0){
-    		updateColumn(filterHeader.getFilterEditor(n), (String) model.getColumn(n).getHeaderValue());
+    		TableColumn tc = model.getColumn(n);
+			updateFilter(filterHeader.getFilterEditor(tc.getModelIndex()), (String) tc.getHeaderValue());
     	}
+    	enableUserFilter.setSelected(userFilter.isEnabled());
     }
 
-    void updateColumn(FilterEditor editor, String columnName) {
-    	JMenu menu = (JMenu) getMenu(columnsMenu, columnName, false);
+    void updateFilter(FilterEditor editor, String columnName) {
+    	JMenu menu = (JMenu) getMenu(filtersMenu, columnName, false);
     	((JCheckBoxMenuItem) getMenu(menu, EDITABLE, false)).setSelected(editor.isEditable());
     	((JCheckBoxMenuItem) getMenu(menu, ENABLED, false)).setSelected(editor.isEnabled());
     	((JCheckBoxMenuItem) getMenu(menu, IGNORE_CASE, false)).setSelected(editor.getTextParser().isIgnoreCase());
@@ -594,7 +628,7 @@ public class TableFilterExample extends JFrame {
     	int pos=menu.getItemCount();
     	while(pos-->0){
     		JMenuItem item = menu.getItem(pos);
-    		if (item.getText().equals(name)){
+    		if (item!=null && item.getText().equals(name)){
     			if (remove){
     				menu.remove(pos);
     				item=null;

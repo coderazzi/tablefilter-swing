@@ -42,33 +42,43 @@ class AdaptiveOptionsSupport extends RowFilter{
      * Elsewhere, it is kept as a Set, but here, it is needed to associate
      * a column to each specific filter, so an array is chosen<br>
      * The first N filters correspond to the N filters of each editor, sorted
-     * by column order.
+     * by column order.<br>
+     * Note that any of the first N filters could be null, if there is no
+     * column on that position (column removed from model)
      **/ 
     private RowInfo.Filter[] filters;
 
-    public AdaptiveOptionsSupport(TableModel model,
-                  FilterEditor[] editors,
-                  Set<IFilter> allFilters) {
-    	//note that the allFilters set will be modified
-        int modelColumns = model.getColumnCount();
-        this.rows = new ArrayList<RowInfo>(model.getRowCount()+1);
-        this.filters=new RowInfo.Filter[allFilters.size()];
-        this.editorHandles = new EditorHandle[editors.length];
-        for (int i=0; i<modelColumns; i++){
-        	FilterEditor editor=editors[i];
-        	int column=editor.getModelPosition();
-        	this.editorHandles[i] = new EditorHandle(editor, model);
-            IFilter filter = editor.getFilter();
-            allFilters.remove(filter);
-            filters[column]=new RowInfo.Filter(filter, column);
-        }
-        for (IFilter filter : allFilters) {
-            filters[modelColumns]=new RowInfo.Filter(filter, modelColumns);
-            modelColumns++;
-        }
-        rowEntry = new RowEntry(model, editors);
-        rowsAdded(0, model.getRowCount()-1);
-    }
+    /**
+     * Only constructor; note: the parameter allFilters set is modified 
+     * on the constructor.
+     */
+	public AdaptiveOptionsSupport(TableModel model, FilterEditor[] editors,
+			Set<IFilter> allFilters) {
+		// note that the allFilters set will be modified
+		int modelColumns = model.getColumnCount();
+		int edLength=editors.length;
+		rows = new ArrayList<RowInfo>(model.getRowCount() + 1);
+		editorHandles = new EditorHandle[edLength];
+		//note: modelColumns could be different from editors.length if some
+		//column has been removed from the model
+		filters = new RowInfo.Filter[allFilters.size() + modelColumns - editors.length];
+		for (int i=0; i<modelColumns; i++){
+			filters[i]=null;
+		}
+		for (FilterEditor editor : editors){
+			int column = editor.getModelPosition();
+			this.editorHandles[--edLength] = new EditorHandle(editor, model);
+			IFilter filter = editor.getFilter();
+			allFilters.remove(filter);
+			filters[column] = new RowInfo.Filter(filter, column);			
+		}
+		for (IFilter filter : allFilters) {
+			filters[modelColumns] = new RowInfo.Filter(filter, modelColumns);
+			modelColumns++;
+		}
+		rowEntry = new RowEntry(model, editors);
+		rowsAdded(0, model.getRowCount() - 1);
+	}
 
     /** Handles an table model event */
     public void tableChanged(int event, int firstRow, int lastRow, int column) {
@@ -94,7 +104,7 @@ class AdaptiveOptionsSupport extends RowFilter{
             rowEntry.row = r;
             boolean rowAdded=true;
             for (RowInfo.Filter filter : filters){
-                if (!filter.include(rowEntry)) {
+                if (filter!=null && !filter.include(rowEntry)) {
                 	filter.set(row, false);
                 	rowAdded=false;
                 }
@@ -122,7 +132,9 @@ class AdaptiveOptionsSupport extends RowFilter{
             rowEntry.row = firstRow++;
             if (filter==null){
             	for (RowInfo.Filter f : filters){
-            		f.set(row, f.include(rowEntry));
+            		if (f!=null){
+            			f.set(row, f.include(rowEntry));
+            		}
             	}
             } else {
             	filter.set(row, filter.include(rowEntry));            	
@@ -164,7 +176,7 @@ class AdaptiveOptionsSupport extends RowFilter{
     	RowInfo.Filter filter = getFilter(iFilter);
         rowEntry.row=0;
         for (RowInfo ri : rows) {
-        	changed = filter.set(ri, iFilter.include(rowEntry)) || changed;
+        	changed = filter.set(ri, !iFilter.isEnabled() || iFilter.include(rowEntry)) || changed;
             rowEntry.row++;
         }
         if (changed || updateAssociatedEditor){
@@ -184,6 +196,16 @@ class AdaptiveOptionsSupport extends RowFilter{
         }
     }
     
+    /** Forces the initialization of the options of a editor filter */
+    public void initOptions(IFilter iFilter){
+    	RowInfo.Filter filter = getFilter(iFilter);
+       	if (filter.column < editorHandles.length){
+        	//update only the associated editor, move it at the beginning
+    		switchHandle(getEditorHandle(filter.column), 0);
+    		extractOptions(1, 0, -1);        	    	
+        }
+    }
+    
     /** Reports an update on the properties of an editor */
     public void editorUpdated(FilterEditor fe) {
     	int handle=getEditorHandle(fe.getModelPosition());
@@ -194,7 +216,7 @@ class AdaptiveOptionsSupport extends RowFilter{
     /** Returns the filter with the given {@link IFilter} */
     private RowInfo.Filter getFilter(IFilter filter) {
     	for (RowInfo.Filter f : filters){
-    		if (filter==f.filter){
+    		if (f!=null && f.filter==filter){
     			return f;
     		}
     	}
@@ -344,6 +366,9 @@ class AdaptiveOptionsSupport extends RowFilter{
     	 * @return true if the handle requires no further iteration steps
     	 */
     	public boolean startIteration(boolean fullMode){
+    		if (!editor.isEnabled()){ //do nothing if not enabled
+    			return true;
+    		}
     		options.clear();
     		if (fullMode){
 	    		missingChoices=customChoices==null? Collections.EMPTY_MAP : new HashMap<CustomChoice, RowFilter>(customChoices);    		
@@ -378,10 +403,12 @@ class AdaptiveOptionsSupport extends RowFilter{
     	
     	/**  Final step on the iteration process, updating the editor' options */
     	public void iterationCompleted(boolean fullMode){
-    		if (fullMode){
-    			editor.setOptions(options);
-    		} else {
-    			editor.addOptions(options);
+    		if (editor.isEnabled()){
+	    		if (fullMode){
+	    			editor.setOptions(options);
+	    		} else {
+	    			editor.addOptions(options);
+	    		}
     		}
     	}
     }
@@ -427,7 +454,7 @@ class AdaptiveOptionsSupport extends RowFilter{
     		}
 
     		public boolean include(RowFilter.Entry rowEntry){
-    			return filter.include(rowEntry);
+    			return !filter.isEnabled() || filter.include(rowEntry);
     		}
     		
     		public boolean set(RowInfo row, boolean set) {

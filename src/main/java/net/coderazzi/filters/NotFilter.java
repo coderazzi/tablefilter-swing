@@ -52,6 +52,6 @@ public class NotFilter extends AndFilter {
      * @see  IFilter#include(RowFilter.Entry)
      */
 	@Override public boolean include(RowFilter.Entry rowEntry) {
-        return !super.include(rowEntry);
+        return !isEnabled() || !super.include(rowEntry);
     }
 }

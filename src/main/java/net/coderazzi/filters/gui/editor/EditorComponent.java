@@ -195,6 +195,7 @@ interface EditorComponent {
         	public TextEditor() {
         		super(15); //created with 15 columns
         		addCaretListener(this);
+        		setEnabledState(true);
 			}
         	
         	@Override public void setUI(TextUI ui) {
