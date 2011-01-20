@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ListIterator;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ListCellRenderer;
@@ -194,33 +193,28 @@ public class OptionsListModel extends AbstractListModel {
 					continue;
 				}
 			}
-			if (addCustomChoice((CustomChoice)o, customChoices)){
+			if (addCustomChoice((CustomChoice)o)){
 				choices=null;
 				changed=true;
 			}
 		}
 		if (changed){
-			addCustomChoice(CustomChoice.MATCH_ALL, 0);
+			addCustomChoice(CustomChoice.MATCH_ALL);
 			fireContentsChanged(this, 0, getSize());
 		}
 		return changed;
 	}
 	
-	/**
-	 * Adds a CustomChoice, if not yet present. Only the first options
-	 * -as specified in parameter limit- are used, so the given choice can
-	 * be added, at latest, at the given limit position.
-	 */
-	private boolean addCustomChoice(CustomChoice cf, int limit){
-		ListIterator li = content.listIterator();
-		while (limit-->0){
-			if (li.next().equals(cf)){
-				return false;
-			}
+	/** Adds a CustomChoice, if not yet present */
+	private boolean addCustomChoice(CustomChoice cf){
+		List cc = content.subList(0, customChoices);
+		int pos = Collections.binarySearch(cc, cf);
+		if (pos<0){
+			cc.add(-1-pos, cf);
+			customChoices+=1;
+			return true;
 		}
-		li.add(cf);
-		customChoices+=1;
-		return true;
+		return false;
 	}
 
 	/** Creation of the Match, for text based, sorted content */

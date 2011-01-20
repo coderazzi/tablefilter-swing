@@ -27,6 +27,7 @@ package net.coderazzi.filters.gui.editor;
 
 import java.text.Format;
 import java.text.ParseException;
+import java.util.Comparator;
 
 import javax.swing.Icon;
 import javax.swing.RowFilter;
@@ -35,21 +36,32 @@ import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.gui.FilterSettings;
 
 /**
- * Class to specify a custom filter in the options list
+ * Class to specify a custom filter in the options list<br>
+ * 
+ * A custom filter can specify an icon and a textual representation, which,
+ * if the icon is provided, can be hidden.<br>
+ * The filter associated to the CustomChoice is, by default, the parsing of the 
+ * given textual representation, although a custom filter can be provided by 
+ * overriding the method {@see #getFilter(IFilterTextParser, int)} <br>
+ * 
+ * The order of the custom choices on the options list can be modified with
+ * the precedence attribute. By default, custom choices are sorted by their
+ * textual representation. 
+ * 
  * @author Luismi
  */
-public class CustomChoice {
+public class CustomChoice implements Comparable<CustomChoice>{
+	
+	public final static int DEFAULT_PRECEDENCE = 0;
 	
 	/** Empty filter, returns all entries */
 	public final static CustomChoice MATCH_ALL = new CustomChoice(""){
 		RowFilter rf = new RowFilter(){
-			@Override
-			public boolean include(RowFilter.Entry entry) {
+			@Override public boolean include(RowFilter.Entry entry) {
 				return true;
 			}
 		};
-		@Override
-		public RowFilter getFilter(IFilterTextParser parser, int modelPosition) {
+		@Override public RowFilter getFilter(IFilterTextParser parser, int modelPosition) {
 			return rf;
 		}
 	};
@@ -58,14 +70,12 @@ public class CustomChoice {
 	public final static CustomChoice MATCH_EMPTY = new CustomChoice(
 			FilterSettings.matchEmptyFilterString,
 			FilterSettings.matchEmptyFilterIcon){
-		@Override
-		public RowFilter getFilter(IFilterTextParser parser, 
+		@Override public RowFilter getFilter(IFilterTextParser parser, 
 				final int modelPosition) {
 			final Format format = parser.getFormat(
 						parser.getTableModel().getColumnClass(modelPosition));
 			return new RowFilter(){
-				@Override
-				public boolean include(RowFilter.Entry entry) {
+				@Override public boolean include(RowFilter.Entry entry) {
 					Object o = entry.getValue(modelPosition);
 					if (o==null) return true;
 					if (format!=null){
@@ -80,27 +90,29 @@ public class CustomChoice {
 	
 	private Icon icon;
 	private String str;
+	private int precedence;
+	private final static Comparator<String> reprComparator = FilterSettings.getStringComparator(false);
+	
+	/** Full constructor */
+	 public CustomChoice(String representation, Icon icon, int precedence){
+		this.icon = icon;
+		this.str = representation;
+		this.precedence = precedence;
+	}
 	
 	/**
-	 * Creates a custom choice without associated icon, to be handled
-	 * exclusively as text.<br>
-	 * Unless the method {@see #getFilter(IFilterTextParser, int)}
-	 * is implemented, the associated filter is the parser' handling of
-	 * the passed representation. 
+	 * Creates a custom choice without associated icon, and with default
+	 * precedence, to be handled exclusively as text.
 	 */
 	public CustomChoice(String representation){
-		this(representation, null);
+		this(representation, null, DEFAULT_PRECEDENCE);
 	}
 
 	/**
-	 * Creates a custom choice with associated icon<br>
-	 * Unless the method {@see #getFilter(IFilterTextParser, int)}
-	 * is implemented, the associated filter is the parser' handling of
-	 * the passed representation.
+	 * Creates a custom choice with associated icon and default precedence
 	 */
 	public CustomChoice(String representation, Icon icon){
-		this.icon = icon;
-		this.str = representation;
+		this(representation, icon, DEFAULT_PRECEDENCE);
 	}
 	
 	/**
@@ -115,6 +127,16 @@ public class CustomChoice {
 	/** Returns the string representation of the filter */
 	public String getRepresentation(){
 		return str;
+	}
+	
+	/** Override to define the filter, if parsed*/
+	protected String getParsingExpression(){
+		return str;
+	}
+	
+	/** Returns the precedence value */ 
+	public int getPrecedence(){
+		return precedence;
 	}
 	
 	/** 
@@ -136,25 +158,29 @@ public class CustomChoice {
 	public RowFilter getFilter(IFilterTextParser parser,
 			int modelPosition) {
 		try{
-			return parser.parseText(getRepresentation(), modelPosition);
+			return parser.parseText(getParsingExpression(), modelPosition);
 		} catch (ParseException pex) {
 			return null;
 		}
 	}
 	
-	@Override
-	public String toString() {
+	@Override public String toString() {
 		return getRepresentation();
 	}
 	
-	@Override
-	public int hashCode() {
+	@Override public int hashCode() {
 		return getRepresentation().hashCode();
 	}
 	
-	@Override
-	public boolean equals(Object o) {
+	@Override public boolean equals(Object o) {
 		return (o instanceof CustomChoice) && 
 			((CustomChoice)o).getRepresentation().equals(getRepresentation());
+	}
+	
+	@Override public int compareTo(CustomChoice o) {
+		int ret = getPrecedence() - o.getPrecedence();
+		return ret==0?
+			reprComparator.compare(getRepresentation(), o.getRepresentation())
+			: ret;
 	}
 }

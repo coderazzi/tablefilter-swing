@@ -61,6 +61,7 @@ import javax.swing.table.TableColumnModel;
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterTextParser;
+import net.coderazzi.filters.examples.utils.AgeCustomChoice;
 import net.coderazzi.filters.examples.utils.CenteredRenderer;
 import net.coderazzi.filters.examples.utils.EventsWindow;
 import net.coderazzi.filters.examples.utils.FlagRenderer;
@@ -745,6 +746,7 @@ public class TableFilterExample extends JFrame {
 	            table.getColumnModel().getColumn(
 	            		table.convertColumnIndexToView(agesColumn)).
 	            		setCellRenderer(new CenteredRenderer());
+	            filterHeader.getFilterEditor(agesColumn).setCustomChoices(AgeCustomChoice.getCustomChoices());
 	        }
 	
 	        int datesColumn = tableModel.getColumn(TestTableModel.DATE);
