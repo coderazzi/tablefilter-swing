@@ -5,8 +5,8 @@ import java.util.Set;
 
 import javax.swing.RowFilter;
 
-import net.coderazzi.filters.IFilterTextParser;
-import net.coderazzi.filters.gui.editor.CustomChoice;
+import net.coderazzi.filters.gui.CustomChoice;
+import net.coderazzi.filters.gui.IFilterEditor;
 
 public class AgeCustomChoice extends CustomChoice{
 	
@@ -19,11 +19,12 @@ public class AgeCustomChoice extends CustomChoice{
 	}
 
     @Override
-    public RowFilter getFilter(IFilterTextParser parser, final int modelPosition) {
+    public RowFilter getFilter(IFilterEditor editor) {
+    	final int modelIndex = editor.getModelIndex();
     	return new RowFilter() {
     		@Override
     		public boolean include(Entry entry) {
-    			Object value = entry.getValue(modelPosition);
+    			Object value = entry.getValue(modelIndex);
     			if (value instanceof Integer){
     				int age = (Integer) value;
     				return age>=min && age<=max;

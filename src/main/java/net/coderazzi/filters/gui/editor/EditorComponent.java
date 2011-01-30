@@ -32,8 +32,6 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.Comparator;
 
 import javax.swing.CellRendererPane;
 import javax.swing.Icon;
@@ -46,16 +44,14 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
-import net.coderazzi.filters.IFilterTextParser;
-import net.coderazzi.filters.gui.FilterSettings;
+import net.coderazzi.filters.IParser;
+import net.coderazzi.filters.gui.CustomChoice;
 
 
 /**
@@ -93,30 +89,18 @@ interface EditorComponent {
     /** Enables/disables the editor */
     public void setEnabled(boolean enabled);
 
-    /** Sets the {@link IFilterTextParser} associated to the editor */
-    public void setTextParser(IFilterTextParser parser);
-
-    /** Return the associated {@link IFilterTextParser}*/
-    public IFilterTextParser getTextParser();
-
 	/** 
 	 * Sets the editor content<br>
 	 * The parameters escapeIt must be true if the content could require
 	 * escaping (otherwise, it will be always treated literally). <br>
 	 */
     public void setContent(Object content, boolean escapeIt);
-
+    
     /** Returns the definition associated to the current editor */
     public Object getContent();
     
-    /** 
-     * Defines the filter position associated to this editor.<br>
-     * It corresponds to the table's model column
-     **/
-    public void setPosition(int position);
-
-    /** Returns the filter position associated to this editor */
-    public int getPosition();
+    /** Defines the text parser used by the editor */
+    public void setParser(IParser parser);
 
     /** Sets the editable flag. If editable, the user can enter any content */
     public void setEditable(boolean set);
@@ -148,22 +132,18 @@ interface EditorComponent {
     /** Returns the foreground color used*/
     public Color getForeground();
 
-    /** Method called when the component is removed */
-    public void detach();
-    
     /**
      * EditorComponent for text edition, backed up with a {@link JTextField}<br>
      * It is editable by default.
      */
     static final class Text extends DocumentFilter 
-    		implements DocumentListener, EditorComponent, ListDataListener {
+    		implements DocumentListener, EditorComponent {
 
         private TextEditor textField = new TextEditor();
-        private Collection<CustomChoice> customChoices;
-        private IFilterTextParser parser;
-        private int filterPosition;
+        private FilterEditor editor;
         private boolean editable;
         private RowFilter filter;
+        private IParser textParser;
         /*the source of the filter. Or a String, or a CustomChoice*/
         Object content; 
         PopupComponent popup;
@@ -354,7 +334,9 @@ interface EditorComponent {
             	} else {
             		color = disabledColor;
             	}
-        		super.setForeground(color);
+            	if (color!=super.getForeground()){
+            		super.setForeground(color);
+            	}
             }
 
 			@Override protected void paintComponent(Graphics g) {
@@ -371,19 +353,14 @@ interface EditorComponent {
         	}
         }
 
-        public Text(PopupComponent popupComponent) {
-            this.popup = popupComponent;
-        	popup.getOptionsListModel().addListDataListener(this);
-        	retrieveCustomChoices();
+        public Text(FilterEditor editor, PopupComponent popupComponent) {
+        	this.editor= editor;
+            this.popup = popupComponent;            
             setEditable(true);
         }
 
         @Override public JComponent getComponent() {
             return textField;
-        }
-
-        @Override public void detach() {
-        	popup.getOptionsListModel().removeListDataListener(this);
         }
 
         @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
@@ -403,11 +380,11 @@ interface EditorComponent {
         /** Updates the filter / text is expected trimmed */
         private void updateFilter(String text) {
             boolean error=false;
-            CustomChoice cc = getCustomChoice(text);
+            CustomChoice cc = text.length()==0? CustomChoice.MATCH_ALL : popup.getCustomChoice(text);
             if (cc!=null){
     			content = cc;
     			textField.activateCustomDecoration();
-    			filter = cc.getFilter(parser, filterPosition);            	
+    			filter = cc.getFilter(editor);            	
             } else {
                 content = text;
                 filter = null;
@@ -417,30 +394,14 @@ interface EditorComponent {
     	            	//for editable columns, the text was already
     	            	//escaped when the content was defined
     	            	//(see setContent)
-    	            	text = parser.escape(text, filterPosition);
+    	            	text = textParser.escape(text);
     	            }
-                	filter = parser.parseText(text, 
-                						filterPosition);
+                	filter = textParser.parseText(text); 
                 } catch (ParseException pex) {
                     error=true;
                 }            	
             }
             textField.setError(error);
-        }
-        
-        /** Returns the CustomChoice matching the text (trimmed) */
-        private CustomChoice getCustomChoice(String text) {
-        	if (text.length()==0){
-        		return CustomChoice.MATCH_ALL;
-        	}
-        	Comparator<String> chooser = 
-        		FilterSettings.getStringComparator(parser.isIgnoreCase());
-        	for (CustomChoice cc : customChoices){
-        		if (0==chooser.compare(text, cc.getRepresentation())){
-        			return cc;
-        		}
-        	}
-        	return null;
         }
         
         @Override public RowFilter getFilter() {
@@ -456,17 +417,6 @@ interface EditorComponent {
         	textField.setEnabledState(enabled);
         }
 
-        @Override public void setTextParser(IFilterTextParser parser) {
-            this.parser = parser;
-            if (textField.isEnabled()) {
-                checkFilterUpdate(true);
-            }
-        }
-        
-        @Override public IFilterTextParser getTextParser() {
-            return parser;
-        }
-
         @Override public void setContent(Object content, boolean escapeIt) {
             String text;
             if (content instanceof CustomChoice){
@@ -478,7 +428,7 @@ interface EditorComponent {
             		//if no editable, the options is directly handled, no need
             		//to escape it. When the text is parsed, on no editable
             		//columns, it will be then escaped.
-            		text = parser.escape(text, filterPosition);
+            		text = textParser.escape(text);
             	}
             } else {
             	text = null;
@@ -487,17 +437,16 @@ interface EditorComponent {
             textField.setText(text);
         }
 
-        @Override public void setPosition(int position) {
-            this.filterPosition = position;
-        }
-
-        @Override public int getPosition() {
-            return filterPosition;
-        }
-
         @Override public Object getContent() {
         	checkFilterUpdate(false);
             return content;
+        }
+        
+        @Override public void setParser(IParser parser) {
+        	this.textParser = parser;
+            if (textField.isEnabled()) {
+                checkFilterUpdate(true);
+            }
         }
 
         @Override public void setEditable(boolean set) {
@@ -677,32 +626,16 @@ interface EditorComponent {
 
         /** {@link DocumentListener}: method called when handler is editable */
         @Override public void removeUpdate(DocumentEvent e) {
+        	textField.setError(false);
             getProposalOnEdition(textField.getText(), false);
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
         @Override public void insertUpdate(DocumentEvent e) {
+        	textField.setError(false);
             getProposalOnEdition(textField.getText(), false);
         }
         
-        /** {@link ListDataListener}*/
-        @Override public void contentsChanged(ListDataEvent e) {
-        	retrieveCustomChoices();
-        }
-        
-        /** {@link ListDataListener}*/
-        @Override public void intervalAdded(ListDataEvent e) {
-        	retrieveCustomChoices();
-        }
-        
-        /** {@link ListDataListener}*/
-        @Override public void intervalRemoved(ListDataEvent e) {
-        	retrieveCustomChoices();
-        }
-        
-        private void retrieveCustomChoices(){
-        	this.customChoices = popup.getCustomOptions();        	
-        }
     }
 
     /**
@@ -715,15 +648,15 @@ interface EditorComponent {
         private Object content = CustomChoice.MATCH_ALL;
         private FilterListCellRenderer renderer;
         private CellRendererPane painter = new CellRendererPane();
-        private IFilterTextParser parser;
         private RowFilter filter;
         private Color errorColor;
         private Color disabledColor;
         private boolean focused;
+        FilterEditor editor;
         Object cachedContent;
-        int filterPosition;
 
-        public Rendered(FilterListCellRenderer renderer) {
+        public Rendered(FilterEditor editor, FilterListCellRenderer renderer) {
+        	this.editor = editor;
             this.renderer = renderer;
         }
         
@@ -731,20 +664,16 @@ interface EditorComponent {
             return this;
         }
         
-        @Override public void detach() {
-        	//no need to perform any changes
-        }
-
         @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
             Object currentContent = getContent();
             if (forceUpdate || (currentContent != cachedContent)) {
 	            cachedContent = currentContent;
 	            if (cachedContent instanceof CustomChoice) {
-	                filter = ((CustomChoice)cachedContent).getFilter(parser, filterPosition);
+	                filter = ((CustomChoice)cachedContent).getFilter(editor);
 	            } else {
 	                filter = new RowFilter() {
 	                        @Override public boolean include(RowFilter.Entry entry) {
-	                            Object val = entry.getValue(filterPosition);
+	                            Object val = entry.getValue(editor.getModelIndex());
 	                            return (val == null) ? (cachedContent == null) 
 	                            		: val.equals(cachedContent);
 	                        }
@@ -768,15 +697,6 @@ interface EditorComponent {
         	renderer.setEnabled(enabled);
         }
 
-        @Override public void setTextParser(IFilterTextParser parser) {
-            this.parser = parser;
-            cachedContent = null;
-        }
-
-        @Override public IFilterTextParser getTextParser() {
-            return parser;
-        }
-      
         @Override public void setContent(Object content, boolean escapeIt) {
             this.content = (content == null) ? CustomChoice.MATCH_ALL : content;
             repaint();
@@ -786,16 +706,12 @@ interface EditorComponent {
             return content;
         }
 
-        @Override public void setPosition(int position) {
-            this.filterPosition = position;
-        }
-
-        @Override public int getPosition() {
-            return filterPosition;
-        }
-
         @Override public void setEditable(boolean set) {
             // cannot apply to the rendered component -at least, not currently
+        }
+        
+        @Override public void setParser(IParser parser) {
+        	// not used on rendering        	
         }
 
         @Override public boolean isEditable() {

@@ -25,6 +25,7 @@
 
 package net.coderazzi.filters.gui.editor;
 
+import java.text.Collator;
 import java.text.Format;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +36,7 @@ import java.util.List;
 import javax.swing.AbstractListModel;
 import javax.swing.ListCellRenderer;
 
-import net.coderazzi.filters.gui.FilterSettings;
+import net.coderazzi.filters.gui.CustomChoice;
 
 
 /**
@@ -43,25 +44,30 @@ import net.coderazzi.filters.gui.FilterSettings;
  * When the user specifies a {@link ListCellRenderer}, options are 
  * considered non-text; otherwise, content is converted, if needed, 
  * to Strings, and sorted.<br>
- * This is needed to always show the popup's matches in sequential order. 
+ * This class includes functionality to find the best match for a given
+ * string, returning the option that more closely matches the input. This
+ * functionality works only for text input (i.e., no {@link ListCellRenderer}
+ * specified)<br>
+ * The model handles also specifically {@link CustomChoice} instances, 
+ * which are placed at the beginning of the list, sorted by their own
+ * precedence.<br>
+ * By design, it is not expected to have many {@link CustomChoice} instances
+ * associated to an editor; searching for a custom choice from a given string
+ * is done therefore linearly -with obvious performance drawbacks in cases
+ * with many many custom choices-.
  */
 public class OptionsListModel extends AbstractListModel {
 
 	private static final long serialVersionUID = 3523952153693100563L;
 	private List content;
-	private Format formatter;
-	private boolean useFormatter;
-	private boolean ignoreCase;
+	private Format format;
 	private int customChoices;
-	private Class associatedClass;
-	private Comparator comparator;
-	private Comparator userComparator;
+	boolean useFormatter;
+	Comparator comparator;
 	
-	public OptionsListModel(Class associatedClass) {
+	public OptionsListModel() {
 		this.content = new ArrayList();
-		this.associatedClass = associatedClass;
-		this.useFormatter = associatedClass==String.class;
-		fixComparator();
+		setStringContent(null, Collator.getInstance());
 	}
 	
 	@Override public int getSize() {
@@ -72,60 +78,30 @@ public class OptionsListModel extends AbstractListModel {
 		return content.get(i);
 	}
 
-	/** Returns the class associated to the list model */
-	public Class getAssociatedClass(){
-		return associatedClass;
+	/** Specifies that the content is to be handled as strings */
+	public boolean setStringContent(Format format, Comparator stringComparator) {
+		boolean ret = !useFormatter || format!=this.format || comparator!=stringComparator;
+		if (ret){
+			useFormatter=true;
+			this.format=format;
+			this.comparator=stringComparator;
+			clearContent();
+		}
+		return ret;
 	}
 
-	/**
-	 * Specifies how to handle the content. If no renderer is used, 
-	 * the content is text based, and converted to Strings 
-	 * -and displayed and searched as strings-. 
-	 */
-	public void setStringContent(boolean set) {
-		if (useFormatter!=set){
-			useFormatter=set;
-			fixComparator();
+	/** Specifies that the content requires no conversion to strings */
+	public boolean setRenderedContent(Comparator classComparator) {
+		boolean ret = useFormatter || comparator!=classComparator;
+		if (ret){
+			useFormatter=false;
+			this.format=null;
+			this.comparator=classComparator;
 			clearContent();
-		} 
+		}
+		return ret;
 	}
 
-	/** Specifies the format used to convert Objects to Strings */
-	public void setFormat(Format format) {
-		if (format != this.formatter && String.class!=associatedClass){
-			this.formatter = format;
-			if (useFormatter){
-				clearContent();
-			}
-		}
-	}
-	
-	/** Specifies the comparator to sort the content on the list */
-	public void setRendererComparator(Comparator comparator) {
-		if (userComparator!=comparator){
-			userComparator = comparator;
-			fixComparator();
-			clearContent();
-		}
-	}
-	
-	/** Returns the renderer comparator, if defined */ 
-	public Comparator getRendererComparator(){
-		return userComparator;
-	}
-	
-	/** 
-	 * Sets the flag to ignore case or be case sensitive<br>
-	 * It affects to the algorithms to search for the best match on the content. 
-	 */
-	public void setIgnoreCase(boolean set){
-		if (ignoreCase!=set){
-			ignoreCase = set;
-			fixComparator();
-			clearContent();
-		}
-	}
-	
 	/** Returns true if the object is a valid option (as object, or string) */
 	public boolean isValidOption(Object o){
 		return content.contains(o);
@@ -156,9 +132,15 @@ public class OptionsListModel extends AbstractListModel {
 		return content;
 	}
 
-	/** Returns the list of subchoices in the whole content */
-	public Collection<CustomChoice> getCustomChoices(){
-		return content.subList(0, customChoices);
+	/** Returns the CustomChoice matching the given text, if any */ 
+	public CustomChoice getCustomChoice(String s){
+		for (int i=0; i<customChoices;i++){
+			CustomChoice cc=(CustomChoice) content.get(i);
+			if (0==comparator.compare(s, cc.getRepresentation())){
+				return cc;
+			}
+		}
+		return null;
 	}
 
 	/** 
@@ -171,52 +153,37 @@ public class OptionsListModel extends AbstractListModel {
 	 */
 	public boolean addContent(Collection addedContent) {
 		boolean changed=false;
-		List choices = null;
 		for (Object o : addedContent){
-			boolean custom = o instanceof CustomChoice;
-			if (!custom){
-				if (o!=null && useFormatter){
-					String s = formatter==null? o.toString() : formatter.format(o);	
-					o = s.length()==0? null : s;
-				}
+			if (!(o instanceof CustomChoice)){
 				if (o==null){
 					o=CustomChoice.MATCH_EMPTY;
-				} else {
-					if (choices==null){
-						choices = content.subList(customChoices, content.size());
-					}
-					int pos = Collections.binarySearch(choices, o, comparator);
-					if (pos<0){
-						choices.add(-1-pos, o);
-						changed=true;
-					}
-					continue;
+				} else if (useFormatter){
+					String s = format==null? o.toString() : format.format(o);	
+					o = s.length()==0? CustomChoice.MATCH_EMPTY : s;					
 				}
 			}
-			if (addCustomChoice((CustomChoice)o)){
-				choices=null;
-				changed=true;
-			}
+			changed=addContent(o) || changed;
 		}
 		if (changed){
-			addCustomChoice(CustomChoice.MATCH_ALL);
+			addContent(CustomChoice.MATCH_ALL);
 			fireContentsChanged(this, 0, getSize());
 		}
 		return changed;
 	}
 	
-	/** Adds a CustomChoice, if not yet present */
-	private boolean addCustomChoice(CustomChoice cf){
-		List cc = content.subList(0, customChoices);
-		int pos = Collections.binarySearch(cc, cf);
+	private boolean addContent(Object o){
+		//using the wrapper comparator to handle also CustomChoices
+		int pos = Collections.binarySearch(content, o, wrapperComparator);
 		if (pos<0){
-			cc.add(-1-pos, cf);
-			customChoices+=1;
+			content.add(-1-pos, o);
+			if (o instanceof CustomChoice){
+				customChoices++;
+			}
 			return true;
 		}
 		return false;
 	}
-
+	
 	/** Creation of the Match, for text based, sorted content */
 	private PopupComponent.Match findOnSortedContent(String strStart, 
 			                                         boolean fullMatch) {
@@ -226,82 +193,96 @@ public class OptionsListModel extends AbstractListModel {
 		} else {
 			ret.len = strStart.length();
 			ret.exact = ret.len == 0;
-			int originalLen = ret.len;
-			while (ret.len > 0) {
-				for (Object o : content) {
-					String os;
-					boolean customFilter = o instanceof CustomChoice; 
-					if (customFilter){
-						os = ((CustomChoice) o).getRepresentation();
-					} else {
-						os = (String) o;
+			if (!ret.exact){
+				//find correct position outside the custom choices
+				int pos = Collections.binarySearch(
+						content.subList(customChoices, content.size()), 
+						strStart, 
+						comparator);
+				if (pos>=0){
+					//found it, do nothing else
+					ret.exact=true;
+					ret.index=customChoices + pos;
+				} else if (fullMatch){
+					ret.index=-1;
+					ret.len=0;
+				} else {
+					//try now the two positions around the found one
+					ret.index=customChoices-pos-1;
+					ret.len=getMatchingLength(strStart, ret.index);
+					int nextPost=customChoices-pos-2;
+					if (nextPost>=customChoices){
+						int len = getMatchingLength(strStart, nextPost);
+						if (len>ret.len){
+							ret.index=nextPost;
+							ret.len=len;
+						}
 					}
-					if (os!=null){
-						int osLength = os.length();
-						if (osLength >= ret.len) {
-							String cmpStr = os.substring(0, ret.len); 
-							int cmp = comparator.compare(cmpStr, strStart); 
-							if (cmp == 0) {
-								ret.exact = osLength == originalLen;
-								return ret;
-							} else if (cmp > 0 && !customFilter) {
-								break;
+					ret.exact = ret.len==strStart.length();
+					if (!ret.exact){
+						//with second priority, if not exact, look into 
+						//the custom choices
+						for (int i=0; i<customChoices;i++){
+							int len = getMatchingLength(strStart, i);
+							if (len>ret.len){
+								ret.index=i;
+								ret.len=len;
+								ret.exact = ret.len==strStart.length();
+								if (ret.exact){
+									break;
+								}
 							}
 						}
 					}
-					++ret.index;
 				}
-				if (fullMatch) {
-					ret.index = -1;
-					break;
-				}
-				ret.index = 0;
-				strStart = strStart.substring(0, --ret.len);
 			}
 		}
 		return ret;
 	}
 	
-	/** Ensures that comparator variable has a meaningful content */
-	private void fixComparator(){
-		if (useFormatter){
-			//string based, user comparator won't be used
-	        comparator = FilterSettings.getStringComparator(ignoreCase);
-		} else {
-			//ignore case not used
-			if (userComparator==null){
-		        if (Comparable.class.isAssignableFrom(associatedClass)) {
-		            comparator = DEFAULT_COMPARABLE_COMPARATOR;
-		        } else {
-		        	comparator = DEFAULT_COMPARATOR;
-		        }				
-			} else {
-				comparator = userComparator;
+	/**
+	 * Returns the number of characters matching between 
+	 * content[contentPosition] and target
+	 */
+	private int getMatchingLength(String target, int contentPosition){
+		if (contentPosition>=content.size()){
+			return -1;
+		}
+		Object o = content.get(contentPosition);
+		String s = (o instanceof CustomChoice)? 
+				((CustomChoice)o).getRepresentation() : (String) o;
+		int max = Math.min(target.length(), s.length());
+		for (int i=0; i<max; i++){
+			if (0!=comparator.compare(target.substring(i, i+1), s.substring(i, i+1))){
+				return i;
 			}
 		}
+		return max;
 	}
 	
-	private static Comparator DEFAULT_COMPARATOR = new Comparator() {
+	private Comparator wrapperComparator = new Comparator() {
 		@Override public int compare(Object o1, Object o2) {
-			//on a JTable, sorting will use the string representation, but here
-			//is not enough to distinguish on string representation, as it is
-			//only used for cases where the content is not converted to String
-			int ret = o1.toString().compareTo(o2.toString());
-			if (ret==0 && !o1.equals(o2)){
-				ret = o1.hashCode()-o2.hashCode();
-				if (ret==0){
-					ret=System.identityHashCode(o1)-System.identityHashCode(o2);
+			if (o1 instanceof CustomChoice){
+				if (o2 instanceof CustomChoice){
+					CustomChoice c1=(CustomChoice)o1;
+					CustomChoice c2=(CustomChoice)o2;
+					int ret=c1.getPrecedence() - c2.getPrecedence();
+					if (ret==0){
+						if (useFormatter){
+							//in this case, the comparator is string comparator
+							ret=comparator.compare(c1.getRepresentation(), c2.getRepresentation());
+						} else {
+							ret = o1.hashCode()-o2.hashCode();
+						}
+					}
+					return ret;
 				}
+				return -1;
+			} else if (o2 instanceof CustomChoice){
+				return 1;
 			}
-			return ret;
+			return comparator.compare(o1, o2);
 		}
 	};
 
-	private static Comparator DEFAULT_COMPARABLE_COMPARATOR = 
-		new Comparator<Comparable>() {
-
-		@Override public int compare(Comparable o1, Comparable o2) {
-			return o1.compareTo(o2);
-		}
-	};	
 }

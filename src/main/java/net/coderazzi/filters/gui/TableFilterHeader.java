@@ -33,7 +33,9 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.Format;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +52,6 @@ import javax.swing.table.TableColumnModel;
 
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterObserver;
-import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
 
@@ -65,7 +66,7 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
  * table itself. The position can be automatically handled by the header 
  * itself -that is the default behavior-</p>
  *
- * <p>The editor associated to each column has the type {@link FilterEditor}, 
+ * <p>The editor associated to each column has the type {@link IFilterEditor}, 
  * and can be manipulated separately.</p>
  *
  * <p>The implementation relies on the {@link net.coderazzi.filters.gui.FiltersHandler} 
@@ -125,9 +126,6 @@ public class TableFilterHeader extends JPanel {
      */
     FilterColumnsControllerPanel columnsController;
 
-    /** The filterTextParser to use on text based editors */
-    IFilterTextParser filterTextParser;
-
     /**
      * The privately owned instance of FiltersHandler that conforms the filter 
      * defined by the TableFilterHeader
@@ -153,28 +151,21 @@ public class TableFilterHeader extends JPanel {
      * @see  TableFilterHeader#setTable(JTable)
      */
     public TableFilterHeader() {
-        this(null);
+        this(null, null);
     }
 
-    /**
-     * Constructor, using the default location
-     *
-     * @see  TableFilterHeader#setPosition(net.coderazzi.filters.gui.TableFilterHeader.Position)
-     */
+    /** Basic constructor, using default {@link IParserModel} */
     public TableFilterHeader(JTable table) {
-    	this(table, FilterSettings.headerPosition);
+    	this(table, null);
     }
 
-    /**
-     * Full constructor
-     *
-     * @see  TableFilterHeader#setTable(JTable)
-     * @see  TableFilterHeader#setPosition(net.coderazzi.filters.gui.TableFilterHeader.Position)
-     */
-    public TableFilterHeader(JTable table, Position location) {
+    /** Full constructor */
+    public TableFilterHeader(JTable table, IParserModel parserModel) {
         super(new BorderLayout());
+        if (parserModel==null) parserModel = FilterSettings.newParserModel();
+        filtersHandler.setParserModel(parserModel);
         backgroundSet = foregroundSet = fontSet = false;
-        setPosition(location);
+        setPosition(FilterSettings.headerPosition);
         setTable(table);
     }
 
@@ -200,7 +191,6 @@ public class TableFilterHeader extends JPanel {
         	updateAppearance();
             recreateController();
             table.addComponentListener(resizer);
-            getTextParser().setTableModel(table.getModel());
         }
     	filtersHandler.enableNotifications(true);    	
     }
@@ -209,7 +199,25 @@ public class TableFilterHeader extends JPanel {
     public JTable getTable() {
         return filtersHandler==null? null : filtersHandler.getTable();
     }
+    
+    /** 
+     * Sets the {@link IParserModel}, used to define the parsing of text
+     * on the filter editors.
+     */
+    public void setParserModel(IParserModel parserModel){
+    	filtersHandler.setParserModel(parserModel);
+    }
 
+    /**
+     * Retrieves the current {@link IParserModel};
+     * The returned reference is required to update properties like 
+     * {@link Format} or {@link Comparator} instances associated to each
+     * class, or whether to ignore case.
+     */
+    public IParserModel getParserModel(){
+    	return filtersHandler.getParserModel();
+    }
+    
     /** Adds a filter -user specified- to the filter header */
     public void addFilter(IFilter... filter) {
         filtersHandler.addFilter(filter);
@@ -236,11 +244,7 @@ public class TableFilterHeader extends JPanel {
     /**
      * <p>Invokes resetFilter on all the editor filters.</p>
      *
-     * This does not only implies invoking {@link FilterEditor#resetFilter()},
-     * as it tries to reset the original editor options for enums 
-     * and boolean types 
-     *
-     * @see  FilterEditor#resetFilter()
+     * @see  IFilterEditor#resetFilter()
      */
     public void resetFilter() {
 
@@ -438,7 +442,7 @@ public class TableFilterHeader extends JPanel {
 	}
 
     /** Customizes the editor, can be overridden for custom appearance */
-    protected void customizeEditor(FilterEditor editor) {
+    protected void customizeEditor(IFilterEditor editor) {
         editor.setForeground(getForeground());
         editor.setBackground(getBackground());
         editor.setErrorForeground(getErrorForeground());
@@ -451,45 +455,10 @@ public class TableFilterHeader extends JPanel {
     }
 
     /** Returns the filter editor for the given column in the table model */
-    public FilterEditor getFilterEditor(int modelColumn) {
+    public IFilterEditor getFilterEditor(int modelColumn) {
         return (columnsController == null) ? null : 
         	columnsController.getFilterEditor(
         			getTable().convertColumnIndexToView(modelColumn));
-    }
-
-    /**
-     * <p>Sets the parser to be used on text filter editors.</p>
-     *
-     * <p>This parser overrides any parser already set 
-     * on the separate columns filters.</p>
-     */
-    public void setTextParser(IFilterTextParser parser) {
-        filterTextParser = parser;
-
-        if (columnsController != null) {
-            filtersHandler.enableNotifications(false);
-            columnsController.updateTextParser();
-            filtersHandler.enableNotifications(true);
-        }
-    }
-
-    /**
-     * <p>Returns the parser used on plain text filters.</p>
-     *
-     * <p>Each column can have its own Parser, if setTextParser is used on 
-     * the associated filter. In that case, it is needed to access each 
-     * filter to obtain the used parser.</p>
-     */
-    public IFilterTextParser getTextParser() {
-        if (filterTextParser == null) {
-            filterTextParser = FilterSettings.newTextParser();
-            JTable table = getTable();
-            if (table != null){
-                filterTextParser.setTableModel(table.getModel());
-            }
-        }
-
-        return filterTextParser;
     }
 
     /** Hides / makes visible the header */
@@ -803,10 +772,9 @@ public class TableFilterHeader extends JPanel {
         }
 
         /** Creates an editor for the given column */
-        private FilterEditor createEditor(int modelColumn, boolean enableIt) {            
+        private FilterEditor createEditor(int modelColumn, boolean enableIt) {        	
             FilterEditor ret = new FilterEditor(filtersHandler, 
             		modelColumn, getTable().getModel().getColumnClass(modelColumn));
-            ret.setTextParser(getTextParser());
             ret.getFilter().setEnabled(enableIt);
             filtersHandler.addFilterEditor(ret);
             return ret;
@@ -839,14 +807,6 @@ public class TableFilterHeader extends JPanel {
             preferredSize.height = h;
             placeComponents();
             repaint();
-        }
-
-        /** Sets a new FilterTextParser on all the editors */
-        public void updateTextParser() {
-
-            for (FilterColumnPanel column : columns) {
-                column.editor.setTextParser(filterTextParser);
-            }
         }
 
         /** Invokes resetFilter on all the editors. */
@@ -1003,7 +963,6 @@ public class TableFilterHeader extends JPanel {
             if (--autoRun == 0 && getTable() != null){
             	handlerEnabled=null;
                 updateHeight();
-                getTextParser().setTableModel(getTable().getModel());
             }
             filtersHandler.enableNotifications(true);
         }

@@ -60,7 +60,6 @@ import javax.swing.table.TableColumnModel;
 
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
-import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.examples.utils.AgeCustomChoice;
 import net.coderazzi.filters.examples.utils.CenteredRenderer;
 import net.coderazzi.filters.examples.utils.EventsWindow;
@@ -69,10 +68,10 @@ import net.coderazzi.filters.examples.utils.TestData;
 import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.AutoOptions;
 import net.coderazzi.filters.gui.FilterSettings;
+import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.IFilterHeaderObserver;
 import net.coderazzi.filters.gui.TableFilterHeader;
 import net.coderazzi.filters.gui.TableFilterHeader.Position;
-import net.coderazzi.filters.gui.editor.FilterEditor;
 
 
 @SuppressWarnings("serial")
@@ -113,7 +112,7 @@ public class TableFilterExample extends JFrame {
     			BorderFactory.createEmptyBorder(8, 8, 8, 8)));
     	filterHeader = new TableFilterHeader(){
     		
-    		@Override protected void customizeEditor(FilterEditor editor) {
+    		@Override protected void customizeEditor(IFilterEditor editor) {
     			super.customizeEditor(editor);
     			//enter here any code to customize the editor
     		}
@@ -121,18 +120,18 @@ public class TableFilterExample extends JFrame {
     	filterHeader.addHeaderObserver(new IFilterHeaderObserver() {
 			
 			@Override public void tableFilterUpdated(TableFilterHeader header,
-					FilterEditor editor, TableColumn tableColumn) {
+					IFilterEditor editor, TableColumn tableColumn) {
 				//no need to react
 			}
 			
 			@Override public void tableFilterEditorExcluded(TableFilterHeader header,
-					FilterEditor editor, TableColumn tableColumn) {
+					IFilterEditor editor, TableColumn tableColumn) {
 		    	getMenu(filtersMenu, (String) tableColumn.getHeaderValue(), true);
 			}
 			
 			@Override public void tableFilterEditorCreated(TableFilterHeader header,
-					FilterEditor editor, TableColumn tableColumn) {
-		    	addToFiltersMenu(editor, (String) tableColumn.getHeaderValue());
+					IFilterEditor editor, TableColumn tableColumn) {
+		    	addColumnToFiltersMenu(editor, (String) tableColumn.getHeaderValue());
 			}
 		});
 		useFlagRenderer=new JCheckBoxMenuItem("country flags as icons -in options-", true);
@@ -284,7 +283,7 @@ public class TableFilterExample extends JFrame {
     			new AbstractAction(IGNORE_CASE) {			
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
-				filterHeader.getTextParser().setIgnoreCase(source.isSelected());	
+				filterHeader.getParserModel().setIgnoreCase(source.isSelected());	
 				updateFiltersInfo();
 			}
 		});
@@ -323,7 +322,7 @@ public class TableFilterExample extends JFrame {
 		});
     	onUse.setSelected(true);
     	ignoreCase.setMnemonic(KeyEvent.VK_C);
-    	ignoreCase.setSelected(filterHeader.getTextParser().isIgnoreCase());
+    	ignoreCase.setSelected(filterHeader.getParserModel().isIgnoreCase());
     	adaptiveOptions.setSelected(filterHeader.isAdaptiveOptions());
     	allEnabled.setSelected(filterHeader.isEnabled());
     	visible.setSelected(filterHeader.isVisible());
@@ -345,9 +344,7 @@ public class TableFilterExample extends JFrame {
     	ret.add(visible);
     	ret.add(createPositionMenu());
     	ret.add(createAppearanceMenu());
-    	ret.addSeparator();
     	ret.add(createMaxRowsMenu());
-    	ret.add(createMaxHistoryMenu());
     	ret.addSeparator();
     	ret.add(reset);
     	return ret;
@@ -547,7 +544,7 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
-    void addToFiltersMenu(final FilterEditor editor, final String name) {
+    void addColumnToFiltersMenu(final IFilterEditor editor, final String name) {
     	JMenu menu = (JMenu) getMenu(filtersMenu, name, false);
     	menu.add(createAutoOptionsMenu(editor.getAutoOptions(), new AutoOptionsSet(){
     		@Override public void setAutoOptions(AutoOptions ao) {
@@ -564,7 +561,7 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	menu.add(editable);
-    	JCheckBoxMenuItem enabled = new JCheckBoxMenuItem(ENABLED, editor.isEnabled());
+    	JCheckBoxMenuItem enabled = new JCheckBoxMenuItem(ENABLED, editor.getFilter().isEnabled());
     	enabled.addActionListener(new ActionListener() {			
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
@@ -573,19 +570,12 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	menu.add(enabled);
-    	JCheckBoxMenuItem ignoreCase = new JCheckBoxMenuItem(IGNORE_CASE, editor.getTextParser().isIgnoreCase());
+    	JCheckBoxMenuItem ignoreCase = new JCheckBoxMenuItem(IGNORE_CASE, editor.isIgnoreCase());
     	ignoreCase.addActionListener(new ActionListener() {			
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
 				boolean ignoreCase=source.isSelected();
-				IFilterTextParser parser = editor.getTextParser();
-				if (parser==filterHeader.getTextParser()){
-					parser=parser.clone();
-					parser.setIgnoreCase(ignoreCase);
-					editor.setTextParser(parser);
-				} else {
-					parser.setIgnoreCase(ignoreCase);
-				}
+				editor.setIgnoreCase(ignoreCase);
 			}
 		});
     	menu.add(ignoreCase);
@@ -595,7 +585,17 @@ public class TableFilterExample extends JFrame {
     		menu.add(countrySpecialSorter);
     		menu.addSeparator();
     	}
-
+    	
+    	JMenu history = new JMenu("max history length");
+    	ButtonGroup max = new ButtonGroup();
+    	
+    	for (int i=0; i<10;i++){
+    		JRadioButtonMenuItem item = createMaxHistoryMenuItem(editor, i);
+    		max.add(item);    		
+    		history.add(item);
+    	}
+    	
+    	menu.add(history);
 
     	menu.add(new JMenuItem(new AbstractAction("Remove this column"){
     		@Override
@@ -616,11 +616,11 @@ public class TableFilterExample extends JFrame {
     	enableUserFilter.setSelected(userFilter.isEnabled());
     }
 
-    void updateFilter(FilterEditor editor, String columnName) {
+    void updateFilter(IFilterEditor editor, String columnName) {
     	JMenu menu = (JMenu) getMenu(filtersMenu, columnName, false);
     	((JCheckBoxMenuItem) getMenu(menu, EDITABLE, false)).setSelected(editor.isEditable());
     	((JCheckBoxMenuItem) getMenu(menu, ENABLED, false)).setSelected(editor.getFilter().isEnabled());
-    	((JCheckBoxMenuItem) getMenu(menu, IGNORE_CASE, false)).setSelected(editor.getTextParser().isIgnoreCase());
+    	((JCheckBoxMenuItem) getMenu(menu, IGNORE_CASE, false)).setSelected(editor.isIgnoreCase());
     	JMenu autoOptionsMenu = (JMenu) getMenu(menu, AUTO_OPTIONS, false);
     	((JRadioButtonMenuItem ) getMenu(autoOptionsMenu, editor.getAutoOptions().toString().toLowerCase(), false)).setSelected(true);
     }
@@ -692,22 +692,16 @@ public class TableFilterExample extends JFrame {
 		});
     }
     
-    private JMenu createMaxHistoryMenu (){
-    	JMenu ret = new JMenu("max history on country column");
-
-    	for (int i=0; i<10;i++){
-    		ret.add(createMaxHistoryMenuItem(i));
-    	}
-    	return ret;
-    }
-    
-    private JMenuItem createMaxHistoryMenuItem(final int i){
-    	return new JMenuItem(new AbstractAction(String.valueOf(i)) {			
+    private JRadioButtonMenuItem createMaxHistoryMenuItem(final IFilterEditor editor, final int i){
+    	JRadioButtonMenuItem ret = new JRadioButtonMenuItem(new AbstractAction(String.valueOf(i)) {			
 			@Override public void actionPerformed(ActionEvent e) {
-				filterHeader.getFilterEditor(tableModel.getColumn(
-						TestTableModel.COUNTRY)).setMaxHistory(i);
+				editor.setMaxHistory(i);
 			}
 		});
+    	if (editor.getMaxHistory()==i){
+    		ret.setSelected(true);
+    	}
+    	return ret;
     }
     
     void setCountryEditorRenderer(){
@@ -724,7 +718,7 @@ public class TableFilterExample extends JFrame {
         int column = tableModel.getColumn(TestTableModel.COUNTRY);
         if (tableModel!=null && tableModel.getColumnCount() > column) {
         	Comparator<TestData.Flag> comp = set? new TestData.RedComparator() : null;
-        	filterHeader.getFilterEditor(column).setRendererComparator(comp);
+        	filterHeader.getFilterEditor(column).setComparator(comp);
         }    	    	
     }
     
@@ -758,8 +752,7 @@ public class TableFilterExample extends JFrame {
 	
 	            			private static final long serialVersionUID = 
 	            				8042527267257156699L;
-	            			Format parser = 
-	            				FilterSettings.types.getFormat(Date.class);
+	            			Format parser = filterHeader.getParserModel().getFormat(Date.class);
 	
 	            			@Override public Component getTableCellRendererComponent(
 	            					JTable table, Object value, boolean isSelected, 

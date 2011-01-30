@@ -27,16 +27,12 @@ package net.coderazzi.filters.gui;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.text.Collator;
-import java.util.Comparator;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import net.coderazzi.filters.IFilterTextParser;
+import net.coderazzi.filters.IParser;
 import net.coderazzi.filters.gui.TableFilterHeader.Position;
-import net.coderazzi.filters.parser.FilterTextParser;
-import net.coderazzi.filters.parser.Types;
 
 
 /**
@@ -71,7 +67,7 @@ public class FilterSettings {
     public static Position headerPosition = 
     	Position.valueOf(getString("Header.Position", "INLINE"));
 
-    /** The default date format, used on the default text parser */
+    /** The default date format, used on the default filter model */
     public static String dateFormat = getString("DateFormat", null);
 
     /** The maximum number of visible tows on the popup menus */
@@ -80,12 +76,9 @@ public class FilterSettings {
     /** The maximum size of the history when no options are present */
     public static int maxPopupHistory = getInteger("Popup.maxHistory", 2);
     
-    /** The types used by default on the parser */
-    public static Types types = new Types();
-
     /** The default icon used to represent null/empty values */
     public static Icon matchEmptyFilterIcon = new ImageIcon( 
-    	IFilterTextParser.class.getResource("resources/matchEmptyIcon.png"));
+    	IParser.class.getResource("resources/matchEmptyIcon.png"));
 
     /** 
      * The default string associated to a nop operation.<p>
@@ -96,77 +89,48 @@ public class FilterSettings {
     public static String matchEmptyFilterString = "=";
 
     /** Header's background color*/
-    public  static Color backgroundColor = getColor("backgroundColor", null);
+    public static Color backgroundColor = getColor("backgroundColor", null);
     
     /** Header's foreground color*/
-    public  static Color foregroundColor = getColor("foregroundColor", null);
+    public static Color foregroundColor = getColor("foregroundColor", null);
     
     /** Header's error color*/
-    public  static Color errorColor = getColor("errorColor", Color.red);
+    public static Color errorColor = getColor("errorColor", Color.red);
     
     /** Header's grid color*/
-    public  static Color gridColor = getColor("gridColor", null);
+    public static Color gridColor = getColor("gridColor", null);
     
     /** Header's disabled color*/
-    public  static Color disabledColor = getColor("disabledColor", null);
+    public static Color disabledColor = getColor("disabledColor", null);
     
     /** Header's selection background color*/
-    public  static Color selectionBackgroundColor  =    	
+    public static Color selectionBackgroundColor  =    	
     	getColor("selectionBackgroundColor", null);
     
     /** Header's selection foreground color*/
-    public  static Color selectionForegroundColor = 
+    public static Color selectionForegroundColor = 
     	getColor("selectionForegroundColor", null);
     
     /** Header's font*/
     public static Font font;
 
     /**
-     * The class to handle the text parsing by default.<br>
+     * The class defining the generic {@link IParserModel}<br>
      * It must have a default constructor. <br>
-     * It corresponds to the property TextParser.class
+     * It corresponds to the property ParserModel.class
      */
-    public static Class<? extends IFilterTextParser> filterTextParserClass;
+    public static Class<? extends IParserModel> parserModelClass;
 
     /** Creates a TextParser as defined by default */
-    public static IFilterTextParser newTextParser() {
+    public static IParserModel newParserModel() {
         try {
-            IFilterTextParser ret = filterTextParserClass.newInstance();
-            ret.setIgnoreCase(ignoreCase);
-            types.configure(ret);
-            return ret;
+        	return parserModelClass.newInstance();
         } catch (Exception ex) {
-            throw new RuntimeException("Error creating filter text parser of type "
-                                       + filterTextParserClass, ex);
+            throw new RuntimeException("Error creating parser model of type "
+                                       + parserModelClass, ex);
         }
     }
     
-    /** Internal TableFilter method to get the appropriated String comparator*/
-    public static Comparator<String> getStringComparator(boolean ignoreCase){
-    	Comparator<String> ret;
-    	if (ignoreCase){
-    		if (icCollator==null){
-    			icCollator=createStringComparator(true);
-    		}
-    		ret=icCollator;
-    	} else {
-    		if (collator==null){
-    			collator=createStringComparator(false);
-    		}
-    		ret=collator;    		
-    	}
-    	return ret;
-    }
-    
-    private static Comparator<String> createStringComparator(boolean ignoreCase){
-    	Collator ret=Collator.getInstance();
-    	ret.setStrength(ignoreCase? Collator.PRIMARY : Collator.TERTIARY);    			
-    	return (Comparator) ret;
-    }
-    
-    private static Comparator<String> collator, icCollator; 
-
-
     static {
     	try{
     		font=Font.decode(getString("font"));
@@ -178,19 +142,19 @@ public class FilterSettings {
     	} catch(Exception ex){
     		autoOptions = AutoOptions.ENUMS;
     	}
-        filterTextParserClass = FilterTextParser.class;
-        String cl = getString("TextParser.class", null);
+        parserModelClass = ParserModel.class;
+        String cl = getString("ParserModel.class", null);
         if (cl != null) {
             try {
-                filterTextParserClass = (Class<? extends IFilterTextParser>) 
-                                        Class.forName(cl);
+            	parserModelClass = (Class<? extends IParserModel>) 
+                                    Class.forName(cl);
             } catch (ClassNotFoundException cne) {
                 throw new RuntimeException(
-                		"Error finding filter text parser of class " + cl, cne);
+                		"Error finding filter model of class " + cl, cne);
             } catch (ClassCastException cce) {
                 throw new RuntimeException(
-                		"Filter text parser of class " + cl
-                        + " is not a valid IFilterTextParser class");
+                		"Filter model of class " + cl
+                        + " is not a valid IParserModel class");
             }
         }
     }

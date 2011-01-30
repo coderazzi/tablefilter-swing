@@ -18,9 +18,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.IFilterHeaderObserver;
 import net.coderazzi.filters.gui.TableFilterHeader;
-import net.coderazzi.filters.gui.editor.FilterEditor;
 
 @SuppressWarnings("serial")
 public class EventsWindow extends JDialog 
@@ -114,11 +114,11 @@ public class EventsWindow extends JDialog
 				header.removeHeaderObserver(EventsWindow.this);
 			}
 		});
-		header.getTextParser().addPropertyChangeListener(this);
+		header.getParserModel().addPropertyChangeListener(this);
 	}
 	
 	@Override public void tableFilterEditorCreated(TableFilterHeader header, 
-			FilterEditor editor, TableColumn tc) {
+			IFilterEditor editor, TableColumn tc) {
 		Event event = new Event();
 		event.name=CREATED;
 		event.column=tc.getHeaderValue().toString();
@@ -126,7 +126,7 @@ public class EventsWindow extends JDialog
 	}
 	
 	@Override public void tableFilterEditorExcluded(TableFilterHeader header, 
-			FilterEditor editor, TableColumn tc) {
+			IFilterEditor editor, TableColumn tc) {
 		Event event = new Event();
 		event.name=EXCLUDED;
 		event.column=tc.getHeaderValue().toString();
@@ -135,7 +135,7 @@ public class EventsWindow extends JDialog
 	
 	@Override
 	public void tableFilterUpdated(TableFilterHeader header, 
-			FilterEditor editor, TableColumn tc) {
+			IFilterEditor editor, TableColumn tc) {
 		Event event = new Event();
 		event.name="Updated";
 		event.type = editor.getContent().getClass().getCanonicalName();
@@ -147,10 +147,16 @@ public class EventsWindow extends JDialog
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		Event event = new Event();
-		event.name="Global TextParser";
-		event.column="*";
+		event.name="Global TextModel";
 		event.type = evt.getPropertyName();
-		event.content = evt.getNewValue().toString();
+		Object value = evt.getNewValue();
+		if (value instanceof Class){
+			event.column="Class "+value.toString();
+			event.content = null;
+		} else {
+			event.column="*";
+			event.content = evt.getNewValue().toString();
+		}
 		tableModel.addEvent(event);
 	}
 	

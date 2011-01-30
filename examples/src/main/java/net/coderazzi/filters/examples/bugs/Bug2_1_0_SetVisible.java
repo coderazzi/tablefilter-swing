@@ -85,7 +85,9 @@ public class Bug2_1_0_SetVisible extends JFrame {
 
         table = new JTable(tableModel);
         scrollPane.setViewportView(table);
-        filterHeader = new TableFilterHeader(table, position);
+        filterHeader = new TableFilterHeader();
+        filterHeader.setPosition(position);
+        filterHeader.setTable(table);
         filterHeader.setVisible(visible);
         filterHeader.setEnabled(enabled);
         if (position == Position.NONE) {

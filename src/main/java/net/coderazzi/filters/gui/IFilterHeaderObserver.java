@@ -27,12 +27,10 @@ package net.coderazzi.filters.gui;
 
 import javax.swing.table.TableColumn;
 
-import net.coderazzi.filters.gui.editor.FilterEditor;
-
 
 /**
  * <p>A ITableFilterHeaderObserver instance receives notifications when the 
- * associated {@link net.coderazzi.filters.gui.editor.FilterEditor} instances 
+ * associated {@link net.coderazzi.filters.gui.IFilterEditor} instances 
  * are created, destroyed, or update the held filter.
  * </p>
  *
@@ -47,7 +45,7 @@ public interface IFilterHeaderObserver {
 	 * @param tableColumn the associated {@link TableColumn}
 	 */
 	public void tableFilterEditorCreated(TableFilterHeader header, 
-			                             FilterEditor editor,
+			                             IFilterEditor editor,
 			                             TableColumn tableColumn);
 
 	/**
@@ -58,18 +56,18 @@ public interface IFilterHeaderObserver {
 	 * @param tableColumn the associated {@link TableColumn}
 	 */
 	public void tableFilterEditorExcluded(TableFilterHeader header, 
-			                              FilterEditor editor,
+			                              IFilterEditor editor,
 				                          TableColumn tableColumn);
 
     /**
      * <p>Notification made by the 
-     * {@link net.coderazzi.filters.gui.editor.FilterEditor}
+     * {@link net.coderazzi.filters.gui.IFilterEditor}
      * when the filter's content is updated</p>
      * @param header the associated table filter header
      * @param editor the observable instance
 	 * @param tableColumn the associated {@link TableColumn}
      */
     public void tableFilterUpdated(TableFilterHeader header, 
-    		                       FilterEditor editor,
+    		                       IFilterEditor editor,
 		                           TableColumn tableColumn);
 }

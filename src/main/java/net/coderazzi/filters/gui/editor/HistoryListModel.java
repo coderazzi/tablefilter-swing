@@ -26,11 +26,13 @@
 package net.coderazzi.filters.gui.editor;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ListCellRenderer;
 
+import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.FilterSettings;
 
 
@@ -39,41 +41,30 @@ import net.coderazzi.filters.gui.FilterSettings;
  * When the user specifies a {@link ListCellRenderer}, 
  * history elements are considered non-text; this affects to the 
  * search algorithm to find the best matches 
- * {@link PopupComponent#selectBestMatch(Object, boolean)}
+ * {@link PopupComponent#selectBestMatch(Object, boolean)}<br>
+ * Otherwise, content is always pure strings (@link {@link CustomChoice} are
+ * not inserted into the history)
  */
 class HistoryListModel extends AbstractListModel {
 	private static final long serialVersionUID = -374115548677017807L;
 	private List<Object> history = new ArrayList<Object>();
-	/** history, converted to lower case. Null if content is not text-based */
-	private List<Object> historyLC;
+	private Comparator stringComparator;
 	private int maxHistory = FilterSettings.maxVisiblePopupRows;
-	private boolean stringContent = true;
-	private boolean ignoreCase;
-	
-	/** 
-	 * Sets the flag to ignore case or be case sensitive<br>
-	 * It affects to the algorithms to search for the best match on the content. 
-	 */
-	public void setIgnoreCase(boolean set){
-		ignoreCase = set;
-	}
 	
 	/**
-	 * Specifies how to handle the content. If no renderer is used, the content 
-	 * is text based, and converted to Strings 
-	 * -and displayed and searched as strings-. 
+	 * Specifies how to handle the content. If there is a string comparator,
+	 * content is handled as strings and it is possible to look for
+	 * best matches; otherwise, it is treated as abstract objects, matching
+	 * is done by identity.  
 	 */
-	public boolean setStringContent(boolean set){
-		if (stringContent!=set){
-			stringContent = set;
+	public void setStringContent(Comparator stringComparator){
+		if (this.stringComparator!=stringComparator){
+			this.stringComparator = stringComparator;
 			clear();
-			return true;
 		}
-		return false;
 	}
 
-	@Override
-	public Object getElementAt(int index) {
+	@Override public Object getElementAt(int index) {
 		return history.get(index);
 	}
 
@@ -91,7 +82,6 @@ class HistoryListModel extends AbstractListModel {
 				ret=true;
 				fireIntervalAdded(this, 0, 0);
 			}
-			historyLC=null;
 		}
 		return ret;
 	}
@@ -105,12 +95,10 @@ class HistoryListModel extends AbstractListModel {
 		if (size>0){
 			history.clear();
 			fireIntervalRemoved(this, 0, size);
-			historyLC=null;
 		}
 	}
 
-	@Override
-	public int getSize() {
+	@Override public int getSize() {
 		return history.size();
 	}
 
@@ -123,7 +111,6 @@ class HistoryListModel extends AbstractListModel {
 				history.remove(i);
 			}
 			fireContentsChanged(this, maxHistory, current);
-			historyLC=null;
 			return true;
 		}
 		return false;
@@ -135,22 +122,8 @@ class HistoryListModel extends AbstractListModel {
 
 	/** @see PopupComponent#selectBestMatch(Object, boolean) */
 	public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
-		if (stringContent && (hint instanceof String)) {
-			List list = history;
-			if (ignoreCase){
-				if (historyLC==null){
-					historyLC = new ArrayList<Object>(history.size()+1);
-					for(Object o : history){
-						if (o instanceof String){
-							o = ((String)o).toLowerCase();
-						}
-						historyLC.add(o);
-					}
-				}
-				list = historyLC;
-				hint = ((String) hint).toLowerCase();
-			}
-			return findOnUnsortedContent(list, (String)hint, exact);
+		if (stringComparator!=null && (hint instanceof String)) {			
+			return findOnUnsortedContent((String)hint, exact);
 		}
 		return new PopupComponent.Match(history.indexOf(hint));
 	}
@@ -159,40 +132,52 @@ class HistoryListModel extends AbstractListModel {
 	 * Method to find the best match on a given unsorted list 
 	 * -search is case sensitive- 
 	 **/
-	private PopupComponent.Match findOnUnsortedContent(List list, 
-			String strStart, boolean fullMatch) {
+	private PopupComponent.Match findOnUnsortedContent(String strStart, boolean fullMatch) {
 		PopupComponent.Match ret = new PopupComponent.Match();
-		if (list.isEmpty()) {
+		if (history.isEmpty()) {
 			ret.index = -1;
 		} else {
-			ret.len = strStart.length();
-			ret.index = list.indexOf(strStart);
-			if (ret.index != -1) {
-				ret.exact=true;
-			} else {
-				ret.index = 0;
-				ret.exact = ret.len == 0;
-				int originalLen = ret.len;
-				while (ret.len > 0) {
-					for (Object o : list) {
+			int strLen = strStart.length();
+			if (strLen > 0){
+				ret.index = history.indexOf(strStart);
+				if (ret.index != -1) {
+					ret.len = strLen;
+				} else {
+					int i = history.size();
+					while (--i>0){
+						Object o = history.get(i);
 						if (o instanceof String){
-							String os = (String) o;
-							if (os.startsWith(strStart)) {
-								ret.exact = os.length() == originalLen;
-								return ret;
+							int match = getMatchingLength(strStart, (String) o);
+							if (match>ret.len){
+								ret.index=i;
+								ret.len=match;
+								if (match==strLen){
+									break;
+								}
 							}
 						}
-						++ret.index;
 					}
-					if (fullMatch) {
-						ret.index = -1;
-						break;
-					}
-					ret.index = 0;
-					strStart = strStart.substring(0, --ret.len);
 				}
+			}
+			if (ret.len==strLen){
+				ret.exact=true;
+			} else if (fullMatch){
+				ret.index=-1;
+				ret.len=0;
 			}
 		}
 		return ret;
 	}
+
+	/** Returns the number of characters matching between two strings */
+	private int getMatchingLength(String a, String b){
+		int max = Math.min(a.length(), b.length());
+		for (int i=0; i<max; i++){
+			if (0!=stringComparator.compare(a.substring(i, i+1), b.substring(i, i+1))){
+				return i;
+			}
+		}
+		return max;
+	}
+	
 }

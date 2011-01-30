@@ -23,17 +23,12 @@
  * THE SOFTWARE.
  */
 
-package net.coderazzi.filters.gui.editor;
+package net.coderazzi.filters.gui;
 
 import java.text.Format;
-import java.text.ParseException;
-import java.util.Comparator;
 
 import javax.swing.Icon;
 import javax.swing.RowFilter;
-
-import net.coderazzi.filters.IFilterTextParser;
-import net.coderazzi.filters.gui.FilterSettings;
 
 /**
  * Class to specify a custom filter in the options list<br>
@@ -50,7 +45,7 @@ import net.coderazzi.filters.gui.FilterSettings;
  * 
  * @author Luismi
  */
-public class CustomChoice implements Comparable<CustomChoice>{
+public abstract class CustomChoice {
 	
 	public final static int DEFAULT_PRECEDENCE = 0;
 	
@@ -61,7 +56,7 @@ public class CustomChoice implements Comparable<CustomChoice>{
 				return true;
 			}
 		};
-		@Override public RowFilter getFilter(IFilterTextParser parser, int modelPosition) {
+		@Override public RowFilter getFilter(IFilterEditor editor) {
 			return rf;
 		}
 	};
@@ -70,14 +65,13 @@ public class CustomChoice implements Comparable<CustomChoice>{
 	public final static CustomChoice MATCH_EMPTY = new CustomChoice(
 			FilterSettings.matchEmptyFilterString,
 			FilterSettings.matchEmptyFilterIcon){
-		@Override public RowFilter getFilter(IFilterTextParser parser, 
-				final int modelPosition) {
-			final Format format = parser.getFormat(
-						parser.getTableModel().getColumnClass(modelPosition));
+		@Override public RowFilter getFilter(final IFilterEditor editor) {
+			final int modelIndex = editor.getModelIndex();
 			return new RowFilter(){
 				@Override public boolean include(RowFilter.Entry entry) {
-					Object o = entry.getValue(modelPosition);
+					Object o = entry.getValue(modelIndex);
 					if (o==null) return true;
+					Format format = editor.getFormat();
 					if (format!=null){
 						String s=format.format(o);
 						return s==null || s.trim().length()==0;
@@ -91,7 +85,6 @@ public class CustomChoice implements Comparable<CustomChoice>{
 	private Icon icon;
 	private String str;
 	private int precedence;
-	private final static Comparator<String> reprComparator = FilterSettings.getStringComparator(false);
 	
 	/** Full constructor */
 	 public CustomChoice(String representation, Icon icon, int precedence){
@@ -129,11 +122,6 @@ public class CustomChoice implements Comparable<CustomChoice>{
 		return str;
 	}
 	
-	/** Override to define the filter, if parsed*/
-	protected String getParsingExpression(){
-		return str;
-	}
-	
 	/** Returns the precedence value */ 
 	public int getPrecedence(){
 		return precedence;
@@ -150,19 +138,8 @@ public class CustomChoice implements Comparable<CustomChoice>{
 		return !userRendererSet;
 	}
 	
-	/** 
-	 * Returns the associated filter<br>
-	 * By default, is the parser' handling of the textual representation
-	 * associated to this choice. 
-	 */
-	public RowFilter getFilter(IFilterTextParser parser,
-			int modelPosition) {
-		try{
-			return parser.parseText(getParsingExpression(), modelPosition);
-		} catch (ParseException pex) {
-			return null;
-		}
-	}
+	/** Returns the associated filter */
+	public abstract RowFilter getFilter(IFilterEditor editor);
 	
 	@Override public String toString() {
 		return getRepresentation();
@@ -175,12 +152,5 @@ public class CustomChoice implements Comparable<CustomChoice>{
 	@Override public boolean equals(Object o) {
 		return (o instanceof CustomChoice) && 
 			((CustomChoice)o).getRepresentation().equals(getRepresentation());
-	}
-	
-	@Override public int compareTo(CustomChoice o) {
-		int ret = getPrecedence() - o.getPrecedence();
-		return ret==0?
-			reprComparator.compare(getRepresentation(), o.getRepresentation())
-			: ret;
-	}
+	}	
 }

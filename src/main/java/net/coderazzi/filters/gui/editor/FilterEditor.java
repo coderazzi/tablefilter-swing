@@ -42,11 +42,10 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.Format;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -67,10 +66,13 @@ import javax.swing.table.TableCellRenderer;
 
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
-import net.coderazzi.filters.IFilterTextParser;
 import net.coderazzi.filters.gui.AutoOptions;
-import net.coderazzi.filters.gui.IFilterEditor;
+import net.coderazzi.filters.gui.CustomChoice;
+import net.coderazzi.filters.gui.FilterSettings;
 import net.coderazzi.filters.gui.FiltersHandler;
+import net.coderazzi.filters.gui.IFilterEditor;
+import net.coderazzi.filters.gui.IParserModel;
+import net.coderazzi.filters.parser.DateComparator;
 
 /**
  * Custom component to handle the filter' editors<br>
@@ -83,13 +85,17 @@ import net.coderazzi.filters.gui.FiltersHandler;
  * Mixing therefore different editors under the same filter header
  * should keep the look and feel consistency.
  */
-public class FilterEditor extends JComponent implements IFilterEditor{
+public class FilterEditor extends JComponent implements IFilterEditor {
 
 	private static final long serialVersionUID = 6908400421021655278L;
-	private PropertyChangeListener textParserListener;
 	private EditorBorder border = new EditorBorder();
 	private Set<CustomChoice> customChoices;
 	private AutoOptions autoOptions;
+	private Format format;
+	private Comparator comparator;
+	private boolean ignoreCase;
+	private int modelIndex;
+	private Class modelClass;
 	
 	FiltersHandler filtersHandler;
 	FilterArrowButton downButton = new FilterArrowButton();
@@ -97,32 +103,16 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	EditorComponent editor;
 	PopupComponent popup;
 
-	public FilterEditor(FiltersHandler filtersHandler, int filterPosition,
-			Class<?> associatedClass) {
+	public FilterEditor(FiltersHandler filtersHandler, int modelIndex,
+			Class<?> modelClass) {
 		this.filtersHandler = filtersHandler;
+		this.modelIndex = modelIndex;	
+		this.modelClass = modelClass;
 		
 		setLayout(new BorderLayout());
 		setBorder(border);
 		
-		//update the filter automatically when the parser is updated
-		textParserListener = new PropertyChangeListener() {
-			
-			@Override public void propertyChange(PropertyChangeEvent evt) {
-				String prop = evt.getPropertyName();
-				if (IFilterTextParser.IGNORE_CASE_PROPERTY==prop){
-					popup.setIgnoreCase(((IFilterTextParser)evt.getSource())
-							.isIgnoreCase());
-					requestOptions();
-					filter.checkChanges(true);
-				} else if (IFilterTextParser.FORMAT_PROPERTY==prop &&
-						getAssociatedClass() == evt.getNewValue()){
-			    	popup.setFormat(getFormat());
-			    	requestOptions();
-					filter.checkChanges(true);
-				}
-			}
-		};
-		popup = new PopupComponent(associatedClass) {
+		popup = new PopupComponent() {
 
 			@Override
 			protected void optionSelected(Object selection) {
@@ -139,7 +129,10 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		
 		add(downButton, BorderLayout.EAST);
 		setupEditorComponent(null);
-		editor.setPosition(filterPosition);
+		
+		setFormat(getParserModel().getFormat(modelClass));
+		setComparator(getParserModel().getComparator(modelClass));
+		setIgnoreCase(getParserModel().isIgnoreCase());
 	}
 	
 	/* (non-Javadoc)
@@ -201,14 +194,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	
 	/** formats an object using the current class's format */
 	private String format(Object o){
-		if (o instanceof String){
-			return (String) o;
-		}
-		Format f = editor.getTextParser().getFormat(getAssociatedClass());
-		if (f==null){
-			f = editor.getTextParser().getFormat(String.class);
-		}
-		return f.format(o);
+		return format==null? o==null? "" : o.toString() : format.format(o);
 	}
 
 	/** 
@@ -244,10 +230,14 @@ public class FilterEditor extends JComponent implements IFilterEditor{
     /* (non-Javadoc)
 	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setGridColor(java.awt.Color)
 	 */
-	public void setGridColor(Color c) {
+	@Override public void setGridColor(Color c) {
     	popup.setGridColor(c);
     	border.setColor(c);
     }
+	
+	@Override public Color getGridColor() {
+		return border.getColor();
+	}
 
     /* (non-Javadoc)
 	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setErrorForeground(java.awt.Color)
@@ -339,70 +329,101 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	 */
 	@Override public void resetFilter() {
 		setEditorContent(null, false);
-		this.customChoices=null;
 		requestOptions();		
-		if (autoOptions==AutoOptions.DISABLED && getListCellRenderer()==null){
-			setEditable(true);
-		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setTextParser(net.coderazzi.filters.IFilterTextParser)
-	 */
-    @Override public void setTextParser(IFilterTextParser parser){
-    	if (parser==null){
-    		throw new IllegalArgumentException();
-    	}
-    	releaseTextParser();
-    	parser.addPropertyChangeListener(textParserListener);
-		popup.setIgnoreCase(parser.isIgnoreCase());
-    	popup.setFormat(getFormat(parser));
-    	editor.setTextParser(parser);    	
-    	requestOptions();
-    	filter.checkChanges(false);
-    }
-    
     void requestOptions(){
     	if (isEnabled()){
     		filtersHandler.updatedEditorOptions(this);
     	}
     }
     
-    public Format getFormat(){
-    	return getFormat(getTextParser());
+    @Override public boolean isIgnoreCase() {
+    	return ignoreCase;
     }
     
-    private Format getFormat(IFilterTextParser parser){
-    	Format format = parser.getFormat(getAssociatedClass());
-    	if (format==null){
-    		format = parser.getFormat(String.class);
+    @Override public void setIgnoreCase(boolean set) {
+    	if (ignoreCase!=set){
+    		ignoreCase=set;
+    		formatUpdated();
     	}
+    }
+    
+    @Override public Format getFormat(){
     	return format;
     }
     
-    public Class getAssociatedClass(){
-    	return popup.getAssociatedClass();
-    }
-    
-    private void releaseTextParser(){
-    	IFilterTextParser parser = editor.getTextParser();
-    	if (parser!=null){
-    		parser.removePropertyChangeListener(textParserListener);
+    @Override public void setFormat(Format format){
+    	if (this.format!=format){
+    		this.format = format;
+    		//as bonus, override default Comparator for dates
+    		//if the instance is not a DateComparator, the user has set
+    		//its own comparator (perhaps has done it as well and it is 
+    		//a DateComparator, but seems unlikely)
+    		if (format!=null && 
+    				(comparator instanceof DateComparator) &&
+    				Date.class.isAssignableFrom(modelClass))
+    		{
+   				setComparator(DateComparator.getDateComparator(format));
+    		}
+    		formatUpdated();
     	}
     }
-
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getTextParser()
-	 */
-    @Override public IFilterTextParser getTextParser(){
-    	return editor.getTextParser();
+    
+    private void formatUpdated(){
+		if (getListCellRenderer()==null){
+			popup.setStringContent(format, getStringComparator());
+    		updateTextParser();
+			filter.checkChanges(false);
+			requestOptions();
+		}    	
+    }
+    
+    private void updateTextParser(){
+    	editor.setParser(getParserModel().createParser(this));    	
+    }
+    
+    @Override public void setComparator(Comparator comparator){
+    	//the comparator is only used for rendered content, and also 
+    	//included on the table sorter
+    	if (comparator!=this.comparator && comparator!=null){
+    		updateTextParser();
+    		this.comparator=comparator;
+        	JTable table = filtersHandler.getTable();
+        	if (table!=null && (table.getRowSorter() instanceof DefaultRowSorter)){
+        		((DefaultRowSorter) table.getRowSorter()).setComparator(getModelIndex(), comparator);
+        	}
+    		ListCellRenderer lcr = getListCellRenderer();
+    		if (lcr==null){
+    			filter.checkChanges(true);
+    		} else {
+    			popup.setRenderedContent(lcr, comparator);
+    			requestOptions();
+    		}
+    	}
+    }
+    
+    @Override public Comparator getComparator(){
+    	return comparator;
+    }
+    
+    private IParserModel getParserModel(){
+    	return filtersHandler.getParserModel();
+    }
+    
+    private Comparator getStringComparator(){
+    	return getParserModel().getStringComparator(ignoreCase);
+    }
+    
+    @Override public Class getModelClass(){
+    	return modelClass;
     }
     
     /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getModelPosition()
+	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getModelIndex()
 	 */
-	@Override public int getModelPosition() {
-		return editor.getPosition();
+	@Override public int getModelIndex() {
+		return modelIndex;
 	}
 	
 	/* (non-Javadoc)
@@ -427,7 +448,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	}
 
 	public void addOptions(Collection<?> options) {
-		System.out.println("Editor "+getModelPosition()+": set "+options.size());
+		System.out.println("Editor "+getModelIndex()+": add "+options.size()+" on "+getOptions().size());
 		if (popup.addOptions(options)){
 			downButton.setCanPopup(popup.hasContent());
 		}
@@ -440,30 +461,11 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		return customChoices==null? new HashSet<CustomChoice>() : new HashSet<CustomChoice>(customChoices); 
 	}
 
-	/**
-	 * Sets the comparator associated to the renderer, to ensure a certain
-	 * order on the options list.<br>
-	 * It is also set on the underlying table, that will display the 
-	 * associated column -if sorted-, using this comparator.
-	 */
-    public void setRendererComparator(Comparator comparator){
-    	popup.setRendererComparator(comparator);
-    	JTable table = filtersHandler.getTable();
-    	if (table!=null && (table.getRowSorter() instanceof DefaultRowSorter)){
-    		((DefaultRowSorter) table.getRowSorter()).setComparator(getModelPosition(), comparator);
-    	}
-    }
-    
-    /** Returns the comparator defined for the renderer, if any */
-    public Comparator getRendererComparator(){
-    	return popup.getRendererComparator();
-    }
-    
 	/* (non-Javadoc)
 	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setListCellRenderer(javax.swing.ListCellRenderer)
 	 */
 	@Override public void setListCellRenderer(ListCellRenderer renderer){
-		popup.setListCellRenderer(renderer);
+		popup.setRenderedContent(renderer, comparator);
 		setupEditorComponent(renderer);
 		editor.getComponent().setBackground(getBackground());
 		editor.setForeground(getForeground());
@@ -481,7 +483,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 
     		private static final long serialVersionUID = -5990815893475331934L;
     		private JTable table = filtersHandler.getTable();
-    		private int position = getModelPosition();
+    		private int position = getModelIndex();
 
 			@Override public Component getListCellRendererComponent(JList list, 
 					Object value, int index, boolean isSelected, 
@@ -511,9 +513,6 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setEditable(boolean)
 	 */
 	@Override public void setEditable(boolean enable) {
-		if (!popup.hasOptions()){
-			enable=true;
-		}
 		if (enable != isEditable()) {
 			editor.setEditable(enable);
 		}
@@ -532,6 +531,12 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 	@Override public void setAutoOptions(AutoOptions autoOptions){
 		if (autoOptions!=null && autoOptions!=this.autoOptions){
 			this.autoOptions=autoOptions;
+			Object enums[]=modelClass.getEnumConstants();
+			if (Boolean.class==modelClass || (enums!=null && enums.length<=8)){
+				setEditable(autoOptions==AutoOptions.DISABLED);
+				setMaxHistory(autoOptions==AutoOptions.DISABLED?
+						FilterSettings.maxPopupHistory : 0);
+			}
 			requestOptions();
 		}
 	}
@@ -547,10 +552,10 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		EditorComponent newComponent=null;
 		if (renderer==null){
 			if (!(editor instanceof EditorComponent.Text)){
-				newComponent = new EditorComponent.Text(popup);
+				newComponent = new EditorComponent.Text(this, popup);
 			}
 		} else if (!(editor instanceof EditorComponent.Rendered)){
-			newComponent = popup.createRenderedEditorComponent();
+			newComponent = popup.createRenderedEditorComponent(this);
 			//trigger popup when the user clicks on the component itself
 			newComponent.getComponent().addMouseListener(new MouseAdapter() {
             	@Override public void mouseClicked(MouseEvent e) {
@@ -564,10 +569,7 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		}
 		if (newComponent!=null){
 			if (editor!=null){
-				editor.detach();
 				remove(editor.getComponent());
-				newComponent.setTextParser(editor.getTextParser());
-				newComponent.setPosition(editor.getPosition());
 				newComponent.getComponent().setBackground(editor.getComponent().getBackground());
 				newComponent.setForeground(editor.getForeground());
 				newComponent.setErrorForeground(editor.getErrorForeground());
@@ -1087,6 +1089,10 @@ public class FilterEditor extends JComponent implements IFilterEditor{
 		public void setColor(Color color){
 			borderColor = color;
 			repaint();
+		}
+		
+		public Color getColor(){
+			return borderColor;
 		}
 		
 		@Override public void paintBorder(Component c, Graphics g, int x, int y, 

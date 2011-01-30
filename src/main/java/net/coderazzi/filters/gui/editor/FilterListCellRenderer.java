@@ -40,6 +40,8 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 
+import net.coderazzi.filters.gui.CustomChoice;
+
 /**
  * Special renderer used on the history and options list, 
  * and to render the content when is not text-based 

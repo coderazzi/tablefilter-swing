@@ -44,13 +44,14 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.FilterSettings;
+import net.coderazzi.filters.gui.IFilterEditor;
 
 
 /**
@@ -89,8 +90,8 @@ abstract class PopupComponent implements PopupMenuListener{
 	JList historyList;
 
 
-	public PopupComponent(Class associatedClass) {
-		optionsModel = new OptionsListModel(associatedClass);
+	public PopupComponent() {
+		optionsModel = new OptionsListModel();
 		historyModel = new HistoryListModel();
 		setMaxHistory(maxHistory);
 		createGui();
@@ -99,17 +100,12 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Invoked when the user select an element in the option or history lists*/
 	protected abstract void optionSelected(Object selection);
 	
-	/** Returns the class associated to the list model */
-	public Class getAssociatedClass(){
-		return optionsModel.getAssociatedClass();
-	}
-
 	/** 
 	 * Creates an EditorComponent that can display content with 
 	 * the same renderer used to display the options
 	 */
-	public EditorComponent createRenderedEditorComponent() {
-		return new EditorComponent.Rendered(listRenderer);
+	public EditorComponent createRenderedEditorComponent(FilterEditor editor) {
+		return new EditorComponent.Rendered(editor, listRenderer);
 	}
 
 	/** Returns the current selection -can be history or and option-*/
@@ -209,16 +205,20 @@ abstract class PopupComponent implements PopupMenuListener{
 		return null;
 	}
 
-	/**
-	 * Defines the {@link ListCellRenderer} used to render content in the 
-	 * options and history lists.<br>
-	 * The argument can be null to unset any previously given renderer.<br>
-	 * When a renderer is used, it is considered that the content is not text.
-	 */
-	public void setListCellRenderer(ListCellRenderer renderer) {
+	/** Specifies that the content is to be handled as strings */
+	public void setStringContent(Format format, Comparator stringComparator) {
+		listRenderer.setUserRenderer(null);
+		if (optionsModel.setStringContent(format, stringComparator)){
+			historyModel.setStringContent(stringComparator);
+			reconfigureGui();
+		}
+	}
+
+	/** Specifies that the content requires no conversion to strings */
+	public void setRenderedContent(ListCellRenderer renderer, Comparator classComparator) {
 		listRenderer.setUserRenderer(renderer);
-		optionsModel.setStringContent(renderer == null);
-		if (historyModel.setStringContent(renderer == null)) {
+		if (optionsModel.setRenderedContent(classComparator)){
+			historyModel.setStringContent(null);
 			reconfigureGui();
 		}
 	}
@@ -301,39 +301,6 @@ abstract class PopupComponent implements PopupMenuListener{
 		ensureListRowsHeight();
 	}
 	
-	/** 
-	 * Sets the flag to ignore case or be case sensitive<br>
-	 * This affects the algorithms searching for the best match on the content. 
-	 */
-	public void setIgnoreCase(boolean ignoreCase){
-		historyModel.setIgnoreCase(ignoreCase);
-		optionsModel.setIgnoreCase(ignoreCase);
-	}
-
-	/** 
-	 * Defines the format, used in the options list to convert content 
-	 * into strings (if / when needed)
-	 **/
-	public void setFormat(Format format){
-		optionsModel.setFormat(format);
-		if (format!=null && getListCellRenderer()==null){
-			optionsModel.setStringContent(true);
-		}
-	}
-	
-	/** 
-	 * Sets the comparator used on the options list, but only if the content
-	 * is using a given renderer. As Strings, it has no effect
-	 **/
-	public void setRendererComparator(Comparator comparator){
-		optionsModel.setRendererComparator(comparator);
-	}
-	
-	/** Returns the renderer comparator, if defined */ 
-	public Comparator getRendererComparator(){
-		return optionsModel.getRendererComparator();
-	}
-	
 	/** Returns true if the passed object matches an existing option */
 	public boolean isValidOption(Object object){
 		return optionsModel.isValidOption(object);		
@@ -349,19 +316,19 @@ abstract class PopupComponent implements PopupMenuListener{
 		return !optionsModel.isEmpty();
 	}
 
-	/** @see FilterEditor#setMaxVisibleRows(int) */
+	/** @see IFilterEditor#setMaxVisibleRows(int) */
 	public void setMaxVisibleRows(int maxVisibleRows) {
 		this.maxVisibleRows = Math.max(MIN_VISIBLE_OPTIONS, maxVisibleRows);
 		fixMaxHistory();
 		reconfigureGui();
 	}
 
-	/** @see FilterEditor#getMaxVisibleRows() */
+	/** @see IFilterEditor#getMaxVisibleRows() */
 	public int getMaxVisibleRows() {
 		return maxVisibleRows;
 	}
 
-	/** @see FilterEditor#setMaxHistory(int) */
+	/** @see IFilterEditor#setMaxHistory(int) */
 	public void setMaxHistory(int size) {
 		this.maxHistory = size;
 		if (fixMaxHistory()) {
@@ -369,7 +336,7 @@ abstract class PopupComponent implements PopupMenuListener{
 		}
 	}
 
-	/** @see FilterEditor#getMaxHistory() */
+	/** @see IFilterEditor#getMaxHistory() */
 	public int getMaxHistory() {
 		return maxHistory;
 	}
@@ -414,23 +381,14 @@ abstract class PopupComponent implements PopupMenuListener{
 		return false;
 	}
 
-	/** 
-	 * Adds content to the options list.<br>
-	 * If there is no {@link ListCellRenderer} defined,
-	 * the content is stringfied and sorted -so duplicates are removed-
-	 */
-	public Collection<CustomChoice>  getCustomOptions() {
-		return optionsModel.getCustomChoices();
-	}
-
 	/** Returns the current options */
 	public Collection<?> getOptions(){
 		return optionsModel.getOptions();
 	}
 	
-	/** Returns the model associated to the options */
-	public ListModel getOptionsListModel(){
-		return optionsModel;
+	/** Returns the custom choice matching the given text */
+	public CustomChoice getCustomChoice(String s){
+		return optionsModel.getCustomChoice(s);
 	}
 
 	/**
