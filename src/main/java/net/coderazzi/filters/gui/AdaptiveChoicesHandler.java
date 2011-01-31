@@ -18,12 +18,12 @@ import javax.swing.table.TableModel;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
-class AdaptiveOptionsHandler extends OptionsHandler{
+class AdaptiveChoicesHandler extends ChoicesHandler{
 	
     private AdaptiveOptionsSupport adaptiveSupport;
     private boolean interrupted=true;
     
-    public AdaptiveOptionsHandler(FiltersHandler handler) {
+    public AdaptiveChoicesHandler(FiltersHandler handler) {
     	super(handler);
 	}    
         
@@ -486,7 +486,7 @@ class AdaptiveOptionsHandler extends OptionsHandler{
         				}
         			}
         		}
-        		if (AutoOptions.DISABLED!=editor.getAutoOptions()){
+        		if (AutoChoices.DISABLED!=editor.getAutoOptions()){
         			options.add(entry.getValue(column));
         		}
         		return maxIterationOptions==options.size();

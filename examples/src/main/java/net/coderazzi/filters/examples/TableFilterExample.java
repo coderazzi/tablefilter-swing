@@ -66,7 +66,7 @@ import net.coderazzi.filters.examples.utils.EventsWindow;
 import net.coderazzi.filters.examples.utils.FlagRenderer;
 import net.coderazzi.filters.examples.utils.TestData;
 import net.coderazzi.filters.examples.utils.TestTableModel;
-import net.coderazzi.filters.gui.AutoOptions;
+import net.coderazzi.filters.gui.AutoChoices;
 import net.coderazzi.filters.gui.FilterSettings;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.IFilterHeaderObserver;
@@ -335,7 +335,7 @@ public class TableFilterExample extends JFrame {
     	ret.add(ignoreCase);
     	ret.add(adaptiveOptions);
     	ret.add(createAutoOptionsMenu(filterHeader.getAutoOptions(), new AutoOptionsSet() {			
-			@Override public void setAutoOptions(AutoOptions ao) {
+			@Override public void setAutoOptions(AutoChoices ao) {
 				filterHeader.setAutoOptions(ao);
 				updateFiltersInfo();
 			}
@@ -351,11 +351,11 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
-    private JMenu createAutoOptionsMenu(AutoOptions preselected, final AutoOptionsSet iface){
+    private JMenu createAutoOptionsMenu(AutoChoices preselected, final AutoOptionsSet iface){
     	JMenu ret = new JMenu(AUTO_OPTIONS);
     	ButtonGroup group = new ButtonGroup();
-    	for (AutoOptions ao : AutoOptions.values()){
-    		final AutoOptions set = ao;
+    	for (AutoChoices ao : AutoChoices.values()){
+    		final AutoChoices set = ao;
         	JRadioButtonMenuItem item = new JRadioButtonMenuItem(
         			new AbstractAction(ao.toString().toLowerCase()) {			
     			@Override public void actionPerformed(ActionEvent e) {
@@ -566,7 +566,7 @@ public class TableFilterExample extends JFrame {
     void addColumnToFiltersMenu(final IFilterEditor editor, final String name) {
     	JMenu menu = (JMenu) getMenu(filtersMenu, name, false);
     	menu.add(createAutoOptionsMenu(editor.getAutoOptions(), new AutoOptionsSet(){
-    		@Override public void setAutoOptions(AutoOptions ao) {
+    		@Override public void setAutoOptions(AutoChoices ao) {
     			editor.setAutoOptions(ao);
     			updateFilter(editor, name);
     		}
@@ -816,11 +816,11 @@ public class TableFilterExample extends JFrame {
 	}
 	
 	interface AutoOptionsSet{
-		void setAutoOptions(AutoOptions ao);
+		void setAutoOptions(AutoChoices ao);
 	}
 	
     public final static void main(String[] args) {
-    	FilterSettings.autoOptions=AutoOptions.ENABLED;
+    	FilterSettings.autoOptions=AutoChoices.ENABLED;
         TableFilterExample frame = new TableFilterExample();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();

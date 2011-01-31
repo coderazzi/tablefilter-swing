@@ -495,12 +495,12 @@ public class TableFilterHeader extends JPanel {
 	 * populated with options extracted from the table's content 
 	 * -and updated as the table is updated-.
 	 */
-	public void setAutoOptions(AutoOptions set){
+	public void setAutoOptions(AutoChoices set){
 		filtersHandler.setAutoOptions(set);
 	}
 	
 	/** Returns the auto options flag */
-	public AutoOptions getAutoOptions(){
+	public AutoChoices getAutoOptions(){
 		return filtersHandler.getAutoOptions();
 	}
 

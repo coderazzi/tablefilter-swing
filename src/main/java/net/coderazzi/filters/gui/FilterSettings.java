@@ -53,7 +53,7 @@ public class FilterSettings {
     	Boolean.parseBoolean(getString("AutoSelection", "true"));
 
     /** Whether to automatically fill with content the editor field's options */
-    public static AutoOptions autoOptions;
+    public static AutoChoices autoOptions;
 
     /** Whether to enable adaptive options, true by default */
     public static boolean adaptiveOptions = 
@@ -141,9 +141,9 @@ public class FilterSettings {
     		//font remains null
     	}
     	try{
-        	autoOptions = AutoOptions.valueOf(getString("AutoOptions", "ENUMS"));
+        	autoOptions = AutoChoices.valueOf(getString("AutoOptions", "ENUMS"));
     	} catch(Exception ex){
-    		autoOptions = AutoOptions.ENUMS;
+    		autoOptions = AutoChoices.ENUMS;
     	}
         parserModelClass = ParserModel.class;
         String cl = getString("ParserModel.class", null);

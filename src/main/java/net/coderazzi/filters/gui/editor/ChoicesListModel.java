@@ -56,7 +56,7 @@ import net.coderazzi.filters.gui.CustomChoice;
  * is done therefore linearly -with obvious performance drawbacks in cases
  * with many many custom choices-.
  */
-public class OptionsListModel extends AbstractListModel {
+public class ChoicesListModel extends AbstractListModel {
 
 	private static final long serialVersionUID = 3523952153693100563L;
 	private List content;
@@ -65,7 +65,7 @@ public class OptionsListModel extends AbstractListModel {
 	boolean useFormatter;
 	Comparator comparator;
 	
-	public OptionsListModel() {
+	public ChoicesListModel() {
 		this.content = new ArrayList();
 		setStringContent(null, Collator.getInstance());
 	}

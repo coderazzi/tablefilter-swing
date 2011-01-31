@@ -51,10 +51,10 @@ public interface IFilterEditor {
 	 * AutoOptions automatically changes the editable flag: it is set to true
 	 * for DISABLED values, false otherwise.
 	 */
-	public abstract void setAutoOptions(AutoOptions mode);
+	public abstract void setAutoOptions(AutoChoices mode);
 
 	/** Returns the autoOptions mode*/
-	public abstract AutoOptions getAutoOptions();
+	public abstract AutoChoices getAutoOptions();
 
 	/** Sets the available options, shown on the popup menu */
 	public abstract void setCustomChoices(Set<CustomChoice> options);

@@ -86,7 +86,7 @@ public class FiltersHandler extends AndFilter implements PropertyChangeListener
     private boolean pendingNotifications;
 
 	/**  The autoOptions mode **/
-	private AutoOptions autoOptions=FilterSettings.autoOptions;
+	private AutoChoices autoOptions=FilterSettings.autoOptions;
 	
     /** 
      * The class performing the autoSelection, and following sorter changes.<br>
@@ -103,7 +103,7 @@ public class FiltersHandler extends AndFilter implements PropertyChangeListener
     private JTable table;
 	
     /** Instance to handle options (choices) on each FilterEditor */
-	private OptionsHandler optionsHandler;
+	private ChoicesHandler optionsHandler;
 	
 	/** The associated filter model */
 	private IParserModel parserModel;
@@ -200,7 +200,7 @@ public class FiltersHandler extends AndFilter implements PropertyChangeListener
     }
     
 	/** Sets/unsets the auto options flag */
-    public void setAutoOptions(AutoOptions mode){
+    public void setAutoOptions(AutoChoices mode){
     	if (mode!=autoOptions){
     		enableNotifications(false);
 			this.autoOptions=mode;
@@ -213,7 +213,7 @@ public class FiltersHandler extends AndFilter implements PropertyChangeListener
     }
     
 	/** Returns the auto options mode */
-	public AutoOptions getAutoOptions(){
+	public AutoChoices getAutoOptions(){
 		return autoOptions;
 	}
 	
@@ -231,9 +231,9 @@ public class FiltersHandler extends AndFilter implements PropertyChangeListener
     		reenable=true;
     	}
 		if (enableAdaptiveOptions){
-			optionsHandler = new AdaptiveOptionsHandler(this);
+			optionsHandler = new AdaptiveChoicesHandler(this);
 		} else {
-			optionsHandler = new NonAdaptiveOptionsHandler(this);    			
+			optionsHandler = new NonAdaptiveChoicesHandler(this);    			
 		}
 		if (reenable){
 			enableNotifications(true);    		
@@ -242,7 +242,7 @@ public class FiltersHandler extends AndFilter implements PropertyChangeListener
     
     /** Returns the adaptive options mode */
     public boolean isAdaptiveOptions() {
-        return optionsHandler instanceof AdaptiveOptionsHandler;
+        return optionsHandler instanceof AdaptiveChoicesHandler;
     }
 
     /**

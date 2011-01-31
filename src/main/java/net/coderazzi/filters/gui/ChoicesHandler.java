@@ -13,12 +13,12 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
  * Interface implemented by the classes that handle the options on each
  * {@link FilterEditor}
  */
-abstract class OptionsHandler implements TableModelListener {		
+abstract class ChoicesHandler implements TableModelListener {		
 	
 	private TableModel listenedModel;
 	protected FiltersHandler handler;
     
-    protected OptionsHandler(FiltersHandler handler) {
+    protected ChoicesHandler(FiltersHandler handler) {
     	this.handler = handler;
 	}    
         
@@ -59,7 +59,7 @@ abstract class OptionsHandler implements TableModelListener {
 		} 
 	}
 
-    /** Sets whether to send table model events to the {@link OptionsHandler}*/ 
+    /** Sets whether to send table model events to the {@link ChoicesHandler}*/ 
     protected void setEnableTableModelEvents(boolean set){
     	if (set){
     		JTable table=handler.getTable();

@@ -69,7 +69,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	private JScrollPane historyScrollPane;
 	private JSeparator separator;	
 
-	private OptionsListModel optionsModel;
+	private ChoicesListModel optionsModel;
 	private HistoryListModel historyModel;
 	/** 
 	 * cancelReason contains the source of the event that 
@@ -92,7 +92,7 @@ abstract class PopupComponent implements PopupMenuListener{
 
 
 	public PopupComponent() {
-		optionsModel = new OptionsListModel();
+		optionsModel = new ChoicesListModel();
 		historyModel = new HistoryListModel();
 		setMaxHistory(maxHistory);
 		createGui();

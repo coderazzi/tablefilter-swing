@@ -29,7 +29,7 @@ package net.coderazzi.filters.gui;
  * Enumeration to define the available auto options modes on a table filter or
  * on each separated filter editor
  */
-public enum AutoOptions {
+public enum AutoChoices {
 	/** 
 	 * No auto options, any options must be explicitly inserted 
 	 */

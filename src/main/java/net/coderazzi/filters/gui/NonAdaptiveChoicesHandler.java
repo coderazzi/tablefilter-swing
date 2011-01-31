@@ -10,11 +10,11 @@ import javax.swing.table.TableModel;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
-class NonAdaptiveOptionsHandler extends OptionsHandler{
+class NonAdaptiveChoicesHandler extends ChoicesHandler{
 	
 	private boolean interrupted=true;
 	
-	public NonAdaptiveOptionsHandler(FiltersHandler handler) {
+	public NonAdaptiveChoicesHandler(FiltersHandler handler) {
 		super(handler);
 	}
 	
@@ -74,7 +74,7 @@ class NonAdaptiveOptionsHandler extends OptionsHandler{
 		} else {
 			boolean handled=false;
 			for (FilterEditor editor : handler.getEditors()) {
-				if (editor.isEnabled() && AutoOptions.ENABLED == editor.getAutoOptions()) {
+				if (editor.isEnabled() && AutoChoices.ENABLED == editor.getAutoOptions()) {
 					//insert events can be handled by adding the
 					//new model's values.
 					//updates/deletes require reparsing the whole
@@ -104,17 +104,17 @@ class NonAdaptiveOptionsHandler extends OptionsHandler{
 	 * of enumerations), and from ENUMS to DISABLED (for no enumerations)
 	 */
 	private void initEditorOptions(FilterEditor editor) {
-		AutoOptions autoOptions = editor.getAutoOptions();
-		if (autoOptions == AutoOptions.DISABLED) {
+		AutoChoices autoOptions = editor.getAutoOptions();
+		if (autoOptions == AutoChoices.DISABLED) {
 			editor.setOptions(editor.getCustomChoices());
 		} else {
 			TableModel model = handler.getTable().getModel();
 			Class<?> c = model.getColumnClass(editor.getModelIndex());
 			boolean asEnum = c.equals(Boolean.class) || c.isEnum();
-			if (asEnum && autoOptions != AutoOptions.ENUMS) {
-				editor.setAutoOptions(AutoOptions.ENUMS);
-			} else if (!asEnum && autoOptions == AutoOptions.ENUMS) {
-				editor.setAutoOptions(AutoOptions.DISABLED);
+			if (asEnum && autoOptions != AutoChoices.ENUMS) {
+				editor.setAutoOptions(AutoChoices.ENUMS);
+			} else if (!asEnum && autoOptions == AutoChoices.ENUMS) {
+				editor.setAutoOptions(AutoChoices.DISABLED);
 			} else if (asEnum) {
 				Set options = editor.getCustomChoices();
 				if (c.equals(Boolean.class)) {

@@ -66,7 +66,7 @@ import javax.swing.table.TableCellRenderer;
 
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
-import net.coderazzi.filters.gui.AutoOptions;
+import net.coderazzi.filters.gui.AutoChoices;
 import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.FiltersHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
@@ -89,7 +89,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	private static final long serialVersionUID = 6908400421021655278L;
 	private EditorBorder border = new EditorBorder();
 	private Set<CustomChoice> customChoices;
-	private AutoOptions autoOptions;
+	private AutoChoices autoOptions;
 	private Format format;
 	private Comparator comparator;
 	private boolean ignoreCase;
@@ -174,20 +174,20 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 	
 	/** IFilterEditor method */
-	@Override public void setAutoOptions(AutoOptions autoOptions){
+	@Override public void setAutoOptions(AutoChoices autoOptions){
 		if (autoOptions!=null && autoOptions!=this.autoOptions){
 			this.autoOptions=autoOptions;
 			Object enums[]=modelClass.getEnumConstants();
 			if (Boolean.class==modelClass || (enums!=null && enums.length<=8)){
-				setEditable(autoOptions==AutoOptions.DISABLED);
-				popup.setMaxHistory(autoOptions==AutoOptions.DISABLED? null : 0);
+				setEditable(autoOptions==AutoChoices.DISABLED);
+				popup.setMaxHistory(autoOptions==AutoChoices.DISABLED? null : 0);
 			}
 			requestOptions();
 		}
 	}
 
 	/** IFilterEditor method */
-	@Override public AutoOptions getAutoOptions(){
+	@Override public AutoChoices getAutoOptions(){
 		return autoOptions;
 	}
 	
