@@ -19,6 +19,12 @@ import net.coderazzi.filters.IFilter;
  */
 public interface IFilterEditor {
 
+	/** Returns the model position associated to this editor*/
+	public abstract int getModelIndex();
+
+	/** Returns the class associated to the editor on the model*/
+	public abstract Class<?> getModelClass();
+
 	/**
 	 * Returns the {@link IFilter} associated to the editor's content<br>
 	 * The returned instance can then be used to enable or disable the
@@ -32,11 +38,11 @@ public interface IFilterEditor {
 	 */
 	public abstract void resetFilter();
 
-	/** Returns the model position associated to this editor*/
-	public abstract int getModelIndex();
+	/** Sets the content, adapted to the editors' type */
+	public abstract void setContent(Object content);
 
-	/** Returns the class associated to the editor on the model*/
-	public abstract Class<?> getModelClass();
+	/** Returns the current editor's content */
+	public abstract Object getContent();
 
 	/**
 	 * Using autoOptions, the options displayed on the popup menu are 
@@ -49,6 +55,12 @@ public interface IFilterEditor {
 
 	/** Returns the autoOptions mode*/
 	public abstract AutoOptions getAutoOptions();
+
+	/** Sets the available options, shown on the popup menu */
+	public abstract void setCustomChoices(Set<CustomChoice> options);
+
+	/** Returns the current options */
+	public abstract Set<CustomChoice> getCustomChoices();
 
 	/**
 	 * Defines the editor, if text based -i.e., without associated 
@@ -63,11 +75,21 @@ public interface IFilterEditor {
 	 */
 	public abstract boolean isEditable();
 
-	/** Sets the available options, shown on the popup menu */
-	public abstract void setCustomChoices(Set<CustomChoice> options);
+	/**  Sets the ignore case flag */
+	public abstract void setIgnoreCase(boolean set);
 
-	/** Returns the current options */
-	public abstract Set<CustomChoice> getCustomChoices();
+	/**  Returns the ignore case flag */
+	public abstract boolean isIgnoreCase();
+
+	/** 
+	 * Sets the {@link Format} required by the editor to handle the user's
+	 * input when the associated class is not a String<br>
+	 * It is initially retrieved from the {@link IParserModel}.
+	 */
+	public abstract void setFormat(Format format);
+
+	/**  Returns the associated {@link Format}. */
+	public abstract Format getFormat();
 
 	/** 
 	 * Sets the {@link Comparator} required to compare (and sort) instances
@@ -81,28 +103,6 @@ public interface IFilterEditor {
 
 	/**  Returns the associated {@link Comparator}, which can nver be null. */
 	public abstract Comparator getComparator();
-
-	/** 
-	 * Sets the {@link Format} required by the editor to handle the user's
-	 * input when the associated class is not a String<br>
-	 * It is initially retrieved from the {@link IParserModel}.
-	 */
-	public abstract void setFormat(Format format);
-
-	/**  Returns the associated {@link Format}. */
-	public abstract Format getFormat();
-
-	/**  Sets the ignore case flag */
-	public abstract void setIgnoreCase(boolean set);
-
-	/**  Returns the ignore case flag */
-	public abstract boolean isIgnoreCase();
-
-	/** Returns the current editor's content */
-	public abstract Object getContent();
-
-	/** Sets the content, adapted to the editors' type */
-	public abstract void setContent(Object content);
 
 	/**
 	 * Sets the {@link ListCellRenderer} for the options / history.<p>

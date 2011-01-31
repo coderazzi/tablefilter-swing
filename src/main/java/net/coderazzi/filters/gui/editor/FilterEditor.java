@@ -135,51 +135,28 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		setIgnoreCase(getParserModel().isIgnoreCase());
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setMaxVisibleRows(int)
-	 */
-	@Override public void setMaxVisibleRows(int maxVisibleRows) {
-		popup.setMaxVisibleRows(maxVisibleRows);
-	}
-
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getMaxVisibleRows()
-	 */
-	@Override public int getMaxVisibleRows() {
-		return popup.getMaxVisibleRows();
-	}
-
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setMaxHistory(int)
-	 */
-	@Override public void setMaxHistory(int size) {
-		popup.setMaxHistory(size);
-	}
-
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getMaxHistory()
-	 */
-	@Override public int getMaxHistory() {
-		return popup.getMaxHistory();
+	/** IFilterEditor method */
+	@Override public int getModelIndex() {
+		return modelIndex;
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getFilter()
-	 */
+	/** IFilterEditor method */
+    @Override public Class getModelClass(){
+    	return modelClass;
+    }
+    
+	/** IFilterEditor method */
 	@Override public IFilter getFilter() {
 		return filter;
 	}	
 	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getContent()
-	 */
-	@Override public Object getContent() {
-		return editor.getContent();
+	/** IFilterEditor method */
+	@Override public void resetFilter() {
+		setEditorContent(null, false);
+		requestOptions();		
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setContent(java.lang.Object)
-	 */
+	/** IFilterEditor method */
 	@Override public void setContent(Object content){
 		if (content==null){
 			setEditorContent(CustomChoice.MATCH_ALL, false);
@@ -192,156 +169,58 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		}
 	}
 	
-	/** formats an object using the current class's format */
-	private String format(Object o){
-		return format==null? o==null? "" : o.toString() : format.format(o);
-	}
-
-	/** 
-	 * Sets the content, updating the filter -and propagating any changes-<br>
-	 * The parameters escapeIt must be true if the content could require
-	 * escaping (otherwise, it will be always treated literally). <br>
-	 * Escaping only applies, anyway, to editable columns (Strings) 
-	 */
-	private void setEditorContent(Object content, boolean escapeIt) {
-		editor.setContent(content, escapeIt);
-		filter.checkChanges(false);
+	/** IFilterEditor method */
+	@Override public Object getContent() {
+		return editor.getContent();
 	}
 	
-	void setEditorEnabled(boolean enabled) {
-		super.setEnabled(enabled);
-		downButton.setEnabled(enabled);
-		editor.setEnabled(enabled);
-	}
-	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setBackground(java.awt.Color)
-	 */
-	@Override public void setBackground(Color bg) {
-		super.setBackground(bg);
-		if (editor!=null){
-	    	editor.getComponent().setBackground(bg);
-	    	downButton.setBackground(bg);
-	        popup.setBackground(bg);
-	        repaint();
+	/** IFilterEditor method */
+	@Override public void setAutoOptions(AutoOptions autoOptions){
+		if (autoOptions!=null && autoOptions!=this.autoOptions){
+			this.autoOptions=autoOptions;
+			Object enums[]=modelClass.getEnumConstants();
+			if (Boolean.class==modelClass || (enums!=null && enums.length<=8)){
+				setEditable(autoOptions==AutoOptions.DISABLED);
+				setMaxHistory(autoOptions==AutoOptions.DISABLED?
+						FilterSettings.maxPopupHistory : 0);
+			}
+			requestOptions();
 		}
 	}
+
+	/** IFilterEditor method */
+	@Override public AutoOptions getAutoOptions(){
+		return autoOptions;
+	}
 	
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setGridColor(java.awt.Color)
-	 */
-	@Override public void setGridColor(Color c) {
-    	popup.setGridColor(c);
-    	border.setColor(c);
-    }
+	/** IFilterEditor method */
+	@Override public void setCustomChoices(Set<CustomChoice> options) {
+		if (options==null || options.isEmpty()){
+			this.customChoices=null;
+		} else {
+			this.customChoices = new HashSet<CustomChoice>(options);
+		}
+		requestOptions();
+	}
 	
-	@Override public Color getGridColor() {
-		return border.getColor();
+	/** IFilterEditor method */
+	@Override public Set<CustomChoice> getCustomChoices(){
+		return customChoices==null? new HashSet<CustomChoice>() : new HashSet<CustomChoice>(customChoices); 
 	}
 
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setErrorForeground(java.awt.Color)
-	 */
-    @Override public void setErrorForeground(Color fg) {
-    	editor.setErrorForeground(fg);
-    }
-
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getErrorForeground()
-	 */
-    @Override public Color getErrorForeground() {
-    	return editor.getErrorForeground();
-    }
-
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setDisabledForeground(java.awt.Color)
-	 */
-    @Override public void setDisabledForeground(Color fg){
-    	editor.setDisabledForeground(fg);
-    	downButton.setDisabledColor(fg);
-    	popup.setDisabledColor(fg);
-    }
-
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getDisabledForeground()
-	 */
-    @Override public Color getDisabledForeground(){
-    	return editor.getDisabledForeground();
-    }
-    
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setSelectionForeground(java.awt.Color)
-	 */
-    @Override public void setSelectionForeground(Color fg){
-    	editor.setSelectionForeground(fg);
-    	downButton.setSelectionForeground(fg);
-    	popup.setSelectionForeground(fg);
-    }
-
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getSelectionForeground()
-	 */
-    @Override public Color getSelectionForeground(){
-    	return popup.getSelectionForeground();
-    }
-    
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setSelectionBackground(java.awt.Color)
-	 */
-    @Override public void setSelectionBackground(Color bg){
-    	editor.setSelectionBackground(bg);
-    	downButton.setSelectionBackground(bg);
-    	popup.setSelectionBackground(bg);
-    }
-
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getSelectionBackground()
-	 */
-    @Override public Color getSelectionBackground(){
-    	return popup.getSelectionBackground();
-    }
-    
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setForeground(java.awt.Color)
-	 */
-	@Override public void setForeground(Color fg) {
-		super.setForeground(fg);
-		if (editor!=null){
-	    	editor.setForeground(fg);
-	    	downButton.setForeground(fg);
-	        popup.setForeground(fg);
+	/** IFilterEditor method */
+	@Override public void setEditable(boolean enable) {
+		if (enable != isEditable()) {
+			editor.setEditable(enable);
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setFont(java.awt.Font)
-	 */
-	@Override public void setFont(Font font) {
-		super.setFont(font);
-		if (editor!=null){
-			editor.getComponent().setFont(font);
-	        popup.setFont(font);
-		}
+
+	/** IFilterEditor method */
+	@Override public boolean isEditable() {
+		return editor.isEditable();
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#resetFilter()
-	 */
-	@Override public void resetFilter() {
-		setEditorContent(null, false);
-		requestOptions();		
-	}
-	
-    void requestOptions(){
-    	if (isEnabled()){
-    		filtersHandler.updatedEditorOptions(this);
-    	}
-    }
-    
-    @Override public boolean isIgnoreCase() {
-    	return ignoreCase;
-    }
-    
+	/** IFilterEditor method */
     @Override public void setIgnoreCase(boolean set) {
     	if (ignoreCase!=set){
     		ignoreCase=set;
@@ -349,10 +228,12 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	}
     }
     
-    @Override public Format getFormat(){
-    	return format;
+	/** IFilterEditor method */
+    @Override public boolean isIgnoreCase() {
+    	return ignoreCase;
     }
     
+	/** IFilterEditor method */
     @Override public void setFormat(Format format){
     	if (this.format!=format){
     		this.format = format;
@@ -370,24 +251,17 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	}
     }
     
-    private void formatUpdated(){
-		if (getListCellRenderer()==null){
-			popup.setStringContent(format, getStringComparator());
-    		updateTextParser();
-			filter.checkChanges(false);
-			requestOptions();
-		}    	
+	/** IFilterEditor method */
+    @Override public Format getFormat(){
+    	return format;
     }
     
-    private void updateTextParser(){
-    	editor.setParser(getParserModel().createParser(this));    	
-    }
-    
+	/** IFilterEditor method */
     @Override public void setComparator(Comparator comparator){
     	//the comparator is only used for rendered content, and also 
     	//included on the table sorter
     	if (comparator!=this.comparator && comparator!=null){
-    		updateTextParser();
+    		parserUpdated();
     		this.comparator=comparator;
         	JTable table = filtersHandler.getTable();
         	if (table!=null && (table.getRowSorter() instanceof DefaultRowSorter)){
@@ -403,67 +277,12 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	}
     }
     
+	/** IFilterEditor method */
     @Override public Comparator getComparator(){
     	return comparator;
     }
     
-    private IParserModel getParserModel(){
-    	return filtersHandler.getParserModel();
-    }
-    
-    private Comparator getStringComparator(){
-    	return getParserModel().getStringComparator(ignoreCase);
-    }
-    
-    @Override public Class getModelClass(){
-    	return modelClass;
-    }
-    
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getModelIndex()
-	 */
-	@Override public int getModelIndex() {
-		return modelIndex;
-	}
-	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setCustomChoices(java.util.Set)
-	 */
-	@Override public void setCustomChoices(Set<CustomChoice> options) {
-		if (options==null || options.isEmpty()){
-			this.customChoices=null;
-		} else {
-			this.customChoices = new HashSet<CustomChoice>(options);
-		}
-		requestOptions();
-	}
-	
-	public void setOptions(Collection<?> options){
-		popup.clear();
-		addOptions(options);		
-	}
-	
-	public Collection<?> getOptions(){
-		return popup.getOptions();
-	}
-
-	public void addOptions(Collection<?> options) {
-		System.out.println("Editor "+getModelIndex()+": add "+options.size()+" on "+getOptions().size());
-		if (popup.addOptions(options)){
-			downButton.setCanPopup(popup.hasContent());
-		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getCustomChoices()
-	 */
-	@Override public Set<CustomChoice> getCustomChoices(){
-		return customChoices==null? new HashSet<CustomChoice>() : new HashSet<CustomChoice>(customChoices); 
-	}
-
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setListCellRenderer(javax.swing.ListCellRenderer)
-	 */
+	/** IFilterEditor method */
 	@Override public void setListCellRenderer(ListCellRenderer renderer){
 		popup.setRenderedContent(renderer, comparator);
 		setupEditorComponent(renderer);
@@ -474,9 +293,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		requestOptions();
 	}
 
-    /* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setListCellRenderer(javax.swing.table.TableCellRenderer)
-	 */
+	/** IFilterEditor method */
     @Override public void setListCellRenderer(final TableCellRenderer renderer) {
     	setListCellRenderer(renderer==null? null :
     			new DefaultListCellRenderer() {
@@ -502,52 +319,187 @@ public class FilterEditor extends JComponent implements IFilterEditor {
         });
     }
 
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getListCellRenderer()
-	 */
+	/** IFilterEditor method */
 	@Override public ListCellRenderer getListCellRenderer(){
 		return popup.getListCellRenderer();
 	}
 
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setEditable(boolean)
-	 */
-	@Override public void setEditable(boolean enable) {
-		if (enable != isEditable()) {
-			editor.setEditable(enable);
-		}
+	/** IFilterEditor method */
+	@Override public void setMaxVisibleRows(int maxVisibleRows) {
+		popup.setMaxVisibleRows(maxVisibleRows);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#isEditable()
-	 */
-	@Override public boolean isEditable() {
-		return editor.isEditable();
+	/** IFilterEditor method */
+	@Override public int getMaxVisibleRows() {
+		return popup.getMaxVisibleRows();
+	}
+
+	/** IFilterEditor method */
+	@Override public void setMaxHistory(int size) {
+		popup.setMaxHistory(size);
+	}
+
+	/** IFilterEditor method */
+	@Override public int getMaxHistory() {
+		return popup.getMaxHistory();
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#setAutoOptions(AutoOptions)
+	/** formats an object using the current class's format */
+	private String format(Object o){
+		return format==null? o==null? "" : o.toString() : format.format(o);
+	}
+
+	/** 
+	 * Sets the content, updating the filter -and propagating any changes-<br>
+	 * The parameters escapeIt must be true if the content could require
+	 * escaping (otherwise, it will be always treated literally). <br>
+	 * Escaping only applies, anyway, to editable columns (Strings) 
 	 */
-	@Override public void setAutoOptions(AutoOptions autoOptions){
-		if (autoOptions!=null && autoOptions!=this.autoOptions){
-			this.autoOptions=autoOptions;
-			Object enums[]=modelClass.getEnumConstants();
-			if (Boolean.class==modelClass || (enums!=null && enums.length<=8)){
-				setEditable(autoOptions==AutoOptions.DISABLED);
-				setMaxHistory(autoOptions==AutoOptions.DISABLED?
-						FilterSettings.maxPopupHistory : 0);
-			}
+	private void setEditorContent(Object content, boolean escapeIt) {
+		editor.setContent(content, escapeIt);
+		filter.checkChanges(false);
+	}
+	
+	void setEditorEnabled(boolean enabled) {
+		super.setEnabled(enabled);
+		downButton.setEnabled(enabled);
+		editor.setEnabled(enabled);
+	}
+	
+	/** IFilterEditor method */
+	@Override public void setBackground(Color bg) {
+		super.setBackground(bg);
+		if (editor!=null){
+	    	editor.getComponent().setBackground(bg);
+	    	downButton.setBackground(bg);
+	        popup.setBackground(bg);
+	        repaint();
+		}
+	}
+	
+	/** IFilterEditor method */
+	@Override public void setForeground(Color fg) {
+		super.setForeground(fg);
+		if (editor!=null){
+	    	editor.setForeground(fg);
+	    	downButton.setForeground(fg);
+	        popup.setForeground(fg);
+		}
+	}
+	
+	/** IFilterEditor method */
+    @Override public void setErrorForeground(Color fg) {
+    	editor.setErrorForeground(fg);
+    }
+
+	/** IFilterEditor method */
+    @Override public Color getErrorForeground() {
+    	return editor.getErrorForeground();
+    }
+
+	/** IFilterEditor method */
+    @Override public void setDisabledForeground(Color fg){
+    	editor.setDisabledForeground(fg);
+    	downButton.setDisabledColor(fg);
+    	popup.setDisabledColor(fg);
+    }
+
+	/** IFilterEditor method */
+    @Override public Color getDisabledForeground(){
+    	return editor.getDisabledForeground();
+    }
+    
+	/** IFilterEditor method */
+    @Override public void setSelectionForeground(Color fg){
+    	editor.setSelectionForeground(fg);
+    	downButton.setSelectionForeground(fg);
+    	popup.setSelectionForeground(fg);
+    }
+
+	/** IFilterEditor method */
+    @Override public Color getSelectionForeground(){
+    	return popup.getSelectionForeground();
+    }
+    
+	/** IFilterEditor method */
+    @Override public void setSelectionBackground(Color bg){
+    	editor.setSelectionBackground(bg);
+    	downButton.setSelectionBackground(bg);
+    	popup.setSelectionBackground(bg);
+    }
+
+	/** IFilterEditor method */
+    @Override public Color getSelectionBackground(){
+    	return popup.getSelectionBackground();
+    }
+    
+	/** IFilterEditor method */
+	@Override public void setGridColor(Color c) {
+    	popup.setGridColor(c);
+    	border.setColor(c);
+    }
+	
+	/** IFilterEditor method */
+	@Override public Color getGridColor() {
+		return border.getColor();
+	}
+
+	/** IFilterEditor method */
+	@Override public void setFont(Font font) {
+		super.setFont(font);
+		if (editor!=null){
+			editor.getComponent().setFont(font);
+	        popup.setFont(font);
+		}
+	}
+	
+	/** Method invoked by the FiltersHandler to set the options */
+	public void setOptions(Collection<?> options){
+		popup.clear();
+		addOptions(options);		
+	}
+	
+	/** Method invoked by the FiltersHandler to setup the options */
+	public Collection<?> getOptions(){
+		return popup.getOptions();
+	}
+
+	/** Method invoked by the FiltersHandler to extend the options */
+	public void addOptions(Collection<?> options) {
+		System.out.println("Editor "+getModelIndex()+": add "+options.size()+" on "+getOptions().size());
+		if (popup.addOptions(options)){
+			downButton.setCanPopup(popup.hasContent());
+		}
+	}
+	
+	/** Request options, if enabled, to the filtersHandler */
+    private void requestOptions(){
+    	if (isEnabled()){
+    		filtersHandler.updatedEditorOptions(this);
+    	}
+    }
+    
+    private void formatUpdated(){
+		if (getListCellRenderer()==null){
+			popup.setStringContent(format, getStringComparator());
+    		parserUpdated();
+			filter.checkChanges(false);
 			requestOptions();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see net.coderazzi.filters.gui.editor.IFilterEditor#getAutoOptions()
-	 */
-	@Override public AutoOptions getAutoOptions(){
-		return autoOptions;
-	}
-	
+		}    	
+    }
+    
+    private void parserUpdated(){
+    	editor.setParser(getParserModel().createParser(this));    	
+    }
+    
+    private IParserModel getParserModel(){
+    	return filtersHandler.getParserModel();
+    }
+    
+    private Comparator getStringComparator(){
+    	return getParserModel().getStringComparator(ignoreCase);
+    }
+    
 	private void setupEditorComponent(ListCellRenderer renderer){
 		EditorComponent newComponent=null;
 		if (renderer==null){

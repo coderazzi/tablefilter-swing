@@ -165,7 +165,8 @@ abstract class PopupComponent implements PopupMenuListener{
 	 *  If the content is text-based (there is no {@link ListCellRenderer} 
 	 *  defined), the hint is considered the start of the string, and the best
 	 *  match should start with the given hint). 
-	 *  If the content is not text-based, only exact matches are returned.
+	 *  If the content is not text-based, only exact matches are returned,
+	 *  no matter the value of the parameter perfectMatch
 	 * @param perfectMatch when the content is text-based, if no option/history 
 	 *  starts with the given hint string, smaller hint substrings are used, 
 	 *  unless perfectMatch is true
