@@ -64,6 +64,10 @@ class HistoryListModel extends AbstractListModel {
 			clear();
 		}
 	}
+	
+	public Comparator<String> getStringComparator(){
+		return stringComparator;
+	}
 
 	@Override public Object getElementAt(int index) {
 		return history.get(index);
@@ -89,7 +93,8 @@ class HistoryListModel extends AbstractListModel {
 			}
 		}
 		if (removed){
-			fireContentsChanged(this, 0, history.size());			
+			fireContentsChanged(this, 0, history.size());	
+			ret=true;
 		}
 		lastAdded = st;
 		return ret;

@@ -68,7 +68,6 @@ import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.gui.AutoOptions;
 import net.coderazzi.filters.gui.CustomChoice;
-import net.coderazzi.filters.gui.FilterSettings;
 import net.coderazzi.filters.gui.FiltersHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.IParserModel;
@@ -181,8 +180,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 			Object enums[]=modelClass.getEnumConstants();
 			if (Boolean.class==modelClass || (enums!=null && enums.length<=8)){
 				setEditable(autoOptions==AutoOptions.DISABLED);
-				setMaxHistory(autoOptions==AutoOptions.DISABLED?
-						FilterSettings.maxPopupHistory : 0);
+				popup.setMaxHistory(autoOptions==AutoOptions.DISABLED? null : 0);
 			}
 			requestOptions();
 		}
@@ -433,6 +431,16 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	return popup.getSelectionBackground();
     }
     
+	/** IFilterEditor method */
+    @Override public void setTextSelectionColor(Color c) {
+    	editor.setTextSelectionColor(c);
+    }
+
+	/** IFilterEditor method */
+    @Override public Color getTextSelectionColor() {
+    	return editor.getTextSelectionColor();
+    }
+
 	/** IFilterEditor method */
 	@Override public void setGridColor(Color c) {
     	popup.setGridColor(c);
@@ -1022,8 +1030,10 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	    			delegateFilter = newFilter;
 	    			reportFilterUpdatedToObservers();
 	    		}
-    			popup.addHistory(editor.getContent());
-    			downButton.setCanPopup(popup.hasContent());
+	    		if (editor.isValidContent()){
+	    			popup.addHistory(editor.getContent());
+	    			downButton.setCanPopup(popup.hasContent());
+	    		}
     		}
     	}
     }

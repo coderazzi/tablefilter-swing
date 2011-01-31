@@ -111,6 +111,9 @@ public class FilterSettings {
     public static Color selectionForegroundColor = 
     	getColor("selectionForegroundColor", null);
     
+    /** Header's selection color */
+    public static Color selectionColor = getColor("selectionColor", null);
+
     /** Header's font*/
     public static Font font;
 

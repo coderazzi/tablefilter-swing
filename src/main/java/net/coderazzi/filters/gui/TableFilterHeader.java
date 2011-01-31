@@ -88,7 +88,7 @@ public class TableFilterHeader extends JPanel {
     /**
      * <p>Location of the header in relation to the table</p>
      * <p>Note that this location is only meaningful when the table is set 
-     * inside a scroll pane, and this header instance is not explicitely 
+     * inside a scroll pane, and this header instance is not explicitly 
      * included in a container</p>
      * <ul>
      * <li>TOP: the filter is placed automatically above the table header.</li>
@@ -107,12 +107,12 @@ public class TableFilterHeader extends JPanel {
     private Color errorColor, gridColor, disabledForeground;
     
     /** Colors for selections on filter editors */
-    private Color selectionBackground, selectionForeground;
+    private Color selectionBackground, selectionForeground, selectionColor;
 
     /** whether the user has explicitly provided colors/font */
     private boolean backgroundSet, foregroundSet, disabledColorSet;
     private boolean selectionBackgroundSet, selectionForegroundSet;
-    private boolean gridColorSet, errorColorSet, fontSet;
+    private boolean selectionColorSet, gridColorSet, errorColorSet, fontSet;
     
     /** The helper to handle the location of the filter in the table header */
     private PositionHelper positionHelper = new PositionHelper(this);
@@ -386,6 +386,25 @@ public class TableFilterHeader extends JPanel {
         return selectionBackground;
     }
 
+    /** Sets the color set by default as text selection on filters */
+    public void setTextSelectionColor(Color c) {    	
+        this.selectionColor = c;
+        this.selectionColorSet = true;
+        
+        if (columnsController != null)
+            columnsController.setTextSelectionColor(c);
+    }
+
+    /**
+     * <p>Returns the color set by default as text selection on filters</p>
+     *
+     * <p>Note that the color of each specific editor can be different, 
+     * if the user customizes it directly</p>
+     */
+    public Color getTextSelectionColor() {
+        return selectionColor;
+    }
+
     /**
      * Sets the foreground color used by the parsing text editors 
      * when there are errors on the filter expressions.
@@ -449,6 +468,7 @@ public class TableFilterHeader extends JPanel {
         editor.setDisabledForeground(getDisabledForeground());
     	editor.setSelectionBackground(getSelectionBackground());
     	editor.setSelectionForeground(getSelectionForeground());
+    	editor.setTextSelectionColor(getTextSelectionColor());
     	editor.setGridColor(getGridColor());
         editor.setMaxVisibleRows(maxVisibleRows);
         editor.setFont(getFont());
@@ -550,6 +570,7 @@ public class TableFilterHeader extends JPanel {
     	updateForeground();
     	updateSelectionBackground();
     	updateSelectionForeground();
+    	updateSelectionColor();
     	updateDisabledForeground();
     	updateErrorForeground();
     	updateGridColor();
@@ -640,6 +661,26 @@ public class TableFilterHeader extends JPanel {
 		}
 		setSelectionForeground(c);
 		selectionForegroundSet=set;
+    }
+    
+    /** Updates the selection color on all components */
+    private void updateSelectionColor(){
+		boolean set = selectionColorSet;
+		Color c;
+		if (set){
+			c=getTextSelectionColor();
+		} else {
+			c = FilterSettings.backgroundColor;
+			if (c==null){
+		    	Color a = getBackground();
+	    		Color b = getSelectionBackground();
+	    		c = new Color((a.getRed() + b.getRed())/2,
+	    				(a.getGreen() + b.getGreen())/2,
+	    				(a.getBlue() + b.getBlue())/2);    				
+			}
+		}
+		setTextSelectionColor(c);
+		selectionColorSet=set;
     }
     
     /** Updates the disabled foreground on all components */
@@ -878,6 +919,13 @@ public class TableFilterHeader extends JPanel {
                 	panel.editor.setErrorForeground(fg);
         }
 
+        public void setTextSelectionColor(Color c) {
+
+            if (columns != null)
+                for (FilterColumnPanel panel : this.columns)
+                	panel.editor.setTextSelectionColor(c);
+        }
+        
         public void setGridColor(Color c) {
 
             if (columns != null)

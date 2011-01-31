@@ -185,6 +185,12 @@ public interface IFilterEditor {
 	/** Returns the color used to represent disabled state */
 	public abstract Color getSelectionBackground();
 	
+	/** Sets the color set by default as text selection on filters */
+    public abstract void setTextSelectionColor(Color c);
+
+    /** Returns the color set by default as text selection on filters */
+    public abstract Color getTextSelectionColor();
+    
 	/** Sets the grid color on the header */
 	public abstract void setGridColor(Color c);
 

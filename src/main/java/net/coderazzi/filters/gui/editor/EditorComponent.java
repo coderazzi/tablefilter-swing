@@ -32,6 +32,7 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.text.ParseException;
+import java.util.Comparator;
 
 import javax.swing.CellRendererPane;
 import javax.swing.Icon;
@@ -82,9 +83,8 @@ interface EditorComponent {
 
     /** 
      * Informs that the editor has received the focus.
-     * @return true if the associated popup should be shown 
      */
-    public boolean focusMoved(boolean gained);
+    public void focusMoved(boolean gained);
     
     /** Enables/disables the editor */
     public void setEnabled(boolean enabled);
@@ -108,6 +108,9 @@ interface EditorComponent {
     /** Returns the editable flag*/
     public boolean isEditable();
 
+    /** Returns true if the content is valid*/
+    public boolean isValidContent();
+
     /** Sets the color used to show filter's errors (invalid syntax) */
     public void setErrorForeground(Color fg);
 
@@ -126,6 +129,12 @@ interface EditorComponent {
     /** Sets the background color used to represent selected state */
     public void setSelectionBackground(Color bg);
 
+	/** Sets the color set by default as text selection on filters */
+    public void setTextSelectionColor(Color c);
+
+    /** Returns the color set by default as text selection on filters */
+    public Color getTextSelectionColor();
+    
     /** Sets the foreground color used*/
     public void setForeground(Color fg);
 
@@ -272,6 +281,10 @@ interface EditorComponent {
         		}
         	}
         	
+        	public boolean isError(){
+        		return error;
+        	}
+        	
             public void setErrorForeground(Color fg) {
             	errorColor = fg;
             	if (error){
@@ -404,13 +417,16 @@ interface EditorComponent {
             textField.setError(error);
         }
         
+        @Override public boolean isValidContent(){
+        	return !textField.isError();
+        }
+        
         @Override public RowFilter getFilter() {
             return filter;
         }
 
-        @Override public boolean focusMoved(boolean gained) {
+        @Override public void focusMoved(boolean gained) {
     		textField.focusMoved(gained);
-            return !editable;
         }
 
         @Override public void setEnabled(boolean enabled) {
@@ -463,7 +479,7 @@ interface EditorComponent {
             } else {
                 // ensure that the text contains something okay
                 String proposal = getProposalOnEdition(textField.getText(), 
-                		                               false);
+                		                               true);
                 textField.setText((proposal == null) ? 
                 		CustomChoice.MATCH_ALL.toString() 
                 		: proposal);
@@ -509,6 +525,14 @@ interface EditorComponent {
         	textField.setSelectionBackground(bg);
         }
         
+        @Override public void setTextSelectionColor(Color c) {
+        	textField.setSelectionColor(c);
+        }
+        
+        @Override public Color getTextSelectionColor() {
+        	return textField.getSelectionColor();
+        }
+        
         /** defines that the content is being set from inside */
         public void setControlledSet() {
             controlledSet = true;
@@ -549,10 +573,22 @@ interface EditorComponent {
                 // getting "seccond", which is probably wrong, so we try now
                 // to get a proposal starting at 'sec' ['sec|ond']
                 proposal = getProposalOnEdition(newContentBegin, true);
-                if (proposal == null) {
-                    return;
+                if (proposal != null) {
+                    newContent = newContentBegin;
+                } else {
+                    proposal = getProposalOnEdition(newContent, false);
+                    if (proposal!=null){
+                    	if (proposal.length()<newContentBegin.length() || 
+                    			(0!=popup.getStringComparator().compare(newContentBegin, 
+                    					proposal.substring(0, newContentBegin.length())))){
+                    		proposal=null;
+                    	}
+                    }
+                    if (proposal == null){
+                        return;
+                    }
+                    newContent = proposal;
                 }
-                newContent = newContentBegin;
             }
             int caret;
             if (controlledSet) {
@@ -576,47 +612,38 @@ interface EditorComponent {
             String buffer = textField.getText();
             String newContent = buffer.substring(0, offset) 
             	+ buffer.substring(offset + length);
-            String proposal = getProposalOnEdition(newContent, true);
-            if (!newContent.equals(proposal)) {
-                if (proposal == null) {
+            if (newContent.length() == 0) {
+                super.replace(fb, 0, buffer.length(), "", null);
+            } else {
+	            Comparator<String> comparator = popup.getStringComparator();
+	            String proposal = getProposalOnEdition(newContent, true);
+	            if (proposal==null || comparator.compare(newContent, proposal)!=0){
                     proposal = getProposalOnEdition(newContent, false);
                     if (proposal == null) {
                         return;
                     }
-                }
-                if (matchCount(proposal, newContent) 
-                		<= matchCount(buffer, newContent)) {
-                    proposal = buffer;
-                }
+                    if (PopupComponent.Match.getMatchingLength(proposal, newContent, comparator)
+                    		<= PopupComponent.Match.getMatchingLength(buffer, newContent, comparator)){
+	                    proposal = buffer;
+	                }
+	            }
+	            super.replace(fb, 0, buffer.length(), proposal, null);
+	             
+	            //special case if the removal is due to BACK SPACE
+	    		AWTEvent ev = EventQueue.getCurrentEvent();
+	    		if ((ev instanceof KeyEvent) 
+	    				&& ((KeyEvent)ev).getKeyCode() == KeyEvent.VK_BACK_SPACE){
+	                if (caret > mark) {
+	                    caret = mark;
+	                } else if (buffer == proposal) {
+	                    --caret;
+	                } else if (caret == mark) {
+	                    caret = offset;
+	                }    			
+	    		} 
+	            textField.setCaretPosition(proposal.length());
+	            textField.moveCaretPosition(caret);
             }
-            super.replace(fb, 0, buffer.length(), proposal, null);
-            
-            //special case if the removal is due to BACK SPACE
-    		AWTEvent ev = EventQueue.getCurrentEvent();
-    		if ((ev instanceof KeyEvent) 
-    				&& ((KeyEvent)ev).getKeyCode() == KeyEvent.VK_BACK_SPACE){
-                if (caret > mark) {
-                    caret = mark;
-                } else if (buffer == proposal) {
-                    --caret;
-                } else if (caret == mark) {
-                    caret = offset;
-                }    			
-    		} 
-            textField.setCaretPosition(proposal.length());
-            textField.moveCaretPosition(caret);
-        }
-
-        /** returns the number of starting chars matching among both pars */
-        private int matchCount(String a,
-                               String b) {
-            int max = Math.min(a.length(), b.length());
-            for (int i = 0; i < max; i++) {
-                if (a.charAt(i) != b.charAt(i)) {
-                    return i;
-                }
-            }
-            return max;
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
@@ -651,6 +678,7 @@ interface EditorComponent {
         private RowFilter filter;
         private Color errorColor;
         private Color disabledColor;
+        private Color selectionColor;
         private boolean focused;
         FilterEditor editor;
         Object cachedContent;
@@ -687,10 +715,9 @@ interface EditorComponent {
             return filter;
         }
 
-        @Override public boolean focusMoved(boolean gained) {
+        @Override public void focusMoved(boolean gained) {
         	focused=gained;
         	repaint();
-            return true;
         }
 
         @Override public void setEnabled(boolean enabled) {
@@ -712,6 +739,10 @@ interface EditorComponent {
         
         @Override public void setParser(IParser parser) {
         	// not used on rendering        	
+        }
+        
+        @Override public boolean isValidContent() {
+        	return true;
         }
 
         @Override public boolean isEditable() {
@@ -736,6 +767,14 @@ interface EditorComponent {
         
         @Override public void setSelectionBackground(Color bg) {
         	//no need to do anything
+        }
+        
+        @Override public void setTextSelectionColor(Color c) {
+        	this.selectionColor = c;
+        }
+        
+        @Override public Color getTextSelectionColor() {
+        	return selectionColor;
         }
         
         @Override public Color getDisabledForeground() {

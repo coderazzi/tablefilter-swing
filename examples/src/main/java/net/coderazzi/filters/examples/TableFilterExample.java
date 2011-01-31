@@ -77,7 +77,8 @@ import net.coderazzi.filters.gui.TableFilterHeader.Position;
 @SuppressWarnings("serial")
 public class TableFilterExample extends JFrame {
 
-    private static final String IGNORE_CASE = "ignore case";
+    private static final String MAX_HISTORY_LENGTH = "max history length";
+	private static final String IGNORE_CASE = "ignore case";
 	private static final String ENABLED = "enabled";
     private static final String EDITABLE = "editable";
 	private static final String AUTO_OPTIONS = "auto options";
@@ -343,7 +344,7 @@ public class TableFilterExample extends JFrame {
     	ret.addSeparator();
     	ret.add(visible);
     	ret.add(createPositionMenu());
-    	ret.add(createAppearanceMenu());
+    	ret.add(createAppearanceMenu(null));
     	ret.add(createMaxRowsMenu());
     	ret.addSeparator();
     	ret.add(reset);
@@ -466,76 +467,94 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     	
-    private JMenu createAppearanceMenu(){
+    private JMenu createAppearanceMenu(final IFilterEditor editor){
     	JMenu ret = new JMenu("appearance");
     	ret.add(new JMenuItem(new AbstractAction("background color ...") {			
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
-						"Select header's background color", 
-						filterHeader.getBackground());
+						"Select background color", 
+						editor==null? filterHeader.getBackground() : editor.getBackground());
 				if (ret!=null){
-					filterHeader.setBackground(ret);
+					if (editor==null) {filterHeader.setBackground(ret);} 
+					else {editor.setBackground(ret);}
 				}
 			}
 		}));
     	ret.add(new JMenuItem(new AbstractAction("foreground color ...") {			
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
-						"Select header's foreground color", 
-						filterHeader.getForeground());
+						"Select foreground color", 
+						editor==null? filterHeader.getForeground() : editor.getForeground());
 				if (ret!=null){
-					filterHeader.setForeground(ret);
+					if (editor==null) {filterHeader.setForeground(ret);} 
+					else {editor.setForeground(ret);}
 				}
 			}
 		}));
     	ret.add(new JMenuItem(new AbstractAction("disabled color ...") {			
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
-						"Select header's disabled color", 
-						filterHeader.getDisabledForeground());
+						"Select disabled color", 
+						editor==null? filterHeader.getDisabledForeground() : editor.getDisabledForeground());
 				if (ret!=null){
-					filterHeader.setDisabledForeground(ret);
+					if (editor==null) {filterHeader.setDisabledForeground(ret);} 
+					else {editor.setDisabledForeground(ret);}
 				}
 			}
 		}));
     	ret.add(new JMenuItem(new AbstractAction("grid color ...") {			
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
-						"Select header's grid color", 
-						filterHeader.getGridColor());
+						"Select grid color", 
+						editor==null? filterHeader.getGridColor() : editor.getGridColor());
 				if (ret!=null){
-					filterHeader.setGridColor(ret);
+					if (editor==null) {filterHeader.setGridColor(ret);} 
+					else {editor.setGridColor(ret);}
 				}
 			}
 		}));
     	ret.add(new JMenuItem(new AbstractAction("error color ...") {			
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
-						"Select header's error color", 
-						filterHeader.getErrorForeground());
+						"Select error color", 
+						editor==null? filterHeader.getErrorForeground() : editor.getErrorForeground());
 				if (ret!=null){
-					filterHeader.setErrorForeground(ret);
+					if (editor==null) {filterHeader.setErrorForeground(ret);} 
+					else {editor.setErrorForeground(ret);}
 				}
 			}
 		}));
-    	ret.add(new JMenuItem(new AbstractAction("selection color ...") {			
+    	ret.add(new JMenuItem(new AbstractAction("selection foreground ...") {			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
-						"Select header's selection color", 
-						filterHeader.getSelectionForeground());
+						"Select selection foreground", 
+						editor==null? filterHeader.getSelectionForeground() : editor.getSelectionForeground());
 				if (ret!=null){
-					filterHeader.setSelectionForeground(ret);
+					if (editor==null) {filterHeader.setSelectionForeground(ret);} 
+					else {editor.setSelectionForeground(ret);}
 				}
 			}
 		}));
     	ret.add(new JMenuItem(new AbstractAction("selection background ...") {			
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
-						"Select header's selection background", 
-						filterHeader.getSelectionBackground());
+						"Select selection background", 
+						editor==null? filterHeader.getSelectionBackground() : editor.getSelectionBackground());
 				if (ret!=null){
-					filterHeader.setSelectionBackground(ret);
+					if (editor==null) {filterHeader.setSelectionBackground(ret);} 
+					else {editor.setSelectionBackground(ret);}
+				}
+			}
+		}));
+    	ret.add(new JMenuItem(new AbstractAction("text selection color ...") {			
+			@Override public void actionPerformed(ActionEvent e) {
+				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
+						"Select text selection color", 
+						editor==null? filterHeader.getTextSelectionColor() : editor.getTextSelectionColor());
+				if (ret!=null){
+					if (editor==null) {filterHeader.setTextSelectionColor(ret);} 
+					else {editor.setTextSelectionColor(ret);}
 				}
 			}
 		}));
@@ -586,7 +605,7 @@ public class TableFilterExample extends JFrame {
     		menu.addSeparator();
     	}
     	
-    	JMenu history = new JMenu("max history length");
+    	JMenu history = new JMenu(MAX_HISTORY_LENGTH);
     	ButtonGroup max = new ButtonGroup();
     	
     	for (int i=0; i<10;i++){
@@ -595,6 +614,7 @@ public class TableFilterExample extends JFrame {
     		history.add(item);
     	}
     	
+    	menu.add(createAppearanceMenu(editor));
     	menu.add(history);
 
     	menu.add(new JMenuItem(new AbstractAction("Remove this column"){
@@ -623,6 +643,9 @@ public class TableFilterExample extends JFrame {
     	((JCheckBoxMenuItem) getMenu(menu, IGNORE_CASE, false)).setSelected(editor.isIgnoreCase());
     	JMenu autoOptionsMenu = (JMenu) getMenu(menu, AUTO_OPTIONS, false);
     	((JRadioButtonMenuItem ) getMenu(autoOptionsMenu, editor.getAutoOptions().toString().toLowerCase(), false)).setSelected(true);
+    	JMenu historyMenu = (JMenu) getMenu(menu, MAX_HISTORY_LENGTH, false);
+    	JRadioButtonMenuItem item = ((JRadioButtonMenuItem ) getMenu(historyMenu, String.valueOf(editor.getMaxHistory()), false)); 
+    	if (item!=null){ item.setSelected(true);}
     }
 
     JMenuItem getMenu(JMenu menu, String name, boolean remove){

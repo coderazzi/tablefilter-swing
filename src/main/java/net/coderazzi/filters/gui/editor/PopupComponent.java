@@ -209,6 +209,10 @@ abstract class PopupComponent implements PopupMenuListener{
 			reconfigureGui();
 		}
 	}
+	
+	public Comparator<String> getStringComparator(){
+		return historyModel.getStringComparator();
+	}
 
 	/** Specifies that the content requires no conversion to strings */
 	public void setRenderedContent(ListCellRenderer renderer, Comparator classComparator) {
@@ -325,8 +329,8 @@ abstract class PopupComponent implements PopupMenuListener{
 	}
 
 	/** @see IFilterEditor#setMaxHistory(int) */
-	public void setMaxHistory(int size) {
-		this.maxHistory = size;
+	public void setMaxHistory(Integer size) {
+		this.maxHistory = size==null? FilterSettings.maxPopupHistory : size;
 		if (fixMaxHistory()) {
 			reconfigureGui();
 		}
@@ -734,9 +738,11 @@ abstract class PopupComponent implements PopupMenuListener{
 		public static int getMatchingLength(String a, String b, Comparator stringComparator){
 			int max = Math.min(a.length(), b.length());
 			for (int i=0; i<max; i++){
-				if (0!=stringComparator.compare(a.substring(i, i+1), b.substring(i, i+1))){
-					return i;
-				}
+            	char f = a.charAt(i);
+            	char s = b.charAt(i);
+                if (f!=s && stringComparator.compare(String.valueOf(f), String.valueOf(s))!=0) {
+                    return i;
+                }
 			}
 			return max;
 		}
