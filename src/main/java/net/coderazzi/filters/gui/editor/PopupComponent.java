@@ -37,6 +37,7 @@ import java.awt.event.MouseEvent;
 import java.text.Format;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JList;
@@ -184,13 +185,7 @@ abstract class PopupComponent implements PopupMenuListener{
 						focusOptions();
 						select(match.index);
 					}
-					Object ret = optionsModel.getElementAt(match.index);
-					if (ret instanceof String){
-						return (String) ret;
-					} 
-					if (ret instanceof CustomChoice){
-						return ((CustomChoice)ret).getRepresentation();
-					}
+					return optionsModel.getElementAt(match.index).toString();
 				}
 				return null;
 			}
@@ -200,7 +195,7 @@ abstract class PopupComponent implements PopupMenuListener{
 				focusHistory();
 				select(historyMatch.index);
 			}
-			return (String) historyModel.getElementAt(historyMatch.index);
+			return historyModel.getElementAt(historyMatch.index).toString();
 		}
 		return null;
 	}
@@ -711,5 +706,39 @@ abstract class PopupComponent implements PopupMenuListener{
 			this.index = index;
 			exact = index != -1;
 		}
+
+		public static Match findOnUnsortedContent(List content, int len, 
+				Comparator strComparator, String strStart, boolean fullMatch) 
+		{
+			Match ret = new Match(-1);
+			while (--len>0){
+				int matchLen = getMatchingLength(strStart, content.get(len).toString(), strComparator);
+				if (matchLen>ret.len){
+					ret.index=len;
+					ret.len=matchLen;
+					if (matchLen==strStart.length()){
+						ret.exact=true;
+						return ret;
+					}
+				}
+			}
+			if (fullMatch){
+				ret.index=-1;
+				ret.len=0;
+			}
+			return ret;
+		}
+
+		/** Returns the number of characters matching between two strings */
+		public static int getMatchingLength(String a, String b, Comparator stringComparator){
+			int max = Math.min(a.length(), b.length());
+			for (int i=0; i<max; i++){
+				if (0!=stringComparator.compare(a.substring(i, i+1), b.substring(i, i+1))){
+					return i;
+				}
+			}
+			return max;
+		}
+		
 	}
 }

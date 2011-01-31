@@ -136,7 +136,7 @@ public class OptionsListModel extends AbstractListModel {
 	public CustomChoice getCustomChoice(String s){
 		for (int i=0; i<customChoices;i++){
 			CustomChoice cc=(CustomChoice) content.get(i);
-			if (0==comparator.compare(s, cc.getRepresentation())){
+			if (0==comparator.compare(s, cc.toString())){
 				return cc;
 			}
 		}
@@ -187,14 +187,13 @@ public class OptionsListModel extends AbstractListModel {
 	/** Creation of the Match, for text based, sorted content */
 	private PopupComponent.Match findOnSortedContent(String strStart, 
 			                                         boolean fullMatch) {
-		PopupComponent.Match ret = new PopupComponent.Match();
+		PopupComponent.Match ret;
 		if (content.isEmpty()) {
-			ret.index = -1;
+			ret = new PopupComponent.Match(-1);
 		} else {
-			ret.len = strStart.length();
-			ret.exact = ret.len == 0;
+			ret = PopupComponent.Match.findOnUnsortedContent(
+				content, customChoices, comparator, strStart, fullMatch);
 			if (!ret.exact){
-				//find correct position outside the custom choices
 				int pos = Collections.binarySearch(
 						content.subList(customChoices, content.size()), 
 						strStart, 
@@ -203,36 +202,25 @@ public class OptionsListModel extends AbstractListModel {
 					//found it, do nothing else
 					ret.exact=true;
 					ret.index=customChoices + pos;
-				} else if (fullMatch){
-					ret.index=-1;
-					ret.len=0;
-				} else {
-					//try now the two positions around the found one
-					ret.index=customChoices-pos-1;
-					ret.len=getMatchingLength(strStart, ret.index);
-					int nextPost=customChoices-pos-2;
-					if (nextPost>=customChoices){
-						int len = getMatchingLength(strStart, nextPost);
-						if (len>ret.len){
-							ret.index=nextPost;
+				} else if (!fullMatch){
+					//try the two positions around
+					int suggested=customChoices-pos-1;
+					if (suggested<content.size()){
+						int len = getMatchingLength(strStart, suggested);
+						if (len>ret.len || ret.len==0){
+							ret.index=suggested;
 							ret.len=len;
 						}
 					}
-					ret.exact = ret.len==strStart.length();
-					if (!ret.exact){
-						//with second priority, if not exact, look into 
-						//the custom choices
-						for (int i=0; i<customChoices;i++){
-							int len = getMatchingLength(strStart, i);
-							if (len>ret.len){
-								ret.index=i;
-								ret.len=len;
-								ret.exact = ret.len==strStart.length();
-								if (ret.exact){
-									break;
-								}
-							}
+					if (--suggested>=customChoices){
+						int len = getMatchingLength(strStart, suggested);
+						if (len>ret.len || ret.len==0){
+							ret.index=suggested;
+							ret.len=len;
 						}
+					}
+					if (ret.index>=customChoices){
+						ret.exact = ret.len==content.get(ret.index).toString().length();
 					}
 				}
 			}
@@ -245,19 +233,9 @@ public class OptionsListModel extends AbstractListModel {
 	 * content[contentPosition] and target
 	 */
 	private int getMatchingLength(String target, int contentPosition){
-		if (contentPosition>=content.size()){
-			return -1;
-		}
-		Object o = content.get(contentPosition);
-		String s = (o instanceof CustomChoice)? 
-				((CustomChoice)o).getRepresentation() : (String) o;
-		int max = Math.min(target.length(), s.length());
-		for (int i=0; i<max; i++){
-			if (0!=comparator.compare(target.substring(i, i+1), s.substring(i, i+1))){
-				return i;
-			}
-		}
-		return max;
+		return PopupComponent.Match.getMatchingLength(target, 
+				content.get(contentPosition).toString(),
+				comparator);
 	}
 	
 	private Comparator wrapperComparator = new Comparator() {
@@ -270,7 +248,7 @@ public class OptionsListModel extends AbstractListModel {
 					if (ret==0){
 						if (useFormatter){
 							//in this case, the comparator is string comparator
-							ret=comparator.compare(c1.getRepresentation(), c2.getRepresentation());
+							ret=comparator.compare(c1.toString(), c2.toString());
 						} else {
 							ret = o1.hashCode()-o2.hashCode();
 						}

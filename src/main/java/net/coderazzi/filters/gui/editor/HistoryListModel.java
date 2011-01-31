@@ -48,6 +48,7 @@ import net.coderazzi.filters.gui.FilterSettings;
 class HistoryListModel extends AbstractListModel {
 	private static final long serialVersionUID = -374115548677017807L;
 	private List<Object> history = new ArrayList<Object>();
+	private Object lastAdded;
 	private Comparator stringComparator;
 	private int maxHistory = FilterSettings.maxVisiblePopupRows;
 	
@@ -70,19 +71,27 @@ class HistoryListModel extends AbstractListModel {
 
 	/** Adds an element, Returning true if the number of elements changes */
 	public boolean add(Object st) {
+		//never add the passed element (which is now selected on the
+		//editor). We will added when the next element is passed
 		boolean ret = false;
-		if (maxHistory > 0) {
-			history.remove(st);
-			history.add(0, st);
+		boolean removed = history.remove(st);
+		if (maxHistory > 0 && lastAdded!=null && !lastAdded.equals(st)) {
+			history.add(0, lastAdded);
 			int size = history.size();
 			if (size > maxHistory) {
 				history.remove(--size);
-				fireContentsChanged(this, 0, maxHistory);
+				removed=true;
 			} else {
 				ret=true;
-				fireIntervalAdded(this, 0, 0);
+				if (!removed){
+					fireIntervalAdded(this, 0, 0);
+				}
 			}
 		}
+		if (removed){
+			fireContentsChanged(this, 0, history.size());			
+		}
+		lastAdded = st;
 		return ret;
 	}
 	
@@ -96,6 +105,7 @@ class HistoryListModel extends AbstractListModel {
 			history.clear();
 			fireIntervalRemoved(this, 0, size);
 		}
+		lastAdded=null;
 	}
 
 	@Override public int getSize() {
@@ -123,61 +133,10 @@ class HistoryListModel extends AbstractListModel {
 	/** @see PopupComponent#selectBestMatch(Object, boolean) */
 	public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
 		if (stringComparator!=null && (hint instanceof String)) {			
-			return findOnUnsortedContent((String)hint, exact);
+			return PopupComponent.Match.findOnUnsortedContent(history, 
+					history.size(), stringComparator, (String)hint, exact); 			
 		}
 		return new PopupComponent.Match(history.indexOf(hint));
-	}
-	
-	/** 
-	 * Method to find the best match on a given unsorted list 
-	 * -search is case sensitive- 
-	 **/
-	private PopupComponent.Match findOnUnsortedContent(String strStart, boolean fullMatch) {
-		PopupComponent.Match ret = new PopupComponent.Match();
-		if (history.isEmpty()) {
-			ret.index = -1;
-		} else {
-			int strLen = strStart.length();
-			if (strLen > 0){
-				ret.index = history.indexOf(strStart);
-				if (ret.index != -1) {
-					ret.len = strLen;
-				} else {
-					int i = history.size();
-					while (--i>0){
-						Object o = history.get(i);
-						if (o instanceof String){
-							int match = getMatchingLength(strStart, (String) o);
-							if (match>ret.len){
-								ret.index=i;
-								ret.len=match;
-								if (match==strLen){
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			if (ret.len==strLen){
-				ret.exact=true;
-			} else if (fullMatch){
-				ret.index=-1;
-				ret.len=0;
-			}
-		}
-		return ret;
-	}
-
-	/** Returns the number of characters matching between two strings */
-	private int getMatchingLength(String a, String b){
-		int max = Math.min(a.length(), b.length());
-		for (int i=0; i<max; i++){
-			if (0!=stringComparator.compare(a.substring(i, i+1), b.substring(i, i+1))){
-				return i;
-			}
-		}
-		return max;
 	}
 	
 }

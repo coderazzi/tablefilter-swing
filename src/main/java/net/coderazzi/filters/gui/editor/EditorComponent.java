@@ -368,7 +368,7 @@ interface EditorComponent {
             if (forceUpdate){
             	updateFilter(text);
             } else if (content instanceof CustomChoice){
-    			if (!((CustomChoice)content).getRepresentation().equals(text)){
+    			if (!((CustomChoice)content).toString().equals(text)){
                 	updateFilter(text);
     			}
             } else if (!text.equals(content)){
@@ -421,7 +421,7 @@ interface EditorComponent {
             String text;
             if (content instanceof CustomChoice){
             	//never escape custom choices
-            	text = ((CustomChoice) content).getRepresentation();
+            	text = ((CustomChoice) content).toString();
             } else if (content instanceof String){
             	text = (String) content;
             	if (escapeIt && isEditable()){
@@ -465,7 +465,7 @@ interface EditorComponent {
                 String proposal = getProposalOnEdition(textField.getText(), 
                 		                               false);
                 textField.setText((proposal == null) ? 
-                		CustomChoice.MATCH_ALL.getRepresentation() 
+                		CustomChoice.MATCH_ALL.toString() 
                 		: proposal);
                 ((AbstractDocument) textField.getDocument()).
                 	setDocumentFilter(this);

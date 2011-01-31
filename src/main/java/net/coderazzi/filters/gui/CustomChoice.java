@@ -117,11 +117,6 @@ public abstract class CustomChoice {
 		return icon;
 	}
 	
-	/** Returns the string representation of the filter */
-	public String getRepresentation(){
-		return str;
-	}
-	
 	/** Returns the precedence value */ 
 	public int getPrecedence(){
 		return precedence;
@@ -141,16 +136,17 @@ public abstract class CustomChoice {
 	/** Returns the associated filter */
 	public abstract RowFilter getFilter(IFilterEditor editor);
 	
-	@Override public String toString() {
-		return getRepresentation();
+	/** Returns the string representation of the filter */	
+	@Override final public String toString() {
+		return str;
 	}
 	
 	@Override public int hashCode() {
-		return getRepresentation().hashCode();
+		return str.hashCode();
 	}
 	
 	@Override public boolean equals(Object o) {
 		return (o instanceof CustomChoice) && 
-			((CustomChoice)o).getRepresentation().equals(getRepresentation());
+			(((CustomChoice)o).str).equals(str);
 	}	
 }

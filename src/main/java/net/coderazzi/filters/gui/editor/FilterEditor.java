@@ -1070,11 +1070,8 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	    			delegateFilter = newFilter;
 	    			reportFilterUpdatedToObservers();
 	    		}
-	    		Object content = editor.getContent();
-	    		if (!(content instanceof CustomChoice)){
-	    			popup.addHistory(content);
-	    			downButton.setCanPopup(popup.hasContent());
-	    		}
+    			popup.addHistory(editor.getContent());
+    			downButton.setCanPopup(popup.hasContent());
     		}
     	}
     }

@@ -106,7 +106,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 				CustomChoice cc = (CustomChoice) value;
 				icon = cc.getIcon();
 				if (icon==null || cc.renderTextInOptions(userRenderer!=this)){
-					value = cc.getRepresentation();
+					value = cc.toString();
 					setColor = true;
 				} else {
 					value = null;
