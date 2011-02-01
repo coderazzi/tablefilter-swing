@@ -51,7 +51,6 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.CellRendererPane;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
@@ -461,33 +460,13 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     			new DefaultListCellRenderer() {
 
     		private static final long serialVersionUID = -5990815893475331934L;
-    		private CellRendererPane painter = new CellRendererPane();
-    		private Component delegate; 
 
 			@Override public Component getListCellRendererComponent(JList list, 
 					Object value, int index, boolean isSelected, 
 					boolean cellHasFocus) {
-				delegate = renderer.getTableCellRendererComponent(filtersHandler.getTable(), 
+				return renderer.getTableCellRendererComponent(filtersHandler.getTable(), 
 						value, false, cellHasFocus, 1, getModelIndex());
-				if (isSelected){
-					setBackground(list.getSelectionBackground());
-					setForeground(list.getSelectionForeground());
-				}else {
-					setBackground(list.getBackground());
-					setForeground(list.getForeground());
-				}
-				return this;
             }
-			
-			@Override public void paint(Graphics g) {				
-				Color background = delegate.getBackground();
-				Color foreground = delegate.getForeground();
-				delegate.setBackground(getBackground());
-				delegate.setForeground(getForeground());
-				painter.paintComponent(g, delegate, this, 0, 0, getWidth(), getHeight());
-				delegate.setBackground(background);
-				delegate.setForeground(foreground);
-			}
         });
     }
 

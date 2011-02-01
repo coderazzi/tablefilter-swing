@@ -77,7 +77,8 @@ import net.coderazzi.filters.gui.TableFilterHeader.Position;
 @SuppressWarnings("serial")
 public class TableFilterExample extends JFrame {
 
-    private static final String RECOVER_COLUMN = "Recover column ";
+    private static final String USE_TABLE_RENDERER = "use table renderer";
+	private static final String RECOVER_COLUMN = "Recover column ";
 	private static final String MAX_HISTORY_LENGTH = "max history length";
 	private static final String IGNORE_CASE = "ignore case";
 	private static final String ENABLED = "enabled";
@@ -91,7 +92,6 @@ public class TableFilterExample extends JFrame {
     TableFilterHeader filterHeader;
     JMenu filtersMenu;
     JCheckBoxMenuItem allEnabled;
-    JCheckBoxMenuItem useFlagRenderer;
     JCheckBoxMenuItem countrySpecialSorter;
     JCheckBoxMenuItem enableUserFilter;
     IFilter userFilter;
@@ -136,14 +136,6 @@ public class TableFilterExample extends JFrame {
 		    	addColumnToFiltersMenu(editor, (String) tableColumn.getHeaderValue());
 			}
 		});
-		useFlagRenderer=new JCheckBoxMenuItem("country flags as icons -in choices-", true);
-		useFlagRenderer.addItemListener(new ItemListener() {
-			
-			@Override public void itemStateChanged(ItemEvent e) {
-				setCountryEditorRenderer();
-			}
-		});
-    	
 		countrySpecialSorter = new JCheckBoxMenuItem("country column sorted by red proportion", false);
 		countrySpecialSorter.addItemListener(new ItemListener() {			
 			@Override public void itemStateChanged(ItemEvent e) {
@@ -569,7 +561,7 @@ public class TableFilterExample extends JFrame {
 			}
 		}));
     	ret.addSeparator();
-    	ret.add(createFontSizeMenu());			
+    	ret.add(createFontSizeMenu(editor));			
     	return ret;
     }
     
@@ -609,11 +601,6 @@ public class TableFilterExample extends JFrame {
 		});
     	menu.add(ignoreCase);
     	menu.addSeparator();
-    	if (name.equalsIgnoreCase("country")){
-    		menu.add(useFlagRenderer);
-    		menu.add(countrySpecialSorter);
-    		menu.addSeparator();
-    	}
     	
     	JMenu history = new JMenu(MAX_HISTORY_LENGTH);
     	ButtonGroup max = new ButtonGroup();
@@ -624,9 +611,23 @@ public class TableFilterExample extends JFrame {
     		history.add(item);
     	}
     	
+    	JCheckBoxMenuItem useFlagRenderer=new JCheckBoxMenuItem(USE_TABLE_RENDERER, name.equalsIgnoreCase("country"));
+		useFlagRenderer.addItemListener(new ItemListener() {
+			
+			@Override public void itemStateChanged(ItemEvent e) {
+				editor.setAutoListCellRenderer(((JCheckBoxMenuItem) e.getSource()).isSelected());
+			}
+		});
+    	
+
+		menu.add(useFlagRenderer);
     	menu.add(createAppearanceMenu(editor));
     	menu.add(history);
     	menu.addSeparator();
+    	if (name.equalsIgnoreCase("country")){
+    		menu.add(countrySpecialSorter);
+    		menu.addSeparator();
+    	}
 
     	menu.add(new JMenuItem(new AbstractAction("Remove this column"){
     		@Override
@@ -699,13 +700,13 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
-    private JMenu createFontSizeMenu(){
+    private JMenu createFontSizeMenu(IFilterEditor editor){
     	int RELATIVE_FONT_SIZES[]={-2, -1, 0, 1, 2, 4, 8, 16};
     	int size=filterHeader.getFont().getSize();
     	JMenu ret = new JMenu("font size");
     	ButtonGroup group = new ButtonGroup();
     	for (int i : RELATIVE_FONT_SIZES){
-    		JRadioButtonMenuItem item = createFontSizeMenuItem(size+i);
+    		JRadioButtonMenuItem item = createFontSizeMenuItem(editor, size+i);
     		ret.add(item);
     		group.add(item);
     		if (i==0){
@@ -715,11 +716,16 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
-    private JRadioButtonMenuItem createFontSizeMenuItem(final int size){
+    private JRadioButtonMenuItem createFontSizeMenuItem(final IFilterEditor editor, final int size){
     	return new JRadioButtonMenuItem(new AbstractAction(String.valueOf(size)) {			
 			@Override public void actionPerformed(ActionEvent e) {
-				filterHeader.setFont(
-						filterHeader.getFont().deriveFont((float)(size)));
+				if (editor==null){
+					filterHeader.setFont(
+							filterHeader.getFont().deriveFont((float)(size)));
+				} else {
+					editor.setFont(
+							editor.getFont().deriveFont((float)(size)));					
+				}
 			}
 		});
     }
@@ -763,17 +769,6 @@ public class TableFilterExample extends JFrame {
     	
     }
     
-    void setCountryEditorRenderer(){
-    	if (tableModel!=null && getColumnView(TestTableModel.COUNTRY)!=-1){
-	        int countryColumn = tableModel.getColumn(TestTableModel.COUNTRY);
-	        boolean set = useFlagRenderer.isSelected();
-        	IFilterEditor editor = filterHeader.getFilterEditor(countryColumn);
-        	editor.setAutoListCellRenderer(set);
-        	editor.setEditable(false);
-        	updateFilter(editor, tableModel.getColumnName(countryColumn));
-    	}
-    }
-    
     void setCountryComparator(boolean set){
     	if (tableModel!=null && getColumnView(TestTableModel.COUNTRY)!=-1){
 	        int column = tableModel.getColumn(TestTableModel.COUNTRY);
@@ -788,7 +783,19 @@ public class TableFilterExample extends JFrame {
         if (countryColumn!=-1) {
             table.getColumnModel().getColumn(countryColumn).
             		setCellRenderer(new FlagRenderer());
-        	setCountryEditorRenderer();
+	        int column = tableModel.getColumn(TestTableModel.COUNTRY);
+	        boolean set = true;
+	        JMenu menu = (JMenu) getMenu(filtersMenu, TestTableModel.COUNTRY, false);
+	        if (menu!=null){
+	        	JCheckBoxMenuItem box=(JCheckBoxMenuItem)getMenu(menu, USE_TABLE_RENDERER, false);
+	        	if (box!=null){
+	        		set=box.isSelected();
+	        	}
+	        }
+        	IFilterEditor editor = filterHeader.getFilterEditor(column);
+        	editor.setAutoListCellRenderer(set);
+        	editor.setEditable(false);
+        	updateFilter(editor, tableModel.getColumnName(column));
 	        setCountryComparator(countrySpecialSorter.isSelected());
         }
     }

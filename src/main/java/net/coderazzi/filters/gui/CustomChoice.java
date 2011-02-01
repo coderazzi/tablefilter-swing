@@ -28,16 +28,19 @@ package net.coderazzi.filters.gui;
 import java.text.Format;
 
 import javax.swing.Icon;
+import javax.swing.ListCellRenderer;
 import javax.swing.RowFilter;
 
 /**
  * Class to specify a custom filter in the choices list<br>
  * 
- * A custom filter can specify an icon and a textual representation, which,
- * if the icon is provided, can be hidden.<br>
- * The filter associated to the CustomChoice is, by default, the parsing of the 
- * given textual representation, although a custom filter can be provided by 
- * overriding the method {@see #getFilter(IFilterTextParser, int)} <br>
+ * A custom choice allows to specify custom filters that can be selected as
+ * a choice in the filter editor. A custom choice is associated always to
+ * a text, which the user can input to select the given choice.<br>
+ * 
+ * It is also possible to specify how the custom filter is rendered; by
+ * default it is displayed the icon -if provided-, and the text, unless the
+ * user provides a custom renderer.<br> 
  * 
  * The order of the custom choices on the choices list can be modified with
  * the precedence attribute. By default, custom choices are sorted by their
@@ -108,6 +111,11 @@ public abstract class CustomChoice {
 		this(representation, icon, DEFAULT_PRECEDENCE);
 	}
 	
+	/** Returns the renderer for this choice, or null to use the default one */
+	public ListCellRenderer getRenderer(){
+		return null;
+	}
+	
 	/**
 	 * Return an icon associated to this filter.<br>
 	 * It can be null if there is no associated graphic representation for this
@@ -117,20 +125,18 @@ public abstract class CustomChoice {
 		return icon;
 	}
 	
-	/** Returns the precedence value */ 
-	public int getPrecedence(){
-		return precedence;
-	}
-	
 	/** 
 	 * Returns true if the text should be displayed on the choices, when
 	 * there is an icon present<br>
 	 * This method is only called if an icon is available.
-	 * @param userRendererSet set to true if the user has specified any 
-	 *    special render for the associated column
 	 */
-	public boolean renderText(boolean userRendererSet){
-		return !userRendererSet;
+	public boolean renderText(){
+		return true;
+	}
+	
+	/** Returns the precedence value */ 
+	public int getPrecedence(){
+		return precedence;
 	}
 	
 	/** Returns the associated filter */

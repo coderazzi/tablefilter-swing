@@ -28,6 +28,7 @@ package net.coderazzi.filters.gui.editor;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -81,7 +82,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private int xDeltaBase;
 	private int width;
 	
-	Color disabledColor;
+	Color disabledColor, foregroundColor;
 	boolean addSeparator;
 	ListCellRenderer userRenderer;
 
@@ -101,13 +102,12 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			//By default, is is render the text of the CustomChoice (or choice)
 			// and, if there is also an icon, it is displayed afterwards,
 			// centered
-			boolean setColor=false;
 			if (value instanceof CustomChoice){
 				CustomChoice cc = (CustomChoice) value;
 				icon = cc.getIcon();
-				if (icon==null || cc.renderText(userRenderer!=this)){
+				if (icon==null || cc.renderText()){
 					value = cc.toString();
-					setColor = true;
+					foregroundColor=disabledColor;
 				} else {
 					value = null;
 				}
@@ -123,9 +123,6 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			}
 			super.getListCellRendererComponent(list, value, index, 
 					isSelected, cellHasFocus);
-			if (setColor){
-				setForeground(disabledColor);
-			}
 			return this;
 		}
 		
@@ -191,7 +188,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			boolean focused) {
 		setupRenderer(referenceList, value, -1, focused, false);
 		width = finalWidth;
-		selected = false;
+		selected = focused;
 		xDeltaBase = 0;
 		return this;
 	}
@@ -199,18 +196,25 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private void setupRenderer(JList list, Object value, int index, 
 			boolean isSelected, boolean cellHasFocus) {
 		addSeparator = false;
-		try {
-			inner = userRenderer.getListCellRendererComponent(list, value, 
-					index, isSelected, cellHasFocus);
-		} catch (Exception ex) {
-			inner = null;
+		foregroundColor = getForegroundColor(isSelected);
+		inner=null;
+		ListCellRenderer renderer = userRenderer;	
+		if (value instanceof CustomChoice){
+			CustomChoice cc = (CustomChoice) value;
+			renderer = cc.getRenderer();
+		} 
+		if (renderer!=null){
+			try {
+				inner = renderer.getListCellRendererComponent(list, value, 
+						index, isSelected, cellHasFocus);
+			} catch (Exception ex) {
+				inner = null;
+			}
 		}
 		if (inner == null) {
 			inner = defaultRenderer.getListCellRendererComponent(list, value, 
 					index, isSelected, cellHasFocus);
 		} 
-		inner.setFont(list.getFont());
-		inner.setEnabled(isEnabled());
 		arrowColor = list.getSelectionBackground();
 	}
 
@@ -233,7 +237,21 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 					                          old);
 		} 
 		g.translate(xDelta, -yDelta);
-		painter.paintComponent(g, inner, this, 0, 0, width-xDeltaBase, height);
+		{
+			Font resetFont = inner.getFont();
+			Color resetBackground = inner.getBackground();
+			Color resetForeground = inner.getForeground();
+			boolean resetEnabled = inner.isEnabled();
+			inner.setFont(getFont());
+			inner.setEnabled(isEnabled());
+			inner.setBackground(getBackgroundColor(selected));
+			inner.setForeground(foregroundColor);
+			painter.paintComponent(g, inner, this, 0, 0, width-xDeltaBase, height);
+			inner.setFont(resetFont);
+			inner.setEnabled(resetEnabled);
+			inner.setForeground(resetForeground);
+			inner.setBackground(resetBackground);
+		}
 		if (addSeparator){
 			g.translate(-xDelta, 0);
 			g.setColor(disabledColor);
@@ -250,5 +268,13 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	public boolean isShowing() {
 		return true;
 	}
+	
+	Color getForegroundColor(boolean selected){
+		return selected? referenceList.getSelectionForeground() : referenceList.getForeground();
+	}
+	
+	private Color getBackgroundColor(boolean selected){
+		return selected? referenceList.getSelectionBackground() : referenceList.getBackground();
+	}	
 
 }
