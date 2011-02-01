@@ -77,7 +77,8 @@ import net.coderazzi.filters.gui.TableFilterHeader.Position;
 @SuppressWarnings("serial")
 public class TableFilterExample extends JFrame {
 
-    private static final String MAX_HISTORY_LENGTH = "max history length";
+    private static final String RECOVER_COLUMN = "Recover column ";
+	private static final String MAX_HISTORY_LENGTH = "max history length";
 	private static final String IGNORE_CASE = "ignore case";
 	private static final String ENABLED = "enabled";
     private static final String EDITABLE = "editable";
@@ -616,14 +617,36 @@ public class TableFilterExample extends JFrame {
     	
     	menu.add(createAppearanceMenu(editor));
     	menu.add(history);
+    	menu.addSeparator();
 
     	menu.add(new JMenuItem(new AbstractAction("Remove this column"){
     		@Override
     		public void actionPerformed(ActionEvent e) {
     			TableColumnModel model = table.getColumnModel();
-    			model.removeColumn(model.getColumn(model.getColumnIndex(name)));
+    			TableColumn tc = model.getColumn(model.getColumnIndex(name));
+    			model.removeColumn(tc);
+	    		createFilterColumnRecovery(tc);
     		}
     	}));
+    }
+    
+    void createFilterColumnRecovery(final TableColumn tc){
+    	final String title = RECOVER_COLUMN+(String) tc.getHeaderValue();
+    	JMenuItem item=new JMenuItem(new AbstractAction(title){
+    		@Override
+    		public void actionPerformed(ActionEvent e) {
+    			table.getColumnModel().addColumn(tc);
+    			getMenu(filtersMenu, title, true);
+    			if (TestTableModel.AGE.equals(tc.getHeaderValue())){
+    				customizeAgeColumn();
+    			} else if (TestTableModel.COUNTRY.equals(tc.getHeaderValue())){
+    				customizeCountryColumn();
+    			} else if(TestTableModel.DATE.equals(tc.getHeaderValue())){
+    				customizeDateColumn();
+    			}     			
+    		}
+    	});
+    	filtersMenu.add(item);
     }
     
     void updateFiltersInfo() {
@@ -655,7 +678,6 @@ public class TableFilterExample extends JFrame {
     		if (item!=null && item.getText().equals(name)){
     			if (remove){
     				menu.remove(pos);
-    				item=null;
     			}
     			return item;
     		}
@@ -746,50 +768,59 @@ public class TableFilterExample extends JFrame {
         }    	    	
     }
     
+    void customizeCountryColumn() {
+        int countryColumn = tableModel.getColumn(TestTableModel.COUNTRY);
+
+        if (tableModel.getColumnCount() > countryColumn) {
+            table.getColumnModel().getColumn(
+            		table.convertColumnIndexToView(countryColumn)).
+            		setCellRenderer(new FlagRenderer());
+        	setCountryEditorRenderer();
+	        setCountryComparator(countrySpecialSorter.isSelected());
+        }
+    }
+	
+    void customizeAgeColumn() {
+        int agesColumn = tableModel.getColumn(TestTableModel.AGE);
+
+        if (tableModel.getColumnCount() > agesColumn) {
+            table.getColumnModel().getColumn(
+            		table.convertColumnIndexToView(agesColumn)).
+            		setCellRenderer(new CenteredRenderer());
+            filterHeader.getFilterEditor(agesColumn).setCustomChoices(AgeCustomChoice.getCustomChoices());
+        }
+	}
+    	
+    void customizeDateColumn() {
+        int datesColumn = tableModel.getColumn(TestTableModel.DATE);
+
+        if (tableModel.getColumnCount() > datesColumn) {
+            table.getColumnModel().getColumn(
+            		table.convertColumnIndexToView(datesColumn)).
+            		setCellRenderer(new DefaultTableCellRenderer(){
+
+            			private static final long serialVersionUID = 
+            				8042527267257156699L;
+            			Format parser = filterHeader.getParserModel().getFormat(Date.class);
+
+            			@Override public Component getTableCellRendererComponent(
+            					JTable table, Object value, boolean isSelected, 
+            					boolean hasFocus, int row, int column) {
+            				if (value instanceof Date){
+            					value = parser.format(value);
+            				}
+            				return super.getTableCellRendererComponent(table, 
+            						value, isSelected, hasFocus, row, column);
+            			}			
+            		});
+        }        
+    }
+
     void customizeTable() {
     	if (filterHeader.getTable()!=null){
-	        int countryColumn = tableModel.getColumn(TestTableModel.COUNTRY);
-	
-	        if (tableModel.getColumnCount() > countryColumn) {
-	            table.getColumnModel().getColumn(
-	            		table.convertColumnIndexToView(countryColumn)).
-	            		setCellRenderer(new FlagRenderer());
-	
-	        	setCountryEditorRenderer();
-	        }
-	
-	        int agesColumn = tableModel.getColumn(TestTableModel.AGE);
-	
-	        if (tableModel.getColumnCount() > agesColumn) {
-	            table.getColumnModel().getColumn(
-	            		table.convertColumnIndexToView(agesColumn)).
-	            		setCellRenderer(new CenteredRenderer());
-	            filterHeader.getFilterEditor(agesColumn).setCustomChoices(AgeCustomChoice.getCustomChoices());
-	        }
-	
-	        int datesColumn = tableModel.getColumn(TestTableModel.DATE);
-	
-	        if (tableModel.getColumnCount() > datesColumn) {
-	            table.getColumnModel().getColumn(
-	            		table.convertColumnIndexToView(datesColumn)).
-	            		setCellRenderer(new DefaultTableCellRenderer(){
-	
-	            			private static final long serialVersionUID = 
-	            				8042527267257156699L;
-	            			Format parser = filterHeader.getParserModel().getFormat(Date.class);
-	
-	            			@Override public Component getTableCellRendererComponent(
-	            					JTable table, Object value, boolean isSelected, 
-	            					boolean hasFocus, int row, int column) {
-	            				if (value instanceof Date){
-	            					value = parser.format(value);
-	            				}
-	            				return super.getTableCellRendererComponent(table, 
-	            						value, isSelected, hasFocus, row, column);
-	            			}			
-	            		});
-	        }        
-	        setCountryComparator(countrySpecialSorter.isSelected());
+    		customizeCountryColumn();
+    		customizeAgeColumn();	
+    		customizeDateColumn();
     	}
     }
 
