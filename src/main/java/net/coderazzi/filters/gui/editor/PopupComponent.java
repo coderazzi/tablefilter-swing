@@ -720,12 +720,13 @@ abstract class PopupComponent implements PopupMenuListener{
 				Comparator strComparator, String strStart, boolean fullMatch) 
 		{
 			Match ret = new Match(-1);
-			while (--len>0){
-				int matchLen = getMatchingLength(strStart, content.get(len).toString(), strComparator);
-				if (matchLen>ret.len){
+			while (len-->0){
+				String use=content.get(len).toString();
+				int matchLen = getMatchingLength(strStart, use, strComparator);
+				if (matchLen>ret.len || ret.len==0){
 					ret.index=len;
 					ret.len=matchLen;
-					if (matchLen==strStart.length()){
+					if (use.length()==strStart.length()){
 						ret.exact=true;
 						return ret;
 					}
