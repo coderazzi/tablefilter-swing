@@ -210,6 +210,10 @@ abstract class PopupComponent implements PopupMenuListener{
 		}
 	}
 	
+	/**  
+	 * Returns the string comparator<br> 
+	 * it will be invalid (null or not string comparator) for rendered content
+	 */
 	public Comparator<String> getStringComparator(){
 		return historyModel.getStringComparator();
 	}

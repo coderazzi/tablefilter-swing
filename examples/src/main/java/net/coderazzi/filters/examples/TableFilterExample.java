@@ -731,8 +731,7 @@ public class TableFilterExample extends JFrame {
         int countryColumn = tableModel.getColumn(TestTableModel.COUNTRY);
         boolean set = useFlagRenderer.isSelected();
         if (tableModel!=null && tableModel.getColumnCount() > countryColumn) {
-        	filterHeader.getFilterEditor(countryColumn).setListCellRenderer(
-        			set? new FlagRenderer() : null);
+        	filterHeader.getFilterEditor(countryColumn).setAutoListCellRenderer(set);
         	filterHeader.getFilterEditor(countryColumn).setEditable(false);
         }
     }

@@ -578,6 +578,7 @@ interface EditorComponent {
                 } else {
                     proposal = getProposalOnEdition(newContent, false);
                     if (proposal!=null){
+                    	//on text content, the string comparator cannot be null
                     	if (proposal.length()<newContentBegin.length() || 
                     			(0!=popup.getStringComparator().compare(newContentBegin, 
                     					proposal.substring(0, newContentBegin.length())))){
@@ -615,6 +616,7 @@ interface EditorComponent {
             if (newContent.length() == 0) {
                 super.replace(fb, 0, buffer.length(), "", null);
             } else {
+            	//on text content, this comparator cannot be null
 	            Comparator<String> comparator = popup.getStringComparator();
 	            String proposal = getProposalOnEdition(newContent, true);
 	            if (proposal==null || comparator.compare(newContent, proposal)!=0){

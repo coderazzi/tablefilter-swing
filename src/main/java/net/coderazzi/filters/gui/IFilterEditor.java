@@ -112,18 +112,25 @@ public interface IFilterEditor {
 	 */
 	public abstract void setListCellRenderer(ListCellRenderer renderer);
 
+    /** Returns the associated {@link ListCellRenderer} */
+	public abstract ListCellRenderer getListCellRenderer();
+
 	/**
-	 * <p>Sets as renderer for the editor a generic {@link TableCellRenderer}, 
-	 * as used by the {@link JTable}</p>
+	 * <p>Sets as renderer for the editor the generic {@link TableCellRenderer}, 
+	 * used by the {@link JTable}, updating it as the renderer in the
+	 * table is updated</p>
 	 *
 	 * <p>This method allows reusing a renderer already written for a table 
 	 * as the editor's renderer, but it has an important restriction: it only 
 	 * works if the renderer does not depend on the cell coordinates</p>
 	 */
-	public abstract void setListCellRenderer(final TableCellRenderer renderer);
+	public abstract void setAutoListCellRenderer(boolean set);
 
-	/** Returns the associated {@link ListCellRenderer} */
-	public abstract ListCellRenderer getListCellRenderer();
+	/**
+	 * Returns the auto list cell renderer flag
+	 * @see #setAutoListCellRenderer(boolean)
+	 */
+    public abstract boolean isAutoListCellRenderer();
 
 	/** 
 	 * Sets the maximum number of visible rows in the popup menu<br>

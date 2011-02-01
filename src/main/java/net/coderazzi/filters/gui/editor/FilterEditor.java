@@ -51,6 +51,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.CellRendererPane;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
@@ -95,6 +96,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	private boolean ignoreCase;
 	private int modelIndex;
 	private Class modelClass;
+	private boolean autoRenderer;
 	
 	FiltersHandler filtersHandler;
 	FilterArrowButton downButton = new FilterArrowButton();
@@ -292,36 +294,24 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 
 	/** IFilterEditor method */
-    @Override public void setListCellRenderer(final TableCellRenderer renderer) {
-    	setListCellRenderer(renderer==null? null :
-    			new DefaultListCellRenderer() {
-
-    		private static final long serialVersionUID = -5990815893475331934L;
-    		private JTable table = filtersHandler.getTable();
-    		private int position = getModelIndex();
-
-			@Override public Component getListCellRendererComponent(JList list, 
-					Object value, int index, boolean isSelected, 
-					boolean cellHasFocus) {
-				Component ret =  renderer.getTableCellRendererComponent(table, 
-						value, isSelected, cellHasFocus, 1, position);
-				if (isSelected){
-					ret.setBackground(list.getSelectionBackground());
-					ret.setForeground(list.getSelectionForeground());
-				}else {
-					ret.setBackground(list.getBackground());
-					ret.setForeground(list.getForeground());
-				}
-				return ret;
-            }
-        });
-    }
-
-	/** IFilterEditor method */
 	@Override public ListCellRenderer getListCellRenderer(){
 		return popup.getListCellRenderer();
 	}
 
+	/** IFilterEditor method */
+    @Override public void setAutoListCellRenderer(boolean set) {
+    	autoRenderer=set;    	
+    	setTableCellRenderer(set? 
+    			filtersHandler.getTable().getColumnModel().
+    				getColumn(modelIndex).getCellRenderer() 
+    			: null);
+    }
+    
+	/** IFilterEditor method */
+    @Override public boolean isAutoListCellRenderer(){
+    	return autoRenderer;
+    }    
+    
 	/** IFilterEditor method */
 	@Override public void setMaxVisibleRows(int maxVisibleRows) {
 		popup.setMaxVisibleRows(maxVisibleRows);
@@ -461,6 +451,42 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		}
 	}
 	
+	/** Method invoked by the TableFilterHeader to update the renderer*/
+    public void setTableCellRenderer(final TableCellRenderer renderer){
+    	setListCellRenderer(renderer==null? null :
+    			new DefaultListCellRenderer() {
+
+    		private static final long serialVersionUID = -5990815893475331934L;
+    		private CellRendererPane painter = new CellRendererPane();
+    		private Component delegate; 
+
+			@Override public Component getListCellRendererComponent(JList list, 
+					Object value, int index, boolean isSelected, 
+					boolean cellHasFocus) {
+				delegate = renderer.getTableCellRendererComponent(filtersHandler.getTable(), 
+						value, false, cellHasFocus, 1, getModelIndex());
+				if (isSelected){
+					setBackground(list.getSelectionBackground());
+					setForeground(list.getSelectionForeground());
+				}else {
+					setBackground(list.getBackground());
+					setForeground(list.getForeground());
+				}
+				return this;
+            }
+			
+			@Override public void paint(Graphics g) {				
+				Color background = delegate.getBackground();
+				Color foreground = delegate.getForeground();
+				delegate.setBackground(getBackground());
+				delegate.setForeground(getForeground());
+				painter.paintComponent(g, delegate, this, 0, 0, getWidth(), getHeight());
+				delegate.setBackground(background);
+				delegate.setForeground(foreground);
+			}
+        });
+    }
+
 	/** Method invoked by the FiltersHandler to set the choices */
 	public void setChoices(Collection<?> choices){
 		popup.clear();

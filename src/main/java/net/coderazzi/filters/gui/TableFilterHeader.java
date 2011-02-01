@@ -1114,12 +1114,19 @@ public class TableFilterHeader extends JPanel {
             /** Listening for changes on the width of the table' column */
             @Override
 			public void propertyChange(PropertyChangeEvent evt) {
-                int newW = tc.getWidth();
-
-                if (w != newW) {
-                    w = newW;
-                    placeComponents();
-                }
+            	if ("cellRenderer".equals(evt.getPropertyName())){
+            		if (editor.isAutoListCellRenderer()){
+            			editor.setTableCellRenderer(tc.getCellRenderer());
+            		}
+            	} else {
+            		//just listen for any property
+	                int newW = tc.getWidth();
+	
+	                if (w != newW) {
+	                    w = newW;
+	                    placeComponents();
+	                }
+            	}
             }
         }
     }
