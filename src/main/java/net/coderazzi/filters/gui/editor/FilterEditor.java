@@ -261,7 +261,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	//the comparator is only used for rendered content, and also 
     	//included on the table sorter
     	if (comparator!=this.comparator && comparator!=null){
-    		parserUpdated();
+    		parserUpdated(editor);
     		this.comparator=comparator;
         	JTable table = filtersHandler.getTable();
         	if (table!=null && (table.getRowSorter() instanceof DefaultRowSorter)){
@@ -284,13 +284,17 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     
 	/** IFilterEditor method */
 	@Override public void setListCellRenderer(ListCellRenderer renderer){
-		popup.setRenderedContent(renderer, comparator);
+		if (renderer==null){
+			popup.setStringContent(format, getStringComparator());
+		} else {
+			popup.setRenderedContent(renderer, comparator);
+		}
 		setupEditorComponent(renderer);
-		editor.getComponent().setBackground(getBackground());
-		editor.setForeground(getForeground());
-		editor.getComponent().setFont(getFont());
+//		editor.getComponent().setBackground(getBackground());
+//		editor.setForeground(getForeground());
+//		editor.getComponent().setFont(getFont());
 		filter.checkChanges(true);
-		requestChoices();
+		requestChoices();			
 	}
 
 	/** IFilterEditor method */
@@ -500,7 +504,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
 	/** Method invoked by the FiltersHandler to extend the choices */
 	public void addChoices(Collection<?> choices) {
-		System.out.println("Editor "+getModelIndex()+": add "+choices.size()+" on "+getChoices().size());
+		//System.out.println("Editor "+getModelIndex()+": add "+choices.size()+" on "+getChoices().size());
 		if (popup.addChoices(choices)){
 			downButton.setCanPopup(popup.hasContent());
 		}
@@ -516,13 +520,13 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     private void formatUpdated(){
 		if (getListCellRenderer()==null){
 			popup.setStringContent(format, getStringComparator());
-    		parserUpdated();
+    		parserUpdated(editor);
 			filter.checkChanges(false);
 			requestChoices();
 		}    	
     }
     
-    private void parserUpdated(){
+    private void parserUpdated(EditorComponent editor){
     	editor.setParser(getParserModel().createParser(this));    	
     }
     
@@ -539,6 +543,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		if (renderer==null){
 			if (!(editor instanceof EditorComponent.Text)){
 				newComponent = new EditorComponent.Text(this, popup);
+	    		parserUpdated(newComponent);
 			}
 		} else if (!(editor instanceof EditorComponent.Rendered)){
 			newComponent = popup.createRenderedEditorComponent(this);
@@ -555,20 +560,22 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		}
 		if (newComponent!=null){
 			if (editor!=null){
-				remove(editor.getComponent());
 				newComponent.getComponent().setBackground(editor.getComponent().getBackground());
-				newComponent.setForeground(editor.getForeground());
-				newComponent.setErrorForeground(editor.getErrorForeground());
 				newComponent.getComponent().setFont(editor.getComponent().getFont());
-				newComponent.setErrorForeground(editor.getErrorForeground());
-				newComponent.setDisabledForeground(editor.getDisabledForeground());
+				newComponent.setForeground(editor.getForeground());
+				newComponent.setErrorForeground(getErrorForeground());
+				newComponent.setDisabledForeground(getDisabledForeground());
+				newComponent.setSelectionBackground(getSelectionBackground());
+				newComponent.setSelectionForeground(getSelectionForeground());
+				newComponent.setTextSelectionColor(getTextSelectionColor());
+				remove(editor.getComponent());
 			}
 			editor = newComponent;
 			setupComponent(editor.getComponent());
 			add(editor.getComponent(), BorderLayout.CENTER);
+			setEditorEnabled(filter.isEnabled());
 			revalidate();
 		}		
-		setEditorEnabled(filter.isEnabled());
 	}
 	
 	private void setupComponent(JComponent component){
