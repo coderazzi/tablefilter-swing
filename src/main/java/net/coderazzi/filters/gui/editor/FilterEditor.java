@@ -290,9 +290,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 			popup.setRenderedContent(renderer, comparator);
 		}
 		setupEditorComponent(renderer);
-//		editor.getComponent().setBackground(getBackground());
-//		editor.setForeground(getForeground());
-//		editor.getComponent().setFont(getFont());
 		filter.checkChanges(true);
 		requestChoices();			
 	}
