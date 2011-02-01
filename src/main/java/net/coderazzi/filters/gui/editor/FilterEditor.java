@@ -301,11 +301,14 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
 	/** IFilterEditor method */
     @Override public void setAutoListCellRenderer(boolean set) {
-    	autoRenderer=set;    	
-    	setTableCellRenderer(set? 
-    			filtersHandler.getTable().getColumnModel().
-    				getColumn(modelIndex).getCellRenderer() 
-    			: null);
+    	autoRenderer=set;    
+    	TableCellRenderer tcr = null;
+    	if (set){
+    		JTable table = filtersHandler.getTable();
+            tcr = table.getColumnModel().getColumn(
+            		table.convertColumnIndexToView(modelIndex)).getCellRenderer();
+    	}
+    	setTableCellRenderer(tcr);
     }
     
 	/** IFilterEditor method */

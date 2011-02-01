@@ -205,6 +205,13 @@ public class TableFilterExample extends JFrame {
 
     }
     
+    void reinitFiltersMenu(){
+    	int pos=filtersMenu.getItemCount();
+    	while(pos-->2){
+    		filtersMenu.remove(filtersMenu.getItem(pos));
+    	}
+    }
+    
     private JMenu createTableMenu(){
     	JCheckBoxMenuItem autoResize = 
     		new JCheckBoxMenuItem(new AbstractAction("Auto resize") {
@@ -251,6 +258,7 @@ public class TableFilterExample extends JFrame {
 		tableMenu.addSeparator();
 		tableMenu.add(new JMenuItem(new AbstractAction("Change model width") {			
 			@Override public void actionPerformed(ActionEvent e) {
+            	reinitFiltersMenu();
 				tableModel.changeModel(table);
                 customizeTable();
                 removeElement.setEnabled(true);
@@ -259,6 +267,7 @@ public class TableFilterExample extends JFrame {
 		tableMenu.add(new JMenuItem(new AbstractAction("Use new model") {			
 			@Override public void actionPerformed(ActionEvent e) {
             	tableModel = TestTableModel.createTestTableModel();
+            	reinitFiltersMenu();
                 table.setModel(tableModel);
                 customizeTable();
                 removeElement.setEnabled(true);
@@ -749,31 +758,35 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
+    private int getColumnView(String column){
+        return table.convertColumnIndexToView(tableModel.getColumn(column));
+    	
+    }
+    
     void setCountryEditorRenderer(){
-        int countryColumn = tableModel.getColumn(TestTableModel.COUNTRY);
-        boolean set = useFlagRenderer.isSelected();
-        if (tableModel!=null && tableModel.getColumnCount() > countryColumn) {
+    	if (tableModel!=null && getColumnView(TestTableModel.COUNTRY)!=-1){
+	        int countryColumn = tableModel.getColumn(TestTableModel.COUNTRY);
+	        boolean set = useFlagRenderer.isSelected();
         	IFilterEditor editor = filterHeader.getFilterEditor(countryColumn);
         	editor.setAutoListCellRenderer(set);
         	editor.setEditable(false);
         	updateFilter(editor, tableModel.getColumnName(countryColumn));
-        }
+    	}
     }
     
     void setCountryComparator(boolean set){
-        int column = tableModel.getColumn(TestTableModel.COUNTRY);
-        if (tableModel!=null && tableModel.getColumnCount() > column) {
+    	if (tableModel!=null && getColumnView(TestTableModel.COUNTRY)!=-1){
+	        int column = tableModel.getColumn(TestTableModel.COUNTRY);
         	Comparator<TestData.Flag> comp = set? new TestData.RedComparator() : null;
         	filterHeader.getFilterEditor(column).setComparator(comp);
-        }    	    	
+    	}
     }
     
     void customizeCountryColumn() {
-        int countryColumn = tableModel.getColumn(TestTableModel.COUNTRY);
+        int countryColumn = getColumnView(TestTableModel.COUNTRY);
 
-        if (tableModel.getColumnCount() > countryColumn) {
-            table.getColumnModel().getColumn(
-            		table.convertColumnIndexToView(countryColumn)).
+        if (countryColumn!=-1) {
+            table.getColumnModel().getColumn(countryColumn).
             		setCellRenderer(new FlagRenderer());
         	setCountryEditorRenderer();
 	        setCountryComparator(countrySpecialSorter.isSelected());
@@ -782,21 +795,20 @@ public class TableFilterExample extends JFrame {
 	
     void customizeAgeColumn() {
         int agesColumn = tableModel.getColumn(TestTableModel.AGE);
+        int agesColumnView = getColumnView(TestTableModel.AGE);
 
-        if (tableModel.getColumnCount() > agesColumn) {
-            table.getColumnModel().getColumn(
-            		table.convertColumnIndexToView(agesColumn)).
+        if (agesColumnView!=-1) {
+            table.getColumnModel().getColumn(agesColumnView).
             		setCellRenderer(new CenteredRenderer());
             filterHeader.getFilterEditor(agesColumn).setCustomChoices(AgeCustomChoice.getCustomChoices());
         }
 	}
     	
     void customizeDateColumn() {
-        int datesColumn = tableModel.getColumn(TestTableModel.DATE);
+        int datesColumnView = getColumnView(TestTableModel.DATE);
 
-        if (tableModel.getColumnCount() > datesColumn) {
-            table.getColumnModel().getColumn(
-            		table.convertColumnIndexToView(datesColumn)).
+        if (datesColumnView!=-1) {
+            table.getColumnModel().getColumn(datesColumnView).
             		setCellRenderer(new DefaultTableCellRenderer(){
 
             			private static final long serialVersionUID = 
