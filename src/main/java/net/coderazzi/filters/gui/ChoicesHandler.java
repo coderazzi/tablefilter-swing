@@ -10,7 +10,7 @@ import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
 /** 
- * Interface implemented by the classes that handle the options on each
+ * Interface implemented by the classes that handle the choices on each
  * {@link FilterEditor}
  */
 abstract class ChoicesHandler implements TableModelListener {		

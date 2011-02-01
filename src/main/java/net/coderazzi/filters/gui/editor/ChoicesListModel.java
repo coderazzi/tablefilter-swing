@@ -40,12 +40,12 @@ import net.coderazzi.filters.gui.CustomChoice;
 
 
 /**
- * List model to handle the options in the popup menu.<br>
- * When the user specifies a {@link ListCellRenderer}, options are 
+ * List model to handle the choices in the popup menu.<br>
+ * When the user specifies a {@link ListCellRenderer}, choices are 
  * considered non-text; otherwise, content is converted, if needed, 
  * to Strings, and sorted.<br>
  * This class includes functionality to find the best match for a given
- * string, returning the option that more closely matches the input. This
+ * string, returning the choice that more closely matches the input. This
  * functionality works only for text input (i.e., no {@link ListCellRenderer}
  * specified)<br>
  * The model handles also specifically {@link CustomChoice} instances, 
@@ -102,8 +102,8 @@ public class ChoicesListModel extends AbstractListModel {
 		return ret;
 	}
 
-	/** Returns true if the object is a valid option (as object, or string) */
-	public boolean isValidOption(Object o){
+	/** Returns true if the object is a valid choice (as object, or string) */
+	public boolean isValidChoice(Object o){
 		return content.contains(o);
 	}
 	
@@ -127,8 +127,8 @@ public class ChoicesListModel extends AbstractListModel {
 		return content.isEmpty();
 	}
 
-	/** Returns the current options */
-	public Collection<?> getOptions(){
+	/** Returns the current choices */
+	public Collection<?> getChoices(){
 		return content;
 	}
 
@@ -144,8 +144,8 @@ public class ChoicesListModel extends AbstractListModel {
 	}
 
 	/** 
-	 * Adds additional options.<br>
-	 * If the content is text-based, the options are converted into Strings, 
+	 * Adds additional choices.<br>
+	 * If the content is text-based, the choices are converted into Strings, 
 	 * and sorted.<br>
 	 * Otherwise, no sorting is performed, although duplicates are still
 	 * discarded

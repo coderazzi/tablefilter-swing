@@ -34,7 +34,7 @@ public interface IFilterEditor {
 
 	/**
 	 * Resets the filter, which implies set its content to empty and reset
-	 * its history options
+	 * its history choices
 	 */
 	public abstract void resetFilter();
 
@@ -45,27 +45,27 @@ public interface IFilterEditor {
 	public abstract Object getContent();
 
 	/**
-	 * Using autoOptions, the options displayed on the popup menu are 
+	 * Using autoChoices, the choices displayed on the popup menu are 
 	 * automatically extracted from the associated {@link TableModel}.<br>
 	 * For editors associated to boolean or short enumerations, setting the
-	 * AutoOptions automatically changes the editable flag: it is set to true
+	 * AutoChoices automatically changes the editable flag: it is set to true
 	 * for DISABLED values, false otherwise.
 	 */
-	public abstract void setAutoOptions(AutoChoices mode);
+	public abstract void setAutoChoices(AutoChoices mode);
 
-	/** Returns the autoOptions mode*/
-	public abstract AutoChoices getAutoOptions();
+	/** Returns the autoChoices mode*/
+	public abstract AutoChoices getAutoChoices();
 
-	/** Sets the available options, shown on the popup menu */
-	public abstract void setCustomChoices(Set<CustomChoice> options);
+	/** Sets the available choices, shown on the popup menu */
+	public abstract void setCustomChoices(Set<CustomChoice> choices);
 
-	/** Returns the current options */
+	/** Returns the current choices */
 	public abstract Set<CustomChoice> getCustomChoices();
 
 	/**
 	 * Defines the editor, if text based -i.e., without associated 
 	 * {@link ListCellRenderer}, as editable: this flag means that the user 
-	 * can enter any text, not being limited to the existing options
+	 * can enter any text, not being limited to the existing choices
 	 */
 	public abstract void setEditable(boolean enable);
 
@@ -105,7 +105,7 @@ public interface IFilterEditor {
 	public abstract Comparator getComparator();
 
 	/**
-	 * Sets the {@link ListCellRenderer} for the options / history.<p>
+	 * Sets the {@link ListCellRenderer} for the choices / history.<p>
 	 * It also affectes to how the content is rendered<br>
 	 * If not null, the content cannot be text-edited anymore
 	 * @param renderer
@@ -136,7 +136,7 @@ public interface IFilterEditor {
 
 	/**
 	 * Limits the history size. <br>
-	 * This limit is only used when the popup contains also options. Otherwise, 
+	 * This limit is only used when the popup contains also choices. Otherwise, 
 	 * the maximum history size is to the maximum number of visible rows<br>
 	 */
 	public abstract void setMaxHistory(int size);
@@ -145,7 +145,7 @@ public interface IFilterEditor {
 	 * Returns the maximum history size, as defined by the user.<br>
 	 * This is not the real maximum history size, as it depends on the max 
 	 * number of visible rows and whether the popup contains only history
-	 * or also options 
+	 * or also choices 
 	 */
 	public abstract int getMaxHistory();
 

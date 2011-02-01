@@ -441,7 +441,7 @@ interface EditorComponent {
             } else if (content instanceof String){
             	text = (String) content;
             	if (escapeIt && isEditable()){
-            		//if no editable, the options is directly handled, no need
+            		//if no editable, the choices are directly handled, no need
             		//to escape it. When the text is parsed, on no editable
             		//columns, it will be then escaped.
             		text = textParser.escape(text);

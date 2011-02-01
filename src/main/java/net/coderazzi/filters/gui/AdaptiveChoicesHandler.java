@@ -20,7 +20,7 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
 
 class AdaptiveChoicesHandler extends ChoicesHandler{
 	
-    private AdaptiveOptionsSupport adaptiveSupport;
+    private AdaptiveChoicesSupport adaptiveSupport;
     private boolean interrupted=true;
     
     public AdaptiveChoicesHandler(FiltersHandler handler) {
@@ -30,17 +30,17 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
     @Override public boolean setInterrupted(boolean interrupted){
     	//while interrupted, remove the adaptive support, and create it
     	//only when the interruption finishes. There is no sense trying to
-    	//'pause' the AdaptiveOptionsSupport, as the interruption can be
+    	//'pause' the AdaptiveChoicesSupport, as the interruption can be
     	//related to new editors or filters
     	boolean ret=false;
     	if (this.interrupted!=interrupted){
 	    	this.interrupted=interrupted;
 	    	if (interrupted){
-	        	ret = removeAdaptiveOptionsSupport();
+	        	ret = removeAdaptiveChoicesSupport();
 	    	} else {
 	    		ret=handler.getTable()!=null && handler.isEnabled();
 	        	if (ret){
-	        		createAdaptiveOptionsSupport();
+	        		createAdaptiveChoicesSupport();
 	        	}
 	    	}
     	}
@@ -59,9 +59,9 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
     
     @Override public void filterOperation(boolean start) {
     	if (start){
-    		removeAdaptiveOptionsSupport();
+    		removeAdaptiveChoicesSupport();
     	} else if (!interrupted){
-    		createAdaptiveOptionsSupport();
+    		createAdaptiveChoicesSupport();
     		handler.updateTableFilter();
     	}
     }
@@ -69,16 +69,16 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
     @Override public void filterEnabled(IFilter filter){
 		if (adaptiveSupport==null){
 			if (!interrupted){
-				createAdaptiveOptionsSupport();
+				createAdaptiveChoicesSupport();
 				handler.updateTableFilter();
 			}
 		} else { 
-			adaptiveSupport.initOptions(filter);
+			adaptiveSupport.initChoices(filter);
 		}
     }
     
     @Override public void allFiltersDisabled(){
-    	if (removeAdaptiveOptionsSupport()){
+    	if (removeAdaptiveChoicesSupport()){
     		handler.updateTableFilter();
     	}
     }
@@ -95,7 +95,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
 		}
 	}	
 	
-	private boolean removeAdaptiveOptionsSupport(){
+	private boolean removeAdaptiveChoicesSupport(){
 		if (adaptiveSupport==null){
 			return false;
 		}
@@ -104,20 +104,20 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
 		return true;
 	}
 	
-	private void createAdaptiveOptionsSupport(){
+	private void createAdaptiveChoicesSupport(){
 		Collection<FilterEditor> eds = handler.getEditors();
-    	adaptiveSupport = new AdaptiveOptionsSupport(handler.getTable().getModel(),
+    	adaptiveSupport = new AdaptiveChoicesSupport(handler.getTable().getModel(),
     				eds.toArray(new FilterEditor[eds.size()]),
     				handler.getFilters());
     	setEnableTableModelEvents(true);
 	}
 
     /**
-     * Helper class, only needed when the filter header has adaptive options support
+     * Helper class, only needed when the filter header has adaptive choices support
      * It holds, for each row and filter (editor or user defined), 
      * a bit defining whether it is filtered in or out<br>
      */
-    static class AdaptiveOptionsSupport extends RowFilter{
+    static class AdaptiveChoicesSupport extends RowFilter{
 
     	/** A RowInfo for each row on the table model */
         private ArrayList<RowInfo> rows;
@@ -144,7 +144,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
          * Only constructor; note: the parameter allFilters set is modified 
          * on the constructor.
          */
-    	public AdaptiveOptionsSupport(TableModel model, FilterEditor[] editors,
+    	public AdaptiveChoicesSupport(TableModel model, FilterEditor[] editors,
     			Set<IFilter> allFilters) {
     		// note that the allFilters set will be modified
     		int modelColumns = model.getColumnCount();
@@ -204,7 +204,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
                 added=added||rowAdded;
             }
             if (added){
-            	extractOptions(editorHandles.length, firstRow, lastRow);
+            	extractChoices(editorHandles.length, firstRow, lastRow);
             }
         }
 
@@ -236,7 +236,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
             	firstRow=0;
             	lastRow=-1;
             }
-            extractOptions(editorHandles.length, firstRow, lastRow);
+            extractChoices(editorHandles.length, firstRow, lastRow);
         }
 
         /** Handles a table model event after some rows are deleted*/
@@ -253,7 +253,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
         	}
         	sublist.clear();
         	if (changed){
-        		extractOptions(editorHandles.length, 0, -1);
+        		extractChoices(editorHandles.length, 0, -1);
         	}
         }
 
@@ -284,17 +284,17 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
             		switchHandle(getEditorHandle(filter.column), 0);
             		width=1;
                 }
-        		extractOptions(width, 0, -1);        	
+        		extractChoices(width, 0, -1);        	
             }
         }
         
-        /** Forces the initialization of the options of a editor filter */
-        public void initOptions(IFilter iFilter){
+        /** Forces the initialization of the choices of a editor filter */
+        public void initChoices(IFilter iFilter){
         	RowInfo.Filter filter = getFilter(iFilter);
            	if (filter.column < editorHandles.length){
             	//update only the associated editor, move it at the beginning
         		switchHandle(getEditorHandle(filter.column), 0);
-        		extractOptions(1, 0, -1);        	    	
+        		extractChoices(1, 0, -1);        	    	
             }
         }
         
@@ -317,12 +317,12 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
 
         /** 
          * Handles all the rows between firstRow and lastRow, updating the
-         * options of the first handles in the editorHandles instance' variable.<br>
+         * choices of the first handles in the editorHandles instance' variable.<br>
          * That is, the order of the variables in the editorHandlers variable is
          * modified, so that only the first handles are updated
          * @param lastRow can be -1 to represent the whole model
          **/
-        private void extractOptions(int handles, int firstRow, int lastRow) {
+        private void extractChoices(int handles, int firstRow, int lastRow) {
         	int rows=rowEntry.getModelRowCount()-1;
         	if (lastRow==-1){
         		lastRow=rows;
@@ -399,23 +399,23 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
 
         /**
          * Helper class to handle an editor. It is very associated to the
-         * algorithm used in {@link AdaptiveOptionsSupport#extractOptions(int, int, int)}
+         * algorithm used in {@link AdaptiveChoicesSupport#extractChoices(int, int, int)}
          */
         static class EditorHandle{
         	/** the model position of the associated editor */
         	int column;
         	/** The associated FilterEditor*/ 
         	private FilterEditor editor;
-        	/** The maximum number of options the editor can have (enums) */
-        	private int maxOptions;
-        	/** Temporal variable for maxOptions, inside an iteration */
-        	private int maxIterationOptions; //temporal variable for maxOptions
-        	/** The options defined for the editor, with the associated filter */
+        	/** The maximum number of choices the editor can have (enums) */
+        	private int maxChoices;
+        	/** Temporal variable for maxChoices, inside an iteration */
+        	private int maxIterationChoices; //temporal variable for maxChoices
+        	/** The choices defined for the editor, with the associated filter */
         	private Map<CustomChoice, RowFilter> customChoices;
         	/** On an iteration, the choices not yet added */
         	private Map<CustomChoice, RowFilter> missingChoices;
-        	/** The options that will be set on the editor */
-        	private Set options = new HashSet();
+        	/** The choices that will be set on the editor */
+        	private Set choices = new HashSet();
         	
         	public EditorHandle(FilterEditor editor, TableModel model){
         		this.editor=editor;
@@ -431,43 +431,43 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
         	}
         	/** Initializes the member's variables */ 
         	private void init(TableModel model){
-        		Set<CustomChoice> options = editor.getCustomChoices();
+        		Set<CustomChoice> choices = editor.getCustomChoices();
     	        Class<?> c = model.getColumnClass(column);
     	        if (c.equals(Boolean.class)){
-    	        	maxOptions=2;
+    	        	maxChoices=2;
     	        } else {
     		        Object o[]=c.getEnumConstants();
-    		        maxOptions = o==null? Integer.MAX_VALUE : o.length;
+    		        maxChoices = o==null? Integer.MAX_VALUE : o.length;
     	        }
-        		if (!options.isEmpty()){
+        		if (!choices.isEmpty()){
         			customChoices = new HashMap<CustomChoice, RowFilter>();
-        			for (CustomChoice cc : options){
+        			for (CustomChoice cc : choices){
         				customChoices.put(cc, cc.getFilter(editor));
         			}
-        			if (maxOptions!=Integer.MAX_VALUE){
-        				maxOptions+=customChoices.size();
+        			if (maxChoices!=Integer.MAX_VALUE){
+        				maxChoices+=customChoices.size();
         			}
         		}    		
         	}
         	
         	/** 
-        	 * Starts an iteration in {@link AdaptiveOptionsSupport#extractOptions(int, int, int)}
+        	 * Starts an iteration in {@link AdaptiveChoicesSupport#extractChoices(int, int, int)}
         	 * @param fullMode set to true if the outcome of the iteration is to set
-        	 *  options to the editor, or false if the outcome is to add options.
+        	 *  choices to the editor, or false if the outcome is to add choices.
         	 * @return true if the handle requires no further iteration steps
         	 */
         	public boolean startIteration(boolean fullMode){
         		if (!editor.isEnabled()){ //do nothing if not enabled
         			return true;
         		}
-        		options.clear();
+        		choices.clear();
         		if (fullMode){
     	    		missingChoices=customChoices==null? Collections.EMPTY_MAP : new HashMap<CustomChoice, RowFilter>(customChoices);    		
-    	    		maxIterationOptions=maxOptions;
+    	    		maxIterationChoices=maxChoices;
         		} else {
-            		maxIterationOptions=maxOptions - editor.getOptions().size();
+            		maxIterationChoices=maxChoices - editor.getChoices().size();
         		}
-        		return maxIterationOptions==0;
+        		return maxIterationChoices==0;
         	}
         	
         	/** 
@@ -481,24 +481,24 @@ class AdaptiveChoicesHandler extends ChoicesHandler{
         			while (it.hasNext()){
         				Map.Entry<CustomChoice, RowFilter> o = it.next();
         				if (o.getValue().include(entry)){
-        					options.add(o.getKey());
+        					choices.add(o.getKey());
         					it.remove();
         				}
         			}
         		}
-        		if (AutoChoices.DISABLED!=editor.getAutoOptions()){
-        			options.add(entry.getValue(column));
+        		if (AutoChoices.DISABLED!=editor.getAutoChoices()){
+        			choices.add(entry.getValue(column));
         		}
-        		return maxIterationOptions==options.size();
+        		return maxIterationChoices==choices.size();
         	}
         	
-        	/**  Final step on the iteration process, updating the editor' options */
+        	/**  Final step on the iteration process, updating the editor' choices */
         	public void iterationCompleted(boolean fullMode){
         		if (editor.isEnabled()){
     	    		if (fullMode){
-    	    			editor.setOptions(options);
+    	    			editor.setChoices(choices);
     	    		} else {
-    	    			editor.addOptions(options);
+    	    			editor.addChoices(choices);
     	    		}
         		}
         	}

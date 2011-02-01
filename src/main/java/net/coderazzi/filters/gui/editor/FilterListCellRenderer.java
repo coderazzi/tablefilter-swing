@@ -43,7 +43,7 @@ import javax.swing.ListModel;
 import net.coderazzi.filters.gui.CustomChoice;
 
 /**
- * Special renderer used on the history and options list, 
+ * Special renderer used on the history and choices list, 
  * and to render the content when is not text-based 
  * (the user has specified a {@link ListCellRenderer}<br>
  * 
@@ -105,7 +105,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			if (value instanceof CustomChoice){
 				CustomChoice cc = (CustomChoice) value;
 				icon = cc.getIcon();
-				if (icon==null || cc.renderTextInOptions(userRenderer!=this)){
+				if (icon==null || cc.renderText(userRenderer!=this)){
 					value = cc.toString();
 					setColor = true;
 				} else {

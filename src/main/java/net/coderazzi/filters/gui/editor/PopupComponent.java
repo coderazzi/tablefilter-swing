@@ -57,19 +57,19 @@ import net.coderazzi.filters.gui.IFilterEditor;
 
 /**
  * Internal editor component, responsible to handle the popup menu,
- * which contains the history and the options list.
+ * which contains the history and the choices list.
  */
 abstract class PopupComponent implements PopupMenuListener{
 
-	/** Minimum number of visible options -if there are options- */
-	private static final int MIN_VISIBLE_OPTIONS = 4; 
+	/** Minimum number of visible choices -if there are choices- */
+	private static final int MIN_VISIBLE_CHOICES = 4; 
 	private JPopupMenu popup;
 	private FilterListCellRenderer listRenderer;
-	private JScrollPane optionsScrollPane;
+	private JScrollPane choicesScrollPane;
 	private JScrollPane historyScrollPane;
 	private JSeparator separator;	
 
-	private ChoicesListModel optionsModel;
+	private ChoicesListModel choicesModel;
 	private HistoryListModel historyModel;
 	/** 
 	 * cancelReason contains the source of the event that 
@@ -77,39 +77,39 @@ abstract class PopupComponent implements PopupMenuListener{
 	 **/
 	private Object cancelReason;
 
-	/** This is the total max number of visble rows (history PLUS options) */
+	/** This is the total max number of visble rows (history PLUS choices) */
 	private int maxVisibleRows = FilterSettings.maxVisiblePopupRows;
 	/** 
 	 * Max history is the maximum number of elements in the history list 
-	 * when there are NO options 
+	 * when there are NO choices 
 	 **/
 	private int maxHistory = FilterSettings.maxPopupHistory; 
 
-	/** focusedList always refer to one of optionsList or historyList */
+	/** focusedList always refer to one of choicesList or historyList */
 	JList focusedList;
-	JList optionsList;
+	JList choicesList;
 	JList historyList;
 
 
 	public PopupComponent() {
-		optionsModel = new ChoicesListModel();
+		choicesModel = new ChoicesListModel();
 		historyModel = new HistoryListModel();
 		setMaxHistory(maxHistory);
 		createGui();
 	}
 
-	/** Invoked when the user select an element in the option or history lists*/
-	protected abstract void optionSelected(Object selection);
+	/** Invoked when the user select an element in the choices or history lists*/
+	protected abstract void choiceSelected(Object selection);
 	
 	/** 
 	 * Creates an EditorComponent that can display content with 
-	 * the same renderer used to display the options
+	 * the same renderer used to display the choices
 	 */
 	public EditorComponent createRenderedEditorComponent(FilterEditor editor) {
 		return new EditorComponent.Rendered(editor, listRenderer);
 	}
 
-	/** Returns the current selection -can be history or and option-*/
+	/** Returns the current selection -can be history or and choices-*/
 	public Object getSelection() {
 		return focusedList.getSelectedValue();
 	}
@@ -125,7 +125,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	}
 	
 	/**
-	 * Displays the popup, if there is content (history or options), 
+	 * Displays the popup, if there is content (history or choices), 
 	 * and is not yet visible<br>
 	 * It uses the passed component as guide to set the location 
 	 * and the size of the popup.
@@ -136,7 +136,7 @@ abstract class PopupComponent implements PopupMenuListener{
 		}
 		setPopupFocused(false);
 		int width = editor.getParent().getWidth()-1;
-		configurePaneSize(optionsScrollPane, width);
+		configurePaneSize(choicesScrollPane, width);
 		configurePaneSize(historyScrollPane, width);
 		if (editor.isValid()){
 			popup.show(editor, -editor.getLocation().x-1, editor.getHeight());
@@ -158,8 +158,8 @@ abstract class PopupComponent implements PopupMenuListener{
 
 	/**
 	 * Finds -and selects- the best match to a given content, 
-	 * using the existing history and options.<br>
-	 * It always favor content belonging to the options list, 
+	 * using the existing history and choices.<br>
+	 * It always favor content belonging to the choices list, 
 	 * rather than to the history list.
 	 * @param hint an object used to select the match. 
 	 *  If the content is text-based (there is no {@link ListCellRenderer} 
@@ -167,26 +167,26 @@ abstract class PopupComponent implements PopupMenuListener{
 	 *  match should start with the given hint). 
 	 *  If the content is not text-based, only exact matches are returned,
 	 *  no matter the value of the parameter perfectMatch
-	 * @param perfectMatch when the content is text-based, if no option/history 
+	 * @param perfectMatch when the content is text-based, if no choice/history 
 	 *  starts with the given hint string, smaller hint substrings are used, 
 	 *  unless perfectMatch is true
 	 */
 	public String selectBestMatch(Object hint, boolean perfectMatch) {
 		Match historyMatch = historyModel.getClosestMatch(hint, perfectMatch);
-		if (optionsModel.getSize() > 0) {
-			Match match = optionsModel.getClosestMatch(hint, 
+		if (choicesModel.getSize() > 0) {
+			Match match = choicesModel.getClosestMatch(hint, 
 					perfectMatch || historyMatch.exact);
 			if (isVisible() && match.index >= 0) {
-				optionsList.ensureIndexIsVisible(match.index);
+				choicesList.ensureIndexIsVisible(match.index);
 			}
 			if (match.exact || (!historyMatch.exact 
 					&& (match.len >= historyMatch.len))) {
 				if (match.index >= 0) {
 					if (isVisible()) {
-						focusOptions();
+						focusChoices();
 						select(match.index);
 					}
-					return optionsModel.getElementAt(match.index).toString();
+					return choicesModel.getElementAt(match.index).toString();
 				}
 				return null;
 			}
@@ -204,7 +204,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Specifies that the content is to be handled as strings */
 	public void setStringContent(Format format, Comparator stringComparator) {
 		listRenderer.setUserRenderer(null);
-		if (optionsModel.setStringContent(format, stringComparator)){
+		if (choicesModel.setStringContent(format, stringComparator)){
 			historyModel.setStringContent(stringComparator);
 			reconfigureGui();
 		}
@@ -217,7 +217,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Specifies that the content requires no conversion to strings */
 	public void setRenderedContent(ListCellRenderer renderer, Comparator classComparator) {
 		listRenderer.setUserRenderer(renderer);
-		if (optionsModel.setRenderedContent(classComparator)){
+		if (choicesModel.setRenderedContent(classComparator)){
 			historyModel.setStringContent(null);
 			reconfigureGui();
 		}
@@ -246,36 +246,36 @@ abstract class PopupComponent implements PopupMenuListener{
 
 	/** Sets the list's background color */
 	public void setBackground(Color color){
-		optionsList.setBackground(color);
+		choicesList.setBackground(color);
 		historyList.setBackground(color);
 	}
 	
 	/** Sets the list's foreground color */
 	public void setForeground(Color color){
-		optionsList.setForeground(color);
+		choicesList.setForeground(color);
 		historyList.setForeground(color);
 	}
 	
 	/** Sets the list's selected background color */
 	public void setSelectionBackground(Color color){
-		optionsList.setSelectionBackground(color);
+		choicesList.setSelectionBackground(color);
 		historyList.setSelectionBackground(color);
 	}
 	
 	/** Sets the list's selected foreground color */
 	public void setSelectionForeground(Color color){
-		optionsList.setSelectionForeground(color);
+		choicesList.setSelectionForeground(color);
 		historyList.setSelectionForeground(color);
 	}
 	
 	/** Gets the list's selected background color */
 	public Color getSelectionBackground(){
-		return optionsList.getSelectionBackground();
+		return choicesList.getSelectionBackground();
 	}
 	
 	/** Gets the list's selected foreground color */
 	public Color getSelectionForeground(){
-		return optionsList.getSelectionForeground();
+		return choicesList.getSelectionForeground();
 	}
 	
 	/** Sets the disabled color, used on the CustomChoices' text */
@@ -296,29 +296,29 @@ abstract class PopupComponent implements PopupMenuListener{
 	
 	/** Sets the list's font color */
 	public void setFont(Font font){
-		optionsList.setFont(font);
+		choicesList.setFont(font);
 		historyList.setFont(font);
 		ensureListRowsHeight();
 	}
 	
-	/** Returns true if the passed object matches an existing option */
-	public boolean isValidOption(Object object){
-		return optionsModel.isValidOption(object);		
+	/** Returns true if the passed object matches an existing choice */
+	public boolean isValidChoice(Object object){
+		return choicesModel.isValidChoice(object);		
 	}
 	
 	/** Returns true if the popup has any content to display */
 	public boolean hasContent(){
-		return !optionsModel.isEmpty() || !historyModel.isEmpty();
+		return !choicesModel.isEmpty() || !historyModel.isEmpty();
 	}
 
-	/** Returns true if the popup contains options (history notwithstanding) */
-	public boolean hasOptions() {
-		return !optionsModel.isEmpty();
+	/** Returns true if the popup contains choices (history notwithstanding) */
+	public boolean hasChoices() {
+		return !choicesModel.isEmpty();
 	}
 
 	/** @see IFilterEditor#setMaxVisibleRows(int) */
 	public void setMaxVisibleRows(int maxVisibleRows) {
-		this.maxVisibleRows = Math.max(MIN_VISIBLE_OPTIONS, maxVisibleRows);
+		this.maxVisibleRows = Math.max(MIN_VISIBLE_CHOICES, maxVisibleRows);
 		fixMaxHistory();
 		reconfigureGui();
 	}
@@ -344,16 +344,16 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Internal method to calculate the real history size used */
 	private boolean fixMaxHistory(){
 		int now = historyModel.getMaxHistory();
-		int optionsSize = optionsModel.getSize();
-		int finalSize = optionsSize==0? maxVisibleRows 
+		int choicesSize = choicesModel.getSize();
+		int finalSize = choicesSize==0? maxVisibleRows 
 				: Math.min(maxHistory, maxVisibleRows 
-						- Math.min(optionsSize, MIN_VISIBLE_OPTIONS));
+						- Math.min(choicesSize, MIN_VISIBLE_CHOICES));
 		return finalSize==now? false : historyModel.setMaxHistory(finalSize);
 	}
 
-	/** Clears both the history and the options lists */
+	/** Clears both the history and the choices lists */
 	public void clear() {
-		optionsModel.clearContent();
+		choicesModel.clearContent();
 		historyModel.clear();
 		fixMaxHistory();
 		reconfigureGui();
@@ -367,13 +367,13 @@ abstract class PopupComponent implements PopupMenuListener{
 	}
 
 	/** 
-	 * Adds content to the options list.<br>
+	 * Adds content to the choices list.<br>
 	 * If there is no {@link ListCellRenderer} defined,
 	 * the content is stringfied and sorted -so duplicates are removed-
 	 * @returns true if the operation implies a change
 	 */
-	public boolean addOptions(Collection<?> options) {
-		if (optionsModel.addContent(options)){
+	public boolean addChoices(Collection<?> choices) {
+		if (choicesModel.addContent(choices)){
 			fixMaxHistory();
 			reconfigureGui();
 			return true;
@@ -381,14 +381,14 @@ abstract class PopupComponent implements PopupMenuListener{
 		return false;
 	}
 
-	/** Returns the current options */
-	public Collection<?> getOptions(){
-		return optionsModel.getOptions();
+	/** Returns the current choices */
+	public Collection<?> getChoices(){
+		return choicesModel.getChoices();
 	}
 	
 	/** Returns the custom choice matching the given text */
 	public CustomChoice getCustomChoice(String s){
-		return optionsModel.getCustomChoice(s);
+		return choicesModel.getCustomChoice(s);
 	}
 
 	/**
@@ -399,7 +399,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	 */
 	public boolean selectFirst(boolean forceJump) {
 		boolean ret = canSwitchToHistory() 
-			&& (forceJump || optionsList.getSelectedIndex() == 0);
+			&& (forceJump || choicesList.getSelectedIndex() == 0);
 		if (ret) {
 			focusHistory();
 		}
@@ -409,21 +409,21 @@ abstract class PopupComponent implements PopupMenuListener{
 	/**
 	 * Selects the last element in the focused list. If it is already on the
 	 * last element, or forceJump is true, selects the last element on the
-	 * options list.<br>
+	 * choices list.<br>
 	 * Returns true if there is indeed a change (or forceJump is true)
 	 */
 	public boolean selectLast(boolean forceJump) {
-		boolean ret = canSwitchToOptions() && (forceJump 
+		boolean ret = canSwitchToChoices() && (forceJump 
 				|| historyList.getSelectedIndex() == historyModel.getSize() - 1);
 		if (ret) {
-			focusOptions();
+			focusChoices();
 		}
 		return select(focusedList.getModel().getSize() - 1) || ret;
 	}
 
 	/**
 	 * If jumpRequired is true, or cannot move up on the focused list and the
-	 * focused list is the option list, then move to the last element on the
+	 * focused list is the choices list, then move to the last element on the
 	 * history list.<br>
 	 * Otherwise, it just returns false
 	 */
@@ -441,30 +441,30 @@ abstract class PopupComponent implements PopupMenuListener{
 	/**
 	 * If jumpRequired is true, or cannot move down on the focused list and the
 	 * focused list is the history list, then move to the first visible element 
-	 * on the options list.<br>
+	 * on the choices list.<br>
 	 * Otherwise, it just returns false
 	 */
 	public void selectDown(boolean jumpRequired) {
 		if (jumpRequired || !select(focusedList.getSelectedIndex() + 1)) {
-			if (canSwitchToOptions()) {
-				focusOptions();
-				select(optionsList.getFirstVisibleIndex());
+			if (canSwitchToChoices()) {
+				focusChoices();
+				select(choicesList.getFirstVisibleIndex());
 			}
 		}
 	}
 
-	/** Moves down a page, or to the last element in the option list, if needed*/
+	/** Moves down a page, or to the last element in the choices list, if needed*/
 	public void selectDownPage() {
 		if (isFocusInHistory()) {
-			if (canSwitchToOptions()) {
-				focusOptions();
+			if (canSwitchToChoices()) {
+				focusChoices();
 			}
 			select(focusedList.getLastVisibleIndex());
 		} else {
-			int last = optionsList.getLastVisibleIndex();
-			if (last == optionsList.getSelectedIndex()) {
-				last = Math.min(last + last - optionsList.getFirstVisibleIndex(),
-						optionsModel.getSize() - 1);
+			int last = choicesList.getLastVisibleIndex();
+			if (last == choicesList.getSelectedIndex()) {
+				last = Math.min(last + last - choicesList.getFirstVisibleIndex(),
+						choicesModel.getSize() - 1);
 			}
 			select(last);
 		}
@@ -474,14 +474,14 @@ abstract class PopupComponent implements PopupMenuListener{
 	public void selectUpPage() {
 		int select = 0;
 		if (!isFocusInHistory()) {
-			int selected = optionsList.getSelectedIndex();
+			int selected = choicesList.getSelectedIndex();
 			if (canSwitchToHistory() && selected == 0) {
 				focusHistory();
 			} else {
-				select = optionsList.getFirstVisibleIndex();
+				select = choicesList.getFirstVisibleIndex();
 				if (select == selected) {
 					select = Math.max(0, 
-							select + select - optionsList.getLastVisibleIndex());
+							select + select - choicesList.getLastVisibleIndex());
 				}
 			}
 		}
@@ -503,31 +503,31 @@ abstract class PopupComponent implements PopupMenuListener{
 	}
 
 	/** 
-	 * Returns true if the focused list is the options list 
+	 * Returns true if the focused list is the choices list 
 	 * and there is history content 
 	 **/
 	private boolean canSwitchToHistory() {
-		return focusedList == optionsList && !historyModel.isEmpty();
+		return focusedList == choicesList && !historyModel.isEmpty();
 	}
 
 	/** 
 	 * Returns true if the focused list is the history list 
-	 * and there is options content 
+	 * and there is choices content 
 	 **/
-	private boolean canSwitchToOptions() {
-		return focusedList == historyList && optionsScrollPane.isVisible();
+	private boolean canSwitchToChoices() {
+		return focusedList == historyList && choicesScrollPane.isVisible();
 	}
 
 	/** Moves the focus to the history list */
 	private void focusHistory() {
-		optionsList.clearSelection();
+		choicesList.clearSelection();
 		focusedList = historyList;
 	}
 
-	/** Moves the focus to the options list */
-	private void focusOptions() {
+	/** Moves the focus to the choices list */
+	private void focusChoices() {
 		historyList.clearSelection();
-		focusedList = optionsList;
+		focusedList = choicesList;
 	}
 
 	/** Returns true if the focused list is the history list*/
@@ -546,33 +546,33 @@ abstract class PopupComponent implements PopupMenuListener{
 	private void ensureListRowsHeight(){
 		Object prototype;
 		if (listRenderer!=null && listRenderer.getUserRenderer()==null){
-			prototype = optionsList.getPrototypeCellValue();
+			prototype = choicesList.getPrototypeCellValue();
 			//we need to change the prototype. The jlist will not update its
 			//cell height if the prototype does not change
 			prototype = "X".equals(prototype) ? "Z" : "X";
 		} else {
 			prototype=null;
 		}
-		optionsList.setPrototypeCellValue(prototype);
+		choicesList.setPrototypeCellValue(prototype);
 		historyList.setPrototypeCellValue(prototype); 		
 	}
 
 	/** Creation of the popup's gui */
 	private void createGui() {
 		MouseHandler mouseHandler = new MouseHandler();
-		optionsList = new JList(optionsModel);
-		optionsList.addMouseMotionListener(mouseHandler);
-		optionsList.addMouseListener(mouseHandler);
+		choicesList = new JList(choicesModel);
+		choicesList.addMouseMotionListener(mouseHandler);
+		choicesList.addMouseListener(mouseHandler);
 
-		optionsScrollPane = createScrollPane(optionsList);
+		choicesScrollPane = createScrollPane(choicesList);
 
 		historyList = new JList(historyModel);
 		historyList.addMouseMotionListener(mouseHandler);
 		historyList.addMouseListener(mouseHandler);
 
-		optionsList.setBorder(null);
-		optionsList.setFocusable(false);
-		optionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		choicesList.setBorder(null);
+		choicesList.setFocusable(false);
+		choicesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		historyList.setBorder(null);
 		historyList.setFocusable(false);
@@ -591,37 +591,37 @@ abstract class PopupComponent implements PopupMenuListener{
 		historyScrollPane = createScrollPane(historyList);
 		popup.add(historyScrollPane, BorderLayout.NORTH);
 		popup.add(separator, BorderLayout.CENTER);
-		popup.add(optionsScrollPane, BorderLayout.SOUTH);
+		popup.add(choicesScrollPane, BorderLayout.SOUTH);
 		popup.setDoubleBuffered(true);
 		popup.setFocusable(false);
 
-		listRenderer = new FilterListCellRenderer(optionsList);
-		optionsList.setCellRenderer(listRenderer);
+		listRenderer = new FilterListCellRenderer(choicesList);
+		choicesList.setCellRenderer(listRenderer);
 		historyList.setCellRenderer(listRenderer);
 		reconfigureGui();
 	}
 
 	/** 
 	 * Reconfigures the gui, ensuring the correct size of the history 
-	 * and option lists 
+	 * and choices lists 
 	 **/
 	private void reconfigureGui() {
-		// if there is no history and no options, show still the history
+		// if there is no history and no choices, show still the history
 		int historySize = historyModel.getSize();
-		boolean showOptions = optionsModel.getSize() > 0;
-		boolean showHistory = historySize > 0 || !showOptions;
-		optionsScrollPane.setVisible(showOptions);
+		boolean showChoices = choicesModel.getSize() > 0;
+		boolean showHistory = historySize > 0 || !showChoices;
+		choicesScrollPane.setVisible(showChoices);
 		historyScrollPane.setVisible(showHistory);
 		if (showHistory) {
 			historyList.setVisibleRowCount(Math.max(1, historySize));
 			historyScrollPane.setPreferredSize(null);
 		}
-		if (showOptions) {
-			optionsList.setVisibleRowCount(Math.min(optionsModel.getSize(), 
+		if (showChoices) {
+			choicesList.setVisibleRowCount(Math.min(choicesModel.getSize(), 
 					maxVisibleRows - historySize));
-			optionsScrollPane.setPreferredSize(null);
+			choicesScrollPane.setPreferredSize(null);
 		}
-		separator.setVisible(showHistory && showOptions);
+		separator.setVisible(showHistory && showChoices);
 	}
 
 	
@@ -661,7 +661,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	}
 
 	/**
-	 * The mouse handler will select automatically the option under the mouse,
+	 * The mouse handler will select automatically the choice under the mouse,
 	 * and passes directly the focus to the popup under the mouse
 	 */
 	final class MouseHandler extends MouseAdapter {
@@ -674,7 +674,7 @@ abstract class PopupComponent implements PopupMenuListener{
 		@Override public void mouseMoved(MouseEvent e) {
 			setPopupFocused(true);
 			JList focus = (JList) e.getSource();
-			JList other = (focus == optionsList) ? historyList : optionsList;
+			JList other = (focus == choicesList) ? historyList : choicesList;
 			focus.setSelectedIndex(focus.locationToIndex(e.getPoint()));
 			if (other.getModel().getSize() > 0) {
 				other.setSelectedIndex(0); // silly, but needed
@@ -684,13 +684,13 @@ abstract class PopupComponent implements PopupMenuListener{
 		}
 
 		private void listSelection(Object object) {
-			optionSelected(object);
+			choiceSelected(object);
 			hide();
 		}
 	}
 
 	/**
-	 * Class to find matches in the lists (history / options)
+	 * Class to find matches in the lists (history / choices)
 	 */
 	static class Match {
 		// index in the list. Will be -1 if the content is empty or a fullMatch

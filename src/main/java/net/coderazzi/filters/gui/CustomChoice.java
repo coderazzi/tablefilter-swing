@@ -31,7 +31,7 @@ import javax.swing.Icon;
 import javax.swing.RowFilter;
 
 /**
- * Class to specify a custom filter in the options list<br>
+ * Class to specify a custom filter in the choices list<br>
  * 
  * A custom filter can specify an icon and a textual representation, which,
  * if the icon is provided, can be hidden.<br>
@@ -39,7 +39,7 @@ import javax.swing.RowFilter;
  * given textual representation, although a custom filter can be provided by 
  * overriding the method {@see #getFilter(IFilterTextParser, int)} <br>
  * 
- * The order of the custom choices on the options list can be modified with
+ * The order of the custom choices on the choices list can be modified with
  * the precedence attribute. By default, custom choices are sorted by their
  * textual representation. 
  * 
@@ -123,13 +123,13 @@ public abstract class CustomChoice {
 	}
 	
 	/** 
-	 * Returns true if the text should be displayed on the options, when
+	 * Returns true if the text should be displayed on the choices, when
 	 * there is an icon present<br>
 	 * This method is only called if an icon is available.
 	 * @param userRendererSet set to true if the user has specified any 
 	 *    special render for the associated column
 	 */
-	public boolean renderTextInOptions(boolean userRendererSet){
+	public boolean renderText(boolean userRendererSet){
 		return !userRendererSet;
 	}
 	

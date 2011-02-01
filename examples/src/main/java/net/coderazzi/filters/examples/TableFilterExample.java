@@ -81,7 +81,7 @@ public class TableFilterExample extends JFrame {
 	private static final String IGNORE_CASE = "ignore case";
 	private static final String ENABLED = "enabled";
     private static final String EDITABLE = "editable";
-	private static final String AUTO_OPTIONS = "auto options";
+	private static final String AUTO_CHOICES = "auto choices";
 
     TestTableModel tableModel;
     JTable table;
@@ -135,7 +135,7 @@ public class TableFilterExample extends JFrame {
 		    	addColumnToFiltersMenu(editor, (String) tableColumn.getHeaderValue());
 			}
 		});
-		useFlagRenderer=new JCheckBoxMenuItem("country flags as icons -in options-", true);
+		useFlagRenderer=new JCheckBoxMenuItem("country flags as icons -in choices-", true);
 		useFlagRenderer.addItemListener(new ItemListener() {
 			
 			@Override public void itemStateChanged(ItemEvent e) {
@@ -289,11 +289,11 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	
-    	JCheckBoxMenuItem adaptiveOptions=new JCheckBoxMenuItem(
-    			new AbstractAction("adaptive options") {			
+    	JCheckBoxMenuItem adaptiveChoices=new JCheckBoxMenuItem(
+    			new AbstractAction("adaptive choices") {			
 			@Override public void actionPerformed(ActionEvent e) {
 				JCheckBoxMenuItem source =(JCheckBoxMenuItem) e.getSource();
-				filterHeader.setAdaptiveOptions(source.isSelected());				
+				filterHeader.setAdaptiveChoices(source.isSelected());				
 				updateFiltersInfo();
 			}
 		});
@@ -324,7 +324,7 @@ public class TableFilterExample extends JFrame {
     	onUse.setSelected(true);
     	ignoreCase.setMnemonic(KeyEvent.VK_C);
     	ignoreCase.setSelected(filterHeader.getParserModel().isIgnoreCase());
-    	adaptiveOptions.setSelected(filterHeader.isAdaptiveOptions());
+    	adaptiveChoices.setSelected(filterHeader.isAdaptiveChoices());
     	allEnabled.setSelected(filterHeader.isEnabled());
     	visible.setSelected(filterHeader.isVisible());
 
@@ -333,10 +333,10 @@ public class TableFilterExample extends JFrame {
     	ret.add(onUse);
     	ret.addSeparator();
     	ret.add(ignoreCase);
-    	ret.add(adaptiveOptions);
-    	ret.add(createAutoOptionsMenu(filterHeader.getAutoOptions(), new AutoOptionsSet() {			
-			@Override public void setAutoOptions(AutoChoices ao) {
-				filterHeader.setAutoOptions(ao);
+    	ret.add(adaptiveChoices);
+    	ret.add(createAutoChoicesMenu(filterHeader.getAutoChoices(), new AutoChoicesSet() {			
+			@Override public void setAutoChoices(AutoChoices ao) {
+				filterHeader.setAutoChoices(ao);
 				updateFiltersInfo();
 			}
 		}));
@@ -351,15 +351,15 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
-    private JMenu createAutoOptionsMenu(AutoChoices preselected, final AutoOptionsSet iface){
-    	JMenu ret = new JMenu(AUTO_OPTIONS);
+    private JMenu createAutoChoicesMenu(AutoChoices preselected, final AutoChoicesSet iface){
+    	JMenu ret = new JMenu(AUTO_CHOICES);
     	ButtonGroup group = new ButtonGroup();
     	for (AutoChoices ao : AutoChoices.values()){
     		final AutoChoices set = ao;
         	JRadioButtonMenuItem item = new JRadioButtonMenuItem(
         			new AbstractAction(ao.toString().toLowerCase()) {			
     			@Override public void actionPerformed(ActionEvent e) {
-    				iface.setAutoOptions(set);
+    				iface.setAutoChoices(set);
     			}
     		});    		
         	group.add(item);
@@ -565,9 +565,9 @@ public class TableFilterExample extends JFrame {
     
     void addColumnToFiltersMenu(final IFilterEditor editor, final String name) {
     	JMenu menu = (JMenu) getMenu(filtersMenu, name, false);
-    	menu.add(createAutoOptionsMenu(editor.getAutoOptions(), new AutoOptionsSet(){
-    		@Override public void setAutoOptions(AutoChoices ao) {
-    			editor.setAutoOptions(ao);
+    	menu.add(createAutoChoicesMenu(editor.getAutoChoices(), new AutoChoicesSet(){
+    		@Override public void setAutoChoices(AutoChoices ao) {
+    			editor.setAutoChoices(ao);
     			updateFilter(editor, name);
     		}
     	}
@@ -641,8 +641,8 @@ public class TableFilterExample extends JFrame {
     	((JCheckBoxMenuItem) getMenu(menu, EDITABLE, false)).setSelected(editor.isEditable());
     	((JCheckBoxMenuItem) getMenu(menu, ENABLED, false)).setSelected(editor.getFilter().isEnabled());
     	((JCheckBoxMenuItem) getMenu(menu, IGNORE_CASE, false)).setSelected(editor.isIgnoreCase());
-    	JMenu autoOptionsMenu = (JMenu) getMenu(menu, AUTO_OPTIONS, false);
-    	((JRadioButtonMenuItem ) getMenu(autoOptionsMenu, editor.getAutoOptions().toString().toLowerCase(), false)).setSelected(true);
+    	JMenu autoChoicesMenu = (JMenu) getMenu(menu, AUTO_CHOICES, false);
+    	((JRadioButtonMenuItem ) getMenu(autoChoicesMenu, editor.getAutoChoices().toString().toLowerCase(), false)).setSelected(true);
     	JMenu historyMenu = (JMenu) getMenu(menu, MAX_HISTORY_LENGTH, false);
     	JRadioButtonMenuItem item = ((JRadioButtonMenuItem ) getMenu(historyMenu, String.valueOf(editor.getMaxHistory()), false)); 
     	if (item!=null){ item.setSelected(true);}
@@ -815,12 +815,12 @@ public class TableFilterExample extends JFrame {
 		}
 	}
 	
-	interface AutoOptionsSet{
-		void setAutoOptions(AutoChoices ao);
+	interface AutoChoicesSet{
+		void setAutoChoices(AutoChoices ao);
 	}
 	
     public final static void main(String[] args) {
-    	FilterSettings.autoOptions=AutoChoices.ENABLED;
+    	FilterSettings.autoChoices=AutoChoices.ENABLED;
         TableFilterExample frame = new TableFilterExample();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();

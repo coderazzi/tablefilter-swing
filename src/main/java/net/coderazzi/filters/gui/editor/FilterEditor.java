@@ -77,7 +77,7 @@ import net.coderazzi.filters.parser.DateComparator;
  * Custom component to handle the filter' editors<br>
  * It includes:<ul>
  * <li>A editor component, usually a text field to enter the filter text.</li>
- * <li>A popup menu containing both history and predefined option elements.</li>
+ * <li>A popup menu containing both history and predefined choice elements.</li>
  * <li>An arrow button to display the popup menu.</li></ul>
  * The component keeps the same look and feel under all cases 
  * (being editable or not, having custom cell renderers or not). 
@@ -89,7 +89,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	private static final long serialVersionUID = 6908400421021655278L;
 	private EditorBorder border = new EditorBorder();
 	private Set<CustomChoice> customChoices;
-	private AutoChoices autoOptions;
+	private AutoChoices autoChoices;
 	private Format format;
 	private Comparator comparator;
 	private boolean ignoreCase;
@@ -114,7 +114,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		popup = new PopupComponent() {
 
 			@Override
-			protected void optionSelected(Object selection) {
+			protected void choiceSelected(Object selection) {
 				popupSelection(selection);
 			}
 		};
@@ -152,7 +152,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	/** IFilterEditor method */
 	@Override public void resetFilter() {
 		setEditorContent(null, false);
-		requestOptions();		
+		requestChoices();		
 	}
 	
 	/** IFilterEditor method */
@@ -162,8 +162,8 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		} else if (isEditable()){
 			//we need to use, eventually, the provided formatter
 			setEditorContent(format(content), true);
-		} else if (popup.isValidOption(content)){
-			//the content must be a valid option
+		} else if (popup.isValidChoice(content)){
+			//the content must be a valid choice
 			setEditorContent(format(content), true);			
 		}
 	}
@@ -174,31 +174,31 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 	
 	/** IFilterEditor method */
-	@Override public void setAutoOptions(AutoChoices autoOptions){
-		if (autoOptions!=null && autoOptions!=this.autoOptions){
-			this.autoOptions=autoOptions;
+	@Override public void setAutoChoices(AutoChoices autoChoices){
+		if (autoChoices!=null && autoChoices!=this.autoChoices){
+			this.autoChoices=autoChoices;
 			Object enums[]=modelClass.getEnumConstants();
 			if (Boolean.class==modelClass || (enums!=null && enums.length<=8)){
-				setEditable(autoOptions==AutoChoices.DISABLED);
-				popup.setMaxHistory(autoOptions==AutoChoices.DISABLED? null : 0);
+				setEditable(autoChoices==AutoChoices.DISABLED);
+				popup.setMaxHistory(autoChoices==AutoChoices.DISABLED? null : 0);
 			}
-			requestOptions();
+			requestChoices();
 		}
 	}
 
 	/** IFilterEditor method */
-	@Override public AutoChoices getAutoOptions(){
-		return autoOptions;
+	@Override public AutoChoices getAutoChoices(){
+		return autoChoices;
 	}
 	
 	/** IFilterEditor method */
-	@Override public void setCustomChoices(Set<CustomChoice> options) {
-		if (options==null || options.isEmpty()){
+	@Override public void setCustomChoices(Set<CustomChoice> choices) {
+		if (choices==null || choices.isEmpty()){
 			this.customChoices=null;
 		} else {
-			this.customChoices = new HashSet<CustomChoice>(options);
+			this.customChoices = new HashSet<CustomChoice>(choices);
 		}
-		requestOptions();
+		requestChoices();
 	}
 	
 	/** IFilterEditor method */
@@ -270,7 +270,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     			filter.checkChanges(true);
     		} else {
     			popup.setRenderedContent(lcr, comparator);
-    			requestOptions();
+    			requestChoices();
     		}
     	}
     }
@@ -288,7 +288,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		editor.setForeground(getForeground());
 		editor.getComponent().setFont(getFont());
 		filter.checkChanges(true);
-		requestOptions();
+		requestChoices();
 	}
 
 	/** IFilterEditor method */
@@ -461,29 +461,29 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		}
 	}
 	
-	/** Method invoked by the FiltersHandler to set the options */
-	public void setOptions(Collection<?> options){
+	/** Method invoked by the FiltersHandler to set the choices */
+	public void setChoices(Collection<?> choices){
 		popup.clear();
-		addOptions(options);		
+		addChoices(choices);		
 	}
 	
-	/** Method invoked by the FiltersHandler to setup the options */
-	public Collection<?> getOptions(){
-		return popup.getOptions();
+	/** Method invoked by the FiltersHandler to setup the choices */
+	public Collection<?> getChoices(){
+		return popup.getChoices();
 	}
 
-	/** Method invoked by the FiltersHandler to extend the options */
-	public void addOptions(Collection<?> options) {
-		System.out.println("Editor "+getModelIndex()+": add "+options.size()+" on "+getOptions().size());
-		if (popup.addOptions(options)){
+	/** Method invoked by the FiltersHandler to extend the choices */
+	public void addChoices(Collection<?> choices) {
+		System.out.println("Editor "+getModelIndex()+": add "+choices.size()+" on "+getChoices().size());
+		if (popup.addChoices(choices)){
 			downButton.setCanPopup(popup.hasContent());
 		}
 	}
 	
-	/** Request options, if enabled, to the filtersHandler */
-    private void requestOptions(){
+	/** Request choices, if enabled, to the filtersHandler */
+    private void requestChoices(){
     	if (isEnabled()){
-    		filtersHandler.updatedEditorOptions(this);
+    		filtersHandler.updateEditorChoices(this);
     	}
     }
     
@@ -492,7 +492,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 			popup.setStringContent(format, getStringComparator());
     		parserUpdated();
 			filter.checkChanges(false);
-			requestOptions();
+			requestChoices();
 		}    	
     }
     
@@ -582,7 +582,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		setupDownCtrlKey(component);
 	}
 
-	/** Method called when an element in the options menu is selected */
+	/** Method called when an element in the choices popup is selected */
 	void popupSelection(Object selection) {
 		if (selection != null) {
 			//the selection must be escaped if it is a String which does
@@ -592,7 +592,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 
 	/** Shows the popup menu, preselecting the best match */
-	boolean showOptions() {
+	boolean showChoices() {
 		if (!popup.isVisible()) {
 			if (!popup.display(editor.getComponent())){
 				return false;
@@ -606,7 +606,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	void triggerPopup(Object source){
 		if (!popup.isMenuCanceledForMouseEvent(source)){
 			editor.getComponent().requestFocus();
-			if (showOptions()){
+			if (showChoices()){
 				popup.setPopupFocused(true);
 			}
 		}		
@@ -694,7 +694,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
 			@Override public void actionPerformed(ActionEvent e) {
 				//if focus is on the popup: select the very last item on the 
-				//popup, changing probably from the history list to the option 
+				//popup, changing probably from the history list to the choices 
 				//list;  if the item is already on the very last element, or the 
 				//focus is on the text field, move the caret to the end
 				if (!popup.isPopupFocused() || !popup.selectLast(true)){
@@ -719,7 +719,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
 			@Override public void actionPerformed(ActionEvent e) {
 				//if focus is on the popup: select the very first item on the 
-				//popup, changing probably from the option list to the history 
+				//popup, changing probably from the choices list to the history 
 				//list;  if the item is already on the very first element, or 
 				//the focus is on the text field, move the caret home
 				if (!popup.isPopupFocused() || !popup.selectFirst(true)){
@@ -738,7 +738,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
 	/**
 	 * If the focus is on the popup, Home moves the selected item to the first
-	 * in the list -if it is the first on the options list jumps to the first on
+	 * in the list -if it is the first on the choices list jumps to the first on
 	 * the history list. Otherwise, just moves the caret position to the origin.
 	 * Exceptionally, if the focus is on the popup and the selected item is
 	 * already the very first shown, it also moves the caret position to the
@@ -772,13 +772,13 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
 			@Override public void actionPerformed(ActionEvent e) {
 				//without moving the focus, move down one page on the popup menu, 
-				//probably jumping to options list
+				//probably jumping to choices list
 				if (popup.isVisible()) {
 					boolean focusPopup = popup.isPopupFocused();
 					popup.selectDownPage();
 					popup.setPopupFocused(focusPopup);
 				} else {
-					showOptions();
+					showChoices();
 				}
 			}
 		};
@@ -815,7 +815,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 			private static final long serialVersionUID = 746565926592574009L;
 
 			@Override public void actionPerformed(ActionEvent e) {
-				//if focus is on the popup: move from options to history, and, 
+				//if focus is on the popup: move from choices to history, and, 
 				//being already on history, up to text field.
 				if (popup.isPopupFocused()) {
 					if (!popup.selectUp(true)){
@@ -847,7 +847,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 						popup.setPopupFocused(true);
 					}
 				} else {
-					showOptions();
+					showChoices();
 				}
 			}
 		};
@@ -865,7 +865,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 			@Override public void actionPerformed(ActionEvent e) {
 				//if popup is not visible, make it visible
 				//if popup has not the focus, pass it the focus
-				//else: move to the first visible element in the options
+				//else: move to the first visible element in the choices
 				if (popup.isVisible()) {
 					if (popup.isPopupFocused()){
 						popup.selectDown(true);
@@ -873,7 +873,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 						popup.setPopupFocused(true);
 					}
 				} else {
-					showOptions();
+					showChoices();
 				}
 			}
 		};
@@ -900,7 +900,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 						popup.setPopupFocused(true);
 					}
 				} else {
-					showOptions();
+					showChoices();
 				}
 			}
 		};

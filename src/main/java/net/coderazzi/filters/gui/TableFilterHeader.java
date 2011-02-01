@@ -117,7 +117,7 @@ public class TableFilterHeader extends JPanel {
     /** The helper to handle the location of the filter in the table header */
     private PositionHelper positionHelper = new PositionHelper(this);
         
-	/** This is the total max number of visible rows (history PLUS options) */
+	/** This is the total max number of visible rows (history PLUS choices) */
 	int maxVisibleRows = FilterSettings.maxVisiblePopupRows;
     
     /**
@@ -491,17 +491,17 @@ public class TableFilterHeader extends JPanel {
 	}
 	
 	/**
-	 * Sets the auto options flag. When set, all editors are automatically 
-	 * populated with options extracted from the table's content 
+	 * Sets the auto choices flag. When set, all editors are automatically 
+	 * populated with choices extracted from the table's content 
 	 * -and updated as the table is updated-.
 	 */
-	public void setAutoOptions(AutoChoices set){
-		filtersHandler.setAutoOptions(set);
+	public void setAutoChoices(AutoChoices set){
+		filtersHandler.setAutoChoices(set);
 	}
 	
-	/** Returns the auto options flag */
-	public AutoChoices getAutoOptions(){
-		return filtersHandler.getAutoOptions();
+	/** Returns the auto choices flag */
+	public AutoChoices getAutoChoices(){
+		return filtersHandler.getAutoChoices();
 	}
 
     /** Enables/Disables the filters */
@@ -520,17 +520,17 @@ public class TableFilterHeader extends JPanel {
     }
 
     /**
-     * Sets the adaptive options mode
+     * Sets the adaptive choices mode
      */
-    public void setAdaptiveOptions(boolean enable) {
-    	filtersHandler.setAdaptiveOptions(enable);
+    public void setAdaptiveChoices(boolean enable) {
+    	filtersHandler.setAdaptiveChoices(enable);
     }
 
     /**
-     * Returns the adaptive options mode
+     * Returns the adaptive choices mode
      */
-    public boolean isAdaptiveOptions() {
-        return filtersHandler.isAdaptiveOptions();
+    public boolean isAdaptiveChoices() {
+        return filtersHandler.isAdaptiveChoices();
     }
 
     /** Sets the font used on all the editors. */

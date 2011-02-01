@@ -52,12 +52,12 @@ public class FilterSettings {
     public static boolean autoSelection = 
     	Boolean.parseBoolean(getString("AutoSelection", "true"));
 
-    /** Whether to automatically fill with content the editor field's options */
-    public static AutoChoices autoOptions;
+    /** Whether to automatically fill with content the editor field's choices */
+    public static AutoChoices autoChoices;
 
-    /** Whether to enable adaptive options, true by default */
-    public static boolean adaptiveOptions = 
-    	Boolean.parseBoolean(getString("AdaptiveOptions", "true"));
+    /** Whether to enable adaptive choices, true by default */
+    public static boolean adaptiveChoices = 
+    	Boolean.parseBoolean(getString("AdaptiveChoices", "true"));
 
     /** Whether to ignore case or not, false by default (case sensitive) */
     public static boolean ignoreCase = 
@@ -73,7 +73,7 @@ public class FilterSettings {
     /** The maximum number of visible tows on the popup menus */
     public static int maxVisiblePopupRows = getInteger("Popup.maxVisibleRows", 8);
     
-    /** The maximum size of the history when no options are present */
+    /** The maximum size of the history when no choices are present */
     public static int maxPopupHistory = getInteger("Popup.maxHistory", 2);
     
     /** The default icon used to represent null/empty values */
@@ -141,9 +141,9 @@ public class FilterSettings {
     		//font remains null
     	}
     	try{
-        	autoOptions = AutoChoices.valueOf(getString("AutoOptions", "ENUMS"));
+        	autoChoices = AutoChoices.valueOf(getString("AutoChoices", "ENUMS"));
     	} catch(Exception ex){
-    		autoOptions = AutoChoices.ENUMS;
+    		autoChoices = AutoChoices.ENUMS;
     	}
         parserModelClass = ParserModel.class;
         String cl = getString("ParserModel.class", null);
