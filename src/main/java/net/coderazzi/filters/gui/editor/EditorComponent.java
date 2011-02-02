@@ -66,6 +66,37 @@ interface EditorComponent {
     /** Returns the swing component associated to the editor */
     public JComponent getComponent();
 
+    /**
+     * Returns the filter associated to the current content.<br> 
+     * Always invoked after {@link #checkFilterUpdate(boolean)}
+     */
+    public RowFilter getFilter();
+
+    /** Returns the definition associated to the current editor */
+    public Object getContent();
+    
+	/** 
+	 * Sets the editor content<br>
+	 * The parameters escapeIt must be true if the content could require
+	 * escaping (otherwise, it will be always treated literally). <br>
+	 */
+    public void setContent(Object content, boolean escapeIt);
+    
+    /** Returns true if the content is valid*/
+    public boolean isValidContent();
+
+    /** Returns the editable flag*/
+    public boolean isEditable();
+
+    /** Sets the editable flag. If editable, the user can enter any content */
+    public void setEditable(boolean set);
+
+    /** Enables/disables the editor */
+    public void setEnabled(boolean enabled);
+
+    /** Defines the text parser used by the editor */
+    public void setParser(IParser parser);
+
     /** 
      * Call always before {@link #getFilter()} to verify if the filter
      * has been updated. 
@@ -75,41 +106,16 @@ interface EditorComponent {
      */
     public RowFilter checkFilterUpdate(boolean forceUpdate);
 
-    /**
-     * Returns the filter associated to the current content.<br> 
-     * Always invoked after {@link #checkFilterUpdate(boolean)}
-     */
-    public RowFilter getFilter();
-
     /** 
      * Informs that the editor has received the focus.
      */
     public void focusMoved(boolean gained);
     
-    /** Enables/disables the editor */
-    public void setEnabled(boolean enabled);
+    /** Sets the foreground color used*/
+    public void setForeground(Color fg);
 
-	/** 
-	 * Sets the editor content<br>
-	 * The parameters escapeIt must be true if the content could require
-	 * escaping (otherwise, it will be always treated literally). <br>
-	 */
-    public void setContent(Object content, boolean escapeIt);
-    
-    /** Returns the definition associated to the current editor */
-    public Object getContent();
-    
-    /** Defines the text parser used by the editor */
-    public void setParser(IParser parser);
-
-    /** Sets the editable flag. If editable, the user can enter any content */
-    public void setEditable(boolean set);
-
-    /** Returns the editable flag*/
-    public boolean isEditable();
-
-    /** Returns true if the content is valid*/
-    public boolean isValidContent();
+    /** Returns the foreground color used*/
+    public Color getForeground();
 
     /** Sets the color used to show filter's errors (invalid syntax) */
     public void setErrorForeground(Color fg);
@@ -135,12 +141,6 @@ interface EditorComponent {
     /** Returns the color set by default as text selection on filters */
     public Color getTextSelectionColor();
     
-    /** Sets the foreground color used*/
-    public void setForeground(Color fg);
-
-    /** Returns the foreground color used*/
-    public Color getForeground();
-
     /**
      * EditorComponent for text edition, backed up with a {@link JTextField}<br>
      * It is editable by default.
@@ -193,11 +193,51 @@ interface EditorComponent {
         		setBorder(null);
         	}
         	
+			@Override protected void paintComponent(Graphics g) {
+        		super.paintComponent(g);
+        		if (icon!=null){
+        			if (trackedText==null || trackedText.equals(getText())){
+        			    int x=(getWidth()-icon.getIconWidth())/2;
+        			    int y=(getHeight()-icon.getIconHeight())/2;    
+    			    	icon.paintIcon(this, g, x, y);
+        			} else {
+        				deactivateCustomDecoration();
+        			}
+        		}
+        	}
         	@Override public void setText(String t) {
         		String tmp = trackedText;
         		trackedText = null; //avoid any checks on the caret listener 
         		super.setText(t);
         		trackedText = tmp;
+        	}
+        	
+        	/**
+        	 * Reports that the textfield has been enabled or not. Do not
+        	 * call directly setEnabled().<br>
+        	 * It sets the component as focusable, and 
+        	 */
+        	public void setEnabledState(boolean enabled){
+        		//if enabled, there is already a check on the filter, so
+        		//the activation / deactivation of decoration will
+        		//work on its own
+        		this.enabled=enabled;
+        		if (!enabled && activateCustomDecoration()){
+			    	icon = UIManager.getLookAndFeel().getDisabledIcon(this, icon);     
+			    	trackedText = null; //do not track text changes
+    			}
+            	setFocusable(enabled);
+        	}
+        	
+        	public void setError(boolean error){
+        		this.error=error;
+        		if (enabled){
+        			ensureCorrectForegroundColor();
+        		}
+        	}
+        	
+        	public boolean isError(){
+        		return error;
         	}
         	
         	/**
@@ -229,23 +269,6 @@ interface EditorComponent {
         		}
         	}
         	
-        	/**
-        	 * Reports that the textfield has been enabled or not. Do not
-        	 * call directly setEnabled().<br>
-        	 * It sets the component as focusable, and 
-        	 */
-        	public void setEnabledState(boolean enabled){
-        		//if enabled, there is already a check on the filter, so
-        		//the activation / deactivation of decoration will
-        		//work on its own
-        		this.enabled=enabled;
-        		if (!enabled && activateCustomDecoration()){
-			    	icon = UIManager.getLookAndFeel().getDisabledIcon(this, icon);     
-			    	trackedText = null; //do not track text changes
-    			}
-            	setFocusable(enabled);
-        	}
-        	
             public void focusMoved(boolean gained) {
             	focus=gained;
         		trackedText = null; // do not track changes (gain or not, not yet)
@@ -272,17 +295,6 @@ interface EditorComponent {
 	                	deactivateCustomDecoration();
 	                }
         		}
-        	}
-        	
-        	public void setError(boolean error){
-        		this.error=error;
-        		if (enabled){
-        			ensureCorrectForegroundColor();
-        		}
-        	}
-        	
-        	public boolean isError(){
-        		return error;
         	}
         	
             public void setErrorForeground(Color fg) {
@@ -352,18 +364,6 @@ interface EditorComponent {
             	}
             }
 
-			@Override protected void paintComponent(Graphics g) {
-        		super.paintComponent(g);
-        		if (icon!=null){
-        			if (trackedText==null || trackedText.equals(getText())){
-        			    int x=(getWidth()-icon.getIconWidth())/2;
-        			    int y=(getHeight()-icon.getIconHeight())/2;    
-    			    	icon.paintIcon(this, g, x, y);
-        			} else {
-        				deactivateCustomDecoration();
-        			}
-        		}
-        	}
         }
 
         public Text(FilterEditor editor, PopupComponent popupComponent) {
@@ -376,63 +376,15 @@ interface EditorComponent {
             return textField;
         }
 
-        @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
-            String text = textField.getText().trim();
-            if (forceUpdate){
-            	updateFilter(text);
-            } else if (content instanceof CustomChoice){
-    			if (!((CustomChoice)content).toString().equals(text)){
-                	updateFilter(text);
-    			}
-            } else if (!text.equals(content)){
-            	updateFilter(text);            	
-            }
-            return filter;
-        }
-        
-        /** Updates the filter / text is expected trimmed */
-        private void updateFilter(String text) {
-            boolean error=false;
-            CustomChoice cc = text.length()==0? CustomChoice.MATCH_ALL : popup.getCustomChoice(text);
-            if (cc!=null){
-    			content = cc;
-    			textField.activateCustomDecoration();
-    			filter = cc.getFilter(editor);            	
-            } else {
-                content = text;
-                filter = null;
-                textField.deactivateCustomDecoration();
-                try {
-    	            if (!isEditable()){
-    	            	//for editable columns, the text was already
-    	            	//escaped when the content was defined
-    	            	//(see setContent)
-    	            	text = textParser.escape(text);
-    	            }
-                	filter = textParser.parseText(text); 
-                } catch (ParseException pex) {
-                    error=true;
-                }            	
-            }
-            textField.setError(error);
-        }
-        
-        @Override public boolean isValidContent(){
-        	return !textField.isError();
-        }
-        
         @Override public RowFilter getFilter() {
             return filter;
         }
 
-        @Override public void focusMoved(boolean gained) {
-    		textField.focusMoved(gained);
+        @Override public Object getContent() {
+        	checkFilterUpdate(false);
+            return content;
         }
-
-        @Override public void setEnabled(boolean enabled) {
-        	textField.setEnabledState(enabled);
-        }
-
+        
         @Override public void setContent(Object content, boolean escapeIt) {
             String text;
             if (content instanceof CustomChoice){
@@ -453,16 +405,12 @@ interface EditorComponent {
             textField.setText(text);
         }
 
-        @Override public Object getContent() {
-        	checkFilterUpdate(false);
-            return content;
+        @Override public boolean isValidContent(){
+        	return !textField.isError();
         }
         
-        @Override public void setParser(IParser parser) {
-        	this.textParser = parser;
-            if (textField.isEnabled()) {
-                checkFilterUpdate(true);
-            }
+        @Override public boolean isEditable() {
+            return editable;
         }
 
         @Override public void setEditable(boolean set) {
@@ -489,8 +437,41 @@ interface EditorComponent {
             controlledSet = false;
         }
 
-        @Override public boolean isEditable() {
-            return editable;
+        @Override public void setEnabled(boolean enabled) {
+        	textField.setEnabledState(enabled);
+        }
+
+        @Override public void setParser(IParser parser) {
+        	this.textParser = parser;
+            if (textField.isEnabled()) {
+                checkFilterUpdate(true);
+            }
+        }
+
+        @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
+            String text = textField.getText().trim();
+            if (forceUpdate){
+            	updateFilter(text);
+            } else if (content instanceof CustomChoice){
+    			if (!((CustomChoice)content).toString().equals(text)){
+                	updateFilter(text);
+    			}
+            } else if (!text.equals(content)){
+            	updateFilter(text);            	
+            }
+            return filter;
+        }
+        
+        @Override public void focusMoved(boolean gained) {
+    		textField.focusMoved(gained);
+        }
+
+        @Override public void setForeground(Color fg) {
+        	textField.setForeground(fg);
+        }
+
+        @Override public Color getForeground() {
+            return textField.getNormalForeground();
         }
 
         @Override public void setErrorForeground(Color fg) {
@@ -507,14 +488,6 @@ interface EditorComponent {
 
         @Override public Color getDisabledForeground() {
             return textField.getDisabledForeground();
-        }
-
-        @Override public void setForeground(Color fg) {
-        	textField.setForeground(fg);
-        }
-
-        @Override public Color getForeground() {
-            return textField.getNormalForeground();
         }
 
         @Override public void setSelectionForeground(Color fg) {
@@ -545,6 +518,33 @@ interface EditorComponent {
             return ret;
         }
 
+        /** Updates the filter / text is expected trimmed */
+        private void updateFilter(String text) {
+            boolean error=false;
+            CustomChoice cc = text.length()==0? CustomChoice.MATCH_ALL : popup.getCustomChoice(text);
+            if (cc!=null){
+    			content = cc;
+    			textField.activateCustomDecoration();
+    			filter = cc.getFilter(editor);            	
+            } else {
+                content = text;
+                filter = null;
+                textField.deactivateCustomDecoration();
+                try {
+    	            if (!isEditable()){
+    	            	//for editable columns, the text was already
+    	            	//escaped when the content was defined
+    	            	//(see setContent)
+    	            	text = textParser.escape(text);
+    	            }
+                	filter = textParser.parseText(text); 
+                } catch (ParseException pex) {
+                    error=true;
+                }            	
+            }
+            textField.setError(error);
+        }
+        
         /** {@link DocumentFilter}: method called if handler is not editable */
         @Override public void insertString(FilterBypass fb,
                                  int offset,
@@ -694,6 +694,39 @@ interface EditorComponent {
             return this;
         }
         
+        @Override public RowFilter getFilter() {
+            return filter;
+        }
+
+        @Override public Object getContent() {
+            return content;
+        }
+
+        @Override public void setContent(Object content, boolean escapeIt) {
+            this.content = (content == null) ? CustomChoice.MATCH_ALL : content;
+            repaint();
+        }
+
+        @Override public boolean isValidContent() {
+        	return true;
+        }
+
+        @Override public boolean isEditable() {
+            return false;
+        }
+
+        @Override public void setEditable(boolean set) {
+            // cannot apply to the rendered component -at least, not currently
+        }
+        
+        @Override public void setEnabled(boolean enabled) {
+        	renderer.setEnabled(enabled);
+        }
+
+        @Override public void setParser(IParser parser) {
+        	// not used on rendering        	
+        }
+        
         @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
             Object currentContent = getContent();
             if (forceUpdate || (currentContent != cachedContent)) {
@@ -713,42 +746,9 @@ interface EditorComponent {
             return filter;
         }
 
-        @Override public RowFilter getFilter() {
-            return filter;
-        }
-
         @Override public void focusMoved(boolean gained) {
         	focused=gained;
         	repaint();
-        }
-
-        @Override public void setEnabled(boolean enabled) {
-        	renderer.setEnabled(enabled);
-        }
-
-        @Override public void setContent(Object content, boolean escapeIt) {
-            this.content = (content == null) ? CustomChoice.MATCH_ALL : content;
-            repaint();
-        }
-
-        @Override public Object getContent() {
-            return content;
-        }
-
-        @Override public void setEditable(boolean set) {
-            // cannot apply to the rendered component -at least, not currently
-        }
-        
-        @Override public void setParser(IParser parser) {
-        	// not used on rendering        	
-        }
-        
-        @Override public boolean isValidContent() {
-        	return true;
-        }
-
-        @Override public boolean isEditable() {
-            return false;
         }
 
         @Override public void setErrorForeground(Color fg) {

@@ -78,6 +78,47 @@ public class ChoicesListModel extends AbstractListModel {
 		return content.get(i);
 	}
 
+	public void clearContent() {
+		int size = getSize();
+		if (size > 0) {
+			customChoices = 0;
+			content.clear();
+			fireIntervalRemoved(this, 0, size);
+		}
+	}
+	
+	public boolean isEmpty(){
+		return content.isEmpty();
+	}
+
+	/** Returns true if the object is a valid choice (as object, or string) */
+	public boolean isValidChoice(Object o){
+		return content.contains(o);
+	}
+	
+	/** Returns the current choices */
+	public Collection<?> getChoices(){
+		return content;
+	}
+
+	/** Returns the CustomChoice matching the given text, if any */ 
+	public CustomChoice getCustomChoice(String s){
+		for (int i=0; i<customChoices;i++){
+			CustomChoice cc=(CustomChoice) content.get(i);
+			if (0==comparator.compare(s, cc.toString())){
+				return cc;
+			}
+		}
+		return null;
+	}
+
+	/** @see PopupComponent#selectBestMatch(Object, boolean) */
+	public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
+		return (useFormatter && (hint instanceof String))? 
+				findOnSortedContent((String)hint, exact) : 
+					new PopupComponent.Match(content.indexOf(hint));
+	}
+
 	/** Specifies that the content is to be handled as strings */
 	public boolean setStringContent(Format format, Comparator stringComparator) {
 		boolean ret = !useFormatter || format!=this.format || comparator!=stringComparator;
@@ -100,47 +141,6 @@ public class ChoicesListModel extends AbstractListModel {
 			clearContent();
 		}
 		return ret;
-	}
-
-	/** Returns true if the object is a valid choice (as object, or string) */
-	public boolean isValidChoice(Object o){
-		return content.contains(o);
-	}
-	
-	/** @see PopupComponent#selectBestMatch(Object, boolean) */
-	public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
-		return (useFormatter && (hint instanceof String))? 
-				findOnSortedContent((String)hint, exact) : 
-					new PopupComponent.Match(content.indexOf(hint));
-	}
-
-	public void clearContent() {
-		int size = getSize();
-		if (size > 0) {
-			customChoices = 0;
-			content.clear();
-			fireIntervalRemoved(this, 0, size);
-		}
-	}
-	
-	public boolean isEmpty(){
-		return content.isEmpty();
-	}
-
-	/** Returns the current choices */
-	public Collection<?> getChoices(){
-		return content;
-	}
-
-	/** Returns the CustomChoice matching the given text, if any */ 
-	public CustomChoice getCustomChoice(String s){
-		for (int i=0; i<customChoices;i++){
-			CustomChoice cc=(CustomChoice) content.get(i);
-			if (0==comparator.compare(s, cc.toString())){
-				return cc;
-			}
-		}
-		return null;
 	}
 
 	/** 

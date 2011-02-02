@@ -101,14 +101,6 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Invoked when the user select an element in the choices or history lists*/
 	protected abstract void choiceSelected(Object selection);
 	
-	/** 
-	 * Creates an EditorComponent that can display content with 
-	 * the same renderer used to display the choices
-	 */
-	public EditorComponent createRenderedEditorComponent(FilterEditor editor) {
-		return new EditorComponent.Rendered(editor, listRenderer);
-	}
-
 	/** Returns the current selection -can be history or and choices-*/
 	public Object getSelection() {
 		return focusedList.getSelectedValue();
@@ -117,6 +109,61 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Returns true if the current selection belongs to the history*/
 	public boolean isHistorySelection(){
 		return focusedList==historyList;
+	}
+
+	/** Returns true if the passed object matches an existing choice */
+	public boolean isValidChoice(Object object){
+		return choicesModel.isValidChoice(object);		
+	}
+	
+	/** Returns true if the popup has any content to display */
+	public boolean hasContent(){
+		return !choicesModel.isEmpty() || !historyModel.isEmpty();
+	}
+
+	/** Returns true if the popup contains choices (history notwithstanding) */
+	public boolean hasChoices() {
+		return !choicesModel.isEmpty();
+	}
+
+	/** Returns the custom choice matching the given text */
+	public CustomChoice getCustomChoice(String s){
+		return choicesModel.getCustomChoice(s);
+	}
+
+	/** Returns the current choices */
+	public Collection<?> getChoices(){
+		return choicesModel.getChoices();
+	}
+	
+	/** 
+	 * Adds content to the choices list.<br>
+	 * If there is no {@link ListCellRenderer} defined,
+	 * the content is stringfied and sorted -so duplicates are removed-
+	 * @returns true if the operation implies a change
+	 */
+	public boolean addChoices(Collection<?> choices) {
+		if (choicesModel.addContent(choices)){
+			fixMaxHistory();
+			reconfigureGui();
+			return true;
+		}
+		return false;
+	}
+
+	/** Adds content to the history list */
+	public void addHistory(Object st) {
+		if (historyModel.add(st)) {
+			reconfigureGui();
+		}
+	}
+
+	/** Clears both the history and the choices lists */
+	public void clear() {
+		choicesModel.clearContent();
+		historyModel.clear();
+		fixMaxHistory();
+		reconfigureGui();
 	}
 
 	/** Returns true if the popup is currently visible */
@@ -154,6 +201,45 @@ abstract class PopupComponent implements PopupMenuListener{
 			return true;
 		}
 		return false;
+	}
+
+	/** 
+	 * Creates an EditorComponent that can display content with 
+	 * the same renderer used to display the choices
+	 */
+	public EditorComponent createRenderedEditorComponent(FilterEditor editor) {
+		return new EditorComponent.Rendered(editor, listRenderer);
+	}
+
+	/** Returns the current {@link ListCellRenderer} */
+	public ListCellRenderer getListCellRenderer() {
+		return listRenderer.getUserRenderer();
+	}
+
+	/** Specifies that the content requires no conversion to strings */
+	public void setRenderedContent(ListCellRenderer renderer, Comparator classComparator) {
+		listRenderer.setUserRenderer(renderer);
+		if (choicesModel.setRenderedContent(classComparator)){
+			historyModel.setStringContent(null);
+			reconfigureGui();
+		}
+	}
+
+	/** Specifies that the content is to be handled as strings */
+	public void setStringContent(Format format, Comparator stringComparator) {
+		listRenderer.setUserRenderer(null);
+		if (choicesModel.setStringContent(format, stringComparator)){
+			historyModel.setStringContent(stringComparator);
+			reconfigureGui();
+		}
+	}
+	
+	/**  
+	 * Returns the string comparator<br> 
+	 * it will be invalid (null or not string comparator) for rendered content
+	 */
+	public Comparator<String> getStringComparator(){
+		return historyModel.getStringComparator();
 	}
 
 	/**
@@ -201,37 +287,6 @@ abstract class PopupComponent implements PopupMenuListener{
 		return null;
 	}
 
-	/** Specifies that the content is to be handled as strings */
-	public void setStringContent(Format format, Comparator stringComparator) {
-		listRenderer.setUserRenderer(null);
-		if (choicesModel.setStringContent(format, stringComparator)){
-			historyModel.setStringContent(stringComparator);
-			reconfigureGui();
-		}
-	}
-	
-	/**  
-	 * Returns the string comparator<br> 
-	 * it will be invalid (null or not string comparator) for rendered content
-	 */
-	public Comparator<String> getStringComparator(){
-		return historyModel.getStringComparator();
-	}
-
-	/** Specifies that the content requires no conversion to strings */
-	public void setRenderedContent(ListCellRenderer renderer, Comparator classComparator) {
-		listRenderer.setUserRenderer(renderer);
-		if (choicesModel.setRenderedContent(classComparator)){
-			historyModel.setStringContent(null);
-			reconfigureGui();
-		}
-	}
-
-	/** Returns the current {@link ListCellRenderer} */
-	public ListCellRenderer getListCellRenderer() {
-		return listRenderer.getUserRenderer();
-	}
-
 	/** 
 	 * Informs that the focus is on the popup: 
 	 * this affects how the selected elements are displayed
@@ -246,78 +301,6 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** Returns true if the focus is currently on the popup */
 	public boolean isPopupFocused() {
 		return isVisible() && listRenderer.isFocusOnList();
-	}
-
-	/** Sets the list's background color */
-	public void setBackground(Color color){
-		choicesList.setBackground(color);
-		historyList.setBackground(color);
-	}
-	
-	/** Sets the list's foreground color */
-	public void setForeground(Color color){
-		choicesList.setForeground(color);
-		historyList.setForeground(color);
-	}
-	
-	/** Sets the list's selected background color */
-	public void setSelectionBackground(Color color){
-		choicesList.setSelectionBackground(color);
-		historyList.setSelectionBackground(color);
-	}
-	
-	/** Sets the list's selected foreground color */
-	public void setSelectionForeground(Color color){
-		choicesList.setSelectionForeground(color);
-		historyList.setSelectionForeground(color);
-	}
-	
-	/** Gets the list's selected background color */
-	public Color getSelectionBackground(){
-		return choicesList.getSelectionBackground();
-	}
-	
-	/** Gets the list's selected foreground color */
-	public Color getSelectionForeground(){
-		return choicesList.getSelectionForeground();
-	}
-	
-	/** Sets the disabled color, used on the CustomChoices' text */
-	public void setDisabledColor(Color color){
-		listRenderer.setDisabledColor(color);
-	}
-	
-	/** Sets the disabled color, used for many things, like border, separator */
-	public void setGridColor(Color color){
-		popup.setBorder(BorderFactory.createLineBorder(color, 1));
-		separator.setForeground(color);
-	}
-	
-	/** Return the grid color*/
-	public Color getGridColor(){
-		return separator.getForeground();
-	}
-	
-	/** Sets the list's font color */
-	public void setFont(Font font){
-		choicesList.setFont(font);
-		historyList.setFont(font);
-		ensureListRowsHeight();
-	}
-	
-	/** Returns true if the passed object matches an existing choice */
-	public boolean isValidChoice(Object object){
-		return choicesModel.isValidChoice(object);		
-	}
-	
-	/** Returns true if the popup has any content to display */
-	public boolean hasContent(){
-		return !choicesModel.isEmpty() || !historyModel.isEmpty();
-	}
-
-	/** Returns true if the popup contains choices (history notwithstanding) */
-	public boolean hasChoices() {
-		return !choicesModel.isEmpty();
 	}
 
 	/** @see IFilterEditor#setMaxVisibleRows(int) */
@@ -345,56 +328,6 @@ abstract class PopupComponent implements PopupMenuListener{
 		return maxHistory;
 	}
 	
-	/** Internal method to calculate the real history size used */
-	private boolean fixMaxHistory(){
-		int now = historyModel.getMaxHistory();
-		int choicesSize = choicesModel.getSize();
-		int finalSize = choicesSize==0? maxVisibleRows 
-				: Math.min(maxHistory, maxVisibleRows 
-						- Math.min(choicesSize, MIN_VISIBLE_CHOICES));
-		return finalSize==now? false : historyModel.setMaxHistory(finalSize);
-	}
-
-	/** Clears both the history and the choices lists */
-	public void clear() {
-		choicesModel.clearContent();
-		historyModel.clear();
-		fixMaxHistory();
-		reconfigureGui();
-	}
-
-	/** Adds content to the history list */
-	public void addHistory(Object st) {
-		if (historyModel.add(st)) {
-			reconfigureGui();
-		}
-	}
-
-	/** 
-	 * Adds content to the choices list.<br>
-	 * If there is no {@link ListCellRenderer} defined,
-	 * the content is stringfied and sorted -so duplicates are removed-
-	 * @returns true if the operation implies a change
-	 */
-	public boolean addChoices(Collection<?> choices) {
-		if (choicesModel.addContent(choices)){
-			fixMaxHistory();
-			reconfigureGui();
-			return true;
-		}
-		return false;
-	}
-
-	/** Returns the current choices */
-	public Collection<?> getChoices(){
-		return choicesModel.getChoices();
-	}
-	
-	/** Returns the custom choice matching the given text */
-	public CustomChoice getCustomChoice(String s){
-		return choicesModel.getCustomChoice(s);
-	}
-
 	/**
 	 * Selects the first element in the focused list. If it is already on the
 	 * first element, or forceJump is true, selects the first element on the
@@ -492,6 +425,63 @@ abstract class PopupComponent implements PopupMenuListener{
 		select(select);
 	}
 
+	/** Sets the list's background color */
+	public void setBackground(Color color){
+		choicesList.setBackground(color);
+		historyList.setBackground(color);
+	}
+	
+	/** Sets the list's foreground color */
+	public void setForeground(Color color){
+		choicesList.setForeground(color);
+		historyList.setForeground(color);
+	}
+	
+	/** Sets the list's selected background color */
+	public void setSelectionBackground(Color color){
+		choicesList.setSelectionBackground(color);
+		historyList.setSelectionBackground(color);
+	}
+	
+	/** Sets the list's selected foreground color */
+	public void setSelectionForeground(Color color){
+		choicesList.setSelectionForeground(color);
+		historyList.setSelectionForeground(color);
+	}
+	
+	/** Gets the list's selected background color */
+	public Color getSelectionBackground(){
+		return choicesList.getSelectionBackground();
+	}
+	
+	/** Gets the list's selected foreground color */
+	public Color getSelectionForeground(){
+		return choicesList.getSelectionForeground();
+	}
+	
+	/** Sets the disabled color, used on the CustomChoices' text */
+	public void setDisabledColor(Color color){
+		listRenderer.setDisabledColor(color);
+	}
+	
+	/** Sets the disabled color, used for many things, like border, separator */
+	public void setGridColor(Color color){
+		popup.setBorder(BorderFactory.createLineBorder(color, 1));
+		separator.setForeground(color);
+	}
+	
+	/** Return the grid color*/
+	public Color getGridColor(){
+		return separator.getForeground();
+	}
+	
+	/** Sets the list's font color */
+	public void setFont(Font font){
+		choicesList.setFont(font);
+		historyList.setFont(font);
+		ensureListRowsHeight();
+	}
+	
 	/**
 	 * Selects the given row in the focused list.<br>
 	 * Returns true if there is a selection change
@@ -520,6 +510,16 @@ abstract class PopupComponent implements PopupMenuListener{
 	 **/
 	private boolean canSwitchToChoices() {
 		return focusedList == historyList && choicesScrollPane.isVisible();
+	}
+
+	/** Internal method to calculate the real history size used */
+	private boolean fixMaxHistory(){
+		int now = historyModel.getMaxHistory();
+		int choicesSize = choicesModel.getSize();
+		int finalSize = choicesSize==0? maxVisibleRows 
+				: Math.min(maxHistory, maxVisibleRows 
+						- Math.min(choicesSize, MIN_VISIBLE_CHOICES));
+		return finalSize==now? false : historyModel.setMaxHistory(finalSize);
 	}
 
 	/** Moves the focus to the history list */
