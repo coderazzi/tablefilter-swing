@@ -613,39 +613,35 @@ interface EditorComponent {
             String buffer = textField.getText();
             String newContent = buffer.substring(0, offset) 
             	+ buffer.substring(offset + length);
-            if (newContent.length() == 0) {
-                super.replace(fb, 0, buffer.length(), "", null);
-            } else {
-            	//on text content, this comparator cannot be null
-	            Comparator<String> comparator = popup.getStringComparator();
-	            String proposal = getProposalOnEdition(newContent, true);
-	            if (proposal==null || comparator.compare(newContent, proposal)!=0){
-                    proposal = getProposalOnEdition(newContent, false);
-                    if (proposal == null) {
-                        return;
-                    }
-                    if (PopupComponent.Match.getMatchingLength(proposal, newContent, comparator)
-                    		<= PopupComponent.Match.getMatchingLength(buffer, newContent, comparator)){
-	                    proposal = buffer;
-	                }
-	            }
-	            super.replace(fb, 0, buffer.length(), proposal, null);
-	             
-	            //special case if the removal is due to BACK SPACE
-	    		AWTEvent ev = EventQueue.getCurrentEvent();
-	    		if ((ev instanceof KeyEvent) 
-	    				&& ((KeyEvent)ev).getKeyCode() == KeyEvent.VK_BACK_SPACE){
-	                if (caret > mark) {
-	                    caret = mark;
-	                } else if (buffer == proposal) {
-	                    --caret;
-	                } else if (caret == mark) {
-	                    caret = offset;
-	                }    			
-	    		} 
-	            textField.setCaretPosition(proposal.length());
-	            textField.moveCaretPosition(caret);
+        	//on text content, this comparator cannot be null
+            Comparator<String> comparator = popup.getStringComparator();
+            String proposal = getProposalOnEdition(newContent, true);
+            if (proposal==null || comparator.compare(newContent, proposal)!=0){
+                proposal = getProposalOnEdition(newContent, false);
+                if (proposal == null) {
+                    return;
+                }
+                if (PopupComponent.Match.getMatchingLength(proposal, newContent, comparator)
+                		<= PopupComponent.Match.getMatchingLength(buffer, newContent, comparator)){
+                    proposal = buffer;
+                }
             }
+            super.replace(fb, 0, buffer.length(), proposal, null);
+             
+            //special case if the removal is due to BACK SPACE
+    		AWTEvent ev = EventQueue.getCurrentEvent();
+    		if ((ev instanceof KeyEvent) 
+    				&& ((KeyEvent)ev).getKeyCode() == KeyEvent.VK_BACK_SPACE){
+                if (caret > mark) {
+                    caret = mark;
+                } else if (buffer == proposal) {
+                    --caret;
+                } else if (caret == mark) {
+                    caret = offset;
+                }    			
+    		} 
+            textField.setCaretPosition(proposal.length());
+            textField.moveCaretPosition(caret);
         }
 
         /** {@link DocumentListener}: method called when handler is editable */

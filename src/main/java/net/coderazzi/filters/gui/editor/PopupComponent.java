@@ -719,6 +719,7 @@ abstract class PopupComponent implements PopupMenuListener{
 		public static Match findOnUnsortedContent(List content, int len, 
 				Comparator strComparator, String strStart, boolean fullMatch) 
 		{
+			int strLen=strStart.length();
 			Match ret = new Match(-1);
 			while (len-->0){
 				String use=content.get(len).toString();
@@ -726,7 +727,7 @@ abstract class PopupComponent implements PopupMenuListener{
 				if (matchLen>ret.len || ret.len==0){
 					ret.index=len;
 					ret.len=matchLen;
-					if (use.length()==strStart.length()){
+					if (matchLen==strLen && use.length()==strLen){
 						ret.exact=true;
 						return ret;
 					}
