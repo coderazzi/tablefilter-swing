@@ -77,12 +77,12 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private Component inner;
 	private Color arrowColor;
 
-	private boolean selected;
+	private boolean showArrow;
 	private boolean focusOnList;
 	private int xDeltaBase;
 	private int width;
 	
-	Color disabledColor, foregroundColor;
+	Color disabledColor, foregroundColor, backgroundColor;
 	boolean addSeparator;
 	ListCellRenderer userRenderer;
 
@@ -178,7 +178,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 				focusOnList && isSelected, cellHasFocus);
 		width = referenceList.isShowing() ? 
 				referenceList.getWidth() : list.getWidth();
-		selected = isSelected;
+		showArrow = isSelected;
 		xDeltaBase = WIDTH_ARROW + 2 * X_MARGIN_ARROW;
 		return this;
 	}
@@ -188,7 +188,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			boolean focused) {
 		setupRenderer(referenceList, value, -1, focused, false);
 		width = finalWidth;
-		selected = focused;
+		showArrow = false;
 		xDeltaBase = 0;
 		return this;
 	}
@@ -196,7 +196,13 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private void setupRenderer(JList list, Object value, int index, 
 			boolean isSelected, boolean cellHasFocus) {
 		addSeparator = false;
-		foregroundColor = getForegroundColor(isSelected);
+		if (isSelected){
+			foregroundColor = list.getSelectionForeground();
+			backgroundColor = list.getSelectionBackground();
+		} else {
+			foregroundColor = list.getForeground();
+			backgroundColor = list.getBackground();			
+		}
 		inner=null;
 		ListCellRenderer renderer = userRenderer;	
 		if (value instanceof CustomChoice){
@@ -223,7 +229,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		int height = getHeight();
 		int xDelta = xDeltaBase;
 		int yDelta = 0;
-		if (selected) {
+		if (showArrow) {
 			Object old = ((Graphics2D) g).getRenderingHint(
 					RenderingHints.KEY_ANTIALIASING);
 			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -244,7 +250,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			boolean resetEnabled = inner.isEnabled();
 			inner.setFont(getFont());
 			inner.setEnabled(isEnabled());
-			inner.setBackground(getBackgroundColor(selected));
+			inner.setBackground(backgroundColor);
 			inner.setForeground(foregroundColor);
 			painter.paintComponent(g, inner, this, 0, 0, width-xDeltaBase, height);
 			inner.setFont(resetFont);
@@ -269,12 +275,4 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		return true;
 	}
 	
-	Color getForegroundColor(boolean selected){
-		return selected? referenceList.getSelectionForeground() : referenceList.getForeground();
-	}
-	
-	private Color getBackgroundColor(boolean selected){
-		return selected? referenceList.getSelectionBackground() : referenceList.getBackground();
-	}	
-
 }

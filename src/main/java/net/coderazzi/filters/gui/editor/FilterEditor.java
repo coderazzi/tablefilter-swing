@@ -609,7 +609,10 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 			if (!popup.display(editor.getComponent())){
 				return false;
 			}
-			popup.selectBestMatch(editor.getContent(), false);
+			if (null==popup.selectBestMatch(editor.getContent(), false)){
+				//select ANYTHING
+				popup.selectBestMatch("", false);
+			}
 		}
 		return true;
 	}
