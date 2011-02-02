@@ -99,8 +99,8 @@ public class TableFilterExample extends JFrame {
     public TableFilterExample() {
         super("Table Filter Example");
         getContentPane().add(createGui());
-//        filterHeader.setAdaptiveChoices(false);
-//        filterHeader.setAutoChoices(AutoChoices.DISABLED);
+        filterHeader.setAdaptiveChoices(false);
+        filterHeader.setAutoChoices(AutoChoices.DISABLED);
         setJMenuBar(createMenu());
     	filterHeader.setTable(table);
         customizeTable();

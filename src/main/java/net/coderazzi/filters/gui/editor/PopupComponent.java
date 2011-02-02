@@ -32,6 +32,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.Format;
@@ -40,7 +41,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -68,6 +71,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	private JScrollPane choicesScrollPane;
 	private JScrollPane historyScrollPane;
 	private JSeparator separator;	
+	private EmptyPopup emptyPopupMark;
 
 	private ChoicesListModel choicesModel;
 	private HistoryListModel historyModel;
@@ -116,11 +120,6 @@ abstract class PopupComponent implements PopupMenuListener{
 		return choicesModel.isValidChoice(object);		
 	}
 	
-	/** Returns true if the popup has any content to display */
-	public boolean hasContent(){
-		return !choicesModel.isEmpty() || !historyModel.isEmpty();
-	}
-
 	/** Returns true if the popup contains choices (history notwithstanding) */
 	public boolean hasChoices() {
 		return !choicesModel.isEmpty();
@@ -140,15 +139,12 @@ abstract class PopupComponent implements PopupMenuListener{
 	 * Adds content to the choices list.<br>
 	 * If there is no {@link ListCellRenderer} defined,
 	 * the content is stringfied and sorted -so duplicates are removed-
-	 * @returns true if the operation implies a change
 	 */
-	public boolean addChoices(Collection<?> choices) {
+	public void addChoices(Collection<?> choices) {
 		if (choicesModel.addContent(choices)){
 			fixMaxHistory();
 			reconfigureGui();
-			return true;
 		}
-		return false;
 	}
 
 	/** Adds content to the history list */
@@ -178,13 +174,14 @@ abstract class PopupComponent implements PopupMenuListener{
 	 * and the size of the popup.
 	 */
 	public boolean display(Component editor) {
-		if (isVisible() || !hasContent()) {
+		if (isVisible()){
 			return false;
 		}
 		setPopupFocused(false);
 		int width = editor.getParent().getWidth()-1;
 		configurePaneSize(choicesScrollPane, width);
 		configurePaneSize(historyScrollPane, width);
+		configurePaneSize(emptyPopupMark, width);
 		if (editor.isValid()){
 			popup.show(editor, -editor.getLocation().x-1, editor.getHeight());
 		}
@@ -292,7 +289,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	 * this affects how the selected elements are displayed
 	 **/
 	public void setPopupFocused(boolean set) {
-		if (set != listRenderer.isFocusOnList()) {
+		if (set != listRenderer.isFocusOnList() && !emptyPopupMark.isVisible()) {
 			listRenderer.setFocusOnList(set);
 			focusedList.repaint();
 		}
@@ -300,7 +297,7 @@ abstract class PopupComponent implements PopupMenuListener{
 
 	/** Returns true if the focus is currently on the popup */
 	public boolean isPopupFocused() {
-		return isVisible() && listRenderer.isFocusOnList();
+		return isVisible() && listRenderer.isFocusOnList() && !emptyPopupMark.isVisible();
 	}
 
 	/** @see IFilterEditor#setMaxVisibleRows(int) */
@@ -441,6 +438,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	public void setSelectionBackground(Color color){
 		choicesList.setSelectionBackground(color);
 		historyList.setSelectionBackground(color);
+		emptyPopupMark.setBackground(color);
 	}
 	
 	/** Sets the list's selected foreground color */
@@ -540,7 +538,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	}
 
 	/** Configures the passed pane to have the given preferred width */
-	private void configurePaneSize(JScrollPane pane, int width) {
+	private void configurePaneSize(JComponent pane, int width) {
 		Dimension size = pane.getPreferredSize();
 		size.width = width;
 		pane.setPreferredSize(size);
@@ -585,6 +583,7 @@ abstract class PopupComponent implements PopupMenuListener{
 		ensureListRowsHeight();
 
 		separator = new JSeparator();
+		emptyPopupMark = new EmptyPopup();
 
 		popup = new JPopupMenu();
 		popup.setLayout(new BorderLayout());
@@ -593,7 +592,10 @@ abstract class PopupComponent implements PopupMenuListener{
 		popup.addPopupMenuListener(this);
 
 		historyScrollPane = createScrollPane(historyList);
-		popup.add(historyScrollPane, BorderLayout.NORTH);
+		JPanel inner = new JPanel(new BorderLayout());
+		inner.add(emptyPopupMark, BorderLayout.NORTH);
+		inner.add(historyScrollPane, BorderLayout.CENTER);
+		popup.add(inner, BorderLayout.NORTH);
 		popup.add(separator, BorderLayout.CENTER);
 		popup.add(choicesScrollPane, BorderLayout.SOUTH);
 		popup.setDoubleBuffered(true);
@@ -610,10 +612,9 @@ abstract class PopupComponent implements PopupMenuListener{
 	 * and choices lists 
 	 **/
 	private void reconfigureGui() {
-		// if there is no history and no choices, show still the history
 		int historySize = historyModel.getSize();
 		boolean showChoices = choicesModel.getSize() > 0;
-		boolean showHistory = historySize > 0 || !showChoices;
+		boolean showHistory = historySize > 0;
 		choicesScrollPane.setVisible(showChoices);
 		historyScrollPane.setVisible(showHistory);
 		if (showHistory) {
@@ -626,6 +627,8 @@ abstract class PopupComponent implements PopupMenuListener{
 			choicesScrollPane.setPreferredSize(null);
 		}
 		separator.setVisible(showHistory && showChoices);
+		// if there is no history and no choices, show the empty space content
+		emptyPopupMark.setVisible(!showHistory && !showChoices);
 	}
 
 	
@@ -662,6 +665,22 @@ abstract class PopupComponent implements PopupMenuListener{
 		boolean ret = !popup.isVisible() && cancelReason==source;
 		cancelReason=null;
 		return ret;
+	}
+	
+	/** Class behaving as a small separator of fixed height */
+	final static class EmptyPopup extends JComponent{
+		private static final long serialVersionUID = 7927091558851809637L;
+		Dimension size = new Dimension(0, 4);
+		@Override public Dimension getPreferredSize() {
+			return size;
+		}
+		@Override public void setPreferredSize(Dimension preferredSize) {
+			this.size=preferredSize;			
+		}
+		@Override protected void paintComponent(Graphics g) {
+			g.setColor(getBackground());
+			g.fillRect(0, 0, getWidth(), getHeight());
+		}
 	}
 
 	/**

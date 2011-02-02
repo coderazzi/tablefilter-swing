@@ -125,7 +125,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 				triggerPopup(downButton);
 			}
 		});	
-		downButton.setCanPopup(false);
 		
 		add(downButton, BorderLayout.EAST);
 		setupEditorComponent(null);
@@ -484,9 +483,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	/** Method invoked by the FiltersHandler to extend the choices */
 	public void addChoices(Collection<?> choices) {
 		//System.out.println("Editor "+getModelIndex()+": add "+choices.size()+" on "+getChoices().size());
-		if (popup.addChoices(choices)){
-			downButton.setCanPopup(popup.hasContent());
-		}
+		popup.addChoices(choices);
 	}
 	
 	/** Request choices, if enabled, to the filtersHandler */
@@ -860,6 +857,10 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 						popup.selectUp(false);
 					} else {
 						popup.setPopupFocused(true);
+						//if still not focused, it has empty content
+						if (!popup.isPopupFocused()){
+							popup.hide();
+						}
 					}
 				} else {
 					showChoices();
@@ -926,11 +927,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
 	/**
 	 * Custom implementation of the arrow used to display the popup menu.<br>
-	 * It can have three states:<ul>
-	 * <li>Disabled: shown  with disabled, color</li> 
-	 * <li>Enabled, full: shown with normal color</li> 
-	 * <li>Enabled, not full: means that the popup cannot be shown, because has 
-	 * no content;  it is displayed as disabled</li> 
 	 */
 	final static class FilterArrowButton extends JButton {
 		private static final long serialVersionUID = -777416843479142582L;
@@ -940,15 +936,8 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		private final static int MIN_Y = 6;
 		
 		private boolean focus;
-		private boolean canPopup=true;
-		private boolean enabled=true;
 		private Color disabledColor;
 		private Color selectionForeground, selectionBackground;
-		
-		public void setCanPopup(boolean full){
-			this.canPopup=full;
-			super.setEnabled(full && enabled);
-		}
 		
 		public void setFocused(boolean focus){
 			this.focus=focus;
@@ -976,11 +965,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 			}
 		}
 		
-		@Override public void setEnabled(boolean b) {
-			this.enabled=b;
-			super.setEnabled(canPopup && enabled);
-		}
-		
 		@Override public void paint(Graphics g) {
 			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
@@ -988,13 +972,13 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 			int height = getHeight();
 			int width = getWidth();
 
-			g.setColor(enabled && focus? selectionBackground: getBackground());
+			g.setColor(isEnabled() && focus? selectionBackground: getBackground());
 			g.fillRect(0, 0, width, height);
 
 			width = (width - MIN_X) / 2;
 			height = Math.min(height / 2, height - MIN_Y);
 			g.translate(width, height);
-			if (enabled && canPopup){
+			if (isEnabled()){
 				g.setColor(focus? selectionForeground : getForeground());
 			} else {
 				g.setColor(disabledColor);
@@ -1047,7 +1031,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	    		}
 	    		if (editor.isValidContent()){
 	    			popup.addHistory(editor.getContent());
-	    			downButton.setCanPopup(popup.hasContent());
 	    		}
     		}
     	}
