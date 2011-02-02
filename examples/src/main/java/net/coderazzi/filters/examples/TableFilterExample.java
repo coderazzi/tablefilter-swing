@@ -619,7 +619,6 @@ public class TableFilterExample extends JFrame {
 			}
 		});
     	
-
 		menu.add(useFlagRenderer);
     	menu.add(createAppearanceMenu(editor));
     	menu.add(history);
