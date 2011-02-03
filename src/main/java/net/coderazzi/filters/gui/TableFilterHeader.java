@@ -120,6 +120,9 @@ public class TableFilterHeader extends JPanel {
 	/** This is the total max number of visible rows (history PLUS choices) */
 	int maxVisibleRows = FilterSettings.maxVisiblePopupRows;
     
+	/** This is the total max number of visible rows (history PLUS choices) */
+	int maxHistory = FilterSettings.maxPopupHistory;
+    
     /**
      * The columnsController is a glue component, controlling the filters 
      * associated to each column
@@ -167,6 +170,13 @@ public class TableFilterHeader extends JPanel {
         backgroundSet = foregroundSet = fontSet = false;
         setPosition(FilterSettings.headerPosition);
         setTable(table);
+    }
+
+    /** Returns the filter editor for the given column in the table model */
+    public IFilterEditor getFilterEditor(int modelColumn) {
+        return (columnsController == null) ? null : 
+        	columnsController.getFilterEditor(
+        			getTable().convertColumnIndexToView(modelColumn));
     }
 
     /**
@@ -218,14 +228,56 @@ public class TableFilterHeader extends JPanel {
     	return filtersHandler.getParserModel();
     }
     
-    /** Adds a filter -user specified- to the filter header */
-    public void addFilter(IFilter... filter) {
-        filtersHandler.addFilter(filter);
+	/**
+	 * Sets the auto choices flag. When set, all editors are automatically 
+	 * populated with choices extracted from the table's content 
+	 * -and updated as the table is updated-.
+	 */
+	public void setAutoChoices(AutoChoices set){
+		filtersHandler.setAutoChoices(set);
+	}
+	
+	/** Returns the auto choices flag */
+	public AutoChoices getAutoChoices(){
+		return filtersHandler.getAutoChoices();
+	}
+
+    /**
+     * Sets the adaptive choices mode
+     */
+    public void setAdaptiveChoices(boolean enable) {
+    	filtersHandler.setAdaptiveChoices(enable);
     }
 
-    /** Adds a filter -user specified- to the filter header */
-    public void removeFilter(IFilter... filter) {
-        filtersHandler.removeFilter(filter);
+    /**
+     * Returns the adaptive choices mode
+     */
+    public boolean isAdaptiveChoices() {
+        return filtersHandler.isAdaptiveChoices();
+    }
+
+    /** Hides / makes visible the header */
+	@Override public void setVisible(boolean flag) {
+    	if (isVisible()!=flag){
+    		positionHelper.headerVisibilityChanged(flag);
+    	}
+    	super.setVisible(flag);
+		positionHelper.headerVisibilityChanged(flag);
+	}
+	
+    /** Enables/Disables the filters */
+    @Override public void setEnabled(boolean enabled) {
+    	//it is not possible to call to super.setEnabled(enabled);
+    	//the filter header can embed the the header of the table, which 
+    	//would then become also disabled.
+    	if (filtersHandler!=null){
+        	filtersHandler.setEnabled(enabled);
+    	}
+    }
+    
+    /** Returns the current enable status */
+    @Override public boolean isEnabled() {
+    	return filtersHandler==null || filtersHandler.isEnabled();
     }
 
     /**
@@ -241,6 +293,58 @@ public class TableFilterHeader extends JPanel {
         return positionHelper.getPosition();
     }
 
+	/** 
+	 * Sets the maximum number of visible rows in the popup menu 
+	 * (a minimum is always enforced) 
+	 **/
+	public void setMaxVisibleRows(int maxVisibleRows) {
+		this.maxVisibleRows = maxVisibleRows;
+		if (columnsController!=null){
+			columnsController.setMaxVisibleRows(maxVisibleRows);
+		}
+	}
+
+	/** Returns the maximum number of visible rows in the popup menu*/
+	public int getMaxVisibleRows() {
+		return maxVisibleRows;
+	}
+
+	/** 
+	 * Sets the maximum history size, always lower than the max number of
+	 * visible rows 
+	 **/
+	public void setMaxHistory(int maxHistory) {
+		this.maxHistory = maxHistory;
+		if (columnsController!=null){
+			columnsController.setMaxHistory(maxHistory);
+		}
+	}
+
+	/** Returns the maximum history size*/
+	public int getMaxHistory() {
+		return maxVisibleRows;
+	}
+
+    /** Adds a filter -user specified- to the filter header */
+    public void addFilter(IFilter... filter) {
+        filtersHandler.addFilter(filter);
+    }
+
+    /** Adds a filter -user specified- to the filter header */
+    public void removeFilter(IFilter... filter) {
+        filtersHandler.removeFilter(filter);
+    }
+
+    /** Adds a new observer to the header */
+    public void addHeaderObserver(IFilterHeaderObserver observer) {
+        observers.add(observer);
+    }
+
+    /** Removes an existing observer from the header */
+    public void removeHeaderObserver(IFilterHeaderObserver observer) {
+    	observers.remove(observer);
+    }
+    
     /**
      * <p>Invokes resetFilter on all the editor filters.</p>
      *
@@ -253,41 +357,6 @@ public class TableFilterHeader extends JPanel {
             columnsController.resetFilters();
             filtersHandler.enableNotifications(true);
         }
-    }
-
-    /** Method automatically invoked when the class ancestor changes */
-    @Override public void addNotify() {
-    	super.addNotify();
-    	positionHelper.filterHeaderContainmentUpdate();
-    }
-    
-    /**
-     * removes the current columnsController
-     * @return true if there was a controller
-     */
-    private boolean removeController() {
-
-        if (columnsController != null) {
-            columnsController.detach();
-            remove(columnsController);
-            columnsController = null;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * creates/recreates the current columnsController
-     */
-    void recreateController() {
-        filtersHandler.enableNotifications(false);
-        removeController();
-        columnsController = new FilterColumnsControllerPanel(getFont(), 
-        		getForeground(), 
-        		getBackground());
-        add(columnsController, BorderLayout.CENTER);
-        revalidate();
-        filtersHandler.enableNotifications(true);
     }
 
     /** Sets the background color used by the parsed-based editors. */
@@ -444,95 +513,6 @@ public class TableFilterHeader extends JPanel {
         return gridColor;
     }
 
-	/** 
-	 * Sets the maximum number of visible rows in the popup menu 
-	 * (a minimum is always enforced) 
-	 **/
-	public void setMaxVisibleRows(int maxVisibleRows) {
-		this.maxVisibleRows = maxVisibleRows;
-		if (columnsController!=null){
-			columnsController.setMaxVisibleRows(maxVisibleRows);
-		}
-	}
-
-	/** Returns the maximum number of visible rows in the popup menu*/
-	public int getMaxVisibleRows() {
-		return maxVisibleRows;
-	}
-
-    /** Customizes the editor, can be overridden for custom appearance */
-    protected void customizeEditor(IFilterEditor editor) {
-        editor.setForeground(getForeground());
-        editor.setBackground(getBackground());
-        editor.setErrorForeground(getErrorForeground());
-        editor.setDisabledForeground(getDisabledForeground());
-    	editor.setSelectionBackground(getSelectionBackground());
-    	editor.setSelectionForeground(getSelectionForeground());
-    	editor.setTextSelectionColor(getTextSelectionColor());
-    	editor.setGridColor(getGridColor());
-        editor.setMaxVisibleRows(maxVisibleRows);
-        editor.setFont(getFont());
-    }
-
-    /** Returns the filter editor for the given column in the table model */
-    public IFilterEditor getFilterEditor(int modelColumn) {
-        return (columnsController == null) ? null : 
-        	columnsController.getFilterEditor(
-        			getTable().convertColumnIndexToView(modelColumn));
-    }
-
-    /** Hides / makes visible the header */
-	@Override public void setVisible(boolean flag) {
-    	if (isVisible()!=flag){
-    		positionHelper.headerVisibilityChanged(flag);
-    	}
-    	super.setVisible(flag);
-		positionHelper.headerVisibilityChanged(flag);
-	}
-	
-	/**
-	 * Sets the auto choices flag. When set, all editors are automatically 
-	 * populated with choices extracted from the table's content 
-	 * -and updated as the table is updated-.
-	 */
-	public void setAutoChoices(AutoChoices set){
-		filtersHandler.setAutoChoices(set);
-	}
-	
-	/** Returns the auto choices flag */
-	public AutoChoices getAutoChoices(){
-		return filtersHandler.getAutoChoices();
-	}
-
-    /** Enables/Disables the filters */
-    @Override public void setEnabled(boolean enabled) {
-    	//it is not possible to call to super.setEnabled(enabled);
-    	//the filter header can embed the the header of the table, which 
-    	//would then become also disabled.
-    	if (filtersHandler!=null){
-        	filtersHandler.setEnabled(enabled);
-    	}
-    }
-    
-    /** Returns the current enable status */
-    @Override public boolean isEnabled() {
-    	return filtersHandler==null || filtersHandler.isEnabled();
-    }
-
-    /**
-     * Sets the adaptive choices mode
-     */
-    public void setAdaptiveChoices(boolean enable) {
-    	filtersHandler.setAdaptiveChoices(enable);
-    }
-
-    /**
-     * Returns the adaptive choices mode
-     */
-    public boolean isAdaptiveChoices() {
-        return filtersHandler.isAdaptiveChoices();
-    }
-
     /** Sets the font used on all the editors. */
     @Override public void setFont(Font font) {
         super.setFont(font);
@@ -543,14 +523,10 @@ public class TableFilterHeader extends JPanel {
         }
     }
     
-    /** Adds a new observer to the header */
-    public void addHeaderObserver(IFilterHeaderObserver observer) {
-        observers.add(observer);
-    }
-
-    /** Removes an existing observer from the header */
-    public void removeHeaderObserver(IFilterHeaderObserver observer) {
-    	observers.remove(observer);
+    /** Method automatically invoked when the class ancestor changes */
+    @Override public void addNotify() {
+    	super.addNotify();
+    	positionHelper.filterHeaderContainmentUpdate();
     }
     
     @Override public void updateUI() {
@@ -577,6 +553,21 @@ public class TableFilterHeader extends JPanel {
     	updateFont();
     }
     
+    /** Customizes the editor, can be overridden for custom appearance */
+    protected void customizeEditor(IFilterEditor editor) {
+        editor.setForeground(getForeground());
+        editor.setBackground(getBackground());
+        editor.setErrorForeground(getErrorForeground());
+        editor.setDisabledForeground(getDisabledForeground());
+    	editor.setSelectionBackground(getSelectionBackground());
+    	editor.setSelectionForeground(getSelectionForeground());
+    	editor.setTextSelectionColor(getTextSelectionColor());
+    	editor.setGridColor(getGridColor());
+        editor.setFont(getFont());
+        editor.setMaxVisibleRows(maxVisibleRows);
+        editor.setMaxHistory(maxHistory);
+    }
+
     /** Updates the font on all components */
     private void updateFont(){
 		boolean set = fontSet;
@@ -735,6 +726,35 @@ public class TableFilterHeader extends JPanel {
     }
     
     /**
+     * removes the current columnsController
+     * @return true if there was a controller
+     */
+    private boolean removeController() {
+
+        if (columnsController != null) {
+            columnsController.detach();
+            remove(columnsController);
+            columnsController = null;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * creates/recreates the current columnsController
+     */
+    void recreateController() {
+        filtersHandler.enableNotifications(false);
+        removeController();
+        columnsController = new FilterColumnsControllerPanel(getFont(), 
+        		getForeground(), 
+        		getBackground());
+        add(columnsController, BorderLayout.CENTER);
+        revalidate();
+        filtersHandler.enableNotifications(true);
+    }
+
+    /**
      * Class setting up together all the column filters<br>
      * Note that, while the TableFilterHeader handles columns using their 
      * model numbering, the FilterColumnsControllerPanel manages the columns 
@@ -861,6 +881,13 @@ public class TableFilterHeader extends JPanel {
     	public void setMaxVisibleRows(int maxVisibleRows) {
             for (FilterColumnPanel column : columns) {
                 column.editor.setMaxVisibleRows(maxVisibleRows);
+            }
+    	}
+
+    	/** Sets the maximum nhistory popup menu*/
+    	public void setMaxHistory(int maxHistory) {
+            for (FilterColumnPanel column : columns) {
+                column.editor.setMaxHistory(maxHistory);
             }
     	}
 
