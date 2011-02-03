@@ -152,6 +152,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	/** IFilterEditor method */
 	@Override public void resetFilter() {
 		setEditorContent(null, false);
+		popup.clearHistory();
 		requestChoices();		
 	}
 	

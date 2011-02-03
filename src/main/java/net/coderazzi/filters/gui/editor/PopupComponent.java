@@ -155,6 +155,12 @@ abstract class PopupComponent implements PopupMenuListener{
 		hide();
 	}
 
+	/** Clears the history list */
+	public void clearHistory() {
+		historyModel.clear();
+		hide();
+	}
+
 	/** Returns true if the popup is currently visible */
 	public boolean isVisible() {
 		return popup!=null && popup.isVisible();
