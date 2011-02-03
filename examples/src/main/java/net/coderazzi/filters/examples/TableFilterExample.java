@@ -350,6 +350,7 @@ public class TableFilterExample extends JFrame {
     	ret.add(createPositionMenu());
     	ret.add(createAppearanceMenu(null));
     	ret.add(createMaxRowsMenu());
+    	ret.add(createMaxHistoryMenu(null));
     	ret.addSeparator();
     	ret.add(reset);
     	return ret;
@@ -604,15 +605,6 @@ public class TableFilterExample extends JFrame {
     	menu.add(ignoreCase);
     	menu.addSeparator();
     	
-    	JMenu history = new JMenu(MAX_HISTORY_LENGTH);
-    	ButtonGroup max = new ButtonGroup();
-    	
-    	for (int i=0; i<10;i++){
-    		JRadioButtonMenuItem item = createMaxHistoryMenuItem(editor, i);
-    		max.add(item);    		
-    		history.add(item);
-    	}
-    	
     	JCheckBoxMenuItem useFlagRenderer=new JCheckBoxMenuItem(USE_TABLE_RENDERER, name.equalsIgnoreCase("country"));
 		useFlagRenderer.addItemListener(new ItemListener() {
 			
@@ -623,7 +615,7 @@ public class TableFilterExample extends JFrame {
     	
 		menu.add(useFlagRenderer);
     	menu.add(createAppearanceMenu(editor));
-    	menu.add(history);
+    	menu.add(createMaxHistoryMenu(editor));
     	menu.addSeparator();
     	if (name.equalsIgnoreCase("country")){
     		menu.add(countrySpecialSorter);
@@ -749,19 +741,46 @@ public class TableFilterExample extends JFrame {
     	return new JRadioButtonMenuItem(new AbstractAction(String.valueOf(i)) {			
 			@Override public void actionPerformed(ActionEvent e) {
 				filterHeader.setMaxVisibleRows(i);
+				updateFiltersInfo();
 			}
 		});
     }
     
-    private JRadioButtonMenuItem createMaxHistoryMenuItem(final IFilterEditor editor, final int i){
+    private JMenu createMaxHistoryMenu(IFilterEditor editor){
+    	JMenu history = new JMenu(MAX_HISTORY_LENGTH);
+    	ButtonGroup max = new ButtonGroup();
+    	
+    	for (int i=0; i<10;i++){
+    		max.add(createMaxHistoryMenuItem(history, editor, i));    		
+    	}
+    	return history;
+    }
+    
+    private JRadioButtonMenuItem createMaxHistoryMenuItem(final JMenu history, 
+    		final IFilterEditor editor, final int i){
     	JRadioButtonMenuItem ret = new JRadioButtonMenuItem(new AbstractAction(String.valueOf(i)) {			
 			@Override public void actionPerformed(ActionEvent e) {
-				editor.setMaxHistory(i);
+				if (editor==null){
+					filterHeader.setMaxHistory(i);
+					updateFiltersInfo();
+				}else {
+					editor.setMaxHistory(i);
+					int set = editor.getMaxHistory();
+					if (set!=i){
+						JRadioButtonMenuItem mode = (JRadioButtonMenuItem) 
+							getMenu(history, String.valueOf(set), false);
+						if (mode!=null){
+							mode.setSelected(true);
+						}
+					}
+				}
 			}
 		});
-    	if (editor.getMaxHistory()==i){
+    	int current = editor==null? filterHeader.getMaxHistory() : editor.getMaxHistory();
+    	if (current==i){
     		ret.setSelected(true);
     	}
+		history.add(ret);
     	return ret;
     }
     

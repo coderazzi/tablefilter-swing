@@ -303,7 +303,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** @see IFilterEditor#setMaxVisibleRows(int) */
 	public void setMaxVisibleRows(int maxVisibleRows) {
 		this.maxVisibleRows = Math.max(MIN_VISIBLE_CHOICES, maxVisibleRows);
-		hide();
+		setMaxHistory(getMaxHistory());
 	}
 
 	/** @see IFilterEditor#getMaxVisibleRows() */

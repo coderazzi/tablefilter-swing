@@ -322,7 +322,7 @@ public class TableFilterHeader extends JPanel {
 
 	/** Returns the maximum history size*/
 	public int getMaxHistory() {
-		return maxVisibleRows;
+		return maxHistory;
 	}
 
     /** Adds a filter -user specified- to the filter header */
