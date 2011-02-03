@@ -145,6 +145,7 @@ public interface IFilterEditor {
 	 * Limits the history size. <br>
 	 * This limit is only used when the popup contains also choices. Otherwise, 
 	 * the maximum history size is to the maximum number of visible rows<br>
+	 * The max history cannot be greater than the max visible rows
 	 */
 	public abstract void setMaxHistory(int size);
 

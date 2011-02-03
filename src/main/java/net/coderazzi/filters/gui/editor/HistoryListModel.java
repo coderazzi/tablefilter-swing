@@ -33,7 +33,6 @@ import javax.swing.AbstractListModel;
 import javax.swing.ListCellRenderer;
 
 import net.coderazzi.filters.gui.CustomChoice;
-import net.coderazzi.filters.gui.FilterSettings;
 
 
 /**
@@ -48,9 +47,10 @@ import net.coderazzi.filters.gui.FilterSettings;
 class HistoryListModel extends AbstractListModel {
 	private static final long serialVersionUID = -374115548677017807L;
 	private List<Object> history = new ArrayList<Object>();
+	private List<Object> shownHistory = history;
 	private Object lastAdded;
 	private Comparator stringComparator;
-	private int maxHistory = FilterSettings.maxVisiblePopupRows;
+	private int maxHistory;
 	
 	/**
 	 * Specifies how to handle the content. If there is a string comparator,
@@ -58,19 +58,40 @@ class HistoryListModel extends AbstractListModel {
 	 * best matches; otherwise, it is treated as abstract objects, matching
 	 * is done by identity.  
 	 */
-	public void setStringContent(Comparator stringComparator){
+	public void setStringContent(Comparator<String> stringComparator){
 		if (this.stringComparator!=stringComparator){
 			this.stringComparator = stringComparator;
 			clear();
 		}
 	}
 	
+	/** Returns the string comparator, if provided */
 	public Comparator<String> getStringComparator(){
 		return stringComparator;
 	}
+	
+	/** Clears any restrictions. {@see #restrict(Object)} */
+	public int clearRestrictions(){
+		shownHistory = history;
+		return shownHistory.size();
+	}
+	
+	/** Restricts the elements from the history -without removing it */
+	public boolean restrict(Object exclude){
+		int index=shownHistory.indexOf(exclude);
+		if (index!=-1){
+			if (shownHistory==history){
+				shownHistory = new ArrayList<Object>(history);						
+			}
+			shownHistory.remove(index);
+			fireIntervalAdded(this, index, index);
+			return true;
+		}
+		return false;
+	}
 
 	@Override public Object getElementAt(int index) {
-		return history.get(index);
+		return shownHistory.get(index);
 	}
 
 	/** Adds an element, Returning true if the number of elements changes */
@@ -79,7 +100,10 @@ class HistoryListModel extends AbstractListModel {
 		//editor). We will added when the next element is passed
 		boolean ret = false;
 		boolean removed = history.remove(st);
-		if (maxHistory > 0 && lastAdded!=null && !lastAdded.equals(st)) {
+		if (maxHistory > 0 && 
+				lastAdded!=null && 
+				(lastAdded.toString().length()>0) && 
+				!lastAdded.equals(st)) {
 			history.add(0, lastAdded);
 			int size = history.size();
 			if (size > maxHistory) {
@@ -97,51 +121,54 @@ class HistoryListModel extends AbstractListModel {
 			ret=true;
 		}
 		lastAdded = st;
+		shownHistory = history;
 		return ret;
 	}
 	
 	public boolean isEmpty(){
-		return history.isEmpty();
+		return shownHistory.isEmpty();
 	}
 	
 	public void clear(){
 		int size = history.size();
 		if (size>0){
 			history.clear();
+			shownHistory = history;
 			fireIntervalRemoved(this, 0, size);
 		}
 		lastAdded=null;
 	}
 
 	@Override public int getSize() {
-		return history.size();
+		return shownHistory.size();
 	}
 
-	/** Sets the max history; returns true if the number of elements changes */
-	public boolean setMaxHistory(int size) {
+	/** Sets the max history size*/
+	public void setMaxHistory(int size) {
 		maxHistory = size;
 		int current=history.size();
 		if (current>size){
 			for (int i=current-1;i>=size;i--){
 				history.remove(i);
 			}
+			shownHistory = history;
 			fireContentsChanged(this, maxHistory, current);
-			return true;
 		}
-		return false;
 	}
-
-	public int getMaxHistory() {
+	
+	/** Returns the max history */
+	public int getMaxHistory(){
 		return maxHistory;
 	}
 
 	/** @see PopupComponent#selectBestMatch(Object, boolean) */
 	public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
 		if (stringComparator!=null && (hint instanceof String)) {			
-			return PopupComponent.Match.findOnUnsortedContent(history, 
-					history.size(), stringComparator, (String)hint, exact); 			
+			return PopupComponent.Match.findOnUnsortedContent(shownHistory, 
+					shownHistory.size(), stringComparator, (String)hint, exact); 			
 		}
-		return new PopupComponent.Match(history.indexOf(hint));
+		return new PopupComponent.Match(shownHistory.indexOf(hint));
 	}
 	
 }
+      

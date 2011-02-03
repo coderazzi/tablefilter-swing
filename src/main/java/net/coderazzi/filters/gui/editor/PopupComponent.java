@@ -81,14 +81,9 @@ abstract class PopupComponent implements PopupMenuListener{
 	 **/
 	private Object cancelReason;
 
-	/** This is the total max number of visble rows (history PLUS choices) */
-	private int maxVisibleRows = FilterSettings.maxVisiblePopupRows;
-	/** 
-	 * Max history is the maximum number of elements in the history list 
-	 * when there are NO choices 
-	 **/
-	private int maxHistory = FilterSettings.maxPopupHistory; 
-
+	/** This is the total max number of visible rows (history PLUS choices) */
+	private int maxVisibleRows;
+	
 	/** focusedList always refer to one of choicesList or historyList */
 	JList focusedList;
 	JList choicesList;
@@ -98,7 +93,8 @@ abstract class PopupComponent implements PopupMenuListener{
 	public PopupComponent() {
 		choicesModel = new ChoicesListModel();
 		historyModel = new HistoryListModel();
-		setMaxHistory(maxHistory);
+		setMaxVisibleRows(FilterSettings.maxVisiblePopupRows);
+		setMaxHistory(FilterSettings.maxPopupHistory);
 		createGui();
 	}
 
@@ -142,15 +138,14 @@ abstract class PopupComponent implements PopupMenuListener{
 	 */
 	public void addChoices(Collection<?> choices) {
 		if (choicesModel.addContent(choices)){
-			fixMaxHistory();
-			reconfigureGui();
+			hide();
 		}
 	}
 
 	/** Adds content to the history list */
 	public void addHistory(Object st) {
 		if (historyModel.add(st)) {
-			reconfigureGui();
+			hide();
 		}
 	}
 
@@ -158,13 +153,12 @@ abstract class PopupComponent implements PopupMenuListener{
 	public void clear() {
 		choicesModel.clearContent();
 		historyModel.clear();
-		fixMaxHistory();
-		reconfigureGui();
+		hide();
 	}
 
 	/** Returns true if the popup is currently visible */
 	public boolean isVisible() {
-		return popup.isVisible();
+		return popup!=null && popup.isVisible();
 	}
 	
 	/**
@@ -177,6 +171,7 @@ abstract class PopupComponent implements PopupMenuListener{
 		if (isVisible()){
 			return false;
 		}
+		prepareGui();
 		setPopupFocused(false);
 		int width = editor.getParent().getWidth()-1;
 		configurePaneSize(choicesScrollPane, width);
@@ -215,19 +210,19 @@ abstract class PopupComponent implements PopupMenuListener{
 
 	/** Specifies that the content requires no conversion to strings */
 	public void setRenderedContent(ListCellRenderer renderer, Comparator classComparator) {
+		hide();
 		listRenderer.setUserRenderer(renderer);
 		if (choicesModel.setRenderedContent(classComparator)){
 			historyModel.setStringContent(null);
-			reconfigureGui();
 		}
 	}
 
 	/** Specifies that the content is to be handled as strings */
-	public void setStringContent(Format format, Comparator stringComparator) {
+	public void setStringContent(Format format, Comparator<String> stringComparator) {
+		hide();
 		listRenderer.setUserRenderer(null);
 		if (choicesModel.setStringContent(format, stringComparator)){
 			historyModel.setStringContent(stringComparator);
-			reconfigureGui();
 		}
 	}
 	
@@ -303,8 +298,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	/** @see IFilterEditor#setMaxVisibleRows(int) */
 	public void setMaxVisibleRows(int maxVisibleRows) {
 		this.maxVisibleRows = Math.max(MIN_VISIBLE_CHOICES, maxVisibleRows);
-		fixMaxHistory();
-		reconfigureGui();
+		hide();
 	}
 
 	/** @see IFilterEditor#getMaxVisibleRows() */
@@ -313,16 +307,14 @@ abstract class PopupComponent implements PopupMenuListener{
 	}
 
 	/** @see IFilterEditor#setMaxHistory(int) */
-	public void setMaxHistory(Integer size) {
-		this.maxHistory = size==null? FilterSettings.maxPopupHistory : size;
-		if (fixMaxHistory()) {
-			reconfigureGui();
-		}
+	public void setMaxHistory(int size) {
+		historyModel.setMaxHistory(Math.max(0, Math.min(size, maxVisibleRows)));
+		hide();
 	}
 
 	/** @see IFilterEditor#getMaxHistory() */
 	public int getMaxHistory() {
-		return maxHistory;
+		return historyModel.getMaxHistory();
 	}
 	
 	/**
@@ -499,7 +491,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	 * and there is history content 
 	 **/
 	private boolean canSwitchToHistory() {
-		return focusedList == choicesList && !historyModel.isEmpty();
+		return focusedList == choicesList && historyScrollPane.isVisible();
 	}
 
 	/** 
@@ -508,16 +500,6 @@ abstract class PopupComponent implements PopupMenuListener{
 	 **/
 	private boolean canSwitchToChoices() {
 		return focusedList == historyList && choicesScrollPane.isVisible();
-	}
-
-	/** Internal method to calculate the real history size used */
-	private boolean fixMaxHistory(){
-		int now = historyModel.getMaxHistory();
-		int choicesSize = choicesModel.getSize();
-		int finalSize = choicesSize==0? maxVisibleRows 
-				: Math.min(maxHistory, maxVisibleRows 
-						- Math.min(choicesSize, MIN_VISIBLE_CHOICES));
-		return finalSize==now? false : historyModel.setMaxHistory(finalSize);
 	}
 
 	/** Moves the focus to the history list */
@@ -604,33 +586,45 @@ abstract class PopupComponent implements PopupMenuListener{
 		listRenderer = new FilterListCellRenderer(choicesList);
 		choicesList.setCellRenderer(listRenderer);
 		historyList.setCellRenderer(listRenderer);
-		reconfigureGui();
 	}
 
 	/** 
 	 * Reconfigures the gui, ensuring the correct size of the history 
 	 * and choices lists 
 	 **/
-	private void reconfigureGui() {
-		int historySize = historyModel.getSize();
-		boolean showChoices = choicesModel.getSize() > 0;
+	private void prepareGui() {
+		//The history size PLUS choices size must be below `maxVisibleRows`
+		//(note that the history size is always lower than `maxVisibleRows`,
+		// and that it should be, if possible, equal to 'maxPopupHistory')
+		//In addition, the history should not show any of the choices that
+		// are visible, when all choices can be displayed at once
+		int historySize = historyModel.clearRestrictions(); //restrict none
+		int choicesSize = choicesModel.getSize();
+		int maxChoices = Math.min(choicesSize, maxVisibleRows - historySize);
+		if (historySize > 0 && choicesSize <= maxChoices){
+			for (int i=0; i<choicesSize; i++){
+				if (historyModel.restrict(choicesModel.getElementAt(i))){
+					--historySize;
+				}				
+			}
+			maxChoices=choicesSize;
+		}
 		boolean showHistory = historySize > 0;
+		boolean showChoices = maxChoices > 0;
 		choicesScrollPane.setVisible(showChoices);
 		historyScrollPane.setVisible(showHistory);
 		if (showHistory) {
-			historyList.setVisibleRowCount(Math.max(1, historySize));
+			historyList.setVisibleRowCount(historySize);
 			historyScrollPane.setPreferredSize(null);
 		}
 		if (showChoices) {
-			choicesList.setVisibleRowCount(Math.min(choicesModel.getSize(), 
-					maxVisibleRows - historySize));
+			choicesList.setVisibleRowCount(maxChoices);
 			choicesScrollPane.setPreferredSize(null);
 		}
 		separator.setVisible(showHistory && showChoices);
 		// if there is no history and no choices, show the empty space content
 		emptyPopupMark.setVisible(!showHistory && !showChoices);
 	}
-
 	
 	private JScrollPane createScrollPane(JList list) {
 		JScrollPane ret = new JScrollPane(list, 

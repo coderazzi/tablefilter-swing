@@ -180,7 +180,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 			Object enums[]=modelClass.getEnumConstants();
 			if (Boolean.class==modelClass || (enums!=null && enums.length<=8)){
 				setEditable(autoChoices==AutoChoices.DISABLED);
-				popup.setMaxHistory(autoChoices==AutoChoices.DISABLED? null : 0);
 			}
 			requestChoices();
 		}
@@ -510,7 +509,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	return filtersHandler.getParserModel();
     }
     
-    private Comparator getStringComparator(){
+    private Comparator<String> getStringComparator(){
     	return getParserModel().getStringComparator(ignoreCase);
     }
     
