@@ -54,7 +54,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import net.coderazzi.filters.gui.CustomChoice;
-import net.coderazzi.filters.gui.FilterSettings;
 import net.coderazzi.filters.gui.IFilterEditor;
 
 
@@ -93,8 +92,6 @@ abstract class PopupComponent implements PopupMenuListener{
 	public PopupComponent() {
 		choicesModel = new ChoicesListModel();
 		historyModel = new HistoryListModel();
-		setMaxVisibleRows(FilterSettings.maxVisiblePopupRows);
-		setMaxHistory(FilterSettings.maxPopupHistory);
 		createGui();
 	}
 

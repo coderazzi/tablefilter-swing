@@ -826,7 +826,6 @@ public class TableFilterHeader extends JPanel {
             FilterEditor editor = createEditor(columnModel, enableIt);
             FilterColumnPanel column = new FilterColumnPanel(
             		tableColumnModel.getColumn(columnView), editor);
-            customizeEditor(column.editor);
             column.updateHeight();
             columns.add(column);
             add(column);
@@ -836,6 +835,7 @@ public class TableFilterHeader extends JPanel {
         private FilterEditor createEditor(int modelColumn, boolean enableIt) {        	
             FilterEditor ret = new FilterEditor(filtersHandler, 
             		modelColumn, getTable().getModel().getColumnClass(modelColumn));
+            customizeEditor(ret);
             ret.getFilter().setEnabled(enableIt);
             filtersHandler.addFilterEditor(ret);
             return ret;
