@@ -470,7 +470,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
 	/** Method invoked by the FiltersHandler to set the choices */
 	public void setChoices(Collection<?> choices){
-		popup.clear();
+		popup.clearChoices();
 		addChoices(choices);		
 	}
 	

@@ -149,10 +149,9 @@ abstract class PopupComponent implements PopupMenuListener{
 		}
 	}
 
-	/** Clears both the history and the choices lists */
-	public void clear() {
+	/** Clears the choices lists */
+	public void clearChoices() {
 		choicesModel.clearContent();
-		historyModel.clear();
 		hide();
 	}
 
