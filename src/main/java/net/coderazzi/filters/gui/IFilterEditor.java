@@ -1,7 +1,5 @@
 package net.coderazzi.filters.gui;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.text.Format;
 import java.util.Comparator;
 import java.util.Set;
@@ -132,15 +130,6 @@ public interface IFilterEditor {
 	 */
     public abstract boolean isAutoListCellRenderer();
 
-	/** 
-	 * Sets the maximum number of visible rows in the popup menu<br>
-	 * A minimum is always enforced
-	 **/
-	public abstract void setMaxVisibleRows(int maxVisibleRows);
-
-	/** Returns the maximum number of visible rows in the popup menu*/
-	public abstract int getMaxVisibleRows();
-
 	/**
 	 * Limits the history size. <br>
 	 * This limit is only used when the popup contains also choices. Otherwise, 
@@ -156,59 +145,4 @@ public interface IFilterEditor {
 	 * or also choices 
 	 */
 	public abstract int getMaxHistory();
-
-	/** Sets the background color */
-	public abstract void setBackground(Color bg);
-
-	/** Gets the background color */
-	public abstract Color getBackground();
-
-	/** Sets the foreground color */
-	public abstract void setForeground(Color fg);
-
-	/** Gets the foreground color */
-	public abstract Color getForeground();
-
-	/** Sets the color used to show filter's errors (invalid syntax) */
-	public abstract void setErrorForeground(Color fg);
-
-	/** Returns the color used to show filter's errors */
-	public abstract Color getErrorForeground();
-
-	/** Sets the color used to represent disabled state */
-	public abstract void setDisabledForeground(Color fg);
-
-	/** Returns the color used to represent disabled state */
-	public abstract Color getDisabledForeground();
-
-	/** Sets the foreground color used to represent selected state */
-	public abstract void setSelectionForeground(Color fg);
-
-	/** Returns the foreground color used to represent selected state */
-	public abstract Color getSelectionForeground();
-
-	/** Sets the background color used to represent selected state */
-	public abstract void setSelectionBackground(Color bg);
-
-	/** Returns the color used to represent disabled state */
-	public abstract Color getSelectionBackground();
-	
-	/** Sets the color set by default as text selection on filters */
-    public abstract void setTextSelectionColor(Color c);
-
-    /** Returns the color set by default as text selection on filters */
-    public abstract Color getTextSelectionColor();
-    
-	/** Sets the grid color on the header */
-	public abstract void setGridColor(Color c);
-
-	/** Returns the grid color on the header */
-	public abstract Color getGridColor();
-
-	/** Sets the editor's font */
-	public abstract void setFont(Font font);
-
-	/** Returns the editor's font */
-	public abstract Font getFont();
-
 }

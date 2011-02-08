@@ -52,6 +52,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterObserver;
+import net.coderazzi.filters.gui.editor.Look;
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
 
@@ -85,7 +86,10 @@ public class TableFilterHeader extends JPanel {
 
 	private static final long serialVersionUID = 5217701111228491294L;
 
-    /**
+	/** Minimum number of visible choices -if there are choices- */
+	private static final int MIN_VISIBLE_CHOICES = 4; 
+
+	/**
      * <p>Location of the header in relation to the table</p>
      * <p>Note that this location is only meaningful when the table is set 
      * inside a scroll pane, and this header instance is not explicitly 
@@ -103,12 +107,6 @@ public class TableFilterHeader extends JPanel {
     	TOP, INLINE, NONE
     }
 
-    /** Colors for the filters */
-    private Color errorColor, gridColor, disabledForeground;
-    
-    /** Colors for selections on filter editors */
-    private Color selectionBackground, selectionForeground, selectionColor;
-
     /** whether the user has explicitly provided colors/font */
     private boolean backgroundSet, foregroundSet, disabledColorSet;
     private boolean selectionBackgroundSet, selectionForegroundSet;
@@ -117,8 +115,8 @@ public class TableFilterHeader extends JPanel {
     /** The helper to handle the location of the filter in the table header */
     private PositionHelper positionHelper = new PositionHelper(this);
         
-	/** This is the total max number of visible rows (history PLUS choices) */
-	int maxVisibleRows = FilterSettings.maxVisiblePopupRows;
+    /** Appearance instance */
+    Look look = new Look();
     
 	/** This is the total max number of visible rows (history PLUS choices) */
 	int maxHistory = FilterSettings.maxPopupHistory;
@@ -198,7 +196,7 @@ public class TableFilterHeader extends JPanel {
             revalidate();
         }
         else{
-        	updateAppearance();
+        	updateLook();
             recreateController();
             table.addComponentListener(resizer);
         }
@@ -298,15 +296,16 @@ public class TableFilterHeader extends JPanel {
 	 * (a minimum is always enforced) 
 	 **/
 	public void setMaxVisibleRows(int maxVisibleRows) {
-		this.maxVisibleRows = maxVisibleRows;
-		if (columnsController!=null){
-			columnsController.setMaxVisibleRows(maxVisibleRows);
+		int tmp = Math.max(MIN_VISIBLE_CHOICES, maxVisibleRows);
+		if (tmp != look.maxVisiblePopupRows){
+			look.maxVisiblePopupRows = tmp;
+			lookUpdated();
 		}
 	}
 
 	/** Returns the maximum number of visible rows in the popup menu*/
 	public int getMaxVisibleRows() {
-		return maxVisibleRows;
+		return look.maxVisiblePopupRows;
 	}
 
 	/** 
@@ -362,68 +361,42 @@ public class TableFilterHeader extends JPanel {
     /** Sets the background color used by the parsed-based editors. */
     @Override public void setBackground(Color bg) {
     	super.setBackground(bg);
-    	backgroundSet=true;
 
-        if (columnsController != null){
-            columnsController.setBackground(bg);
+        if (look != null){
+        	backgroundSet=true;
+        	look.background=bg;
+        	lookUpdated();
         }
     }
 
-    /** Updates the background on all components */
-    @Override public Color getBackground(){
-		Color c;
-		if (backgroundSet){
-			c=super.getBackground();
-		} else {
-			c = FilterSettings.backgroundColor;
-			if (c==null){
-				JTable table = getTable();
-				if (table==null){
-					c=super.getBackground();
-				} else {
-			    	Color background = table.getBackground();
-		    		Color header = table.getTableHeader().getBackground();
-		    		c = new Color((header.getRed() + background.getRed())/2,
-		    				(header.getGreen() + background.getGreen())/2,
-		    				(header.getBlue() + background.getBlue())/2);
-				}
-			}
-		}
-		return c;
-    }
-    
     /** Sets the foreground color used by the editors. */
     @Override public void setForeground(Color fg) {
     	super.setForeground(fg);
-    	foregroundSet=true;
 
-        if (columnsController != null){
-            columnsController.setForeground(fg);
+        if (look != null){
+        	foregroundSet=true;
+        	look.foreground=fg;
+        	lookUpdated();
         }
     }
 
     /** Sets the color used for disabled fields */
     public void setDisabledForeground(Color dfg) {
-    	disabledForeground = dfg;
-    	disabledColorSet = true;
-
-        if (columnsController != null){
-            columnsController.setDisabledForeground(dfg);
-        }
+        this.disabledColorSet = true;
+        look.disabledForeground=dfg;
+    	lookUpdated();
     }
 
     /** Sets the color used for disabled fields */
     public Color getDisabledForeground() {
-    	return disabledForeground;
+    	return look.disabledForeground;
     }
 
     /** Sets the foreground color used to represent selected state */
     public void setSelectionForeground(Color fg) {
-        this.selectionForeground = fg;
         this.selectionForegroundSet = true;
-
-        if (columnsController != null)
-            columnsController.setSelectionForeground(fg);
+        look.selectionForeground=fg;
+    	lookUpdated();
     }
 
     /**
@@ -433,16 +406,14 @@ public class TableFilterHeader extends JPanel {
      * if the user customizes it directly</p>
      */
     public Color getSelectionForeground() {
-        return selectionForeground;
+        return look.selectionForeground;
     }
 
     /** Sets the background color used to represent selected state */
     public void setSelectionBackground(Color bg) {
-        this.selectionBackground = bg;
         this.selectionBackgroundSet = true;
-        
-        if (columnsController != null)
-            columnsController.setSelectionBackground(bg);
+        look.selectionBackground=bg;
+    	lookUpdated();
     }
 
     /**
@@ -452,16 +423,14 @@ public class TableFilterHeader extends JPanel {
      * if the user customizes it directly</p>
      */
     public Color getSelectionBackground() {
-        return selectionBackground;
+        return look.selectionBackground;
     }
 
     /** Sets the color set by default as text selection on filters */
     public void setTextSelectionColor(Color c) {    	
-        this.selectionColor = c;
         this.selectionColorSet = true;
-        
-        if (columnsController != null)
-            columnsController.setTextSelectionColor(c);
+        look.textSelection=c;
+    	lookUpdated();
     }
 
     /**
@@ -471,7 +440,7 @@ public class TableFilterHeader extends JPanel {
      * if the user customizes it directly</p>
      */
     public Color getTextSelectionColor() {
-        return selectionColor;
+        return look.textSelection;
     }
 
     /**
@@ -479,11 +448,9 @@ public class TableFilterHeader extends JPanel {
      * when there are errors on the filter expressions.
      */
     public void setErrorForeground(Color fg) {
-        this.errorColor = fg;
         this.errorColorSet = true;
-
-        if (columnsController != null)
-            columnsController.setErrorForeground(fg);
+        look.errorForeground=fg;
+    	lookUpdated();
     }
 
     /**
@@ -494,31 +461,30 @@ public class TableFilterHeader extends JPanel {
      * if the user customizes it directly</p>
      */
     public Color getErrorForeground() {
-        return errorColor;
+        return look.errorForeground;
     }
 
     /** Sets the color used to draw the header's grid */
     public void setGridColor(Color c) {
-        this.gridColor = c;
         this.gridColorSet = true;
-
-        if (columnsController != null)
-            columnsController.setGridColor(c);
+        look.gridColor=c;
+    	lookUpdated();
     }
 
     /**
      * <p>Returns the color set by default for the header's grid</p>
      */
     public Color getGridColor() {
-        return gridColor;
+        return look.gridColor;
     }
 
     /** Sets the font used on all the editors. */
     @Override public void setFont(Font font) {
         super.setFont(font);
-        fontSet=true;
-        if (columnsController != null) {
-            columnsController.setFont(font);
+        if (look!=null){
+        	fontSet=true;
+        	look.font=font;
+        	lookUpdated();
             revalidate();
         }
     }
@@ -530,18 +496,23 @@ public class TableFilterHeader extends JPanel {
     }
     
     @Override public void updateUI() {
+    	//updateUI calls to setBackground and setForeground, possibly,
+    	//and that should not affect directly the look (is updated afterwards)
+    	Look look = this.look;
+    	this.look=null;
     	super.updateUI();
+    	this.look=look;
     	if (columnsController!=null){
     		SwingUtilities.invokeLater(new Runnable() {				
 				@Override public void run() {
-					updateAppearance();
+					updateLook();
 				}
 			});
     	}
     }
     
     /** Updates the whole appearance: colors and font*/
-    void updateAppearance(){
+    void updateLook(){
     	updateBackground();
     	updateForeground();
     	updateSelectionBackground();
@@ -551,28 +522,19 @@ public class TableFilterHeader extends JPanel {
     	updateErrorForeground();
     	updateGridColor();
     	updateFont();
+    	lookUpdated();
     }
     
-    /** Customizes the editor, can be overridden for custom appearance */
-    protected void customizeEditor(IFilterEditor editor) {
-        editor.setForeground(getForeground());
-        editor.setBackground(getBackground());
-        editor.setErrorForeground(getErrorForeground());
-        editor.setDisabledForeground(getDisabledForeground());
-    	editor.setSelectionBackground(getSelectionBackground());
-    	editor.setSelectionForeground(getSelectionForeground());
-    	editor.setTextSelectionColor(getTextSelectionColor());
-    	editor.setGridColor(getGridColor());
-        editor.setFont(getFont());
-        editor.setMaxVisibleRows(maxVisibleRows);
-        editor.setMaxHistory(maxHistory);
+    private void lookUpdated(){
+    	if (columnsController!=null){
+    		columnsController.setLook(look);
+    	}    	
     }
-
+    
     /** Updates the font on all components */
     private void updateFont(){
-		boolean set = fontSet;
 		Font f;
-		if (set){
+		if (fontSet){
 			f=getFont();
 		} else {
 			f = FilterSettings.font;
@@ -581,15 +543,14 @@ public class TableFilterHeader extends JPanel {
         		f = f.deriveFont(f.getSize()*.9f);
 			}
 		}
-		setFont(f);
-		fontSet=set;
+		look.font=f;
+		super.setFont(f);		
     }
     
     /** Updates the background on all components */
     private void updateBackground(){
-		boolean set = backgroundSet;
 		Color c;
-		if (set){
+		if (backgroundSet){
 			c=getBackground();
 		} else {
 			c = FilterSettings.backgroundColor;
@@ -602,15 +563,14 @@ public class TableFilterHeader extends JPanel {
 	    				(header.getBlue() + background.getBlue())/2);    				
 			}
 		}
-		setBackground(c);
-		backgroundSet=set;
+		look.background=c;
+		super.setBackground(c);
     }
     
     /** Updates the foreground on all components */
     private void updateForeground(){
-		boolean set = foregroundSet;
 		Color c;
-		if (set){
+		if (foregroundSet){
 			c=getForeground();
 		} else {
 			c = FilterSettings.foregroundColor;
@@ -618,111 +578,78 @@ public class TableFilterHeader extends JPanel {
 				c = getTable().getForeground();
 			}
 		}
-		setForeground(c);
-		foregroundSet=set;
+		look.foreground=c;
+		super.setForeground(c);
     }
     
     /** Updates the selection background on all components */
     private void updateSelectionBackground(){
-		boolean set = selectionBackgroundSet;
-		Color c;
-		if (set){
-			c=getSelectionBackground();
-		} else {
-			c = FilterSettings.selectionBackgroundColor;
-			if (c==null){
-				c = getTable().getSelectionBackground();
+		if (!selectionBackgroundSet){
+			look.selectionBackground= FilterSettings.selectionBackgroundColor;
+			if (look.selectionBackground==null && getTable()!=null){
+				look.selectionBackground = getTable().getSelectionBackground(); 
 			}
 		}
-		setSelectionBackground(c);
-		selectionBackgroundSet=set;
     }
 
     /** Updates the selection foreground on all components */
     private void updateSelectionForeground(){
-		boolean set = selectionForegroundSet;
-		Color c;
-		if (set){
-			c=getSelectionForeground();
-		} else {
-			c = FilterSettings.selectionForegroundColor;
-			if (c==null){
-				c = getTable().getSelectionForeground();
+		if (!selectionForegroundSet){
+			look.selectionForeground = FilterSettings.selectionForegroundColor;
+			if (look.selectionForeground==null && getTable()!=null){
+				look.selectionForeground = getTable().getSelectionForeground(); 
 			}
 		}
-		setSelectionForeground(c);
-		selectionForegroundSet=set;
     }
     
     /** Updates the selection color on all components */
     private void updateSelectionColor(){
-		boolean set = selectionColorSet;
-		Color c;
-		if (set){
-			c=getTextSelectionColor();
-		} else {
-			c = FilterSettings.backgroundColor;
-			if (c==null){
+		if (!selectionColorSet){
+			look.textSelection = FilterSettings.selectionColor;
+			if (look.textSelection==null){
 		    	Color a = getBackground();
 	    		Color b = getSelectionBackground();
-	    		c = new Color((a.getRed() + b.getRed())/2,
+	    		if (a!=null && b!=null){
+	    			look.textSelection = 
+	    				new Color((a.getRed() + b.getRed())/2,
 	    				(a.getGreen() + b.getGreen())/2,
-	    				(a.getBlue() + b.getBlue())/2);    				
+	    				(a.getBlue() + b.getBlue())/2);
+	    		}
 			}
 		}
-		setTextSelectionColor(c);
-		selectionColorSet=set;
     }
     
     /** Updates the disabled foreground on all components */
     private void updateDisabledForeground(){
-		boolean set = disabledColorSet;
-		Color c;
-		if (set){
-			c=getDisabledForeground();
-		} else {
-			c = FilterSettings.disabledColor;
-			if (c==null){
-				c = getTable().getGridColor();
-	        	if (c.equals(getBackground())){
-	        		c=Color.lightGray;
+		if (!disabledColorSet){
+			look.disabledForeground = FilterSettings.disabledColor;
+			if (look.disabledForeground==null && getTable()!=null){
+				look.disabledForeground = getTable().getGridColor(); 
+	        	if (look.disabledForeground.equals(getBackground())){
+	        		look.disabledForeground=Color.lightGray;
 	        	}
 			}
 		}
-		setDisabledForeground(c);
-		disabledColorSet=set;
     }
 
     /** Updates the grid color on all components */
     private void updateGridColor(){
-		boolean set = gridColorSet;
-		Color c;
-		if (set){
-			c=getGridColor();
-		} else {
-			c = FilterSettings.gridColor;
-			if (c==null){
-				c = getTable().getGridColor();
+		if (!gridColorSet){
+			look.gridColor = FilterSettings.gridColor;
+			if (look.gridColor==null && getTable()!=null){
+				look.gridColor = getTable().getGridColor(); 
 			}
 		}
-		setGridColor(c);
-		gridColorSet=set;
     }
 
     /** Updates the error foreground on all components */
     private void updateErrorForeground(){
-		boolean set = errorColorSet;
-		Color c;
-		if (set){
-			c=getErrorForeground();
-		} else {
-			c = FilterSettings.errorColor;
-			if (c==null){
-        		c=Color.red;
+		if (!errorColorSet){
+			look.errorForeground = FilterSettings.errorColor;
+			if (look.disabledForeground==null){
+				look.disabledForeground = Color.red;
 			}
 		}
-		setErrorForeground(c);
-		errorColorSet=set;
     }
     
     /**
@@ -835,7 +762,8 @@ public class TableFilterHeader extends JPanel {
         private FilterEditor createEditor(int modelColumn, boolean enableIt) {        	
             FilterEditor ret = new FilterEditor(filtersHandler, 
             		modelColumn, getTable().getModel().getColumnClass(modelColumn));
-            customizeEditor(ret);
+            ret.setLook(look);
+            ret.setMaxHistory(maxHistory);
             ret.getFilter().setEnabled(enableIt);
             filtersHandler.addFilterEditor(ret);
             return ret;
@@ -877,89 +805,28 @@ public class TableFilterHeader extends JPanel {
             }
         }
         
-    	/** Sets the maximum number of visible rows in the popup menu*/
-    	public void setMaxVisibleRows(int maxVisibleRows) {
-            for (FilterColumnPanel column : columns) {
-                column.editor.setMaxVisibleRows(maxVisibleRows);
-            }
-    	}
-
-    	/** Sets the maximum nhistory popup menu*/
+    	/** Sets the maximum history popup menu*/
     	public void setMaxHistory(int maxHistory) {
             for (FilterColumnPanel column : columns) {
                 column.editor.setMaxHistory(maxHistory);
             }
     	}
 
-        @Override public void setFont(Font font) {
-            super.setFont(font);
-
-            if ((this.columns != null) && !this.columns.isEmpty()) {
-
-                for (FilterColumnPanel panel : this.columns)
-                    panel.setFont(font);
-
-                updateHeight();
-            }
+        public void setLook(Look look){
+        	boolean fontChange = getFont()!=look.font;
+        	setBackground(look.background);
+        	setForeground(look.foreground);
+            if (columns != null){
+                for (FilterColumnPanel panel : this.columns){
+                    panel.setLook(look);
+                }
+            }        	
+        	if (fontChange){
+        		setFont(look.font);
+        		updateHeight();
+        	}
         }
         
-        @Override public void setBackground(Color bg) {
-        	super.setBackground(bg);
-
-            if (columns != null)
-                for (FilterColumnPanel panel : this.columns)
-                    panel.editor.setBackground(bg);
-        }
-
-        public void setSelectionBackground(Color bg) {
-        	super.setBackground(bg);
-
-            if (columns != null)
-                for (FilterColumnPanel panel : this.columns)
-                    panel.editor.setSelectionBackground(bg);
-        }
-
-        public void setDisabledForeground(Color bg) {
-            if (columns != null)
-                for (FilterColumnPanel panel : this.columns)
-                    panel.editor.setDisabledForeground(bg);
-        }
-
-        public void setSelectionForeground(Color fg) {
-            if (columns != null)
-                for (FilterColumnPanel panel : this.columns)
-                    panel.editor.setSelectionForeground(fg);
-        }
-
-        @Override public void setForeground(Color fg) {
-        	super.setForeground(fg);
-
-            if (columns != null)
-                for (FilterColumnPanel panel : this.columns)
-                	panel.editor.setForeground(fg);
-        }
-
-        public void setErrorForeground(Color fg) {
-
-            if (columns != null)
-                for (FilterColumnPanel panel : this.columns)
-                	panel.editor.setErrorForeground(fg);
-        }
-
-        public void setTextSelectionColor(Color c) {
-
-            if (columns != null)
-                for (FilterColumnPanel panel : this.columns)
-                	panel.editor.setTextSelectionColor(c);
-        }
-        
-        public void setGridColor(Color c) {
-
-            if (columns != null)
-                for (FilterColumnPanel panel : this.columns)
-                	panel.editor.setGridColor(c);
-        }
-
         /** {@link TableColumnModelListener} interface */
         @Override public void columnMarginChanged(ChangeEvent e) {
             placeComponents();
@@ -1115,15 +982,16 @@ public class TableFilterHeader extends JPanel {
                 }
                 tc.removePropertyChangeListener(this);
             }
-
-            @Override public void setFont(Font font) {
-            	super.setFont(font);
-            	if (editor!=null){
-	                editor.setFont(font);
-	                updateHeight();
+            
+            public void setLook(Look look){
+            	editor.setLook(look);
+            	Font oldFont = getFont();
+            	if (oldFont!=look.font){
+            		setFont(look.font);
+            		updateHeight();
             	}
             }
-            
+
             public void updateHeight() {
                 h = getPreferredSize().height;
                 revalidate();
@@ -1157,5 +1025,4 @@ public class TableFilterHeader extends JPanel {
             }
         }
     }
-
 }

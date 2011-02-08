@@ -25,10 +25,12 @@
 
 package net.coderazzi.filters.gui;
 
+import java.awt.Font;
+import java.awt.Graphics;
 import java.text.Format;
 
 import javax.swing.Icon;
-import javax.swing.ListCellRenderer;
+import javax.swing.JComponent;
 import javax.swing.RowFilter;
 
 /**
@@ -110,12 +112,19 @@ public abstract class CustomChoice {
 	public CustomChoice(String representation, Icon icon){
 		this(representation, icon, DEFAULT_PRECEDENCE);
 	}
-	
-	/** Returns the renderer for this choice, or null to use the default one */
-	public ListCellRenderer getRenderer(){
-		return null;
+
+	/** Decorates a component, by default with the icon, if present */
+	public void decorateComponent(JComponent c, Graphics g) {
+		Font f = c.getFont();
+		if (f!=null){
+			c.setFont(f.deriveFont(Font.ITALIC));
+		}
+		if (icon!=null){
+		    int x=(c.getWidth()-icon.getIconWidth())/2;
+		    int y=(c.getHeight()-icon.getIconHeight())/2;    
+	    	icon.paintIcon(c, g, x, y);				
+		}
 	}
-	
 	/**
 	 * Return an icon associated to this filter.<br>
 	 * It can be null if there is no associated graphic representation for this
@@ -123,15 +132,6 @@ public abstract class CustomChoice {
 	 */
 	public Icon getIcon(){
 		return icon;
-	}
-	
-	/** 
-	 * Returns true if the text should be displayed on the choices, when
-	 * there is an icon present<br>
-	 * This method is only called if an icon is available.
-	 */
-	public boolean renderText(){
-		return true;
 	}
 	
 	/** Returns the precedence value */ 
@@ -146,13 +146,4 @@ public abstract class CustomChoice {
 	@Override final public String toString() {
 		return str;
 	}
-	
-	@Override public int hashCode() {
-		return str.hashCode();
-	}
-	
-	@Override public boolean equals(Object o) {
-		return (o instanceof CustomChoice) && 
-			(((CustomChoice)o).str).equals(str);
-	}	
 }

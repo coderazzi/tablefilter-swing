@@ -106,40 +106,11 @@ interface EditorComponent {
      */
     public RowFilter checkFilterUpdate(boolean forceUpdate);
 
-    /** 
-     * Informs that the editor has received the focus.
-     */
+    /** Informs that the editor has received the focus. */
     public void focusMoved(boolean gained);
-    
-    /** Sets the foreground color used*/
-    public void setForeground(Color fg);
 
-    /** Returns the foreground color used*/
-    public Color getForeground();
-
-    /** Sets the color used to show filter's errors (invalid syntax) */
-    public void setErrorForeground(Color fg);
-
-    /** Returns the color used to show filter's errors */
-    public Color getErrorForeground();
-
-    /** Sets the color used to represent disabled state */
-    public void setDisabledForeground(Color fg);
-
-    /** Returns the color used to represent disabled state */
-    public Color getDisabledForeground();
-
-    /** Sets the foreground color used to represent selected state */
-    public void setSelectionForeground(Color fg);
-
-    /** Sets the background color used to represent selected state */
-    public void setSelectionBackground(Color bg);
-
-	/** Sets the color set by default as text selection on filters */
-    public void setTextSelectionColor(Color c);
-
-    /** Returns the color set by default as text selection on filters */
-    public Color getTextSelectionColor();
+    /** Sets the color schema */
+    public void setLook(Look look);
     
     /**
      * EditorComponent for text edition, backed up with a {@link JTextField}<br>
@@ -173,10 +144,7 @@ interface EditorComponent {
 			
 			private Icon icon;
 			private String trackedText;
-	        private Color errorColor;
-	        private Color foreground, background;
-	        private Color disabledColor;
-	        private Color selectionBackground, selectionForeground;
+	        private Look look;
 	        private boolean enabled;
 	        private boolean error;
 	        private boolean focus;
@@ -191,6 +159,16 @@ interface EditorComponent {
         		super.setUI(ui);
         		//whatever the LookAndFeel, display no border
         		setBorder(null);
+        	}
+        	
+        	public void setLook(Look look){
+        		if (look!=null){
+            		this.look=look;
+	        		setFont(look.font);
+	        		ensureCorrectBackgroundColor();
+	        		ensureCorrectForegroundColor();
+	        		repaint();
+        		}
         	}
         	
 			@Override protected void paintComponent(Graphics g) {
@@ -272,7 +250,7 @@ interface EditorComponent {
             public void focusMoved(boolean gained) {
             	focus=gained;
         		trackedText = null; // do not track changes (gain or not, not yet)
-            	super.setBackground(gained? selectionBackground : background);
+        		ensureCorrectBackgroundColor();
             	//whether we lose or gain focus, we try to reactivate the
             	//decoration -listeners only required if gaining it
             	//without focus, there is no need to check for changes on
@@ -297,70 +275,28 @@ interface EditorComponent {
         		}
         	}
         	
-            public void setErrorForeground(Color fg) {
-            	errorColor = fg;
-            	if (error){
-            		ensureCorrectForegroundColor();
-            	}
-            }
-
-            public Color getErrorForeground() {
-                return errorColor;
-            }
-
-            public void setDisabledForeground(Color fg) {
-            	disabledColor = fg;
-            	if (!enabled){
-            		ensureCorrectForegroundColor();
-            	}
-            }
-
-            public Color getDisabledForeground() {
-                return disabledColor;
-            }
-
-            @Override public void setForeground(Color fg) {
-            	foreground = fg;
-            	ensureCorrectForegroundColor();
-            }
-            
-            @Override public void setBackground(Color bg) {
-            	background = bg;
-            	super.setBackground(bg);
-            }
-
-            public Color getNormalForeground() {
-                return foreground;
-            }
-
-            public void setSelectionForeground(Color fg) {
-            	selectionForeground = fg;
-            	if (focus){
-            		ensureCorrectForegroundColor();
-            	}
-            }
-            
-            public void setSelectionBackground(Color bg) {
-            	selectionBackground=bg;
-            	if (focus){
-            		super.setBackground(bg);
-            	}
-            }
-            
+        	private void ensureCorrectBackgroundColor(){
+        		if (look!=null){
+        			super.setBackground(focus? look.selectionBackground : look.background);
+        		}
+        	}
+        	
             /** Ensures that the correct foreground is on use*/
             private void ensureCorrectForegroundColor(){
-            	Color color;
-            	if (enabled && icon==null){
-            		if (error){
-            			color = errorColor;
-            		} else {
-            			color = focus? selectionForeground : foreground;
-            		}
-            	} else {
-            		color = disabledColor;
-            	}
-            	if (color!=super.getForeground()){
-            		super.setForeground(color);
+            	if (look!=null){
+	            	Color color;
+	            	if (enabled && icon==null){
+	            		if (error){
+	            			color = look.errorForeground;
+	            		} else {
+	            			color = focus? look.selectionForeground : look.foreground;
+	            		}
+	            	} else {
+	            		color = look.disabledForeground;
+	            	}
+	            	if (color!=super.getForeground()){
+	            		super.setForeground(color);
+	            	}
             	}
             }
 
@@ -465,47 +401,11 @@ interface EditorComponent {
         @Override public void focusMoved(boolean gained) {
     		textField.focusMoved(gained);
         }
-
-        @Override public void setForeground(Color fg) {
-        	textField.setForeground(fg);
-        }
-
-        @Override public Color getForeground() {
-            return textField.getNormalForeground();
-        }
-
-        @Override public void setErrorForeground(Color fg) {
-        	textField.setErrorForeground(fg);        	
-        }
-
-        @Override public Color getErrorForeground() {
-            return textField.getErrorForeground();
-        }
-
-        @Override public void setDisabledForeground(Color fg) {
-        	textField.setDisabledForeground(fg);        	
-        }
-
-        @Override public Color getDisabledForeground() {
-            return textField.getDisabledForeground();
-        }
-
-        @Override public void setSelectionForeground(Color fg) {
-        	textField.setSelectionForeground(fg);
-        }
         
-        @Override public void setSelectionBackground(Color bg) {
-        	textField.setSelectionBackground(bg);
+        @Override public void setLook(Look look) {
+        	textField.setLook(look);
         }
-        
-        @Override public void setTextSelectionColor(Color c) {
-        	textField.setSelectionColor(c);
-        }
-        
-        @Override public Color getTextSelectionColor() {
-        	return textField.getSelectionColor();
-        }
-        
+
         /** defines that the content is being set from inside */
         public void setControlledSet() {
             controlledSet = true;
@@ -674,9 +574,6 @@ interface EditorComponent {
         private FilterListCellRenderer renderer;
         private CellRendererPane painter = new CellRendererPane();
         private RowFilter filter;
-        private Color errorColor;
-        private Color disabledColor;
-        private Color selectionColor;
         private boolean focused;
         FilterEditor editor;
         Object cachedContent;
@@ -747,38 +644,11 @@ interface EditorComponent {
         	repaint();
         }
 
-        @Override public void setErrorForeground(Color fg) {
-            this.errorColor = fg;
-        }
-
-        @Override public Color getErrorForeground() {
-            return errorColor;
-        }
-
-        @Override public void setDisabledForeground(Color fg) {
-            disabledColor = fg;
+        @Override public void setLook(Look look) {
+        	setForeground(look.foreground);
+        	setBackground(look.background);
         }
         
-        @Override public void setSelectionForeground(Color fg) {
-        	//no need to do anything
-        }
-        
-        @Override public void setSelectionBackground(Color bg) {
-        	//no need to do anything
-        }
-        
-        @Override public void setTextSelectionColor(Color c) {
-        	this.selectionColor = c;
-        }
-        
-        @Override public Color getTextSelectionColor() {
-        	return selectionColor;
-        }
-        
-        @Override public Color getDisabledForeground() {
-            return disabledColor;
-        }
-
         @Override public boolean isShowing() {
             return true;
         }

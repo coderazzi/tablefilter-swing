@@ -35,16 +35,14 @@ import java.awt.RenderingHints;
 
 import javax.swing.CellRendererPane;
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
 
 import net.coderazzi.filters.gui.CustomChoice;
 
 /**
- * Special renderer used on the history and choices list, 
+ * Special cellRenderer used on the history and choices list, 
  * and to render the content when is not text-based 
  * (the user has specified a {@link ListCellRenderer}<br>
  * 
@@ -64,7 +62,11 @@ import net.coderazzi.filters.gui.CustomChoice;
  * <br>
  */
 class FilterListCellRenderer extends JComponent implements ListCellRenderer {
-
+	
+	public interface TableWrapperRenderer extends ListCellRenderer{
+		//just a markup interface
+	}
+	
 	private static final long serialVersionUID = 6736940091246039334L;
 	private final static int X_MARGIN_ARROW = 1;
 	private final static int WIDTH_ARROW = 5;
@@ -82,58 +84,33 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private int xDeltaBase;
 	private int width;
 	
-	Color disabledColor, foregroundColor, backgroundColor;
+	Color disabledColor;
+	Color fg, bg;
 	boolean addSeparator;
-	ListCellRenderer userRenderer;
+	ListCellRenderer renderer;
 
 	/**
-	 * Specific renderer for the TableFilter, taking care of
+	 * Specific cellRenderer for the TableFilter, taking care of
 	 * {@see CustomChoice} components
 	 */
-	private ListCellRenderer defaultRenderer = new DefaultListCellRenderer() {
-
-		private static final long serialVersionUID = -5732510534272252233L;
-		private Icon icon;
-
-		@Override
-		public Component getListCellRendererComponent(JList list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus) {
-			//In all the cases, we return THIS
-			//By default, is is render the text of the CustomChoice (or choice)
-			// and, if there is also an icon, it is displayed afterwards,
-			// centered
+	private ListCellRenderer defaultRenderer = new DefaultListCellRenderer(){
+		private static final long serialVersionUID = 9185803951279639891L;
+		private CustomChoice cc;
+		@Override public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			if (value instanceof CustomChoice){
-				CustomChoice cc = (CustomChoice) value;
-				icon = cc.getIcon();
-				if (icon==null || cc.renderText()){
-					value = cc.toString();
-					foregroundColor=disabledColor;
-				} else {
-					value = null;
-				}
-				if (icon==null && index>0){
-					ListModel lm = list.getModel();
-					//a separator is added to delimit the custom choices
-					//unless there is only one custom choice (MATCH_ALL) 
-					addSeparator = lm.getSize()>(index+2) 
-						&& !(lm.getElementAt(index+1) instanceof CustomChoice);					
-				}
+				cc=(CustomChoice)value;
+				value=cc.toString();
 			} else {
-				icon = null;
+				cc=null;
 			}
-			super.getListCellRendererComponent(list, value, index, 
-					isSelected, cellHasFocus);
-			return this;
+			return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 		}
 		
-		@Override
-		protected void paintComponent(Graphics g) {
+		@Override protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			if (icon!=null){
-			    int x=(getWidth()-icon.getIconWidth())/2;
-			    int y=(getHeight()-icon.getIconHeight())/2;    
-		    	icon.paintIcon(this, g, x, y);				
-			}
+			if (cc!=null){
+				cc.decorateComponent(this, g);				
+			}				
 		}
 	};
 
@@ -147,8 +124,8 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	 * Reports the disabled color, which will be used to display the text
 	 * on {@see CustomChoice} instances
 	 */
-	public void setDisabledColor(Color color){
-		this.disabledColor = color;
+	public void setLook(Look look){
+		this.disabledColor = look.disabledForeground;
 	}
 	
 	/** 
@@ -163,22 +140,22 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		return focusOnList;
 	}
 
-	public void setUserRenderer(ListCellRenderer renderer) {
-		userRenderer = renderer == null ? defaultRenderer : renderer;
+	public void setUserRenderer(ListCellRenderer cellRenderer) {
+		renderer = cellRenderer;
 	}
 
 	public ListCellRenderer getUserRenderer() {
-		return userRenderer==defaultRenderer? null : userRenderer;
+		return renderer;
 	}
 
-	@Override
-	public Component getListCellRendererComponent(JList list, Object value, 
-			int index, boolean isSelected, boolean cellHasFocus) {
+	@Override public Component getListCellRendererComponent(JList list, 
+			Object value, int index, boolean isSelected, boolean cellHasFocus) {
 		setupRenderer(list, value, index, 
 				focusOnList && isSelected, cellHasFocus);
 		width = referenceList.isShowing() ? 
 				referenceList.getWidth() : list.getWidth();
 		showArrow = isSelected;
+		arrowColor = list.getSelectionBackground();
 		xDeltaBase = WIDTH_ARROW + 2 * X_MARGIN_ARROW;
 		return this;
 	}
@@ -196,32 +173,41 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private void setupRenderer(JList list, Object value, int index, 
 			boolean isSelected, boolean cellHasFocus) {
 		addSeparator = false;
-		if (isSelected){
-			foregroundColor = list.getSelectionForeground();
-			backgroundColor = list.getSelectionBackground();
-		} else {
-			foregroundColor = list.getForeground();
-			backgroundColor = list.getBackground();			
-		}
 		inner=null;
-		ListCellRenderer renderer = userRenderer;	
-		if (value instanceof CustomChoice){
-			CustomChoice cc = (CustomChoice) value;
-			renderer = cc.getRenderer();
-		} 
-		if (renderer!=null){
-			try {
-				inner = renderer.getListCellRendererComponent(list, value, 
-						index, isSelected, cellHasFocus);
-			} catch (Exception ex) {
-				inner = null;
+		boolean useRenderer, setLook;
+		if (renderer instanceof TableWrapperRenderer){
+			setLook = true;
+			useRenderer = true;
+		} else if (renderer==null){
+			setLook = true;
+			useRenderer = false;			
+		} else {
+			//user renderer are totally free to setup the look of the 
+			//custom choices
+			setLook = false;
+			useRenderer = true;						
+		}
+		if (useRenderer){
+			try{
+				inner = renderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			} catch(Exception ex){
+				//inner still null
 			}
 		}
-		if (inner == null) {
-			inner = defaultRenderer.getListCellRendererComponent(list, value, 
-					index, isSelected, cellHasFocus);
-		} 
-		arrowColor = list.getSelectionBackground();
+		if (inner==null){
+			inner=defaultRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+		}
+		if (setLook){
+			if (isSelected){
+				fg = list.getSelectionForeground();
+				bg = list.getSelectionBackground();
+			} else {
+				fg = list.getForeground();
+				bg = list.getBackground();				
+			}
+		} else {
+			fg=null;
+		}
 	}
 
 	@Override
@@ -244,19 +230,26 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		} 
 		g.translate(xDelta, -yDelta);
 		{
-			Font resetFont = inner.getFont();
-			Color resetBackground = inner.getBackground();
-			Color resetForeground = inner.getForeground();
+			Font resetFont = null;
+			Color resetBackground = null;
+			Color resetForeground = null;
+			if (fg!=null){
+				resetFont = inner.getFont();
+				resetBackground = inner.getBackground();
+				resetForeground = inner.getForeground();
+				inner.setFont(getFont());
+				inner.setBackground(bg);
+				inner.setForeground(fg);
+			}
 			boolean resetEnabled = inner.isEnabled();
-			inner.setFont(getFont());
 			inner.setEnabled(isEnabled());
-			inner.setBackground(backgroundColor);
-			inner.setForeground(foregroundColor);
 			painter.paintComponent(g, inner, this, 0, 0, width-xDeltaBase, height);
-			inner.setFont(resetFont);
 			inner.setEnabled(resetEnabled);
-			inner.setForeground(resetForeground);
-			inner.setBackground(resetBackground);
+			if (fg!=null){
+				inner.setFont(resetFont);
+				inner.setForeground(resetForeground);
+				inner.setBackground(resetBackground);
+			}
 		}
 		if (addSeparator){
 			g.translate(-xDelta, 0);

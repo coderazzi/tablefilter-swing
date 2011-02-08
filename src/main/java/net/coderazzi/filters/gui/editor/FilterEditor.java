@@ -28,13 +28,9 @@ package net.coderazzi.filters.gui.editor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Event;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -51,9 +47,7 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultRowSorter;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JTable;
@@ -315,16 +309,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     }    
     
 	/** IFilterEditor method */
-	@Override public void setMaxVisibleRows(int maxVisibleRows) {
-		popup.setMaxVisibleRows(maxVisibleRows);
-	}
-
-	/** IFilterEditor method */
-	@Override public int getMaxVisibleRows() {
-		return popup.getMaxVisibleRows();
-	}
-
-	/** IFilterEditor method */
 	@Override public void setMaxHistory(int size) {
 		popup.setMaxHistory(size);
 	}
@@ -356,115 +340,28 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		editor.setEnabled(enabled);
 	}
 	
-	/** IFilterEditor method */
-	@Override public void setBackground(Color bg) {
-		super.setBackground(bg);
-		if (editor!=null){
-	    	editor.getComponent().setBackground(bg);
-	    	downButton.setBackground(bg);
-	        popup.setBackground(bg);
-	        repaint();
-		}
-	}
-	
-	/** IFilterEditor method */
-	@Override public void setForeground(Color fg) {
-		super.setForeground(fg);
-		if (editor!=null){
-	    	editor.setForeground(fg);
-	    	downButton.setForeground(fg);
-	        popup.setForeground(fg);
-		}
-	}
-	
-	/** IFilterEditor method */
-    @Override public void setErrorForeground(Color fg) {
-    	editor.setErrorForeground(fg);
-    }
-
-	/** IFilterEditor method */
-    @Override public Color getErrorForeground() {
-    	return editor.getErrorForeground();
-    }
-
-	/** IFilterEditor method */
-    @Override public void setDisabledForeground(Color fg){
-    	editor.setDisabledForeground(fg);
-    	downButton.setDisabledColor(fg);
-    	popup.setDisabledColor(fg);
-    }
-
-	/** IFilterEditor method */
-    @Override public Color getDisabledForeground(){
-    	return editor.getDisabledForeground();
-    }
-    
-	/** IFilterEditor method */
-    @Override public void setSelectionForeground(Color fg){
-    	editor.setSelectionForeground(fg);
-    	downButton.setSelectionForeground(fg);
-    	popup.setSelectionForeground(fg);
-    }
-
-	/** IFilterEditor method */
-    @Override public Color getSelectionForeground(){
-    	return popup.getSelectionForeground();
-    }
-    
-	/** IFilterEditor method */
-    @Override public void setSelectionBackground(Color bg){
-    	editor.setSelectionBackground(bg);
-    	downButton.setSelectionBackground(bg);
-    	popup.setSelectionBackground(bg);
-    }
-
-	/** IFilterEditor method */
-    @Override public Color getSelectionBackground(){
-    	return popup.getSelectionBackground();
-    }
-    
-	/** IFilterEditor method */
-    @Override public void setTextSelectionColor(Color c) {
-    	editor.setTextSelectionColor(c);
-    }
-
-	/** IFilterEditor method */
-    @Override public Color getTextSelectionColor() {
-    	return editor.getTextSelectionColor();
-    }
-
-	/** IFilterEditor method */
-	@Override public void setGridColor(Color c) {
-    	popup.setGridColor(c);
-    	border.setColor(c);
-    }
-	
-	/** IFilterEditor method */
-	@Override public Color getGridColor() {
-		return border.getColor();
-	}
-
-	/** IFilterEditor method */
-	@Override public void setFont(Font font) {
-		super.setFont(font);
-		if (editor!=null){
-			editor.getComponent().setFont(font);
-	        popup.setFont(font);
-		}
+	public void setLook(Look look){
+		setBackground(look.background);
+		setForeground(look.foreground);
+		setFont(look.font);
+		editor.setLook(look);
+        popup.setLook(look);
+    	downButton.setLook(look);
+    	border.color=look.gridColor;
+        repaint();
 	}
 	
 	/** Method invoked by the TableFilterHeader to update the renderer*/
     public void setTableCellRenderer(final TableCellRenderer renderer){
     	setListCellRenderer(renderer==null? null :
-    			new DefaultListCellRenderer() {
-
-    		private static final long serialVersionUID = -5990815893475331934L;
+    			new FilterListCellRenderer.TableWrapperRenderer() {
 
 			@Override public Component getListCellRendererComponent(JList list, 
 					Object value, int index, boolean isSelected, 
 					boolean cellHasFocus) {
-				return renderer.getTableCellRendererComponent(filtersHandler.getTable(), 
-						value, false, cellHasFocus, 1, getModelIndex());
+				return renderer.getTableCellRendererComponent(
+						filtersHandler.getTable(), value, false, 
+						cellHasFocus, 1, getModelIndex());
             }
         });
     }
@@ -536,17 +433,10 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		}
 		if (newComponent!=null){
 			if (editor!=null){
-				newComponent.getComponent().setBackground(editor.getComponent().getBackground());
-				newComponent.getComponent().setFont(editor.getComponent().getFont());
-				newComponent.setForeground(editor.getForeground());
-				newComponent.setErrorForeground(getErrorForeground());
-				newComponent.setDisabledForeground(getDisabledForeground());
-				newComponent.setSelectionBackground(getSelectionBackground());
-				newComponent.setSelectionForeground(getSelectionForeground());
-				newComponent.setTextSelectionColor(getTextSelectionColor());
 				remove(editor.getComponent());
 			}
 			editor = newComponent;
+			editor.setLook(downButton.getLook());
 			setupComponent(editor.getComponent());
 			add(editor.getComponent(), BorderLayout.CENTER);
 			setEditorEnabled(filter.isEnabled());
@@ -926,80 +816,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 
 	/**
-	 * Custom implementation of the arrow used to display the popup menu.<br>
-	 */
-	final static class FilterArrowButton extends JButton {
-		private static final long serialVersionUID = -777416843479142582L;
-		private final static int FILL_X[] = { 0, 3, 6 };
-		private final static int FILL_Y[] = { 0, 5, 0 };
-		private final static int MIN_X = 6;
-		private final static int MIN_Y = 6;
-		
-		private boolean focus;
-		private Color disabledColor;
-		private Color selectionForeground, selectionBackground;
-		
-		public void setFocused(boolean focus){
-			this.focus=focus;
-			repaint();
-		}
-		
-		public void setDisabledColor(Color color){
-			disabledColor=color;
-			if (!isEnabled()){
-				repaint();
-			}
-		}
-		
-		public void setSelectionForeground(Color color){
-			selectionForeground=color;
-			if (focus){
-				repaint();
-			}
-		}
-		
-		public void setSelectionBackground(Color color){
-			selectionBackground=color;
-			if (focus){
-				repaint();
-			}
-		}
-		
-		@Override public void paint(Graphics g) {
-			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
-
-			int height = getHeight();
-			int width = getWidth();
-
-			g.setColor(isEnabled() && focus? selectionBackground: getBackground());
-			g.fillRect(0, 0, width, height);
-
-			width = (width - MIN_X) / 2;
-			height = Math.min(height / 2, height - MIN_Y);
-			g.translate(width, height);
-			if (isEnabled()){
-				g.setColor(focus? selectionForeground : getForeground());
-			} else {
-				g.setColor(disabledColor);
-			}
-			g.fillPolygon(FILL_X, FILL_Y, FILL_X.length);
-		}
-
-		@Override protected void paintBorder(Graphics g) {
-			super.paintBorder(g);
-		}
-
-		@Override public boolean isFocusable() {
-			return false;
-		}
-
-		@Override public Dimension getPreferredSize() {
-			return new Dimension(12, 12);
-		}
-	}
-
-    /**
      * Wrapper of the filter associated to the {@link EditorComponent}, 
      * ensuring some added functionality (like auto-adding to the 
      * history list when the filter changes) 
@@ -1039,22 +855,13 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     /**
      * Implementation of the {@link Border} associated to each filter editor
      */
-	final class EditorBorder implements Border {
+	final static class EditorBorder implements Border {
 		
-		private Color borderColor;
-		
-		public void setColor(Color color){
-			borderColor = color;
-			repaint();
-		}
-		
-		public Color getColor(){
-			return borderColor;
-		}
+		Color color;
 		
 		@Override public void paintBorder(Component c, Graphics g, int x, int y, 
 				int width, int height) {
-			g.setColor(borderColor);
+			g.setColor(color);
 			g.drawLine(0, height-1, width-1, height-1);
 			g.drawLine(width-1, 0, width-1, height-1);
 		}

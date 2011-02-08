@@ -33,12 +33,17 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.text.Format;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JComponent;
@@ -51,6 +56,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LookAndFeel;
+import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -67,6 +73,7 @@ import net.coderazzi.filters.examples.utils.FlagRenderer;
 import net.coderazzi.filters.examples.utils.TestData;
 import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.FilterSettings;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.IFilterHeaderObserver;
@@ -114,13 +121,7 @@ public class TableFilterExample extends JFrame {
     	tablePanel.setBorder(BorderFactory.createCompoundBorder(
     			BorderFactory.createLoweredBevelBorder(),
     			BorderFactory.createEmptyBorder(8, 8, 8, 8)));
-    	filterHeader = new TableFilterHeader(){
-    		
-    		@Override protected void customizeEditor(IFilterEditor editor) {
-    			super.customizeEditor(editor);
-    			//enter here any code to customize the editor
-    		}
-    	};
+    	filterHeader = new TableFilterHeader();
     	filterHeader.addHeaderObserver(new IFilterHeaderObserver() {
 			
 			@Override public void tableFilterUpdated(TableFilterHeader header,
@@ -348,7 +349,7 @@ public class TableFilterExample extends JFrame {
     	ret.addSeparator();
     	ret.add(visible);
     	ret.add(createPositionMenu());
-    	ret.add(createAppearanceMenu(null));
+    	ret.add(createAppearanceMenu());
     	ret.add(createMaxRowsMenu());
     	ret.add(createMaxHistoryMenu(null));
     	ret.addSeparator();
@@ -472,16 +473,15 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     	
-    private JMenu createAppearanceMenu(final IFilterEditor editor){
+    private JMenu createAppearanceMenu(){
     	JMenu ret = new JMenu("appearance");
     	ret.add(new JMenuItem(new AbstractAction("background color ...") {			
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
 						"Select background color", 
-						editor==null? filterHeader.getBackground() : editor.getBackground());
+						filterHeader.getBackground());
 				if (ret!=null){
-					if (editor==null) {filterHeader.setBackground(ret);} 
-					else {editor.setBackground(ret);}
+					filterHeader.setBackground(ret); 
 				}
 			}
 		}));
@@ -489,10 +489,9 @@ public class TableFilterExample extends JFrame {
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
 						"Select foreground color", 
-						editor==null? filterHeader.getForeground() : editor.getForeground());
+						filterHeader.getForeground());
 				if (ret!=null){
-					if (editor==null) {filterHeader.setForeground(ret);} 
-					else {editor.setForeground(ret);}
+					filterHeader.setForeground(ret);
 				}
 			}
 		}));
@@ -500,10 +499,9 @@ public class TableFilterExample extends JFrame {
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
 						"Select disabled color", 
-						editor==null? filterHeader.getDisabledForeground() : editor.getDisabledForeground());
+						filterHeader.getDisabledForeground());
 				if (ret!=null){
-					if (editor==null) {filterHeader.setDisabledForeground(ret);} 
-					else {editor.setDisabledForeground(ret);}
+					filterHeader.setDisabledForeground(ret);
 				}
 			}
 		}));
@@ -511,10 +509,9 @@ public class TableFilterExample extends JFrame {
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
 						"Select grid color", 
-						editor==null? filterHeader.getGridColor() : editor.getGridColor());
+						filterHeader.getGridColor());
 				if (ret!=null){
-					if (editor==null) {filterHeader.setGridColor(ret);} 
-					else {editor.setGridColor(ret);}
+					filterHeader.setGridColor(ret);
 				}
 			}
 		}));
@@ -522,22 +519,19 @@ public class TableFilterExample extends JFrame {
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
 						"Select error color", 
-						editor==null? filterHeader.getErrorForeground() : editor.getErrorForeground());
+						filterHeader.getErrorForeground());
 				if (ret!=null){
-					if (editor==null) {filterHeader.setErrorForeground(ret);} 
-					else {editor.setErrorForeground(ret);}
+					filterHeader.setErrorForeground(ret);
 				}
 			}
 		}));
     	ret.add(new JMenuItem(new AbstractAction("selection foreground ...") {			
-			@Override
-			public void actionPerformed(ActionEvent e) {
+			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
 						"Select selection foreground", 
-						editor==null? filterHeader.getSelectionForeground() : editor.getSelectionForeground());
+						filterHeader.getSelectionForeground());
 				if (ret!=null){
-					if (editor==null) {filterHeader.setSelectionForeground(ret);} 
-					else {editor.setSelectionForeground(ret);}
+					filterHeader.setSelectionForeground(ret);
 				}
 			}
 		}));
@@ -545,10 +539,9 @@ public class TableFilterExample extends JFrame {
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
 						"Select selection background", 
-						editor==null? filterHeader.getSelectionBackground() : editor.getSelectionBackground());
+						filterHeader.getSelectionBackground());
 				if (ret!=null){
-					if (editor==null) {filterHeader.setSelectionBackground(ret);} 
-					else {editor.setSelectionBackground(ret);}
+					filterHeader.setSelectionBackground(ret); 
 				}
 			}
 		}));
@@ -556,15 +549,14 @@ public class TableFilterExample extends JFrame {
 			@Override public void actionPerformed(ActionEvent e) {
 				Color ret = JColorChooser.showDialog(TableFilterExample.this, 
 						"Select text selection color", 
-						editor==null? filterHeader.getTextSelectionColor() : editor.getTextSelectionColor());
+						filterHeader.getTextSelectionColor());
 				if (ret!=null){
-					if (editor==null) {filterHeader.setTextSelectionColor(ret);} 
-					else {editor.setTextSelectionColor(ret);}
+					filterHeader.setTextSelectionColor(ret); 
 				}
 			}
 		}));
     	ret.addSeparator();
-    	ret.add(createFontSizeMenu(editor));			
+    	ret.add(createFontSizeMenu());			
     	return ret;
     }
     
@@ -614,7 +606,6 @@ public class TableFilterExample extends JFrame {
 		});
     	
 		menu.add(useFlagRenderer);
-    	menu.add(createAppearanceMenu(editor));
     	menu.add(createMaxHistoryMenu(editor));
     	menu.addSeparator();
     	if (name.equalsIgnoreCase("country")){
@@ -693,13 +684,13 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
-    private JMenu createFontSizeMenu(IFilterEditor editor){
+    private JMenu createFontSizeMenu(){
     	int RELATIVE_FONT_SIZES[]={-2, -1, 0, 1, 2, 4, 8, 16};
     	int size=filterHeader.getFont().getSize();
     	JMenu ret = new JMenu("font size");
     	ButtonGroup group = new ButtonGroup();
     	for (int i : RELATIVE_FONT_SIZES){
-    		JRadioButtonMenuItem item = createFontSizeMenuItem(editor, size+i);
+    		JRadioButtonMenuItem item = createFontSizeMenuItem(size+i);
     		ret.add(item);
     		group.add(item);
     		if (i==0){
@@ -709,16 +700,11 @@ public class TableFilterExample extends JFrame {
     	return ret;
     }
     
-    private JRadioButtonMenuItem createFontSizeMenuItem(final IFilterEditor editor, final int size){
+    private JRadioButtonMenuItem createFontSizeMenuItem(final int size){
     	return new JRadioButtonMenuItem(new AbstractAction(String.valueOf(size)) {			
 			@Override public void actionPerformed(ActionEvent e) {
-				if (editor==null){
-					filterHeader.setFont(
-							filterHeader.getFont().deriveFont((float)(size)));
-				} else {
-					editor.setFont(
-							editor.getFont().deriveFont((float)(size)));					
-				}
+				filterHeader.setFont(
+						filterHeader.getFont().deriveFont((float)(size)));
 			}
 		});
     }
@@ -835,6 +821,10 @@ public class TableFilterExample extends JFrame {
         int datesColumnView = getColumnView(TestTableModel.DATE);
 
         if (datesColumnView!=-1) {
+	        Set<CustomChoice> choices = new HashSet<CustomChoice>();
+	        choices.add(new Ages60sCustomChoice());
+        	filterHeader.getFilterEditor(tableModel.getColumn(TestTableModel.DATE)).
+        		setCustomChoices(choices);
             table.getColumnModel().getColumn(datesColumnView).
             		setCellRenderer(new DefaultTableCellRenderer(){
 
@@ -888,6 +878,32 @@ public class TableFilterExample extends JFrame {
 	
 	interface AutoChoicesSet{
 		void setAutoChoices(AutoChoices ao);
+	}
+	
+	class Ages60sCustomChoice extends CustomChoice{
+		Calendar cal = Calendar.getInstance();
+	    Icon icon = new ImageIcon( 
+	        	TableFilterExample.class.getResource("resources/60.png"));
+		public Ages60sCustomChoice() {
+			super("sixties");
+		}
+		@Override public Icon getIcon() {
+			return icon;
+		}
+		@Override public RowFilter getFilter(IFilterEditor editor) {
+			final int modelIndex = editor.getModelIndex();
+			return new RowFilter(){
+				@Override public boolean include(RowFilter.Entry entry) {
+					Object o = entry.getValue(modelIndex);
+					if (o instanceof Date){
+						cal.setTime((Date)o);
+						int year = cal.get(Calendar.YEAR);
+						return year>=1960 && year<1969;
+					}
+					return false;
+				}				
+			};
+		}
 	}
 	
     public final static void main(String[] args) {

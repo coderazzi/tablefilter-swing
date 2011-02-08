@@ -27,7 +27,6 @@ package net.coderazzi.filters.gui.editor;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -63,8 +62,6 @@ import net.coderazzi.filters.gui.IFilterEditor;
  */
 abstract class PopupComponent implements PopupMenuListener{
 
-	/** Minimum number of visible choices -if there are choices- */
-	private static final int MIN_VISIBLE_CHOICES = 4; 
 	private JPopupMenu popup;
 	private FilterListCellRenderer listRenderer;
 	private JScrollPane choicesScrollPane;
@@ -297,17 +294,6 @@ abstract class PopupComponent implements PopupMenuListener{
 		return isVisible() && listRenderer.isFocusOnList() && !emptyPopupMark.isVisible();
 	}
 
-	/** @see IFilterEditor#setMaxVisibleRows(int) */
-	public void setMaxVisibleRows(int maxVisibleRows) {
-		this.maxVisibleRows = Math.max(MIN_VISIBLE_CHOICES, maxVisibleRows);
-		setMaxHistory(getMaxHistory());
-	}
-
-	/** @see IFilterEditor#getMaxVisibleRows() */
-	public int getMaxVisibleRows() {
-		return maxVisibleRows;
-	}
-
 	/** @see IFilterEditor#setMaxHistory(int) */
 	public void setMaxHistory(int size) {
 		historyModel.setMaxHistory(Math.max(0, Math.min(size, maxVisibleRows)));
@@ -416,62 +402,36 @@ abstract class PopupComponent implements PopupMenuListener{
 		select(select);
 	}
 
-	/** Sets the list's background color */
-	public void setBackground(Color color){
-		choicesList.setBackground(color);
-		historyList.setBackground(color);
-	}
-	
-	/** Sets the list's foreground color */
-	public void setForeground(Color color){
-		choicesList.setForeground(color);
-		historyList.setForeground(color);
-	}
-	
-	/** Sets the list's selected background color */
-	public void setSelectionBackground(Color color){
-		choicesList.setSelectionBackground(color);
-		historyList.setSelectionBackground(color);
-		emptyPopupMark.setBackground(color);
-	}
-	
-	/** Sets the list's selected foreground color */
-	public void setSelectionForeground(Color color){
-		choicesList.setSelectionForeground(color);
-		historyList.setSelectionForeground(color);
-	}
-	
-	/** Gets the list's selected background color */
-	public Color getSelectionBackground(){
-		return choicesList.getSelectionBackground();
-	}
-	
-	/** Gets the list's selected foreground color */
-	public Color getSelectionForeground(){
-		return choicesList.getSelectionForeground();
-	}
-	
-	/** Sets the disabled color, used on the CustomChoices' text */
-	public void setDisabledColor(Color color){
-		listRenderer.setDisabledColor(color);
-	}
-	
-	/** Sets the disabled color, used for many things, like border, separator */
-	public void setGridColor(Color color){
-		popup.setBorder(BorderFactory.createLineBorder(color, 1));
-		separator.setForeground(color);
-	}
-	
-	/** Return the grid color*/
-	public Color getGridColor(){
-		return separator.getForeground();
-	}
-	
-	/** Sets the list's font color */
-	public void setFont(Font font){
-		choicesList.setFont(font);
-		historyList.setFont(font);
-		ensureListRowsHeight();
+	/** Sets the colors schema */
+	public void setLook(Look look){
+		Font oldFont = choicesList.getFont();
+		
+		choicesList.setBackground(look.background);
+		choicesList.setForeground(look.foreground);
+		choicesList.setSelectionBackground(look.selectionBackground);
+		choicesList.setSelectionForeground(look.selectionForeground);
+		choicesList.setFont(look.font);
+
+		historyList.setBackground(look.background);
+		historyList.setForeground(look.foreground);
+		historyList.setSelectionBackground(look.selectionBackground);
+		historyList.setSelectionForeground(look.selectionForeground);
+		historyList.setFont(look.font);
+
+		emptyPopupMark.setBackground(look.selectionBackground);
+		
+		listRenderer.setLook(look);
+		
+		popup.setBorder(BorderFactory.createLineBorder(look.gridColor, 1));
+		
+		separator.setForeground(look.gridColor);
+		
+		maxVisibleRows = look.maxVisiblePopupRows;
+		setMaxHistory(getMaxHistory());
+
+		if (oldFont!=look.font){
+			ensureListRowsHeight();
+		}
 	}
 	
 	/**
