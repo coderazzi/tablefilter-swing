@@ -49,14 +49,12 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultRowSorter;
 import javax.swing.JComponent;
-import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.RowFilter;
 import javax.swing.border.Border;
-import javax.swing.table.TableCellRenderer;
 
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.IFilter;
@@ -89,7 +87,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	private boolean ignoreCase;
 	private int modelIndex;
 	private Class modelClass;
-	private boolean autoRenderer;
 	
 	FiltersHandler filtersHandler;
 	FilterArrowButton downButton = new FilterArrowButton();
@@ -292,23 +289,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 
 	/** IFilterEditor method */
-    @Override public void setAutoListCellRenderer(boolean set) {
-    	autoRenderer=set;    
-    	TableCellRenderer tcr = null;
-    	if (set){
-    		JTable table = filtersHandler.getTable();
-            tcr = table.getColumnModel().getColumn(
-            		table.convertColumnIndexToView(modelIndex)).getCellRenderer();
-    	}
-    	setTableCellRenderer(tcr);
-    }
-    
-	/** IFilterEditor method */
-    @Override public boolean isAutoListCellRenderer(){
-    	return autoRenderer;
-    }    
-    
-	/** IFilterEditor method */
 	@Override public void setMaxHistory(int size) {
 		popup.setMaxHistory(size);
 	}
@@ -351,21 +331,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
         repaint();
 	}
 	
-	/** Method invoked by the TableFilterHeader to update the renderer*/
-    public void setTableCellRenderer(final TableCellRenderer renderer){
-    	setListCellRenderer(renderer==null? null :
-    			new FilterListCellRenderer.TableWrapperRenderer() {
-
-			@Override public Component getListCellRendererComponent(JList list, 
-					Object value, int index, boolean isSelected, 
-					boolean cellHasFocus) {
-				return renderer.getTableCellRendererComponent(
-						filtersHandler.getTable(), value, false, 
-						cellHasFocus, 1, getModelIndex());
-            }
-        });
-    }
-
 	/** Method invoked by the FiltersHandler to set the choices */
 	public void setChoices(Collection<?> choices){
 		popup.clearChoices();

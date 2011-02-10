@@ -142,10 +142,8 @@ public class Bug2_1_0_SetVisible extends JFrame {
         table.getColumnModel().getColumn(table.convertColumnIndexToView(
         		tableModel.getColumn(TestTableModel.AGE))).
         		setCellRenderer(new CenteredRenderer());
-        filterHeader.getFilterEditor(tableModel.getColumn(TestTableModel.AGE))
-        	.setAutoListCellRenderer(true);
         filterHeader.getFilterEditor(tableModel.getColumn(TestTableModel.COUNTRY))
-        	.setAutoListCellRenderer(true);
+        	.setListCellRenderer(new FlagRenderer());
     }
 
     static class ButtonsPanel extends JPanel {

@@ -53,9 +53,10 @@ import javax.swing.RowFilter;
 public abstract class CustomChoice {
 	
 	public final static int DEFAULT_PRECEDENCE = 0;
+	public final static int MATCH_ALL_PRECEDENCE = -255;
 	
 	/** Empty filter, returns all entries */
-	public final static CustomChoice MATCH_ALL = new CustomChoice(""){
+	public final static CustomChoice MATCH_ALL = new CustomChoice("", null, MATCH_ALL_PRECEDENCE){
 		RowFilter rf = new RowFilter(){
 			@Override public boolean include(RowFilter.Entry entry) {
 				return true;

@@ -597,15 +597,22 @@ public class TableFilterExample extends JFrame {
     	menu.add(ignoreCase);
     	menu.addSeparator();
     	
-    	JCheckBoxMenuItem useFlagRenderer=new JCheckBoxMenuItem(USE_TABLE_RENDERER, name.equalsIgnoreCase("country"));
-		useFlagRenderer.addItemListener(new ItemListener() {
-			
-			@Override public void itemStateChanged(ItemEvent e) {
-				editor.setAutoListCellRenderer(((JCheckBoxMenuItem) e.getSource()).isSelected());
-			}
-		});
+    	if (name.equalsIgnoreCase("country")){    		
+        	JCheckBoxMenuItem useFlagRenderer=new JCheckBoxMenuItem(USE_TABLE_RENDERER, true);
+    		useFlagRenderer.addItemListener(new ItemListener() {
+    			
+    			@Override public void itemStateChanged(ItemEvent e) {
+    				if (((JCheckBoxMenuItem) e.getSource()).isSelected()){
+    					editor.setListCellRenderer(new FlagRenderer());
+    				} else {
+    					editor.setListCellRenderer(null);
+    				}
+    			}
+    		});
+        	
+    		menu.add(useFlagRenderer);
+    	}
     	
-		menu.add(useFlagRenderer);
     	menu.add(createMaxHistoryMenu(editor));
     	menu.addSeparator();
     	if (name.equalsIgnoreCase("country")){
@@ -799,7 +806,9 @@ public class TableFilterExample extends JFrame {
 	        	}
 	        }
         	IFilterEditor editor = filterHeader.getFilterEditor(column);
-        	editor.setAutoListCellRenderer(set);
+        	if (set){
+        		editor.setListCellRenderer(new FlagRenderer());
+        	}
         	editor.setEditable(false);
         	updateFilter(editor, tableModel.getColumnName(column));
 	        setCountryComparator(countrySpecialSorter.isSelected());

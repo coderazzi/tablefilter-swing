@@ -28,30 +28,61 @@ import java.awt.Component;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JTable;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 
-public class FlagRenderer extends DefaultTableCellRenderer {
+public class FlagRenderer extends JLabel implements ListCellRenderer, TableCellRenderer {
 
 	private static final long serialVersionUID = -6640707874060161068L;
+	
+	public FlagRenderer() {
+		setOpaque(true);
+	}
 
 	@Override public Component getTableCellRendererComponent(JTable table, 
 			Object value, boolean isSelected, boolean hasFocus, int row, 
 			int column) {
-        JLabel label = (JLabel) super.getTableCellRendererComponent(table, 
-        		value, isSelected, hasFocus, row, column);
+		Component ret = setup(table, value, isSelected);
+		if (isSelected){
+			ret.setBackground(table.getSelectionBackground());
+			ret.setForeground(table.getSelectionForeground());
+		}
+		return ret;
+    }
+	
+	@Override public Component getListCellRendererComponent(JList list, Object value,
+			int index, boolean isSelected, boolean cellHasFocus) {
+		Component ret = setup(list, value, isSelected);
+		if (isSelected){
+			ret.setBackground(list.getSelectionBackground());
+			ret.setForeground(list.getSelectionForeground());
+		}
+		return ret;
+	}
 
+	private Component setup(Component owner, Object value, boolean isSelected) {
+		
+		setFont(owner.getFont());
+		
         ImageIcon icon = (ImageIcon) value;
-        label.setIcon(icon);
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setText("");
+        setIcon(icon);
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setText("");
 
         if (icon != null) {
-            label.setToolTipText(icon.getDescription());
+            setToolTipText(icon.getDescription());
+        }
+        
+        if (!isSelected){
+        	setBackground(owner.getBackground());
+        	setForeground(owner.getForeground());        	
         }
 
-        return label;
+        return this;
     }
+	
 }

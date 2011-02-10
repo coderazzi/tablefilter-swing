@@ -4,9 +4,7 @@ import java.text.Format;
 import java.util.Comparator;
 import java.util.Set;
 
-import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -112,23 +110,6 @@ public interface IFilterEditor {
 
     /** Returns the associated {@link ListCellRenderer} */
 	public abstract ListCellRenderer getListCellRenderer();
-
-	/**
-	 * <p>Sets as renderer for the editor the generic {@link TableCellRenderer}, 
-	 * used by the {@link JTable}, updating it as the renderer in the
-	 * table is updated</p>
-	 *
-	 * <p>This method allows reusing a renderer already written for a table 
-	 * as the editor's renderer, but it has an important restriction: it only 
-	 * works if the renderer does not depend on the cell coordinates</p>
-	 */
-	public abstract void setAutoListCellRenderer(boolean set);
-
-	/**
-	 * Returns the auto list cell renderer flag
-	 * @see #setAutoListCellRenderer(boolean)
-	 */
-    public abstract boolean isAutoListCellRenderer();
 
 	/**
 	 * Limits the history size. <br>
