@@ -52,7 +52,6 @@ import javax.swing.table.TableColumnModel;
 
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterObserver;
-import net.coderazzi.filters.gui.editor.Look;
 import net.coderazzi.filters.gui.editor.FilterEditor;
 
 

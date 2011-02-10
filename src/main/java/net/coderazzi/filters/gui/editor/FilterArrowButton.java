@@ -7,6 +7,8 @@ import java.awt.RenderingHints;
 
 import javax.swing.JButton;
 
+import net.coderazzi.filters.gui.Look;
+
 /**
  * Custom implementation of the arrow used to display the popup menu.<br>
  */
@@ -42,16 +44,16 @@ final class FilterArrowButton extends JButton {
 		int height = getHeight();
 		int width = getWidth();
 
-		g.setColor(isEnabled() && focus? look.selectionBackground: look.background);
+		g.setColor(isEnabled() && focus? look.getSelectionBackground(): look.getBackground());
 		g.fillRect(0, 0, width, height);
 
 		width = (width - MIN_X) / 2;
 		height = Math.min(height / 2, height - MIN_Y);
 		g.translate(width, height);
 		if (isEnabled()){
-			g.setColor(focus? look.selectionForeground : look.foreground);
+			g.setColor(focus? look.getSelectionForeground() : look.getForeground());
 		} else {
-			g.setColor(look.disabledForeground);
+			g.setColor(look.getDisabledForeground());
 		}
 		g.fillPolygon(FILL_X, FILL_Y, FILL_X.length);
 	}

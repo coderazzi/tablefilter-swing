@@ -54,6 +54,7 @@ import javax.swing.event.PopupMenuListener;
 
 import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.IFilterEditor;
+import net.coderazzi.filters.gui.Look;
 
 
 /**
@@ -406,30 +407,30 @@ abstract class PopupComponent implements PopupMenuListener{
 	public void setLook(Look look){
 		Font oldFont = choicesList.getFont();
 		
-		choicesList.setBackground(look.background);
-		choicesList.setForeground(look.foreground);
-		choicesList.setSelectionBackground(look.selectionBackground);
-		choicesList.setSelectionForeground(look.selectionForeground);
-		choicesList.setFont(look.font);
+		choicesList.setBackground(look.getBackground());
+		choicesList.setForeground(look.getForeground());
+		choicesList.setSelectionBackground(look.getSelectionBackground());
+		choicesList.setSelectionForeground(look.getSelectionForeground());
+		choicesList.setFont(look.getFont());
 
-		historyList.setBackground(look.background);
-		historyList.setForeground(look.foreground);
-		historyList.setSelectionBackground(look.selectionBackground);
-		historyList.setSelectionForeground(look.selectionForeground);
-		historyList.setFont(look.font);
+		historyList.setBackground(look.getBackground());
+		historyList.setForeground(look.getForeground());
+		historyList.setSelectionBackground(look.getSelectionBackground());
+		historyList.setSelectionForeground(look.getSelectionForeground());
+		historyList.setFont(look.getFont());
 
-		emptyPopupMark.setBackground(look.selectionBackground);
+		emptyPopupMark.setBackground(look.getSelectionBackground());
 		
 		listRenderer.setLook(look);
 		
-		popup.setBorder(BorderFactory.createLineBorder(look.gridColor, 1));
+		popup.setBorder(BorderFactory.createLineBorder(look.getGridColor(), 1));
 		
-		separator.setForeground(look.gridColor);
+		separator.setForeground(look.getGridColor());
 		
-		maxVisibleRows = look.maxVisiblePopupRows;
+		maxVisibleRows = look.getMaxVisiblePopupRows();
 		setMaxHistory(getMaxHistory());
 
-		if (oldFont!=look.font){
+		if (oldFont!=look.getFont()){
 			ensureListRowsHeight();
 		}
 	}

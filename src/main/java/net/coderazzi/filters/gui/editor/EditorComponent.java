@@ -53,6 +53,7 @@ import javax.swing.text.DocumentFilter;
 
 import net.coderazzi.filters.IParser;
 import net.coderazzi.filters.gui.CustomChoice;
+import net.coderazzi.filters.gui.Look;
 
 
 /**
@@ -164,7 +165,7 @@ interface EditorComponent {
         	public void setLook(Look look){
         		if (look!=null){
             		this.look=look;
-	        		setFont(look.font);
+	        		setFont(look.getFont());
 	        		ensureCorrectBackgroundColor();
 	        		ensureCorrectForegroundColor();
 	        		repaint();
@@ -277,7 +278,7 @@ interface EditorComponent {
         	
         	private void ensureCorrectBackgroundColor(){
         		if (look!=null){
-        			super.setBackground(focus? look.selectionBackground : look.background);
+        			super.setBackground(focus? look.getSelectionBackground() : look.getBackground());
         		}
         	}
         	
@@ -287,12 +288,12 @@ interface EditorComponent {
 	            	Color color;
 	            	if (enabled && icon==null){
 	            		if (error){
-	            			color = look.errorForeground;
+	            			color = look.getErrorForeground();
 	            		} else {
-	            			color = focus? look.selectionForeground : look.foreground;
+	            			color = focus? look.getSelectionForeground() : look.getForeground();
 	            		}
 	            	} else {
-	            		color = look.disabledForeground;
+	            		color = look.getDisabledForeground();
 	            	}
 	            	if (color!=super.getForeground()){
 	            		super.setForeground(color);
@@ -645,8 +646,8 @@ interface EditorComponent {
         }
 
         @Override public void setLook(Look look) {
-        	setForeground(look.foreground);
-        	setBackground(look.background);
+        	setForeground(look.getForeground());
+        	setBackground(look.getBackground());
         }
         
         @Override public boolean isShowing() {

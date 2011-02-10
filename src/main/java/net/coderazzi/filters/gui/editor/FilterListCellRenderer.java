@@ -40,6 +40,7 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import net.coderazzi.filters.gui.CustomChoice;
+import net.coderazzi.filters.gui.Look;
 
 /**
  * Special cellRenderer used on the history and choices list, 
@@ -125,7 +126,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	 * on {@see CustomChoice} instances
 	 */
 	public void setLook(Look look){
-		this.disabledColor = look.disabledForeground;
+		this.disabledColor = look.getDisabledForeground();
 	}
 	
 	/** 

@@ -63,6 +63,7 @@ import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.FiltersHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.IParserModel;
+import net.coderazzi.filters.gui.Look;
 import net.coderazzi.filters.parser.DateComparator;
 
 /**
@@ -321,13 +322,13 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 	
 	public void setLook(Look look){
-		setBackground(look.background);
-		setForeground(look.foreground);
-		setFont(look.font);
+		setBackground(look.getBackground());
+		setForeground(look.getForeground());
+		setFont(look.getFont());
 		editor.setLook(look);
         popup.setLook(look);
     	downButton.setLook(look);
-    	border.color=look.gridColor;
+    	border.color=look.getGridColor();
         repaint();
 	}
 	
