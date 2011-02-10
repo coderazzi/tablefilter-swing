@@ -63,6 +63,7 @@ import net.coderazzi.filters.gui.FiltersHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.IParserModel;
 import net.coderazzi.filters.gui.Look;
+import net.coderazzi.filters.gui.ChoiceRenderer;
 import net.coderazzi.filters.parser.DateComparator;
 
 /**
@@ -256,7 +257,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
         	if (table!=null && (table.getRowSorter() instanceof DefaultRowSorter)){
         		((DefaultRowSorter) table.getRowSorter()).setComparator(getModelIndex(), comparator);
         	}
-    		Renderer lcr = getRenderer();
+    		ChoiceRenderer lcr = getRenderer();
     		if (lcr==null){
     			filter.checkChanges(true);
     		} else {
@@ -282,7 +283,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 	
 	/** IFilterEditor method */
-	@Override public void setRenderer(Renderer renderer){
+	@Override public void setRenderer(ChoiceRenderer renderer){
 		if (renderer==null){
 			popup.setStringContent(format, getStringComparator());
 		} else {
@@ -294,7 +295,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 
 	/** IFilterEditor method */
-	@Override public Renderer getRenderer(){
+	@Override public ChoiceRenderer getRenderer(){
 		return popup.getRenderer();
 	}
 
@@ -381,7 +382,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	return getParserModel().getStringComparator(ignoreCase);
     }
     
-	private void setupEditorComponent(Renderer renderer){
+	private void setupEditorComponent(ChoiceRenderer renderer){
 		EditorComponent newComponent=null;
 		if (renderer==null){
 			if (!(editor instanceof EditorComponent.Text)){

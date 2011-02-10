@@ -34,9 +34,10 @@ import javax.swing.table.TableCellRenderer;
 
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.Look;
+import net.coderazzi.filters.gui.ChoiceRenderer;
 
 
-public class FlagRenderer extends JLabel implements IFilterEditor.Renderer, TableCellRenderer {
+public class FlagRenderer extends JLabel implements ChoiceRenderer, TableCellRenderer {
 
 	private static final long serialVersionUID = -6640707874060161068L;
 	

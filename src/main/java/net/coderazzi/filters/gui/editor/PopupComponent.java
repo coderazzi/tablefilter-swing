@@ -54,6 +54,7 @@ import javax.swing.event.PopupMenuListener;
 import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.Look;
+import net.coderazzi.filters.gui.ChoiceRenderer;
 
 
 /**
@@ -203,12 +204,12 @@ abstract class PopupComponent implements PopupMenuListener{
 	}
 
 	/** Returns the current Renderer */
-	public IFilterEditor.Renderer getRenderer() {
+	public ChoiceRenderer getRenderer() {
 		return listRenderer.getUserRenderer();
 	}
 
 	/** Specifies that the content requires no conversion to strings */
-	public void setRenderedContent(IFilterEditor.Renderer renderer, Comparator classComparator) {
+	public void setRenderedContent(ChoiceRenderer renderer, Comparator classComparator) {
 		hide();
 		listRenderer.setUserRenderer(renderer);
 		if (choicesModel.setRenderedContent(classComparator)){

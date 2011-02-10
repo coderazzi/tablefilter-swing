@@ -1,6 +1,5 @@
 package net.coderazzi.filters.gui;
 
-import java.awt.Component;
 import java.text.Format;
 import java.util.Comparator;
 import java.util.Set;
@@ -60,7 +59,7 @@ public interface IFilterEditor {
 
 	/**
 	 * Defines the editor, if text based -i.e., without associated 
-	 * {@link Renderer}, as editable: this flag means that the user 
+	 * {@link ChoiceRenderer}, as editable: this flag means that the user 
 	 * can enter any text, not being limited to the existing choices
 	 */
 	public void setEditable(boolean enable);
@@ -117,23 +116,17 @@ public interface IFilterEditor {
 	public int getMaxHistory();
 
 	/**
-	 * Sets the {@link Renderer} for the choices / history.<p>
+	 * Sets the {@link ChoiceRenderer} for the choices / history.<p>
 	 * It also affectes to how the content is rendered<br>
 	 * If not null, the content cannot be text-edited anymore
 	 * @param renderer
 	 */
-	public void setRenderer(Renderer renderer);
+	public void setRenderer(ChoiceRenderer renderer);
 
-    /** Returns the associated {@link Renderer} */
-	public Renderer getRenderer();
+    /** Returns the associated {@link ChoiceRenderer} */
+	public ChoiceRenderer getRenderer();
 
 	/** Returns the current editor's look */
 	public Look getLook();
-
-	/** Interface to customize the content of the editor */
-	public interface Renderer {
-		public Component getRendererComponent(IFilterEditor editor,
-				Object value, boolean isSelected);
-	}
 
 }

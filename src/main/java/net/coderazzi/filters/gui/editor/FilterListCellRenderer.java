@@ -41,7 +41,7 @@ import javax.swing.ListCellRenderer;
 
 import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.IFilterEditor;
-import net.coderazzi.filters.gui.IFilterEditor.Renderer;
+import net.coderazzi.filters.gui.ChoiceRenderer;
 
 /**
  * Special cellRenderer used on the history and choices list, 
@@ -65,10 +65,6 @@ import net.coderazzi.filters.gui.IFilterEditor.Renderer;
  */
 class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	
-	public interface TableWrapperRenderer extends ListCellRenderer{
-		//just a markup interface
-	}
-	
 	private static final long serialVersionUID = 6736940091246039334L;
 	private final static int X_MARGIN_ARROW = 1;
 	private final static int WIDTH_ARROW = 5;
@@ -89,7 +85,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	IFilterEditor editor;
 	Color fg, bg;
 	boolean addSeparator;
-	Renderer renderer;
+	ChoiceRenderer renderer;
 
 	/**
 	 * Specific cellRenderer for the TableFilter, taking care of
@@ -135,11 +131,11 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		return focusOnList;
 	}
 
-	public void setUserRenderer(Renderer cellRenderer) {
+	public void setUserRenderer(ChoiceRenderer cellRenderer) {
 		renderer = cellRenderer;
 	}
 
-	public Renderer getUserRenderer() {
+	public ChoiceRenderer getUserRenderer() {
 		return renderer;
 	}
 
@@ -170,10 +166,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		addSeparator = false;
 		inner=null;
 		boolean useRenderer, setLook;
-		if (renderer instanceof TableWrapperRenderer){
-			setLook = true;
-			useRenderer = true;
-		} else if (renderer==null){
+		if (renderer==null){
 			setLook = true;
 			useRenderer = false;			
 		} else {
