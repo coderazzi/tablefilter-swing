@@ -331,8 +331,8 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		setForeground(look.getForeground());
 		setFont(look.getFont());
 		editor.setLook(look);
-        popup.setLook(look);
     	downButton.setLook(look);
+        popup.setLook(look);
     	border.color=look.getGridColor();
         repaint();
 	}

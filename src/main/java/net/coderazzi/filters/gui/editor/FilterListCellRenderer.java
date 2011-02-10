@@ -34,14 +34,16 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 import javax.swing.CellRendererPane;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import net.coderazzi.filters.gui.CustomChoice;
-import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.ChoiceRenderer;
+import net.coderazzi.filters.gui.CustomChoice;
+import net.coderazzi.filters.gui.CustomChoiceDecorator;
+import net.coderazzi.filters.gui.IFilterEditor;
+import net.coderazzi.filters.gui.Look;
 
 /**
  * Special cellRenderer used on the history and choices list, 
@@ -86,37 +88,71 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	Color fg, bg;
 	boolean addSeparator;
 	ChoiceRenderer renderer;
+	CustomChoiceDecorator ccDecorator = new CustomChoiceDecorator.DefaultDecorator();
+	
+	private class DefaultRenderer extends JLabel implements ListCellRenderer{
+		
+		private static final long serialVersionUID = 5837846455371777058L;
+		
+		CustomChoice currentCustomChoice;
+		boolean isSelected;
+		
+		public DefaultRenderer(JList referenceList) {
+			setOpaque(true);
+	        setComponentOrientation(referenceList.getComponentOrientation());
+		}
+		
+		@Override public Component getListCellRendererComponent(JList list, Object value,
+				int index, boolean isSelected, boolean cellHasFocus) {
+			Look look = editor.getLook();
+			Color fg=null;
+			Color bg=null;
+			Font font=null;
+			this.isSelected=isSelected;
+			if (value instanceof CustomChoice){
+				currentCustomChoice = (CustomChoice)value;
+				fg=ccDecorator.getForeground(currentCustomChoice, editor, isSelected);
+				bg=ccDecorator.getBackground(currentCustomChoice, editor, isSelected);
+				font=ccDecorator.getFont(currentCustomChoice, editor, isSelected);
+			} else {
+				currentCustomChoice=null;
+			}
+			if (fg==null){
+				fg=isSelected? look.getSelectionForeground() : look.getForeground();
+			}
+			if (bg==null){
+				bg=isSelected? look.getSelectionBackground() : look.getBackground();
+			}
+			if (font==null){
+				font = look.getFont();
+			}
+			setBackground(bg);
+			setForeground(fg);
+			setFont(font);
+			setText(value==null? "" : value.toString());
+			return this;
+		}
+
+		@Override protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			if (currentCustomChoice!=null){
+				ccDecorator.decorateComponent(currentCustomChoice, editor, isSelected, this, g);
+			}				
+		}
+	}
 
 	/**
 	 * Specific cellRenderer for the TableFilter, taking care of
 	 * {@see CustomChoice} components
 	 */
-	private ListCellRenderer defaultRenderer = new DefaultListCellRenderer(){
-		private static final long serialVersionUID = 9185803951279639891L;
-		private CustomChoice cc;
-		@Override public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-			if (value instanceof CustomChoice){
-				cc=(CustomChoice)value;
-				value=cc.toString();
-			} else {
-				cc=null;
-			}
-			return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		}
-		
-		@Override protected void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			if (cc!=null){
-				cc.decorateComponent(this, g);				
-			}				
-		}
-	};
+	private ListCellRenderer defaultRenderer;
 
 	public FilterListCellRenderer(IFilterEditor editor, JList mainList) {
 		setUserRenderer(null);
 		setDoubleBuffered(true);
 		this.editor = editor;
 		this.referenceList = mainList;
+		this.defaultRenderer=new DefaultRenderer(mainList);
 	}
 	
 	/** 
@@ -165,17 +201,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 			boolean isSelected, boolean cellHasFocus) {
 		addSeparator = false;
 		inner=null;
-		boolean useRenderer, setLook;
-		if (renderer==null){
-			setLook = true;
-			useRenderer = false;			
-		} else {
-			//user renderer are totally free to setup the look of the 
-			//custom choices
-			setLook = false;
-			useRenderer = true;						
-		}
-		if (useRenderer){
+		if (renderer!=null){
 			try{
 				inner = renderer.getRendererComponent(editor, value, isSelected);
 			} catch(Exception ex){
@@ -184,17 +210,6 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		}
 		if (inner==null){
 			inner=defaultRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		}
-		if (setLook){
-			if (isSelected){
-				fg = list.getSelectionForeground();
-				bg = list.getSelectionBackground();
-			} else {
-				fg = list.getForeground();
-				bg = list.getBackground();				
-			}
-		} else {
-			fg=null;
 		}
 	}
 
@@ -218,26 +233,10 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		} 
 		g.translate(xDelta, -yDelta);
 		{
-			Font resetFont = null;
-			Color resetBackground = null;
-			Color resetForeground = null;
-			if (fg!=null){
-				resetFont = inner.getFont();
-				resetBackground = inner.getBackground();
-				resetForeground = inner.getForeground();
-				inner.setFont(getFont());
-				inner.setBackground(bg);
-				inner.setForeground(fg);
-			}
 			boolean resetEnabled = inner.isEnabled();
 			inner.setEnabled(isEnabled());
 			painter.paintComponent(g, inner, this, 0, 0, width-xDeltaBase, height);
 			inner.setEnabled(resetEnabled);
-			if (fg!=null){
-				inner.setFont(resetFont);
-				inner.setForeground(resetForeground);
-				inner.setBackground(resetBackground);
-			}
 		}
 		if (addSeparator){
 			g.translate(-xDelta, 0);

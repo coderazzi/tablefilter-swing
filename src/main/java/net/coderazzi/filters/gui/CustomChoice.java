@@ -25,12 +25,13 @@
 
 package net.coderazzi.filters.gui;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.text.Format;
 
 import javax.swing.Icon;
-import javax.swing.JComponent;
 import javax.swing.RowFilter;
 
 /**
@@ -114,18 +115,51 @@ public abstract class CustomChoice {
 		this(representation, icon, DEFAULT_PRECEDENCE);
 	}
 
-	/** Decorates a component, by default with the icon, if present */
-	public void decorateComponent(JComponent c, Graphics g) {
-		Font f = c.getFont();
-		if (f!=null){
-			c.setFont(f.deriveFont(Font.ITALIC));
-		}
+	/**
+	 * Returns the background color, or null to use the default one
+	 * @param editor the editor where the choice is used
+	 * @param isSelected true if the choice is selected
+	 * @return null to use the default one
+	 */
+	public Color getBackground(IFilterEditor editor, boolean isSelected){
+		return null;
+	}
+
+	/**
+	 * Returns the foreground color, or null to use the default one
+	 * @param editor the editor where the choice is used
+	 * @param isSelected true if the choice is selected
+	 * @return null to use the default one
+	 */
+	public Color getForeground(IFilterEditor editor, boolean isSelected){
+		return null;
+	}
+
+	/**
+	 * Returns the font, or null to use the default one
+	 * @param editor the editor where the choice is used
+	 * @param isSelected true if the choice is selected
+	 * @return null to use the default one
+	 */
+	public Font getFont(IFilterEditor editor, boolean isSelected){
+		return null;
+	}
+
+	/**
+	 * Decorates the choice on the given editor 
+	 * @param editor the editor where the choice is used
+	 * @param isSelected true if the choice is selected
+	 * @param c the component to decorate
+	 * @param g the decoration context
+	 */
+	public void decorateComponent(IFilterEditor editor, boolean isSelected, Component c, Graphics g){
 		if (icon!=null){
 		    int x=(c.getWidth()-icon.getIconWidth())/2;
 		    int y=(c.getHeight()-icon.getIconHeight())/2;    
 	    	icon.paintIcon(c, g, x, y);				
 		}
 	}
+	
 	/**
 	 * Return an icon associated to this filter.<br>
 	 * It can be null if there is no associated graphic representation for this
