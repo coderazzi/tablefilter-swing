@@ -46,7 +46,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.PopupMenuEvent;
@@ -87,10 +86,10 @@ abstract class PopupComponent implements PopupMenuListener{
 	JList historyList;
 
 
-	public PopupComponent() {
+	public PopupComponent(IFilterEditor editor) {
 		choicesModel = new ChoicesListModel();
 		historyModel = new HistoryListModel();
-		createGui();
+		createGui(editor);
 	}
 
 	/** Invoked when the user select an element in the choices or history lists*/
@@ -128,7 +127,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	
 	/** 
 	 * Adds content to the choices list.<br>
-	 * If there is no {@link ListCellRenderer} defined,
+	 * If there is no Renderer defined,
 	 * the content is stringfied and sorted -so duplicates are removed-
 	 */
 	public void addChoices(Collection<?> choices) {
@@ -203,13 +202,13 @@ abstract class PopupComponent implements PopupMenuListener{
 		return new EditorComponent.Rendered(editor, listRenderer);
 	}
 
-	/** Returns the current {@link ListCellRenderer} */
-	public ListCellRenderer getListCellRenderer() {
+	/** Returns the current Renderer */
+	public IFilterEditor.Renderer getRenderer() {
 		return listRenderer.getUserRenderer();
 	}
 
 	/** Specifies that the content requires no conversion to strings */
-	public void setRenderedContent(ListCellRenderer renderer, Comparator classComparator) {
+	public void setRenderedContent(IFilterEditor.Renderer renderer, Comparator classComparator) {
 		hide();
 		listRenderer.setUserRenderer(renderer);
 		if (choicesModel.setRenderedContent(classComparator)){
@@ -240,7 +239,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	 * It always favor content belonging to the choices list, 
 	 * rather than to the history list.
 	 * @param hint an object used to select the match. 
-	 *  If the content is text-based (there is no {@link ListCellRenderer} 
+	 *  If the content is text-based (there is no Renderer 
 	 *  defined), the hint is considered the start of the string, and the best
 	 *  match should start with the given hint). 
 	 *  If the content is not text-based, only exact matches are returned,
@@ -421,8 +420,6 @@ abstract class PopupComponent implements PopupMenuListener{
 
 		emptyPopupMark.setBackground(look.getSelectionBackground());
 		
-		listRenderer.setLook(look);
-		
 		popup.setBorder(BorderFactory.createLineBorder(look.getGridColor(), 1));
 		
 		separator.setForeground(look.getGridColor());
@@ -505,7 +502,7 @@ abstract class PopupComponent implements PopupMenuListener{
 	}
 
 	/** Creation of the popup's gui */
-	private void createGui() {
+	private void createGui(IFilterEditor editor) {
 		MouseHandler mouseHandler = new MouseHandler();
 		choicesList = new JList(choicesModel);
 		choicesList.addMouseMotionListener(mouseHandler);
@@ -546,7 +543,7 @@ abstract class PopupComponent implements PopupMenuListener{
 		popup.setDoubleBuffered(true);
 		popup.setFocusable(false);
 
-		listRenderer = new FilterListCellRenderer(choicesList);
+		listRenderer = new FilterListCellRenderer(editor, choicesList);
 		choicesList.setCellRenderer(listRenderer);
 		historyList.setCellRenderer(listRenderer);
 	}

@@ -34,19 +34,18 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
-import javax.swing.ListCellRenderer;
 
 import net.coderazzi.filters.gui.CustomChoice;
 
 
 /**
  * List model to handle the choices in the popup menu.<br>
- * When the user specifies a {@link ListCellRenderer}, choices are 
+ * When the user specifies a Renderer, choices are 
  * considered non-text; otherwise, content is converted, if needed, 
  * to Strings, and sorted.<br>
  * This class includes functionality to find the best match for a given
  * string, returning the choice that more closely matches the input. This
- * functionality works only for text input (i.e., no {@link ListCellRenderer}
+ * functionality works only for text input (i.e., no Renderer
  * specified)<br>
  * The model handles also specifically {@link CustomChoice} instances, 
  * which are placed at the beginning of the list, sorted by their own

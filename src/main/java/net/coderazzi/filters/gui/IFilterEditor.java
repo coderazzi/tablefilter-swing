@@ -1,10 +1,10 @@
 package net.coderazzi.filters.gui;
 
+import java.awt.Component;
 import java.text.Format;
 import java.util.Comparator;
 import java.util.Set;
 
-import javax.swing.ListCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -14,31 +14,31 @@ import net.coderazzi.filters.IFilter;
  * Public interface of the editors associated to each table's column.
  */
 public interface IFilterEditor {
-
+	
 	/** Returns the model position associated to this editor*/
-	public abstract int getModelIndex();
+	public int getModelIndex();
 
 	/** Returns the class associated to the editor on the model*/
-	public abstract Class<?> getModelClass();
+	public Class<?> getModelClass();
 
 	/**
 	 * Returns the {@link IFilter} associated to the editor's content<br>
 	 * The returned instance can then be used to enable or disable the
 	 * filter and its GUI component. 
 	 **/
-	public abstract IFilter getFilter();
+	public IFilter getFilter();
 
 	/**
 	 * Resets the filter, which implies set its content to empty and reset
 	 * its history choices
 	 */
-	public abstract void resetFilter();
+	public void resetFilter();
 
 	/** Sets the content, adapted to the editors' type */
-	public abstract void setContent(Object content);
+	public void setContent(Object content);
 
 	/** Returns the current editor's content */
-	public abstract Object getContent();
+	public Object getContent();
 
 	/**
 	 * Using autoChoices, the choices displayed on the popup menu are 
@@ -47,45 +47,45 @@ public interface IFilterEditor {
 	 * AutoChoices automatically changes the editable flag: it is set to true
 	 * for DISABLED values, false otherwise.
 	 */
-	public abstract void setAutoChoices(AutoChoices mode);
+	public void setAutoChoices(AutoChoices mode);
 
 	/** Returns the autoChoices mode*/
-	public abstract AutoChoices getAutoChoices();
+	public AutoChoices getAutoChoices();
 
 	/** Sets the available choices, shown on the popup menu */
-	public abstract void setCustomChoices(Set<CustomChoice> choices);
+	public void setCustomChoices(Set<CustomChoice> choices);
 
 	/** Returns the current choices */
-	public abstract Set<CustomChoice> getCustomChoices();
+	public Set<CustomChoice> getCustomChoices();
 
 	/**
 	 * Defines the editor, if text based -i.e., without associated 
-	 * {@link ListCellRenderer}, as editable: this flag means that the user 
+	 * {@link Renderer}, as editable: this flag means that the user 
 	 * can enter any text, not being limited to the existing choices
 	 */
-	public abstract void setEditable(boolean enable);
+	public void setEditable(boolean enable);
 
 	/** 
 	 * Returns the editable flag
 	 * @see #setEditable(boolean)
 	 */
-	public abstract boolean isEditable();
+	public boolean isEditable();
 
 	/**  Sets the ignore case flag */
-	public abstract void setIgnoreCase(boolean set);
+	public void setIgnoreCase(boolean set);
 
 	/**  Returns the ignore case flag */
-	public abstract boolean isIgnoreCase();
+	public boolean isIgnoreCase();
 
 	/** 
 	 * Sets the {@link Format} required by the editor to handle the user's
 	 * input when the associated class is not a String<br>
 	 * It is initially retrieved from the {@link IParserModel}.
 	 */
-	public abstract void setFormat(Format format);
+	public void setFormat(Format format);
 
 	/**  Returns the associated {@link Format}. */
-	public abstract Format getFormat();
+	public Format getFormat();
 
 	/** 
 	 * Sets the {@link Comparator} required to compare (and sort) instances
@@ -95,21 +95,10 @@ public interface IFilterEditor {
 	 * Setting a comparator to null resets the used comparator (i.e: the
 	 * comparator is never null)
 	 */
-	public abstract void setComparator(Comparator comparator);
+	public void setComparator(Comparator comparator);
 
 	/**  Returns the associated {@link Comparator}, which can nver be null. */
-	public abstract Comparator getComparator();
-
-	/**
-	 * Sets the {@link ListCellRenderer} for the choices / history.<p>
-	 * It also affectes to how the content is rendered<br>
-	 * If not null, the content cannot be text-edited anymore
-	 * @param renderer
-	 */
-	public abstract void setListCellRenderer(ListCellRenderer renderer);
-
-    /** Returns the associated {@link ListCellRenderer} */
-	public abstract ListCellRenderer getListCellRenderer();
+	public Comparator getComparator();
 
 	/**
 	 * Limits the history size. <br>
@@ -117,7 +106,7 @@ public interface IFilterEditor {
 	 * the maximum history size is to the maximum number of visible rows<br>
 	 * The max history cannot be greater than the max visible rows
 	 */
-	public abstract void setMaxHistory(int size);
+	public void setMaxHistory(int size);
 
 	/** 
 	 * Returns the maximum history size, as defined by the user.<br>
@@ -125,5 +114,26 @@ public interface IFilterEditor {
 	 * number of visible rows and whether the popup contains only history
 	 * or also choices 
 	 */
-	public abstract int getMaxHistory();
+	public int getMaxHistory();
+
+	/**
+	 * Sets the {@link Renderer} for the choices / history.<p>
+	 * It also affectes to how the content is rendered<br>
+	 * If not null, the content cannot be text-edited anymore
+	 * @param renderer
+	 */
+	public void setRenderer(Renderer renderer);
+
+    /** Returns the associated {@link Renderer} */
+	public Renderer getRenderer();
+
+	/** Returns the current editor's look */
+	public Look getLook();
+
+	/** Interface to customize the content of the editor */
+	public interface Renderer {
+		public Component getRendererComponent(IFilterEditor editor,
+				Object value, boolean isSelected);
+	}
+
 }

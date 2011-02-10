@@ -603,9 +603,9 @@ public class TableFilterExample extends JFrame {
     			
     			@Override public void itemStateChanged(ItemEvent e) {
     				if (((JCheckBoxMenuItem) e.getSource()).isSelected()){
-    					editor.setListCellRenderer(new FlagRenderer());
+    					editor.setRenderer(new FlagRenderer());
     				} else {
-    					editor.setListCellRenderer(null);
+    					editor.setRenderer(null);
     				}
     			}
     		});
@@ -807,7 +807,7 @@ public class TableFilterExample extends JFrame {
 	        }
         	IFilterEditor editor = filterHeader.getFilterEditor(column);
         	if (set){
-        		editor.setListCellRenderer(new FlagRenderer());
+        		editor.setRenderer(new FlagRenderer());
         	}
         	editor.setEditable(false);
         	updateFilter(editor, tableModel.getColumnName(column));

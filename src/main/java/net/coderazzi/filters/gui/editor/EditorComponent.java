@@ -38,7 +38,6 @@ import javax.swing.CellRendererPane;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
 import javax.swing.RowFilter;
 import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
@@ -60,7 +59,7 @@ import net.coderazzi.filters.gui.Look;
  * Private interface, defining the editor component [usually a text field]<br>
  * There are two such implementations, the usual one, represented by a
  * {@link JTextField}, and a non-text-based one, which renders the content using
- * a {@link ListCellRenderer} component.<br>
+ * a Renderer component.<br>
  */
 interface EditorComponent {
 

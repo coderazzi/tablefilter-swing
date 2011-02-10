@@ -52,7 +52,6 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.RowFilter;
 import javax.swing.border.Border;
 
@@ -104,7 +103,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 		setLayout(new BorderLayout());
 		setBorder(border);
 		
-		popup = new PopupComponent() {
+		popup = new PopupComponent(this) {
 
 			@Override
 			protected void choiceSelected(Object selection) {
@@ -257,7 +256,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
         	if (table!=null && (table.getRowSorter() instanceof DefaultRowSorter)){
         		((DefaultRowSorter) table.getRowSorter()).setComparator(getModelIndex(), comparator);
         	}
-    		ListCellRenderer lcr = getListCellRenderer();
+    		Renderer lcr = getRenderer();
     		if (lcr==null){
     			filter.checkChanges(true);
     		} else {
@@ -273,7 +272,17 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     }
     
 	/** IFilterEditor method */
-	@Override public void setListCellRenderer(ListCellRenderer renderer){
+	@Override public void setMaxHistory(int size) {
+		popup.setMaxHistory(size);
+	}
+
+	/** IFilterEditor method */
+	@Override public int getMaxHistory() {
+		return popup.getMaxHistory();
+	}
+	
+	/** IFilterEditor method */
+	@Override public void setRenderer(Renderer renderer){
 		if (renderer==null){
 			popup.setStringContent(format, getStringComparator());
 		} else {
@@ -285,20 +294,15 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 	}
 
 	/** IFilterEditor method */
-	@Override public ListCellRenderer getListCellRenderer(){
-		return popup.getListCellRenderer();
+	@Override public Renderer getRenderer(){
+		return popup.getRenderer();
 	}
 
 	/** IFilterEditor method */
-	@Override public void setMaxHistory(int size) {
-		popup.setMaxHistory(size);
+	@Override public Look getLook(){
+		return downButton.getLook();
 	}
 
-	/** IFilterEditor method */
-	@Override public int getMaxHistory() {
-		return popup.getMaxHistory();
-	}
-	
 	/** formats an object using the current class's format */
 	private String format(Object o){
 		return format==null? o==null? "" : o.toString() : format.format(o);
@@ -357,7 +361,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     }
     
     private void formatUpdated(){
-		if (getListCellRenderer()==null){
+		if (getRenderer()==null){
 			popup.setStringContent(format, getStringComparator());
     		parserUpdated(editor);
 			filter.checkChanges(false);
@@ -377,7 +381,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	return getParserModel().getStringComparator(ignoreCase);
     }
     
-	private void setupEditorComponent(ListCellRenderer renderer){
+	private void setupEditorComponent(Renderer renderer){
 		EditorComponent newComponent=null;
 		if (renderer==null){
 			if (!(editor instanceof EditorComponent.Text)){

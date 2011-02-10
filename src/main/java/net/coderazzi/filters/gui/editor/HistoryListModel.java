@@ -30,14 +30,13 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
-import javax.swing.ListCellRenderer;
 
 import net.coderazzi.filters.gui.CustomChoice;
 
 
 /**
  * List model to handle the history in the popup menu.<br>
- * When the user specifies a {@link ListCellRenderer}, 
+ * When the user specifies a Renderer, 
  * history elements are considered non-text; this affects to the 
  * search algorithm to find the best matches 
  * {@link PopupComponent#selectBestMatch(Object, boolean)}<br>

@@ -40,14 +40,15 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import net.coderazzi.filters.gui.CustomChoice;
-import net.coderazzi.filters.gui.Look;
+import net.coderazzi.filters.gui.IFilterEditor;
+import net.coderazzi.filters.gui.IFilterEditor.Renderer;
 
 /**
  * Special cellRenderer used on the history and choices list, 
  * and to render the content when is not text-based 
  * (the user has specified a {@link ListCellRenderer}<br>
  * 
- * This FilterListCellRenderer encapsulated the user's {@link ListCellRenderer}, 
+ * This FilterListCellRenderer encapsulated the user's Renderer, 
  * to have some specific appearance: it differentiates between selected cells, 
  * selected focused cells, and other cells; a cell that is selected is 
  * considered focused if the current focus lies on the Popup menu 
@@ -85,10 +86,10 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 	private int xDeltaBase;
 	private int width;
 	
-	Color disabledColor;
+	IFilterEditor editor;
 	Color fg, bg;
 	boolean addSeparator;
-	ListCellRenderer renderer;
+	Renderer renderer;
 
 	/**
 	 * Specific cellRenderer for the TableFilter, taking care of
@@ -115,18 +116,11 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		}
 	};
 
-	public FilterListCellRenderer(JList mainList) {
+	public FilterListCellRenderer(IFilterEditor editor, JList mainList) {
 		setUserRenderer(null);
 		setDoubleBuffered(true);
+		this.editor = editor;
 		this.referenceList = mainList;
-	}
-	
-	/**
-	 * Reports the disabled color, which will be used to display the text
-	 * on {@see CustomChoice} instances
-	 */
-	public void setLook(Look look){
-		this.disabledColor = look.getDisabledForeground();
 	}
 	
 	/** 
@@ -141,11 +135,11 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		return focusOnList;
 	}
 
-	public void setUserRenderer(ListCellRenderer cellRenderer) {
+	public void setUserRenderer(Renderer cellRenderer) {
 		renderer = cellRenderer;
 	}
 
-	public ListCellRenderer getUserRenderer() {
+	public Renderer getUserRenderer() {
 		return renderer;
 	}
 
@@ -190,7 +184,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		}
 		if (useRenderer){
 			try{
-				inner = renderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				inner = renderer.getRendererComponent(editor, value, isSelected);
 			} catch(Exception ex){
 				//inner still null
 			}
@@ -254,7 +248,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 		}
 		if (addSeparator){
 			g.translate(-xDelta, 0);
-			g.setColor(disabledColor);
+			g.setColor(editor.getLook().getDisabledForeground());
 			g.drawLine(0, getHeight()-1, getWidth(), getHeight()-1);
 		}
 	}
