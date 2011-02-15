@@ -29,38 +29,38 @@ import javax.swing.RowFilter;
 
 
 /**
- * Composed set of filters, added via logical OR
+ * Composed set of filters, added via logical OR.
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
 public class OrFilter extends ComposedFilter {
 
-	/** Default constructor */
-	public OrFilter(){
-		super();
-	}
-	
+    /** Default constructor. */
+    public OrFilter() {
+        super();
+    }
+
     /**
-     * Constructor built up out of one or more 
-     * {@link net.coderazzi.filters.IFilter} instances
+     * Constructor built up out of one or more {@link
+     * net.coderazzi.filters.IFilter} instances.
      */
     public OrFilter(IFilter... observables) {
         super(observables);
     }
 
-    /**
-     * @see  IFilter#include(RowFilter.Entry)
-     */
-	@Override public boolean include(RowFilter.Entry rowEntry) {
+    /** @see  IFilter#include(RowFilter.Entry) */
+    @Override public boolean include(RowFilter.Entry rowEntry) {
         boolean ret = true;
-        for (IFilter filter : filters){
-        	if (filter.isEnabled()){
-	            if (filter.include(rowEntry)){
-	                return true;
-	            }
-	            ret = false;
-        	}
+        for (IFilter filter : filters) {
+            if (filter.isEnabled()) {
+                if (filter.include(rowEntry)) {
+                    return true;
+                }
+
+                ret = false;
+            }
         }
+
         return ret;
     }
 }

@@ -36,138 +36,148 @@ import net.coderazzi.filters.gui.CustomChoice;
 
 /**
  * List model to handle the history in the popup menu.<br>
- * When the user specifies a Renderer, 
- * history elements are considered non-text; this affects to the 
- * search algorithm to find the best matches 
- * {@link PopupComponent#selectBestMatch(Object, boolean)}<br>
- * Otherwise, content is always pure strings (@link {@link CustomChoice} are
- * not inserted into the history)
+ * When the user specifies a Renderer, history elements are considered non-text;
+ * this affects to the search algorithm to find the best matches {@link
+ * PopupComponent#selectBestMatch(Object, boolean)}<br>
+ * Otherwise, content is always pure strings (@link {@link CustomChoice} are not
+ * inserted into the history)
  */
 class HistoryListModel extends AbstractListModel {
-	private static final long serialVersionUID = -374115548677017807L;
-	private List<Object> history = new ArrayList<Object>();
-	private List<Object> shownHistory = history;
-	private Object lastAdded;
-	private Comparator stringComparator;
-	private int maxHistory;
-	
-	/**
-	 * Specifies how to handle the content. If there is a string comparator,
-	 * content is handled as strings and it is possible to look for
-	 * best matches; otherwise, it is treated as abstract objects, matching
-	 * is done by identity.  
-	 */
-	public void setStringContent(Comparator<String> stringComparator){
-		if (this.stringComparator!=stringComparator){
-			this.stringComparator = stringComparator;
-			clear();
-		}
-	}
-	
-	/** Returns the string comparator, if provided */
-	public Comparator<String> getStringComparator(){
-		return stringComparator;
-	}
-	
-	/** Clears any restrictions. {@see #restrict(Object)} */
-	public int clearRestrictions(){
-		shownHistory = history;
-		return shownHistory.size();
-	}
-	
-	/** Restricts the elements from the history -without removing it */
-	public boolean restrict(Object exclude){
-		int index=shownHistory.indexOf(exclude);
-		if (index!=-1){
-			if (shownHistory==history){
-				shownHistory = new ArrayList<Object>(history);						
-			}
-			shownHistory.remove(index);
-			fireIntervalAdded(this, index, index);
-			return true;
-		}
-		return false;
-	}
+    private static final long serialVersionUID = -374115548677017807L;
+    private List<Object> history = new ArrayList<Object>();
+    private List<Object> shownHistory = history;
+    private Object lastAdded;
+    private Comparator stringComparator;
+    private int maxHistory;
 
-	@Override public Object getElementAt(int index) {
-		return shownHistory.get(index);
-	}
+    /**
+     * Specifies how to handle the content. If there is a string comparator,
+     * content is handled as strings and it is possible to look for best
+     * matches; otherwise, it is treated as abstract objects, matching is done
+     * by identity.
+     */
+    public void setStringContent(Comparator<String> stringComparator) {
+        if (this.stringComparator != stringComparator) {
+            this.stringComparator = stringComparator;
+            clear();
+        }
+    }
 
-	/** Adds an element, Returning true if the number of elements changes */
-	public boolean add(Object st) {
-		//never add the passed element (which is now selected on the
-		//editor). We will added when the next element is passed
-		boolean ret = false;
-		boolean removed = history.remove(st);
-		if (maxHistory > 0 && 
-				lastAdded!=null && 
-				(lastAdded.toString().length()>0) && 
-				!lastAdded.equals(st)) {
-			history.add(0, lastAdded);
-			int size = history.size();
-			if (size > maxHistory) {
-				history.remove(--size);
-				removed=true;
-			} else {
-				ret=true;
-				if (!removed){
-					fireIntervalAdded(this, 0, 0);
-				}
-			}
-		}
-		if (removed){
-			fireContentsChanged(this, 0, history.size());	
-			ret=true;
-		}
-		lastAdded = st;
-		shownHistory = history;
-		return ret;
-	}
-	
-	public boolean isEmpty(){
-		return shownHistory.isEmpty();
-	}
-	
-	public void clear(){
-		int size = history.size();
-		if (size>0){
-			history.clear();
-			shownHistory = history;
-			fireIntervalRemoved(this, 0, size);
-		}
-		lastAdded=null;
-	}
+    /** Returns the string comparator, if provided. */
+    public Comparator<String> getStringComparator() {
+        return stringComparator;
+    }
 
-	@Override public int getSize() {
-		return shownHistory.size();
-	}
+    /** Clears any restrictions. {@link #restrict(Object)} */
+    public int clearRestrictions() {
+        shownHistory = history;
 
-	/** Sets the max history size*/
-	public void setMaxHistory(int size) {
-		maxHistory = size;
-		int current=history.size();
-		if (current>size){
-			for (int i=current-1;i>=size;i--){
-				history.remove(i);
-			}
-			shownHistory = history;
-			fireContentsChanged(this, maxHistory, current);
-		}
-	}
-	
-	/** Returns the max history */
-	public int getMaxHistory(){
-		return maxHistory;
-	}
+        return shownHistory.size();
+    }
 
-	/** @see PopupComponent#selectBestMatch(Object, boolean) */
-	public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
-		if (stringComparator!=null && (hint instanceof String)) {			
-			return PopupComponent.Match.findOnUnsortedContent(shownHistory, 
-					shownHistory.size(), stringComparator, (String)hint, exact); 			
-		}
-		return new PopupComponent.Match(shownHistory.indexOf(hint));
-	}
-	
+    /** Restricts the elements from the history -without removing it. */
+    public boolean restrict(Object exclude) {
+        int index = shownHistory.indexOf(exclude);
+        if (index != -1) {
+            if (shownHistory == history) {
+                shownHistory = new ArrayList<Object>(history);
+            }
+
+            shownHistory.remove(index);
+            fireIntervalAdded(this, index, index);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override public Object getElementAt(int index) {
+        return shownHistory.get(index);
+    }
+
+    /** Adds an element, Returning true if the number of elements changes. */
+    public boolean add(Object st) {
+        // never add the passed element (which is now selected on the
+        // editor). We will added when the next element is passed
+        boolean ret = false;
+        boolean removed = history.remove(st);
+        if ((maxHistory > 0) && (lastAdded != null)
+                && (lastAdded.toString().length() > 0)
+                && !lastAdded.equals(st)) {
+            history.add(0, lastAdded);
+
+            int size = history.size();
+            if (size > maxHistory) {
+                history.remove(--size);
+                removed = true;
+            } else {
+                ret = true;
+                if (!removed) {
+                    fireIntervalAdded(this, 0, 0);
+                }
+            }
+        }
+
+        if (removed) {
+            fireContentsChanged(this, 0, history.size());
+            ret = true;
+        }
+
+        lastAdded = st;
+        shownHistory = history;
+
+        return ret;
+    }
+
+    public boolean isEmpty() {
+        return shownHistory.isEmpty();
+    }
+
+    public void clear() {
+        int size = history.size();
+        if (size > 0) {
+            history.clear();
+            shownHistory = history;
+            fireIntervalRemoved(this, 0, size);
+        }
+
+        lastAdded = null;
+    }
+
+    @Override public int getSize() {
+        return shownHistory.size();
+    }
+
+    /** Sets the max history size. */
+    public void setMaxHistory(int size) {
+        maxHistory = size;
+
+        int current = history.size();
+        if (current > size) {
+            for (int i = current - 1; i >= size; i--) {
+                history.remove(i);
+            }
+
+            shownHistory = history;
+            fireContentsChanged(this, maxHistory, current);
+        }
+    }
+
+    /** Returns the max history. */
+    public int getMaxHistory() {
+        return maxHistory;
+    }
+
+    /** @see  PopupComponent#selectBestMatch(Object, boolean) */
+    public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
+        if ((stringComparator != null) && (hint instanceof String)) {
+            return PopupComponent.Match.findOnUnsortedContent(shownHistory,
+                    shownHistory.size(), stringComparator, (String) hint,
+                    exact);
+        }
+
+        return new PopupComponent.Match(shownHistory.indexOf(hint));
+    }
+
 }
-      

@@ -31,15 +31,16 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import java.text.ParseException;
+
 import java.util.Comparator;
 
 import javax.swing.CellRendererPane;
-import javax.swing.Icon;
-import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
-import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -56,492 +57,506 @@ import net.coderazzi.filters.gui.Look;
 
 
 /**
- * Private interface, defining the editor component [usually a text field]<br>
- * There are two such implementations, the usual one, represented by a
- * {@link JTextField}, and a non-text-based one, which renders the content using
- * a Renderer component.<br>
+ * <p>Component representing the filter editor itself, where the user can enter
+ * the filter text (if not rendered) and is displayed the current filter
+ * choice.</p>
+ *
+ * <p>The underlying component is a {@link JTextField}, even when the content is
+ * rendered.</p>
  */
-interface EditorComponent {
+public class EditorComponent extends JTextField {
 
-    /** Returns the swing component associated to the editor */
-    public JComponent getComponent();
+    private static final long serialVersionUID = -2196080442586435546L;
+
+    private Controller controller;
+    private boolean focus;
+    FilterEditor filterEditor;
+    PopupComponent popupComponent;
+
+    public EditorComponent(FilterEditor   editor,
+                           PopupComponent popupComponent) {
+        super(15); // created with 15 columns
+        this.filterEditor = editor;
+        this.popupComponent = popupComponent;
+        this.controller = new EditableTextController();
+    }
+
+    @Override public void setUI(TextUI ui) {
+        super.setUI(ui);
+        // whatever the LookAndFeel, display no border
+        setBorder(null);
+    }
+
+    @Override protected void paintComponent(Graphics g) {
+        controller.paintComponent(g);
+    }
+
+    /** Updates the current look. */
+    public void updateLook() {
+        controller.updateLook();
+    }
 
     /**
-     * Returns the filter associated to the current content.<br> 
+     * Returns the filter associated to the current content.<br>
      * Always invoked after {@link #checkFilterUpdate(boolean)}
      */
-    public RowFilter getFilter();
+    public RowFilter getFilter() {
+        return controller.getFilter();
+    }
 
-    /** Returns the definition associated to the current editor */
-    public Object getContent();
-    
-	/** 
-	 * Sets the editor content<br>
-	 * The parameters escapeIt must be true if the content could require
-	 * escaping (otherwise, it will be always treated literally). <br>
-	 */
-    public void setContent(Object content, boolean escapeIt);
-    
-    /** Returns true if the content is valid*/
-    public boolean isValidContent();
+    /** Returns the definition associated to the current editor. */
+    public Object getContent() {
+        return controller.getContent();
+    }
 
-    /** Returns the editable flag*/
-    public boolean isEditable();
-
-    /** Sets the editable flag. If editable, the user can enter any content */
-    public void setEditable(boolean set);
-
-    /** Enables/disables the editor */
-    public void setEnabled(boolean enabled);
-
-    /** Defines the text parser used by the editor */
-    public void setParser(IParser parser);
-
-    /** 
-     * Call always before {@link #getFilter()} to verify if the filter
-     * has been updated. 
-     * @param forceUpdate set to true if the filter must been updated, 
-     *   even when the editor's content is not
-     * @return the new filter  
+    /**
+     * Sets the editor content<br>
+     * The parameters escapeIt must be true if the content could require
+     * escaping (otherwise, it will be always treated literally).<br>
      */
-    public RowFilter checkFilterUpdate(boolean forceUpdate);
+    public void setContent(Object content, boolean escapeIt) {
+        controller.setContent(content, escapeIt);
+    }
+
+    /** Requests an update on the text parser used by the editor. */
+    public void updateParser() {
+        if (controller instanceof TextController) {
+            ((TextController) controller).setParser(filterEditor.getParser());
+        }
+    }
+
+    /** Returns the editable flag. */
+    public boolean isEditableContent() {
+        return controller instanceof EditableTextController;
+    }
+
+    /** Sets the text mode and editable flag. */
+    public void setTextMode(boolean editable) {
+        if (controller != null) {
+            if (editable && (controller instanceof EditableTextController)) {
+                return;
+            }
+
+            if (!editable
+                    && (controller instanceof NonEditableTextController)) {
+                return;
+            }
+
+            controller.detach();
+        }
+
+        if (editable) {
+            controller = new EditableTextController();
+        } else {
+            controller = new NonEditableTextController();
+        }
+
+        updateParser();
+    }
+
+    /** Sets the render mode. */
+    public void setRenderMode() {
+        if (controller != null) {
+            if (controller instanceof RenderedController) {
+                return;
+            }
+
+            controller.detach();
+        }
+
+        controller = new RenderedController();
+    }
+
+
+    @Override public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        if (controller != null) {
+            setCaretPosition(0);
+            moveCaretPosition(0);
+            updateLook();
+            setFocusable(enabled);
+        }
+    }
+
+    /** Returns true if the content is valid. */
+    public boolean isValidContent() {
+        return controller.isValidContent();
+    }
+
+    /**
+     * Called always before {@link #getFilter()} to verify if the filter has
+     * been updated.
+     *
+     * @param   forceUpdate  set to true if the filter must been updated, even
+     *                       when the editor's content is not
+     *
+     * @return  the new filter
+     */
+    public RowFilter checkFilterUpdate(boolean forceUpdate) {
+        return controller.checkFilterUpdate(forceUpdate);
+    }
 
     /** Informs that the editor has received the focus. */
-    public void focusMoved(boolean gained);
+    public void focusMoved(boolean gained) {
+        focus = gained;
+        controller.focusMoved(gained);
+    }
 
-    /** Sets the color schema */
-    public void setLook(Look look);
-    
-    /**
-     * EditorComponent for text edition, backed up with a {@link JTextField}<br>
-     * It is editable by default.
-     */
-    static final class Text extends DocumentFilter 
-    		implements DocumentListener, EditorComponent {
 
-        private TextEditor textField = new TextEditor();
-        private FilterEditor editor;
-        private boolean editable;
-        private RowFilter filter;
-        private IParser textParser;
-        /*the source of the filter. Or a String, or a CustomChoice*/
-        Object content; 
-        PopupComponent popup;
-        /** 
-         * This variable is set to true if the content is being set from inside, 
-         * to avoid raising some events 
-         **/
-        private boolean controlledSet;
+    boolean isFocused() {
+        return focus;
+    }
 
-        
+    Look prepareComponentLook(CustomChoice cc) {
+        return popupComponent.getFilterRenderer().prepareComponentLook(this,
+                isFocused(), cc);
+    }
+
+    void superPaintComponent(Graphics g) {
+        super.paintComponent(g);
+    }
+
+
+    /** The JTextField is controlled via this interface. */
+    private interface Controller {
+
         /**
-         * Specific JTextField to be able to represent CustomChoices,
-         * painting their associated icon on the background
+         * Called to replace the basic {@link
+         * JTextField#paintComponents(Graphics)} functionality.
          */
-        class TextEditor extends JTextField implements CaretListener{
-        	
-			private static final long serialVersionUID = 3827985723062383846L;
-			
-			private Icon icon;
-			private String trackedText;
-	        private Look look;
-	        private boolean enabled;
-	        private boolean error;
-	        private boolean focus;
+        void paintComponent(Graphics g);
 
-        	public TextEditor() {
-        		super(15); //created with 15 columns
-        		addCaretListener(this);
-        		setEnabledState(true);
-			}
-        	
-        	@Override public void setUI(TextUI ui) {
-        		super.setUI(ui);
-        		//whatever the LookAndFeel, display no border
-        		setBorder(null);
-        	}
-        	
-        	public void setLook(Look look){
-        		if (look!=null){
-            		this.look=look;
-	        		setFont(look.getFont());
-	        		ensureCorrectBackgroundColor();
-	        		ensureCorrectForegroundColor();
-	        		repaint();
-        		}
-        	}
-        	
-			@Override protected void paintComponent(Graphics g) {
-        		super.paintComponent(g);
-        		if (icon!=null){
-        			if (trackedText==null || trackedText.equals(getText())){
-        			    int x=(getWidth()-icon.getIconWidth())/2;
-        			    int y=(getHeight()-icon.getIconHeight())/2;    
-    			    	icon.paintIcon(this, g, x, y);
-        			} else {
-        				deactivateCustomDecoration();
-        			}
-        		}
-        	}
-        	@Override public void setText(String t) {
-        		String tmp = trackedText;
-        		trackedText = null; //avoid any checks on the caret listener 
-        		super.setText(t);
-        		trackedText = tmp;
-        	}
-        	
-        	/**
-        	 * Reports that the textfield has been enabled or not. Do not
-        	 * call directly setEnabled().<br>
-        	 * It sets the component as focusable, and 
-        	 */
-        	public void setEnabledState(boolean enabled){
-        		//if enabled, there is already a check on the filter, so
-        		//the activation / deactivation of decoration will
-        		//work on its own
-        		this.enabled=enabled;
-        		if (!enabled && activateCustomDecoration()){
-			    	icon = UIManager.getLookAndFeel().getDisabledIcon(this, icon);     
-			    	trackedText = null; //do not track text changes
-    			}
-            	setFocusable(enabled);
-        	}
-        	
-        	public void setError(boolean error){
-        		this.error=error;
-        		if (enabled){
-        			ensureCorrectForegroundColor();
-        		}
-        	}
-        	
-        	public boolean isError(){
-        		return error;
-        	}
-        	
-        	/**
-        	 * Activates, if possible, the custom decoration, that is,
-        	 * if the content is a CustomChoice and has an associated icon
-        	 */
-        	public boolean activateCustomDecoration(){
-        		boolean ret = false;
-        		trackedText=null;
-        		if (content instanceof CustomChoice){
-        			icon = ((CustomChoice)content).getIcon();
-        			if (icon!=null){
-	            		trackedText=getText();
-	            		ret=true;
-        			}
-        		} else {
-        			icon=null;
-        		}
-        		ensureCorrectForegroundColor();
-        		return ret;
-        	}
-        	
-        	/** Deactivates the custom decoration */
-        	public void deactivateCustomDecoration(){
-        		if (icon!=null){
-        			trackedText=null;
-        			icon=null;
-        			ensureCorrectForegroundColor();
-        		}
-        	}
-        	
-            public void focusMoved(boolean gained) {
-            	focus=gained;
-        		trackedText = null; // do not track changes (gain or not, not yet)
-        		ensureCorrectBackgroundColor();
-            	//whether we lose or gain focus, we try to reactivate the
-            	//decoration -listeners only required if gaining it
-            	//without focus, there is no need to check for changes on
-            	//the text when painting the decoration, so set text to null
-        		if (activateCustomDecoration() && !gained){
-        			trackedText=null;
-        		}
-            }
-        	
-        	@Override public void caretUpdate(CaretEvent e) {
-                //if the user moves the cursor on the editor, the focus passes 
-                //automatically back to the editor (from the popup)
-        		if (enabled){
-	                popup.setPopupFocused(false);
-	                if (trackedText!=null){
-	                	//if text is not null, there is decoration, remove it
-	                	//(there can be decoration if text is null, but in that 
-	                	// case the focus is not on the component, no need to
-	                	// modify any decoration)
-	                	deactivateCustomDecoration();
-	                }
-        		}
-        	}
-        	
-        	private void ensureCorrectBackgroundColor(){
-        		if (look!=null){
-        			super.setBackground(focus? look.getSelectionBackground() : look.getBackground());
-        		}
-        	}
-        	
-            /** Ensures that the correct foreground is on use*/
-            private void ensureCorrectForegroundColor(){
-            	if (look!=null){
-	            	Color color;
-	            	if (enabled && icon==null){
-	            		if (error){
-	            			color = look.getErrorForeground();
-	            		} else {
-	            			color = focus? look.getSelectionForeground() : look.getForeground();
-	            		}
-	            	} else {
-	            		color = look.getDisabledForeground();
-	            	}
-	            	if (color!=super.getForeground()){
-	            		super.setForeground(color);
-	            	}
-            	}
-            }
+        /** Detaches the controller, not to be used again. */
+        void detach();
 
+        /** @see  EditorComponent#setContent(Object, boolean) */
+        void setContent(Object content, boolean escapeIt);
+
+        /** @see  EditorComponent#getContent() */
+        Object getContent();
+
+        /** @see  EditorComponent#isValidContent() */
+        boolean isValidContent();
+
+        /** @see  EditorComponent#getFilter() */
+        RowFilter getFilter();
+
+        /** @see  EditorComponent#checkFilterUpdate(boolean) */
+        RowFilter checkFilterUpdate(boolean forceUpdate);
+
+        /** @see  EditorComponent#updateLook() */
+        void updateLook();
+
+        /** @see  EditorComponent#focusMoved(boolean) */
+        void focusMoved(boolean gained);
+    }
+
+
+    /** Controller interface to handle editors with content rendered. */
+    private class RenderedController extends MouseAdapter
+        implements Controller {
+
+        RowFilter filter;
+        private Object content = CustomChoice.MATCH_ALL;
+        Object cachedContent;
+        private CellRendererPane painter = new CellRendererPane();
+
+        RenderedController() {
+            addMouseListener(this);
+            setEditable(false);
         }
 
-        public Text(FilterEditor editor, PopupComponent popupComponent) {
-        	this.editor= editor;
-            this.popup = popupComponent;            
-            setEditable(true);
+        @Override public void paintComponent(Graphics g) {
+            Component c = popupComponent.getFilterRenderer()
+                    .getCellRendererComponent(content, getWidth(), isFocused());
+            painter.paintComponent(g, c, EditorComponent.this, 0, 0, getWidth(),
+                getHeight());
         }
 
-        @Override public JComponent getComponent() {
-            return textField;
+        @Override public void detach() {
+            removeMouseListener(this);
+        }
+
+        @Override public void setContent(Object content, boolean escapeIt) {
+            this.content = (content == null) ? CustomChoice.MATCH_ALL : content;
+            repaint();
+        }
+
+        @Override public Object getContent() {
+            return content;
+        }
+
+        @Override public boolean isValidContent() {
+            return true;
         }
 
         @Override public RowFilter getFilter() {
             return filter;
         }
 
-        @Override public Object getContent() {
-        	checkFilterUpdate(false);
-            return content;
-        }
-        
-        @Override public void setContent(Object content, boolean escapeIt) {
-            String text;
-            if (content instanceof CustomChoice){
-            	//never escape custom choices
-            	text = ((CustomChoice) content).toString();
-            } else if (content instanceof String){
-            	text = (String) content;
-            	if (escapeIt && isEditable()){
-            		//if no editable, the choices are directly handled, no need
-            		//to escape it. When the text is parsed, on no editable
-            		//columns, it will be then escaped.
-            		text = textParser.escape(text);
-            	}
-            } else {
-            	text = null;
+        @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
+            Object currentContent = getContent();
+            if (forceUpdate || (currentContent != cachedContent)) {
+                cachedContent = currentContent;
+                if (cachedContent instanceof CustomChoice) {
+                    filter = ((CustomChoice) cachedContent).getFilter(
+                            filterEditor);
+                } else {
+                    filter = new RowFilter() {
+                        @Override public boolean include(
+                                RowFilter.Entry entry) {
+                            Object val = entry.getValue(
+                                    filterEditor.getModelIndex());
+
+                            return (val == null) ? (cachedContent == null)
+                                                 : val.equals(cachedContent);
+                        }
+                    };
+                }
             }
-            setControlledSet();
-            textField.setText(text);
+
+            return filter;
         }
 
-        @Override public boolean isValidContent(){
-        	return !textField.isError();
-        }
-        
-        @Override public boolean isEditable() {
-            return editable;
+        @Override public void updateLook() {
+            prepareComponentLook(null);
         }
 
-        @Override public void setEditable(boolean set) {
-        	//dispose first the current listeners
-            if (isEditable()) {
-                textField.getDocument().removeDocumentListener(this);
-            } else {
-                ((AbstractDocument) textField.getDocument()).
-                	setDocumentFilter(null);
+        @Override public void focusMoved(boolean gained) {
+            repaint();
+        }
+
+        /** @see  MouseAdapter#mouseClicked(MouseEvent) */
+        @Override public void mouseClicked(MouseEvent e) {
+            if (isEnabled()) {
+                filterEditor.triggerPopup(filterEditor);
             }
-            editable = set;
-            if (set) {
-                textField.getDocument().addDocumentListener(this);
-            } else {
-                // ensure that the text contains something okay
-                String proposal = getProposalOnEdition(textField.getText(), 
-                		                               true);
-                textField.setText((proposal == null) ? 
-                		CustomChoice.MATCH_ALL.toString() 
-                		: proposal);
-                ((AbstractDocument) textField.getDocument()).
-                	setDocumentFilter(this);
-            }
-            controlledSet = false;
         }
 
-        @Override public void setEnabled(boolean enabled) {
-        	textField.setEnabledState(enabled);
+    }
+
+
+    /** Parent class of controllers with text enabled edition. */
+    private abstract class TextController implements Controller, CaretListener {
+
+        protected IParser textParser;
+        private Object content;
+        private RowFilter filter;
+        private boolean error;
+        private boolean useCustomDecoration;
+
+        TextController() {
+            setEditable(true);
+            setText(CustomChoice.MATCH_ALL.toString());
+            addCaretListener(this);
         }
 
-        @Override public void setParser(IParser parser) {
-        	this.textParser = parser;
-            if (textField.isEnabled()) {
+        /**
+         * Sets the parser used in the filter. This controller is not functional
+         * until this parser is set
+         */
+        public void setParser(IParser textParser) {
+            this.textParser = textParser;
+            if (isEnabled()) {
                 checkFilterUpdate(true);
             }
         }
 
-        @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
-            String text = textField.getText().trim();
-            if (forceUpdate){
-            	updateFilter(text);
-            } else if (content instanceof CustomChoice){
-    			if (!((CustomChoice)content).toString().equals(text)){
-                	updateFilter(text);
-    			}
-            } else if (!text.equals(content)){
-            	updateFilter(text);            	
+        @Override public void paintComponent(Graphics g) {
+            superPaintComponent(g);
+            if (useCustomDecoration && (content instanceof CustomChoice)) {
+                filterEditor.getLook().getCustomChoiceDecorator()
+                    .decorateComponent((CustomChoice) content, filterEditor,
+                        isFocused(), EditorComponent.this, g);
             }
+        }
+
+        @Override public void detach() {
+            removeCaretListener(this);
+        }
+
+        @Override public Object getContent() {
+            checkFilterUpdate(false);
+
+            return content;
+        }
+
+        @Override public boolean isValidContent() {
+            return !error;
+        }
+
+        @Override public RowFilter getFilter() {
             return filter;
         }
-        
+
+        @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
+            String text = getText().trim();
+            if (forceUpdate) {
+                updateFilter(text);
+            } else if (content instanceof CustomChoice) {
+                if (!((CustomChoice) content).toString().equals(text)) {
+                    updateFilter(text);
+                }
+            } else if (!text.equals(content)) {
+                updateFilter(text);
+            }
+
+            return filter;
+        }
+
+        @Override public void updateLook() {
+            CustomChoice cc =
+                (useCustomDecoration && (content instanceof CustomChoice))
+                ? (CustomChoice) content : null;
+            Look look = prepareComponentLook(cc);
+            if (isEnabled() && error) {
+                Color foreground = look.getErrorForeground();
+                if (foreground != getForeground()) {
+                    setForeground(foreground);
+                }
+            }
+
+            Color selection = look.getTextSelection();
+            if (getSelectionColor() != selection) {
+                setSelectionColor(selection);
+            }
+        }
+
         @Override public void focusMoved(boolean gained) {
-    		textField.focusMoved(gained);
-        }
-        
-        @Override public void setLook(Look look) {
-        	textField.setLook(look);
-        }
-
-        /** defines that the content is being set from inside */
-        public void setControlledSet() {
-            controlledSet = true;
+            // whether we lose or gain focus, we try to reactivate the
+            // decoration -listeners only required if gaining it
+            // without focus, there is no need to check for changes on
+            // the text when painting the decoration, so set text to null
+            if (!activateCustomDecoration()) {
+                updateLook();
+            }
         }
 
-        /** Returns a proposal for the current edition*/
-        private String getProposalOnEdition(String hint, boolean perfectMatch) {
-            String ret = popup.selectBestMatch(hint, perfectMatch);
-            popup.setPopupFocused(false);
+
+        /** @see  CaretListener#caretUpdate(CaretEvent) */
+        @Override public void caretUpdate(CaretEvent e) {
+            // if the user moves the cursor on the editor, the focus passes
+            // automatically back to the editor (from the popup)
+            if (isEnabled()) {
+                popupComponent.setPopupFocused(false);
+                deactivateCustomDecoration();
+            }
+        }
+
+        /** Reports that the current content is wrong. */
+        protected void setError(boolean error) {
+            this.error = error;
+            if (isEnabled()) {
+                updateLook();
+            }
+        }
+
+        /** Returns a proposal for the current edition. */
+        protected String getProposalOnEdition(String  hint,
+                                              boolean perfectMatch) {
+            String ret = popupComponent.selectBestMatch(hint, perfectMatch);
+            popupComponent.setPopupFocused(false);
+
             return ret;
         }
 
-        /** Updates the filter / text is expected trimmed */
+        /**
+         * Activates, if possible, the custom decoration, that is, if the
+         * content is a CustomChoice and has an associated icon.
+         */
+        protected boolean activateCustomDecoration() {
+            boolean ret = false;
+            if (!useCustomDecoration && (content instanceof CustomChoice)) {
+                useCustomDecoration = true;
+                updateLook();
+                repaint();
+                ret = true;
+            }
+
+            return ret;
+        }
+
+        /** Deactivates the custom decoration. */
+        protected void deactivateCustomDecoration() {
+            if (useCustomDecoration) {
+                useCustomDecoration = false;
+                updateLook();
+                repaint();
+            }
+        }
+
+
+        /**
+         * Subclasses must define this method to ensure that text is properly
+         * escaped (needed in no editable controllers).
+         */
+        protected abstract boolean requiresTextEscaping();
+
+        /** Updates the filter / text is expected trimmed. */
         private void updateFilter(String text) {
-            boolean error=false;
-            CustomChoice cc = text.length()==0? CustomChoice.MATCH_ALL : popup.getCustomChoice(text);
-            if (cc!=null){
-    			content = cc;
-    			textField.activateCustomDecoration();
-    			filter = cc.getFilter(editor);            	
+            boolean error = false;
+            CustomChoice cc = (text.length() == 0)
+                ? CustomChoice.MATCH_ALL : popupComponent.getCustomChoice(text);
+            if (cc != null) {
+                content = cc;
+                activateCustomDecoration();
+                filter = cc.getFilter(filterEditor);
             } else {
+                deactivateCustomDecoration();
                 content = text;
-                filter = null;
-                textField.deactivateCustomDecoration();
                 try {
-    	            if (!isEditable()){
-    	            	//for editable columns, the text was already
-    	            	//escaped when the content was defined
-    	            	//(see setContent)
-    	            	text = textParser.escape(text);
-    	            }
-                	filter = textParser.parseText(text); 
+                    if (requiresTextEscaping()) {
+                        // for editable columns, the text was already
+                        // escaped when the content was defined
+                        // (see setContent)
+                        text = textParser.escape(text);
+                    }
+
+                    filter = textParser.parseText(text);
                 } catch (ParseException pex) {
-                    error=true;
-                }            	
-            }
-            textField.setError(error);
-        }
-        
-        /** {@link DocumentFilter}: method called if handler is not editable */
-        @Override public void insertString(FilterBypass fb,
-                                 int offset,
-                                 String string,
-                                 AttributeSet attr) {
-            // we never use it, we never invoke Document.insertString
-            // note that normal (non programmatically) editing only invokes
-            // replace/remove
-        }
-
-        /** {@link DocumentFilter}: method called if handler is not editable */
-        @Override public void replace(FilterBypass fb,
-                            int offset,
-                            int length,
-                            String text,
-                            AttributeSet attrs) throws BadLocationException {
-            String buffer = textField.getText();
-            String newContentBegin = buffer.substring(0, offset) + text;
-            String newContent = 
-            	newContentBegin + buffer.substring(offset + length);
-            String proposal = getProposalOnEdition(newContent, true);
-            if (proposal == null) {
-                // why this part? Imagine having text "se|cond" with the cursor
-                // at "|". Nothing is selected.
-                // if the user presses now 'c', the code above would imply
-                // getting "seccond", which is probably wrong, so we try now
-                // to get a proposal starting at 'sec' ['sec|ond']
-                proposal = getProposalOnEdition(newContentBegin, true);
-                if (proposal != null) {
-                    newContent = newContentBegin;
-                } else {
-                    proposal = getProposalOnEdition(newContent, false);
-                    if (proposal!=null){
-                    	//on text content, the string comparator cannot be null
-                    	if (proposal.length()<newContentBegin.length() || 
-                    			(0!=popup.getStringComparator().compare(newContentBegin, 
-                    					proposal.substring(0, newContentBegin.length())))){
-                    		proposal=null;
-                    	}
-                    }
-                    if (proposal == null){
-                        return;
-                    }
-                    newContent = proposal;
+                    filter = null;
+                    error = true;
                 }
             }
-            int caret;
-            if (controlledSet) {
-                controlledSet = false;
-                caret = 0;
+
+            setError(error);
+        }
+    }
+
+
+    /** TextController for editable content. */
+    private class EditableTextController extends TextController
+        implements DocumentListener {
+
+        EditableTextController() {
+            getDocument().addDocumentListener(this);
+        }
+
+        @Override public boolean requiresTextEscaping() {
+            return false;
+        }
+
+        @Override public void detach() {
+            super.detach();
+            getDocument().removeDocumentListener(this);
+        }
+
+        @Override public void setContent(Object content, boolean escapeIt) {
+            String text;
+            if (content instanceof CustomChoice) {
+                // never escape custom choices
+                text = ((CustomChoice) content).toString();
+            } else if (content instanceof String) {
+                text = (String) content;
+                if (escapeIt) {
+                    text = textParser.escape(text);
+                }
             } else {
-                caret = 1 + Math.min(textField.getCaret().getDot(), 
-                		             textField.getCaret().getMark());
+                text = null;
             }
-            super.replace(fb, 0, buffer.length(), proposal, attrs);
-            textField.setCaretPosition(proposal.length());
-            textField.moveCaretPosition(caret);
-        }
 
-        /** {@link DocumentFilter}: method called if handler is not editable */
-        @Override public void remove(FilterBypass fb,
-                           int offset,
-                           int length) throws BadLocationException {
-            int caret = textField.getCaret().getDot();
-            int mark = textField.getCaret().getMark();
-            String buffer = textField.getText();
-            String newContent = buffer.substring(0, offset) 
-            	+ buffer.substring(offset + length);
-        	//on text content, this comparator cannot be null
-            Comparator<String> comparator = popup.getStringComparator();
-            String proposal = getProposalOnEdition(newContent, true);
-            if (proposal==null || comparator.compare(newContent, proposal)!=0){
-                proposal = getProposalOnEdition(newContent, false);
-                if (proposal == null) {
-                    return;
-                }
-                if (PopupComponent.Match.getMatchingLength(proposal, newContent, comparator)
-                		<= PopupComponent.Match.getMatchingLength(buffer, newContent, comparator)){
-                    proposal = buffer;
-                }
-            }
-            super.replace(fb, 0, buffer.length(), proposal, null);
-             
-            //special case if the removal is due to BACK SPACE
-    		AWTEvent ev = EventQueue.getCurrentEvent();
-    		if ((ev instanceof KeyEvent) 
-    				&& ((KeyEvent)ev).getKeyCode() == KeyEvent.VK_BACK_SPACE){
-                if (caret > mark) {
-                    caret = mark;
-                } else if (buffer == proposal) {
-                    --caret;
-                } else if (caret == mark) {
-                    caret = offset;
-                }    			
-    		} 
-            textField.setCaretPosition(proposal.length());
-            textField.moveCaretPosition(caret);
+            setText(text);
+            activateCustomDecoration();
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
@@ -551,112 +566,191 @@ interface EditorComponent {
 
         /** {@link DocumentListener}: method called when handler is editable */
         @Override public void removeUpdate(DocumentEvent e) {
-        	textField.setError(false);
-            getProposalOnEdition(textField.getText(), false);
+            deactivateCustomDecoration();
+            setError(false);
+            getProposalOnEdition(getText(), false);
         }
 
         /** {@link DocumentListener}: method called when handler is editable */
         @Override public void insertUpdate(DocumentEvent e) {
-        	textField.setError(false);
-            getProposalOnEdition(textField.getText(), false);
+            deactivateCustomDecoration();
+            setError(false);
+            getProposalOnEdition(getText(), false);
         }
-        
+
     }
 
-    /**
-     * Editor component for cell rendering
-     */
-    static final class Rendered extends JComponent implements EditorComponent {
 
-        private static final long serialVersionUID = -7162028817569553287L;
+    /** TextController for non editable content. */
+    private class NonEditableTextController extends TextController {
 
-        private Object content = CustomChoice.MATCH_ALL;
-        private FilterListCellRenderer renderer;
-        private CellRendererPane painter = new CellRendererPane();
-        private RowFilter filter;
-        private boolean focused;
-        FilterEditor editor;
-        Object cachedContent;
+        boolean onSetText;
 
-        public Rendered(FilterEditor editor, FilterListCellRenderer renderer) {
-        	this.editor = editor;
-            this.renderer = renderer;
-        }
-        
-        @Override public JComponent getComponent() {
-            return this;
-        }
-        
-        @Override public RowFilter getFilter() {
-            return filter;
+        NonEditableTextController() {
+            ((AbstractDocument) getDocument()).setDocumentFilter(
+                new ControllerDocumentFilter());
         }
 
-        @Override public Object getContent() {
-            return content;
-        }
-
-        @Override public void setContent(Object content, boolean escapeIt) {
-            this.content = (content == null) ? CustomChoice.MATCH_ALL : content;
-            repaint();
-        }
-
-        @Override public boolean isValidContent() {
-        	return true;
-        }
-
-        @Override public boolean isEditable() {
-            return false;
-        }
-
-        @Override public void setEditable(boolean set) {
-            // cannot apply to the rendered component -at least, not currently
-        }
-        
-        @Override public void setEnabled(boolean enabled) {
-        	renderer.setEnabled(enabled);
-        }
-
-        @Override public void setParser(IParser parser) {
-        	// not used on rendering        	
-        }
-        
-        @Override public RowFilter checkFilterUpdate(boolean forceUpdate) {
-            Object currentContent = getContent();
-            if (forceUpdate || (currentContent != cachedContent)) {
-	            cachedContent = currentContent;
-	            if (cachedContent instanceof CustomChoice) {
-	                filter = ((CustomChoice)cachedContent).getFilter(editor);
-	            } else {
-	                filter = new RowFilter() {
-	                        @Override public boolean include(RowFilter.Entry entry) {
-	                            Object val = entry.getValue(editor.getModelIndex());
-	                            return (val == null) ? (cachedContent == null) 
-	                            		: val.equals(cachedContent);
-	                        }
-	                    };
-	            }
-            }
-            return filter;
-        }
-
-        @Override public void focusMoved(boolean gained) {
-        	focused=gained;
-        	repaint();
-        }
-
-        @Override public void setLook(Look look) {
-        	setForeground(look.getForeground());
-        	setBackground(look.getBackground());
-        }
-        
-        @Override public boolean isShowing() {
+        @Override public boolean requiresTextEscaping() {
             return true;
         }
 
-        @Override protected void paintComponent(Graphics g) {
-            Component c = renderer.getCellRendererComponent(content, getWidth(),
-            		focused);
-            painter.paintComponent(g, c, this, 0, 0, getWidth(), getHeight());
+        @Override public void detach() {
+            super.detach();
+            ((AbstractDocument) getDocument()).setDocumentFilter(null);
+        }
+
+        @Override public void setContent(Object content, boolean escapeIt) {
+            String text;
+            if (content instanceof CustomChoice) {
+                // never escape custom choices
+                text = ((CustomChoice) content).toString();
+            } else if (content instanceof String) {
+                // if no editable, the choices are directly handled, no need
+                // to escape it. When the text is parsed, on no editable
+                // columns, it will be then escaped.
+                text = (String) content;
+            } else {
+                text = null;
+            }
+
+            onSetText = true;
+            setText(text);
+            onSetText = false;
+            activateCustomDecoration();
+        }
+
+        /**
+         * DocumentFilter instance to handle any user's input, ensuring that the
+         * text always match any of the available choices.
+         */
+        class ControllerDocumentFilter extends DocumentFilter {
+
+            /**
+             * {@link DocumentFilter}: method called if handler is not editable
+             */
+            @Override public void insertString(FilterBypass fb,
+                                               int          offset,
+                                               String       string,
+                                               AttributeSet attr) {
+                // we never use it, we never invoke Document.insertString
+                // note that normal (non programmatically) editing only invokes
+                // replace/remove
+            }
+
+            /**
+             * {@link DocumentFilter}: method called if handler is not editable
+             */
+            @Override public void replace(FilterBypass fb,
+                                          int          offset,
+                                          int          length,
+                                          String       text,
+                                          AttributeSet attrs)
+                                   throws BadLocationException {
+                String buffer = getText();
+                String newContentBegin = buffer.substring(0, offset) + text;
+                String newContent = newContentBegin
+                    + buffer.substring(offset + length);
+                String proposal = getProposalOnEdition(newContent, true);
+                if (proposal == null) {
+
+                    // why this part? Imagine having text "se|cond" with the
+                    // cursor at "|". Nothing is selected. if the user presses
+                    // now 'c', the code above would imply getting "seccond",
+                    // which is probably wrong, so we try now to get a proposal
+                    // starting at 'sec' ['sec|ond']
+                    proposal = getProposalOnEdition(newContentBegin, true);
+                    if (proposal != null) {
+                        newContent = newContentBegin;
+                    } else {
+                        proposal = getProposalOnEdition(newContent, false);
+                        if (proposal != null) {
+                            // on text content, the string comparator cannot
+                            // be null
+                            if ((proposal.length() < newContentBegin.length())
+                                    || (0
+                                        != popupComponent.getStringComparator()
+                                        .compare(newContentBegin,
+                                            proposal.substring(0,
+                                                newContentBegin.length())))) {
+                                proposal = null;
+                            }
+                        }
+
+                        if (proposal == null) {
+                            return;
+                        }
+
+                        newContent = proposal;
+                    }
+                }
+
+                int caret;
+                if (onSetText) {
+                    caret = 0;
+                } else {
+                    caret = 1
+                        + Math.min(getCaret().getDot(), getCaret().getMark());
+                }
+
+                super.replace(fb, 0, buffer.length(), proposal, attrs);
+                setCaretPosition(proposal.length());
+                moveCaretPosition(caret);
+                deactivateCustomDecoration();
+            }
+
+            /**
+             * {@link DocumentFilter}: method called if handler is not editable
+             */
+            @Override public void remove(FilterBypass fb,
+                                         int          offset,
+                                         int          length)
+                                  throws BadLocationException {
+                int caret = getCaret().getDot();
+                int mark = getCaret().getMark();
+                String buffer = getText();
+                String newContent = buffer.substring(0, offset)
+                    + buffer.substring(offset + length);
+                // on text content, this comparator cannot be null
+                Comparator<String> comparator =
+                    popupComponent.getStringComparator();
+                String proposal = getProposalOnEdition(newContent, true);
+                if ((proposal == null)
+                        || (comparator.compare(newContent, proposal) != 0)) {
+                    proposal = getProposalOnEdition(newContent, false);
+                    if (proposal == null) {
+                        return;
+                    }
+
+                    if (
+                        PopupComponent.Match.getMatchingLength(proposal,
+                                newContent, comparator)
+                            <= PopupComponent.Match.getMatchingLength(buffer,
+                                newContent, comparator)) {
+                        proposal = buffer;
+                    }
+                }
+
+                super.replace(fb, 0, buffer.length(), proposal, null);
+
+                // special case if the removal is due to BACK SPACE
+                AWTEvent ev = EventQueue.getCurrentEvent();
+                if ((ev instanceof KeyEvent)
+                        && (((KeyEvent) ev).getKeyCode()
+                            == KeyEvent.VK_BACK_SPACE)) {
+                    if (caret > mark) {
+                        caret = mark;
+                    } else if (buffer == proposal) {
+                        --caret;
+                    } else if (caret == mark) {
+                        caret = offset;
+                    }
+                }
+
+                setCaretPosition(proposal.length());
+                moveCaretPosition(caret);
+                deactivateCustomDecoration();
+            }
         }
     }
 }

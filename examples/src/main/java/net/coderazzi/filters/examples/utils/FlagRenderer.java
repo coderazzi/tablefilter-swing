@@ -32,51 +32,51 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
-import net.coderazzi.filters.gui.IFilterEditor;
-import net.coderazzi.filters.gui.Look;
 import net.coderazzi.filters.gui.ChoiceRenderer;
+import net.coderazzi.filters.gui.IFilterEditor;
 
 
-public class FlagRenderer extends JLabel implements ChoiceRenderer, TableCellRenderer {
+public class FlagRenderer extends JLabel implements ChoiceRenderer,
+    TableCellRenderer {
 
-	private static final long serialVersionUID = -6640707874060161068L;
-	
-	public FlagRenderer() {
-		setOpaque(true);
-	}
+    private static final long serialVersionUID = -6640707874060161068L;
 
-	@Override public Component getTableCellRendererComponent(JTable table, 
-			Object value, boolean isSelected, boolean hasFocus, int row, 
-			int column) {
-		Component ret = setup(value);
-		if (isSelected){
-			ret.setBackground(table.getSelectionBackground());
-			ret.setForeground(table.getSelectionForeground());
-		} else {
-			ret.setBackground(table.getBackground());
-			ret.setForeground(table.getForeground());			
-		}
-		ret.setFont(table.getFont());
-		return ret;
+    public FlagRenderer() {
+        setOpaque(true);
     }
-	
-	@Override public Component getRendererComponent(IFilterEditor editor, Object value,
-			boolean isSelected) {
-		Component ret = setup(value);
-		Look look = editor.getLook();
-		if (isSelected){
-			ret.setBackground(look.getSelectionBackground());
-			ret.setForeground(look.getSelectionForeground());
-		} else {
-			ret.setBackground(look.getBackground());
-			ret.setForeground(look.getForeground());			
-		}
-		ret.setFont(look.getFont());
-		return ret;
-	}
 
-	private Component setup(Object value) {
-		
+    @Override public Component getTableCellRendererComponent(JTable  table,
+                                                             Object  value,
+                                                             boolean isSelected,
+                                                             boolean hasFocus,
+                                                             int     row,
+                                                             int     column) {
+        Component ret = setup(value);
+        if (isSelected) {
+            ret.setBackground(table.getSelectionBackground());
+            ret.setForeground(table.getSelectionForeground());
+        } else {
+            ret.setBackground(table.getBackground());
+            ret.setForeground(table.getForeground());
+        }
+
+        ret.setFont(table.getFont());
+
+        return ret;
+    }
+
+    @Override public Component getRendererComponent(IFilterEditor editor,
+                                                    Object        value,
+                                                    boolean       isSelected) {
+        Component ret = setup(value);
+        editor.getLook().setupComponent(ret, isSelected,
+            editor.getFilter().isEnabled());
+
+        return ret;
+    }
+
+    private Component setup(Object value) {
+
         ImageIcon icon = (ImageIcon) value;
         setIcon(icon);
         setHorizontalAlignment(SwingConstants.CENTER);
@@ -85,7 +85,8 @@ public class FlagRenderer extends JLabel implements ChoiceRenderer, TableCellRen
         if (icon != null) {
             setToolTipText(icon.getDescription());
         }
+
         return this;
     }
-	
+
 }

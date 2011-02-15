@@ -29,32 +29,32 @@ import javax.swing.RowFilter;
 
 
 /**
- * Composed set of filters, added via logical AND
+ * Composed set of filters, added via logical AND.
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
 public class AndFilter extends ComposedFilter {
 
-    /** Default constructor*/
+    /** Default constructor. */
     public AndFilter() {
-    	super();
+        super();
     }
 
     /**
-     * Constructor built up out of one or more 
-     * {@link net.coderazzi.filters.IFilter} instances
+     * Constructor built up out of one or more {@link
+     * net.coderazzi.filters.IFilter} instances.
      */
     public AndFilter(IFilter... observables) {
         super(observables);
     }
 
-    /**
-     * @see  IFilter#include(RowFilter.Entry)
-     */
-	@Override public boolean include(RowFilter.Entry rowEntry) {
-        for (IFilter filter : filters)
-            if (filter.isEnabled() && !filter.include(rowEntry))
+    /** @see  IFilter#include(RowFilter.Entry) */
+    @Override public boolean include(RowFilter.Entry rowEntry) {
+        for (IFilter filter : filters) {
+            if (filter.isEnabled() && !filter.include(rowEntry)) {
                 return false;
+            }
+        }
 
         return true;
     }

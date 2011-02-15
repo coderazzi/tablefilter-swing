@@ -27,10 +27,10 @@ package net.coderazzi.filters.gui.editor;
 
 import java.beans.SimpleBeanInfo;
 
-public class FilterEditorBeanInfo extends SimpleBeanInfo{
-    
-    @Override
-	public java.awt.Image getIcon(int iconKind) {
+
+public class FilterEditorBeanInfo extends SimpleBeanInfo {
+
+    @Override public java.awt.Image getIcon(int iconKind) {
         return loadImage("/net/coderazzi/filters/resources/filterEditor.png");
     }
 

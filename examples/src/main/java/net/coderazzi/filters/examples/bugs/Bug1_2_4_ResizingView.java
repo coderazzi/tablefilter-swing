@@ -6,89 +6,83 @@
 
 package net.coderazzi.filters.examples.bugs;
 
-/**
- *
- * @author  int1634
- */
-public class Bug1_2_4_ResizingView extends javax.swing.JPanel
-{
-        
-		private static final long serialVersionUID = -8267958152880405776L;
+/** @author  int1634 */
+public class Bug1_2_4_ResizingView extends javax.swing.JPanel {
 
-		public Bug1_2_4_ResizingView ()
-        {
-                initComponents ();
-        }
-        
-        private void initComponents()
-        {
+    private static final long serialVersionUID = -8267958152880405776L;
 
-                jPanel1 = new javax.swing.JPanel();
-                splitPane = new javax.swing.JSplitPane();
-                jPanel6 = new javax.swing.JPanel();
-                jPanel9 = new javax.swing.JPanel();
-                tableFilterHeader = new net.coderazzi.filters.gui.TableFilterHeader();
-                jScrollPane12 = new javax.swing.JScrollPane();
-                table = new javax.swing.JTable();
-                jPanel11 = new javax.swing.JPanel();
+    public Bug1_2_4_ResizingView() {
+        initComponents();
+    }
 
-                setLayout(new java.awt.BorderLayout());
+    private void initComponents() {
 
-                jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1 = new javax.swing.JPanel();
+        splitPane = new javax.swing.JSplitPane();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        tableFilterHeader = new net.coderazzi.filters.gui.TableFilterHeader();
+        jScrollPane12 = new javax.swing.JScrollPane();
+        table = new javax.swing.JTable();
+        jPanel11 = new javax.swing.JPanel();
 
-                splitPane.setDividerSize(25);
-                splitPane.setResizeWeight(1.0);
-                splitPane.setContinuousLayout(true);
-                splitPane.setDoubleBuffered(true);
-                splitPane.setOneTouchExpandable(true);
-                splitPane.setOpaque(false);
+        setLayout(new java.awt.BorderLayout());
 
-                jPanel6.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
-                jPanel9.setLayout(new java.awt.BorderLayout());
-                jPanel9.add(tableFilterHeader, java.awt.BorderLayout.NORTH);
+        splitPane.setDividerSize(25);
+        splitPane.setResizeWeight(1.0);
+        splitPane.setContinuousLayout(true);
+        splitPane.setDoubleBuffered(true);
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setOpaque(false);
 
-                jScrollPane12.setViewportView(table);
+        jPanel6.setLayout(new java.awt.BorderLayout());
 
-                jPanel9.add(jScrollPane12, java.awt.BorderLayout.CENTER);
+        jPanel9.setLayout(new java.awt.BorderLayout());
+        jPanel9.add(tableFilterHeader, java.awt.BorderLayout.NORTH);
 
-                jPanel6.add(jPanel9, java.awt.BorderLayout.CENTER);
+        jScrollPane12.setViewportView(table);
 
-                splitPane.setLeftComponent(jPanel6);
+        jPanel9.add(jScrollPane12, java.awt.BorderLayout.CENTER);
 
-                jPanel11.setLayout(new java.awt.BorderLayout());
+        jPanel6.add(jPanel9, java.awt.BorderLayout.CENTER);
 
-                javax.swing.JPanel gray = new javax.swing.JPanel();
-                gray.setBackground(java.awt.Color.darkGray);
-                jPanel11.add(gray, java.awt.BorderLayout.CENTER);
+        splitPane.setLeftComponent(jPanel6);
 
-                splitPane.setRightComponent(jPanel11);
+        jPanel11.setLayout(new java.awt.BorderLayout());
 
-                jPanel1.add(splitPane, java.awt.BorderLayout.CENTER);
+        javax.swing.JPanel gray = new javax.swing.JPanel();
+        gray.setBackground(java.awt.Color.darkGray);
+        jPanel11.add(gray, java.awt.BorderLayout.CENTER);
 
-                add(jPanel1, java.awt.BorderLayout.CENTER);
+        splitPane.setRightComponent(jPanel11);
 
-        }
-        
-        private javax.swing.JPanel jPanel1;
-        private javax.swing.JPanel jPanel11;
-        private javax.swing.JPanel jPanel6;
-        private javax.swing.JPanel jPanel9;
-        private javax.swing.JScrollPane jScrollPane12;
-        private javax.swing.JTable table;
-        private javax.swing.JSplitPane splitPane;
-        private net.coderazzi.filters.gui.TableFilterHeader tableFilterHeader;
+        jPanel1.add(splitPane, java.awt.BorderLayout.CENTER);
 
-        public javax.swing.JTable getTable() {
-                return table;
-        }
+        add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        public net.coderazzi.filters.gui.TableFilterHeader getTableFilterHeader() {
-                return tableFilterHeader;
-        }
+    }
 
-        public javax.swing.JSplitPane getSplitPane() {
-                return splitPane;
-        }
-        
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JScrollPane jScrollPane12;
+    private javax.swing.JTable table;
+    private javax.swing.JSplitPane splitPane;
+    private net.coderazzi.filters.gui.TableFilterHeader tableFilterHeader;
+
+    public javax.swing.JTable getTable() {
+        return table;
+    }
+
+    public net.coderazzi.filters.gui.TableFilterHeader getTableFilterHeader() {
+        return tableFilterHeader;
+    }
+
+    public javax.swing.JSplitPane getSplitPane() {
+        return splitPane;
+    }
+
 }

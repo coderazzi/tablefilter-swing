@@ -29,29 +29,27 @@ import javax.swing.RowFilter;
 
 
 /**
- * Composed set of filters, added via logical AND, and then NOT-ed the result
+ * Composed set of filters, added via logical AND, and then NOT-ed the result.
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
 public class NotFilter extends AndFilter {
-	
-	/** Default constructor */
-	public NotFilter(){
-		super();
-	}
+
+    /** Default constructor. */
+    public NotFilter() {
+        super();
+    }
 
     /**
-     * Constructor built up out of one or more 
-     * {@link net.coderazzi.filters.IFilter} instances
+     * Constructor built up out of one or more {@link
+     * net.coderazzi.filters.IFilter} instances.
      */
     public NotFilter(IFilter... observables) {
         super(observables);
     }
 
-    /**
-     * @see  IFilter#include(RowFilter.Entry)
-     */
-	@Override public boolean include(RowFilter.Entry rowEntry) {
+    /** @see  IFilter#include(RowFilter.Entry) */
+    @Override public boolean include(RowFilter.Entry rowEntry) {
         return !isEnabled() || !super.include(rowEntry);
     }
 }

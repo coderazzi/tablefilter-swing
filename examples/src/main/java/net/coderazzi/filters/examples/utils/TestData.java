@@ -25,7 +25,9 @@
 package net.coderazzi.filters.examples.utils;
 
 import java.awt.image.BufferedImage;
+
 import java.io.ByteArrayOutputStream;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -45,134 +47,139 @@ public class TestData {
 
     private static Random random = new Random();
 
-    static final String[] maleNames = {
-            "alfred", "Alvin", "Blake", "BOb", "Brandon", "BUd", "Burton", 
-            "Charles", "Clark", "Dale", "Damon", "Darren", "Dustin", 
-            "edward", "Elton", "Fletcher", "forrester", "Gary",
-            "Harley", "Harold", "Hugh", "James", "Keane", "Kenneth", 
-            "Landon", ">Lee", "Lincoln", "Maxwell", "Miller", "Nash", "Nelson", 
-            "Norman", "Oswald", "Perry", "Prentice", "=Ralph", "Raymond", 
-            "Richard", "Robert", "Scott", "Spencer", "Stanley", "Sutton", 
-            "Taylor", "Thorne", "Truman", "Tyler", "Wallace",
+    static final String maleNames[] = {
+            "alfred", "Alvin", "Blake", "BOb", "Brandon", "BUd", "Burton",
+            "Charles", "Clark", "Dale", "Damon", "Darren", "Dustin", "edward",
+            "Elton", "Fletcher", "forrester", "Gary", "Harley", "Harold",
+            "Hugh", "James", "Keane", "Kenneth", "Landon", ">Lee", "Lincoln",
+            "Maxwell", "Miller", "Nash", "Nelson", "Norman", "Oswald", "Perry",
+            "Prentice", "=Ralph", "Raymond", "Richard", "Robert", "Scott",
+            "Spencer", "Stanley", "Sutton", "Taylor", "Thorne", "Truman",
+            "Tyler", "Wallace",
         };
 
-    static final String[] femaleNames = {
-            "Aida", "Ashley", "Audrey", "Beverly", "Brenda", "Brook", 
-            "Cameron", "Carling", "Chelsea", "Dale", "Dawn", "Devon", "Dustin", 
-            "Erika", "Farrah", "Harmony", "Hazel", "Heather", "Holly", 
-            "Jamie", "Joyce", "Joy", "Kim", "Kirsten", "Kyla", "Lark", "Lee",
-            "Leigh", "Leslie", "Lindsay", "Mercy", "Nara", "Rowena", 
-            "Sabrina", "Scarlet", "Shelby", "Shirley", "Sparrow", "Spring", 
-            "Storm", "Summer", "Taylor", "Tina", "Trudy", "Ulla", "Verity", 
-            "Wendy", "Whitney", "Wilona"
+    static final String femaleNames[] = {
+            "Aida", "Ashley", "Audrey", "Beverly", "Brenda", "Brook", "Cameron",
+            "Carling", "Chelsea", "Dale", "Dawn", "Devon", "Dustin", "Erika",
+            "Farrah", "Harmony", "Hazel", "Heather", "Holly", "Jamie", "Joyce",
+            "Joy", "Kim", "Kirsten", "Kyla", "Lark", "Lee", "Leigh", "Leslie",
+            "Lindsay", "Mercy", "Nara", "Rowena", "Sabrina", "Scarlet",
+            "Shelby", "Shirley", "Sparrow", "Spring", "Storm", "Summer",
+            "Taylor", "Tina", "Trudy", "Ulla", "Verity", "Wendy", "Whitney",
+            "Wilona"
         };
 
-    // source: http://en.wikipedia.org/wiki/List_of_most_common_surnames#United_States
-    static final String[] familyNames = {
-            "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", 
-            "Miller", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", 
-            "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", 
-            "Martinez", "Robinson", "Clark", "Rodriguez", "Lewis", "Lee", 
-            "Walker", "Hall", "Allen", "Young", "Hernandez", "King", 
-            "Wright", "Lopez", "Hill", "Scott", "Green", "Adams", "Baker", 
-            "Gonzalez", "Nelson", "Carter", "Mitchell", "Perez", 
-            "Roberts", "Turner", "Phillips", "Campbell", "Parker", 
-            "Evans", "Edwards", "Collins", "Stewart", "Sanchez", "Morris", 
-            "Rogers", "Reed", "Cook", "Morgan", "Bell", "Murphy",
-            "Bailey", "Rivera", "Cooper", "Richardson", "Cox", "Howard", 
-            "Ward", "Torres", "Peterson", "Gray", "Ramirez", "James", 
-            "Watson", "Brooks", "Kelly", "Sanders", "Price", "Bennett", 
-            "Wood", "Barnes", "Ross", "Henderson", "Coleman", "Jenkins", 
-            "Perry", "Powell", "Long", "Patterson", "Hughes", "Flores", 
-            "Washington", "Butler", "Simmons", "Foster", "Gonzales", 
-            "Bryant", "Alexander", "Russell", "Griffin", "Diaz", "Hayes"
+    // source:
+    // http://en.wikipedia.org/wiki/List_of_most_common_surnames#United_States
+    static final String familyNames[] = {
+            "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller",
+            "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson",
+            "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez",
+            "Robinson", "Clark", "Rodriguez", "Lewis", "Lee", "Walker", "Hall",
+            "Allen", "Young", "Hernandez", "King", "Wright", "Lopez", "Hill",
+            "Scott", "Green", "Adams", "Baker", "Gonzalez", "Nelson", "Carter",
+            "Mitchell", "Perez", "Roberts", "Turner", "Phillips", "Campbell",
+            "Parker", "Evans", "Edwards", "Collins", "Stewart", "Sanchez",
+            "Morris", "Rogers", "Reed", "Cook", "Morgan", "Bell", "Murphy",
+            "Bailey", "Rivera", "Cooper", "Richardson", "Cox", "Howard", "Ward",
+            "Torres", "Peterson", "Gray", "Ramirez", "James", "Watson",
+            "Brooks", "Kelly", "Sanders", "Price", "Bennett", "Wood", "Barnes",
+            "Ross", "Henderson", "Coleman", "Jenkins", "Perry", "Powell",
+            "Long", "Patterson", "Hughes", "Flores", "Washington", "Butler",
+            "Simmons", "Foster", "Gonzales", "Bryant", "Alexander", "Russell",
+            "Griffin", "Diaz", "Hayes"
         };
 
-    static List<Flag> served = new ArrayList<Flag>(), allIcons;
+    static List<Flag> served = new ArrayList<Flag>();
+    static List<Flag> allIcons;
 
     static {
         getAllIcons();
     }
 
     public static enum Club {
-        Alpha,
-        Geeks,
-        Kappa,
-        Lions,
-        Phi
+        Alpha, Geeks, Kappa, Lions, Phi
     }
-    
-    /** Custom type */
-    public static class Tutor implements Comparable<Tutor>{
-    	String name;
-    	Tutor(){
-    		name= "";
-    	}
-    	Tutor(String firstName, String surname){
-    		this.name=firstName + " " + surname;
-    	}
-    	@Override
-    	public int hashCode() {
-    		return name.hashCode();
-    	}
-    	@Override
-    	public boolean equals(Object obj) {
-    		return (obj instanceof Tutor) && ((Tutor)obj).name.equals(name);
-    	}
-    	@Override
-    	public String toString() {
-    		return name;
-    	}
-    	@Override
-    	public int compareTo(Tutor o) {
-    		return o==null? 1 : name.compareTo(o.name);
-    	}
-    }
-    
-    public static class Flag extends ImageIcon {
-		private static final long serialVersionUID = 1242769439980562528L;
-		private Double redAmount;
 
-		Flag(byte[] array){
-    		super(array);
-    	}
-		
-		public double getRedAmount(){
-			if (redAmount==null){
-				//Graphics g = getImage().getR();
-				int w = getIconWidth();
-				int h = getIconHeight();
-				if (w>0 && h>0){
-					BufferedImage buffImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-				    buffImage.getGraphics().drawImage(this.getImage(), 0, 0, null);
-				    int up=0;
-					for (int i=0; i<w ;i++){
-						for (int j=0; j<h; j++){
-							int c=buffImage.getRGB(i, j);
-							int  red   = (c & 0x00ff0000) >> 16;
-					    	int  green = (c & 0x0000ff00) >> 8;
-					    	int  blue  =  c & 0x000000ff;
-					    	if (red>green && red>blue){
-					    		up++;
-					    	}
-						}
-					}
-					redAmount = ((double)up) / (h*w);
-				}
-			}
-			return redAmount;
-		}
+    /** Custom type. */
+    public static class Tutor implements Comparable<Tutor> {
+        String name;
+
+        Tutor() {
+            name = "";
+        }
+
+        Tutor(String firstName, String surname) {
+            this.name = firstName + " " + surname;
+        }
+
+        @Override public int hashCode() {
+            return name.hashCode();
+        }
+
+        @Override public boolean equals(Object obj) {
+            return (obj instanceof Tutor) && ((Tutor) obj).name.equals(name);
+        }
+
+        @Override public String toString() {
+            return name;
+        }
+
+        @Override public int compareTo(Tutor o) {
+            return (o == null) ? 1 : name.compareTo(o.name);
+        }
     }
-    
-    public static class RedComparator implements Comparator<Flag>{
-    	@Override
-    	public int compare(Flag o1, Flag o2) {
-    		double d = o1.getRedAmount()-o2.getRedAmount(); 
-    		return d==0? 0 : d<0? -1: 1;
-    	}
+
+    public static class Flag extends ImageIcon {
+        private static final long serialVersionUID = 1242769439980562528L;
+        private Double redAmount;
+
+        Flag(byte array[]) {
+            super(array);
+        }
+
+        public double getRedAmount() {
+            if (redAmount == null) {
+                // Graphics g = getImage().getR();
+                int w = getIconWidth();
+                int h = getIconHeight();
+                if ((w > 0) && (h > 0)) {
+                    BufferedImage buffImage = new BufferedImage(w, h,
+                            BufferedImage.TYPE_INT_ARGB);
+                    buffImage.getGraphics().drawImage(this.getImage(), 0, 0,
+                        null);
+
+                    int up = 0;
+                    for (int i = 0; i < w; i++) {
+                        for (int j = 0; j < h; j++) {
+                            int c = buffImage.getRGB(i, j);
+                            int red = (c & 0x00ff0000) >> 16;
+                            int green = (c & 0x0000ff00) >> 8;
+                            int blue = c & 0x000000ff;
+                            if ((red > green) && (red > blue)) {
+                                up++;
+                            }
+                        }
+                    }
+
+                    redAmount = ((double) up) / (h * w);
+                }
+            }
+
+            return redAmount;
+        }
     }
-    
-    public String name, firstName;
+
+    public static class RedComparator implements Comparator<Flag> {
+        @Override public int compare(Flag o1, Flag o2) {
+            double d = o1.getRedAmount() - o2.getRedAmount();
+
+            return (d == 0) ? 0 : ((d < 0) ? -1 : 1);
+        }
+    }
+
+    public String name;
+    public String firstName;
     public Integer age;
     public Boolean male;
     public Tutor tutor;
@@ -181,46 +188,48 @@ public class TestData {
     public Date date;
 
     public TestData() {
-        //1 out of 64 can be with unknown age (null)
-        if (random.nextBoolean() || random.nextBoolean() 
-        		|| random.nextBoolean() || random.nextBoolean()
-        		|| random.nextBoolean() || random.nextBoolean() ){
+        // 1 out of 64 can be with unknown age (null)
+        if (random.nextBoolean() || random.nextBoolean() || random
+                .nextBoolean() || random.nextBoolean() || random
+                .nextBoolean() || random.nextBoolean()) {
             age = 17 + random.nextInt(random.nextBoolean() ? 10 : 25);
         }
+
         male = random.nextBoolean();
         firstName = getFirstName(male);
         name = getName(firstName);
-        //1 out of 4 can be null
-        if (random.nextBoolean() || random.nextBoolean()){
-        	//1 out of 4 can be empty
-            if (random.nextBoolean() && random.nextBoolean()){
-        		tutor = new Tutor();
-        	} else {
-        		tutor = new Tutor(getFirstName(random.nextBoolean()),
-        				          getSurname());
-        	}
+        // 1 out of 4 can be null
+        if (random.nextBoolean() || random.nextBoolean()) {
+            // 1 out of 4 can be empty
+            if (random.nextBoolean() && random.nextBoolean()) {
+                tutor = new Tutor();
+            } else {
+                tutor = new Tutor(getFirstName(random.nextBoolean()),
+                        getSurname());
+            }
         }
-        //1 out of 16 can be without flag
-        if (random.nextBoolean() || random.nextBoolean() 
-        		|| random.nextBoolean() || random.nextBoolean()){
-        	flag = getFlag();
+        // 1 out of 16 can be without flag
+        if (random.nextBoolean() || random.nextBoolean() || random
+                .nextBoolean() || random.nextBoolean()) {
+            flag = getFlag();
         }
+
         club = getClub();
         // date is not exact (not everybody can be born at 00:00!)
-        date = new GregorianCalendar(random.nextInt(50) + 1940, 
-        		random.nextInt(12), random.nextInt(28), 1, 1).getTime();
+        date = new GregorianCalendar(random.nextInt(50) + 1940,
+                random.nextInt(12), random.nextInt(28), 1, 1).getTime();
     }
 
     static void getAllIcons() {
         allIcons = new ArrayList<Flag>();
         try {
             Pattern p = Pattern.compile("gif/(.+)\\.gif");
-            ZipInputStream zip = new ZipInputStream(
-            		TestData.class.getResourceAsStream(
-                    "/net/coderazzi/filters/examples/resources/famfamfam_flag_icons.zip"));
+            ZipInputStream zip = new ZipInputStream(TestData.class
+                        .getResourceAsStream(
+                            "/net/coderazzi/filters/examples/resources/famfamfam_flag_icons.zip"));
             ZipEntry entry;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[16384];
+            byte buffer[] = new byte[16384];
 
             while ((entry = zip.getNextEntry()) != null) {
                 Matcher m = p.matcher(entry.getName());
@@ -237,13 +246,14 @@ public class TestData {
                     ic.setDescription(m.group(1));
                     allIcons.add(ic);
                 }
+
                 zip.closeEntry();
             }
 
             zip.close();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, 
-            		"Error reading icons:" + ex.getMessage());
+            JOptionPane.showMessageDialog(null,
+                "Error reading icons:" + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -255,7 +265,7 @@ public class TestData {
     }
 
     private String getFirstName(boolean male) {
-        String[] source = male ? maleNames : femaleNames;
+        String source[] = male ? maleNames : femaleNames;
 
         return source[random.nextInt(source.length - 1)];
     }
@@ -265,12 +275,12 @@ public class TestData {
     }
 
     private String getSurname() {
-    	
+
         return familyNames[random.nextInt(familyNames.length - 1)];
     }
 
     private Club getClub() {
-        Club[] clubs = Club.values();
+        Club clubs[] = Club.values();
 
         return clubs[random.nextInt(clubs.length)];
     }
@@ -279,12 +289,13 @@ public class TestData {
 
         for (Flag ic : served) {
 
-            if (random.nextBoolean())
+            if (random.nextBoolean()) {
                 return ic;
+            }
         }
 
         if (!allIcons.isEmpty()) {
-        	Flag ret = allIcons.remove(random.nextInt(allIcons.size()));
+            Flag ret = allIcons.remove(random.nextInt(allIcons.size()));
             served.add(ret);
 
             return ret;

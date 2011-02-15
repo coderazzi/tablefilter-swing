@@ -26,68 +26,69 @@
 package net.coderazzi.filters.gui;
 
 import java.beans.PropertyChangeListener;
+
 import java.text.Format;
+
 import java.util.Comparator;
 
 import net.coderazzi.filters.IParser;
 
 
 /**
- * Interface defining the model required to use and create
- * {@link IParser} instances 
+ * Interface defining the model required to use and create {@link IParser}
+ * instances.
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
 public interface IParserModel {
-	
-	/** Property fired when the ignore case value changes */
-	final public static String IGNORE_CASE_PROPERTY = "ignoreCase"; 
 
-	/** Property fired when any class' comparator changes */
-	final public static String COMPARATOR_PROPERTY = "comparator"; 
+    /** Property fired when the ignore case value changes. */
+    String IGNORE_CASE_PROPERTY = "ignoreCase";
 
-	/** Property fired when any class' format changes */
-	final public static String FORMAT_PROPERTY = "format"; 
+    /** Property fired when any class' comparator changes. */
+    String COMPARATOR_PROPERTY = "comparator";
 
-	/** Creates a text parser for the given editor */
-	public IParser createParser(IFilterEditor editor);
-	
-    /** Returns the {@link Format} for the given class */
-    public Format getFormat(Class c);
+    /** Property fired when any class' format changes. */
+    String FORMAT_PROPERTY = "format";
 
-    /** Defines the {@link Format} for the given class */
-    public void setFormat(Class c, Format format);
+    /** Creates a text parser for the given editor. */
+    IParser createParser(IFilterEditor editor);
 
-    /** 
-     * Returns the {@link Comparator} for the given class.<br>
-     * It never returns null. 
-     **/
-    public Comparator getComparator(Class c);
+    /** Returns the {@link Format} for the given class. */
+    Format getFormat(Class c);
 
-    /** Defines the {@link Comparator} for the given class */
-    public void setComparator(Class c, Comparator format);
-    
-    /** Returns the {@link Comparator} used for String comparisons*/
-    public Comparator<String> getStringComparator(boolean ignoreCase);
-    
-    /**  Sets a String comparator that is case sensitive/insensitive */
-    public void setIgnoreCase(boolean set);
-
-    /** 
-     * Returns true if the String comparator ignores case<br>
-     * Note that this is redundant information, which can be retrieved from
-     * the {@link #getComparator(Class)} method with a String.class
-     * parameter. 
-     **/
-    public boolean isIgnoreCase();
+    /** Defines the {@link Format} for the given class. */
+    void setFormat(Class c, Format format);
 
     /**
-     * Adds a {@link PropertyChangeListener}. <br>
+     * Returns the {@link Comparator} for the given class.<br>
+     * It never returns null.
+     */
+    Comparator getComparator(Class c);
+
+    /** Defines the {@link Comparator} for the given class. */
+    void setComparator(Class c, Comparator format);
+
+    /** Returns the {@link Comparator} used for String comparisons. */
+    Comparator<String> getStringComparator(boolean ignoreCase);
+
+    /** Sets a String comparator that is case sensitive/insensitive. */
+    void setIgnoreCase(boolean set);
+
+    /**
+     * Returns true if the String comparator ignores case<br>
+     * Note that this is redundant information, which can be retrieved from the
+     * {@link #getComparator(Class)} method with a String.class parameter.
+     */
+    boolean isIgnoreCase();
+
+    /**
+     * Adds a {@link PropertyChangeListener}.<br>
      * Any property change will be transmitted as an event
      */
-	public void addPropertyChangeListener(PropertyChangeListener listener);
+    void addPropertyChangeListener(PropertyChangeListener listener);
 
-    /** Removes an existing {@link PropertyChangeListener} */
-	public void removePropertyChangeListener(PropertyChangeListener listener);
+    /** Removes an existing {@link PropertyChangeListener}. */
+    void removePropertyChangeListener(PropertyChangeListener listener);
 
 }

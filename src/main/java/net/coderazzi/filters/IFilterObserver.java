@@ -27,7 +27,7 @@ package net.coderazzi.filters;
 
 
 /**
- * <p>A IFilterObserver instance receives notifications when the associated 
+ * <p>A IFilterObserver instance receives notifications when the associated
  * {@link net.coderazzi.filters.IFilter} instance updates the held filter.</p>
  *
  * @author  Luis M Pena - lu@coderazzi.net
@@ -38,5 +38,5 @@ public interface IFilterObserver {
      * <p>Notification made by the observer when the associated {@link
      * net.coderazzi.filters.IFilter} instance updates the held filter.</p>
      */
-    public void filterUpdated(IFilter obs);
+    void filterUpdated(IFilter obs);
 }

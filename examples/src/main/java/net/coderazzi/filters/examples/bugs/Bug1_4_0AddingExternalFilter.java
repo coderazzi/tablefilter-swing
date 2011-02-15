@@ -14,50 +14,51 @@ import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.TableFilterHeader;
 
+
 /**
- * Adding new filters outside the TableHeader does not work (on release 1.4.0)
+ * Adding new filters outside the TableHeader does not work (on release 1.4.0).
  */
-public class Bug1_4_0AddingExternalFilter extends JPanel{
-	
-	private static final long serialVersionUID = 9084957648913273935L;
-	TestTableModel model = TestTableModel.createTestTableModel();
-	Filter addedFilter = new Filter(){
-		@Override
-		public boolean include(Entry entry) {
-			return -1!=entry.getStringValue(
-					model.getColumn(TestTableModel.NAME)).indexOf('e');
-		}
-	};
-	
-	public Bug1_4_0AddingExternalFilter() {
-		super(new BorderLayout());
-		JTable table = new JTable(model);
-		final TableFilterHeader filterHeader = new TableFilterHeader(table);
-		add(new JScrollPane(table), BorderLayout.CENTER);
-		
-		JCheckBox check = new JCheckBox(
-				"Filter out any row where the name does not contain a lower case 'e'");
-		add(check, BorderLayout.SOUTH);
-		
-		check.addItemListener(new ItemListener() {
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				filterHeader.removeFilter(addedFilter);					
-				if (e.getStateChange()==ItemEvent.SELECTED){
-					filterHeader.addFilter(addedFilter);
-				} 
-			}
-		});
-	}
-	
-	public static void main(String[] args) {
-		Bug1_4_0AddingExternalFilter testTableFilter =
-			new Bug1_4_0AddingExternalFilter();
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().add(testTableFilter);
-		frame.pack();
-		frame.setVisible(true);
-	}
+public class Bug1_4_0AddingExternalFilter extends JPanel {
+
+    private static final long serialVersionUID = 9084957648913273935L;
+    TestTableModel model = TestTableModel.createTestTableModel();
+    Filter addedFilter = new Filter() {
+        @Override public boolean include(Entry entry) {
+            return -1
+                    != entry.getStringValue(model.getColumn(
+                            TestTableModel.NAME)).indexOf('e');
+        }
+    };
+
+    public Bug1_4_0AddingExternalFilter() {
+        super(new BorderLayout());
+
+        JTable table = new JTable(model);
+        final TableFilterHeader filterHeader = new TableFilterHeader(table);
+        add(new JScrollPane(table), BorderLayout.CENTER);
+
+        JCheckBox check = new JCheckBox(
+                "Filter out any row where the name does not contain a lower case 'e'");
+        add(check, BorderLayout.SOUTH);
+
+        check.addItemListener(new ItemListener() {
+
+                @Override public void itemStateChanged(ItemEvent e) {
+                    filterHeader.removeFilter(addedFilter);
+                    if (e.getStateChange() == ItemEvent.SELECTED) {
+                        filterHeader.addFilter(addedFilter);
+                    }
+                }
+            });
+    }
+
+    public static void main(String args[]) {
+        Bug1_4_0AddingExternalFilter testTableFilter =
+            new Bug1_4_0AddingExternalFilter();
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(testTableFilter);
+        frame.pack();
+        frame.setVisible(true);
+    }
 }

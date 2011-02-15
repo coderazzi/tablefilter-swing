@@ -29,23 +29,25 @@ import java.text.ParseException;
 
 import javax.swing.RowFilter;
 
+
 /**
  * Interface defining the requirements on text parsing for filter expressions.
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
 public interface IParser {
-	
+
     /**
      * Parses the text, returning a filter that can be applied to the table.
-     * @param expression the text to parse
+     *
+     * @param  expression  the text to parse
      */
-    public RowFilter parseText(String expression) throws ParseException;
+    RowFilter parseText(String expression) throws ParseException;
 
-    /** 
-     * Escapes a given expression, such that, when parsed, the parser will
-     * make no character/operator substitutions.  
+    /**
+     * Escapes a given expression, such that, when parsed, the parser will make
+     * no character/operator substitutions.
      */
-    public String escape(String s);
+    String escape(String s);
 
 }

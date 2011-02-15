@@ -48,18 +48,18 @@ public class TestTableModel extends AbstractTableModel {
     public static final String LCNAME = "Nickname";
     public static final String DATE = "Date";
 
-    private static String[] columnNames = {
+    private static String columnNames[] = {
             NAME, AGE, MALE, TUTOR, COUNTRY, CLUB, LCNAME, DATE
         };
-    private static final Class<?>[] columnTypes = {
-            String.class, Integer.class, Boolean.class, TestData.Tutor.class, 
+    private static final Class<?> columnTypes[] = {
+            String.class, Integer.class, Boolean.class, TestData.Tutor.class,
             Flag.class, TestData.Club.class, String.class, Date.class
         };
 
 
     private static boolean changedModel;
     private List<TestData> data;
-    private int[] columnsOrder;
+    private int columnsOrder[];
 
 
     public static TestTableModel createTestTableModel() {
@@ -71,8 +71,9 @@ public class TestTableModel extends AbstractTableModel {
 
         List<TestData> ltd = new ArrayList<TestData>();
 
-        for (int i = 0; i < elements; i++)
+        for (int i = 0; i < elements; i++) {
             ltd.add(new TestData());
+        }
 
         return new TestTableModel(ltd);
 
@@ -81,6 +82,7 @@ public class TestTableModel extends AbstractTableModel {
 
     public static TestTableModel createLargeTestTableModel(int elements) {
         changedModel = true;
+
         return createTestTableModel(elements);
     }
 
@@ -104,18 +106,25 @@ public class TestTableModel extends AbstractTableModel {
 
     private int[] getRandomOrder() {
         Random random = new Random();
-        int[] n = new int[columnNames.length];
+        int n[] = new int[columnNames.length];
         List<Integer> l = new ArrayList<Integer>();
         int prior = getColumnCount();
-        n[0]=0; //keep always first column as the name
-        for (int i = 1; i < prior; i++)
+        n[0] = 0; // keep always first column as the name
+        for (int i = 1; i < prior; i++) {
             l.add(new Integer(i));
-        for (int i = 1; i < prior; i++)
+        }
+
+        for (int i = 1; i < prior; i++) {
             n[i] = l.remove(random.nextInt(l.size())).intValue();
-        for (int i = prior; i < columnNames.length; i++)
+        }
+
+        for (int i = prior; i < columnNames.length; i++) {
             l.add(new Integer(i));
-        for (int i = prior; i < columnNames.length; i++)
+        }
+
+        for (int i = prior; i < columnNames.length; i++) {
             n[i] = l.remove(random.nextInt(l.size())).intValue();
+        }
 
         return n;
     }
@@ -123,10 +132,12 @@ public class TestTableModel extends AbstractTableModel {
     public void changeModel(JTable table) {
 
         // we keep the same order
-        int[] newColumnsOrder = columnsOrder.clone();
+        int newColumnsOrder[] = columnsOrder.clone();
         for (int i = 0; i < table.getColumnCount(); i++) {
-            newColumnsOrder[i] = columnsOrder[table.convertColumnIndexToModel(i)];
+            newColumnsOrder[i] = columnsOrder[table
+                        .convertColumnIndexToModel(i)];
         }
+
         columnsOrder = newColumnsOrder;
         changedModel = !changedModel;
         fireTableStructureChanged();
@@ -141,9 +152,11 @@ public class TestTableModel extends AbstractTableModel {
     }
 
     public int getColumn(String name) {
-        for (int i = 0; i < columnsOrder.length; i++)
-            if (columnNames[columnsOrder[i]] == name)
+        for (int i = 0; i < columnsOrder.length; i++) {
+            if (columnNames[columnsOrder[i]] == name) {
                 return i;
+            }
+        }
 
         return -1;
     }
@@ -156,48 +169,46 @@ public class TestTableModel extends AbstractTableModel {
         return data.size();
     }
 
-    @Override public Object getValueAt(int rowIndex,
-                             int columnIndex) {
+    @Override public Object getValueAt(int rowIndex, int columnIndex) {
         TestData td = data.get(rowIndex);
 
         switch (columnsOrder[columnIndex]) {
 
-            case 0:
-                return td.name;
+        case 0:
+            return td.name;
 
-            case 1:
-                return td.age;
+        case 1:
+            return td.age;
 
-            case 2:
-                return td.male;
+        case 2:
+            return td.male;
 
-            case 3:
-                return td.tutor;
+        case 3:
+            return td.tutor;
 
-            case 4:
-                return td.flag;
+        case 4:
+            return td.flag;
 
-            case 5:
-                return td.club;
+        case 5:
+            return td.club;
 
-            case 6:
-                return td.firstName;
+        case 6:
+            return td.firstName;
 
-            case 7:
-                return td.date;
+        case 7:
+            return td.date;
         }
 
         return null;
     }
 
-    @Override public boolean isCellEditable(int rowIndex,
-                                  int columnIndex) {
+    @Override public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnsOrder[columnIndex] == 2;
     }
 
     @Override public void setValueAt(Object value,
-                           int rowIndex,
-                           int columnIndex) {
+                                     int    rowIndex,
+                                     int    columnIndex) {
 
         data.get(rowIndex).male = (Boolean) value;
         fireTableRowsUpdated(rowIndex, rowIndex);

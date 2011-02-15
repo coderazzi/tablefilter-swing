@@ -27,17 +27,16 @@ package net.coderazzi.filters.gui;
 
 /**
  * Enumeration to define the available auto choices modes on a table filter or
- * on each separated filter editor
+ * on each separated filter editor.
  */
 public enum AutoChoices {
-	/** 
-	 * No auto choices, any choices must be explicitly inserted 
-	 */
-    DISABLED, 
-    /** 
-     * Enumerations and booleans automatically handled 
-     */
-    ENUMS,    
+
+    /** No auto choices, any choices must be explicitly inserted. */
+    DISABLED,
+
+    /** Enumerations and booleans automatically handled. */
+    ENUMS,
+
     /**
      * Choices extracted from the model, it is guaranteed that the choices
      * include all the model's values, and only those.
