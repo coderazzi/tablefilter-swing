@@ -55,18 +55,19 @@ TableFilterHeader filter = new TableFilterHeader(table);</pre>
 
     <li><a name='userfilters'><span class='mark'>Create additional user filters</span></a>
     <p>
-      It is easy to define additional filters outside the header filter, using the 
-      href='api/net/coderazzi/filters/UserFilter.html'>UserFilter</a> class,
+      It is easy to define additional filters outside the header filter, subclassing from 
+      the <href=''api/net/coderazzi/filters/Filter.html'>Filter</a> class,
       for example:
     </p>
 
 	<pre>    
-final UserFilter userFilter = new UserFilter(filterHeader){
+final Filter userFilter = new Filter(){
 	@Override
 	public boolean include(Entry entry) {
 		return -1!=entry.getStringValue(nameColumn).indexOf('e');
 	}
 };
+filterHeader.addFilter(userFilter);
 JCheckBox check = new JCheckBox("Filter out any row where the "+
                                 "name does not contain a lower case 'e'");		
 check.addItemListener(new ItemListener() {			

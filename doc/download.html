@@ -15,8 +15,8 @@
   
     <p>
       <span class="mark">TableFilter</span> is open source, under 
-      <a href='#license'>MIT license</a>. Its latest version, 3.1.2, has been
-      released the 24th May 2010.
+      <a href='#license'>MIT license</a>. Its latest version, 4.0.0, has been
+      released the 16th February 2011.
     </p>
     
     <ul>
@@ -41,6 +41,15 @@
 	    		<li>Outside a maven project, the binaries, (together with sources and 
 			   		javadoc) can be downloaded directly from the maven repository. The
 			   		last versions are hosted at:
+			   		<ul>
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/4.0.0/'>
+			   		 	Version 4.0.0</a></li> 
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.0.0/'>
+			   		 	Version 4.0.0 for Java 5</a></li> 
+				    </ul>
+	    		</li>
+	    		<li>Note that version 4.x is not API compatible with version 3.x; previous releases
+	    		    are available at:
 			   		<ul>
 			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/3.1.2/'>
 			   		 	Version 3.1.2</a></li> 
@@ -108,6 +117,68 @@ THE SOFTWARE.</pre>
     </p>
 
   <h2><a name="history">History</a></h2>
+    <h3>Version 4.0.0 ( 16th February 2011 ) </h3>
+       
+    	<p>The version 4.x presents, mostly, the same GUI as on version 3.1. 
+  			However, there are many changes under the hood, and the library API
+  			presents many incompatibilities with respect to previous versions.</p>
+  
+		<p>Although most changes relate to new functionality, the
+			old API is also impacted. The most basic changes breaking compatibility 
+			are:</p>
+  
+		<ul>
+			<li>The <span class='mark'>net.coderazzi.filters.gui.editor.FilterEditor</span> 
+			class is not accessible anymore, replaced by the interface  
+			<span class='mark'>net.coderazzi.filters.gui.IFilterEditor</span>.</li>
+			
+			<li>The <span class='mark'>AutoOptions</span> mode, a boolean in version
+			3.x is now an enumeration, renamed as AutoChoices</li> 
+			
+			<li>The class <span class='mark'>net.coderazzi.filters.UserFilter</span> 
+			has been removed, with its functionality directly included in the 
+			<span class='mark'>net.coderazzi.filters.Filter</span> implementation.</li>
+			
+			<li><span class='mark'>setIgnoreCase</span> cannot be invoked any longer
+			on the FilterTextParser (which has been renamed as 
+			<span class='mark'>Parser</span>), but on the associated model, 
+			represented by the interface  
+			<span class='mark'>net.coderazzi.filters.gui.IParserModel</span>		 
+		</ul>
+  
+		<p>In addition to the removal of some bugs, the changes on 4.x have focused
+		on the choices shown to the user on each filter editor:</p>
+		<ul>
+		  <li><span class='mark'>Adaptive choices</span>: the choices provided on
+		  each filter editor are modified automatically when the user applies
+		  changes on other filters in the same table. Only the choices that are
+		  not excluded by the other filters are shown to the user. Note that this
+		  behavior, enabled by default, can be disabled.</li>
+		  
+		  <li><span class='mark'>Custom choices</span>: it is possible to specify
+		  custom choices on any filter editor. A custom choice defines its own
+		  filter and its appearance.</li>
+		  
+		  <li><span class='mark'>Auto choices</span>: in version 3.x, when AutoOptions
+		  was enabled, the removal of elements in the table was not translated into
+		  the filter editor' choices. That is: choices no longer available in the 
+		  table were not removed from the filter editor.</li>
+		  
+		  <li>Proper handling of null values in the table. A custom choice is now
+		  presented to the user to select all null or empty values.</li>
+		  
+		</ul>
+
+		<p>The changes have also tried to make the whole API more consistent and
+		  homogeneous. For example, the previous class 
+		  <span class='mark'>FilterTextParser</span>
+		  and its interface have been replaced by the classes   
+		  <span class='mark'>ParserModel</span> and
+		  <span class='mark'>Parser</span>, together with its own interfaces, and it
+		  is this <span class='mark'>ParserModel</span> where most generic parsing
+		  structures must be set, including case ignoring, string formatters and
+		  comparators.</p>
+		  
     <h3>Version 3.1.2 ( 24th May 2010 ) </h3>
     	<ul>
     		<li>

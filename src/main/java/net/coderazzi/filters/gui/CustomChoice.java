@@ -27,6 +27,7 @@ package net.coderazzi.filters.gui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 
 import java.text.Format;
@@ -182,7 +183,11 @@ public abstract class CustomChoice {
                 use = UIManager.getLookAndFeel().getDisabledIcon(c, icon);
             }
 
-            int x = (c.getWidth() - use.getIconWidth()) / 2;
+            FontMetrics metrics = g.getFontMetrics(editor.getLook().
+                    getCustomChoiceDecorator().getFont(
+                             this, editor, isSelected));
+            int x = Math.max(4 + metrics.stringWidth(toString()),
+                             (c.getWidth() - use.getIconWidth()) / 2);
             int y = (c.getHeight() - use.getIconHeight()) / 2;
             use.paintIcon(c, g, x, y);
         }

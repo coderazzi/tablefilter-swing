@@ -3,7 +3,7 @@
 	<groupId>net.coderazzi</groupId>
 	<artifactId>tablefilter-swing</artifactId>
 	<packaging>jar</packaging>
-	<version>3.1.3-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 	<name>tablefilter-swing</name>
 	<description>TableFilter is a set of Swing components to support user-driven filtering on table.</description>
 	<url>http://coderazzi.net/tablefilter</url>
@@ -53,6 +53,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -61,7 +62,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.0-beta-7</version>
+				<version>2.1</version>
 				<configuration>
 					<tagBase>file:///Users/luismi/development/workspace/tablefilter-swing</tagBase>
 					<mavenExecutorId>forked-path</mavenExecutorId>
@@ -70,6 +71,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -82,6 +84,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -90,25 +93,17 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-		</plugins>
-	</build>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.7</version>
 				<configuration>
 					<doctitle>TableFilter</doctitle>
 					<show>protected</show>
+					<excludePackageNames>net.coderazzi.filters.gui.editor</excludePackageNames>
 					<links>
 						<link>http://java.sun.com/javase/6/docs/api/</link>
 					</links>
 				</configuration>
 			</plugin>
 		</plugins>
-	</reporting>
+	</build>
 	<profiles>
 		<profile>
 			<id>release-sign-artifacts</id>

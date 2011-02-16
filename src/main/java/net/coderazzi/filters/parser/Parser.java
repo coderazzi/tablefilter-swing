@@ -448,7 +448,7 @@ public class Parser implements IParser {
 
     static {
         expressionMatcher = Pattern.compile(
-                "^(>=|<=|<>|!=|!~|~~|==|>|<|=|~|!)?\\s*(.*)$");
+                "^(>=|<=|<>|!~|~~|>|<|=|~|!)?\\s*(.*)$");
 
         IOperand equalOperand = new EqualOperand(true);
         // nullOperand is used when the user enters no operator. It treats
