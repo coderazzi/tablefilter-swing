@@ -28,9 +28,9 @@
 		<url>http://code.google.com/p/tablefilter-swing/issues/list</url>
 	</issueManagement>
 	<scm>
-		<url>scm:hg:file:///Users/luismi/development/workspace/tablefilter-swing</url>
-		<connection>scm:hg:file:///Users/luismi/development/workspace/tablefilter-swing</connection>
-		<developerConnection>scm:hg:file:///Users/luismi/development/workspace/tablefilter-swing</developerConnection>
+		<url>scm:hg:file:///development/workspace/tablefilter-swing</url>
+		<connection>scm:hg:file:///development/workspace/tablefilter-swing</connection>
+		<developerConnection>scm:hg:file:///development/workspace/tablefilter-swing</developerConnection>
 	</scm>
 	<dependencies>
 		<dependency>
@@ -64,7 +64,7 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.1</version>
 				<configuration>
-					<tagBase>file:///Users/luismi/development/workspace/tablefilter-swing</tagBase>
+					<tagBase>file:///development/workspace/tablefilter-swing</tagBase>
 					<mavenExecutorId>forked-path</mavenExecutorId>
 				</configuration>
 			</plugin>
