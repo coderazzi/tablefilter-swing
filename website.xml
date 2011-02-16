@@ -76,6 +76,8 @@
 				     includes='net/coderazzi/filters/**/*.class'/>
 			<fileset dir='examples/src/resources'
 				     includes='**/*'/>
+			<fileset dir='src/main/resources'
+				     includes='**/*'/>
 			<manifest>
 			  <attribute name="Main-Class" 
 			  	    value="net.coderazzi.filters.examples.TableFilterExample"/>			
