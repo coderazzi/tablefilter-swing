@@ -31,20 +31,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import java.text.Format;
-
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -53,8 +48,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import net.coderazzi.filters.IParser;
 import net.coderazzi.filters.gui.ChoiceRenderer;
-import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.Look;
 
@@ -70,14 +65,13 @@ abstract class PopupComponent implements PopupMenuListener {
     private JScrollPane choicesScrollPane;
     private JScrollPane historyScrollPane;
     private JSeparator separator;
-    private EmptyPopup emptyPopupMark;
 
     private ChoicesListModel choicesModel;
     private HistoryListModel historyModel;
 
     /**
-     * cancelReason contains the source of the event that canceled last time the
-     * popup menu.
+     * cancelReason contains the source of the event that cancelled last time 
+     * the popup menu.
      */
     private Object cancelReason;
 
@@ -106,24 +100,9 @@ abstract class PopupComponent implements PopupMenuListener {
         return focusedList.getSelectedValue();
     }
 
-    /** Returns true if the current selection belongs to the history. */
-    public boolean isHistorySelection() {
-        return focusedList == historyList;
-    }
-
     /** Returns true if the passed object matches an existing choice. */
     public boolean isValidChoice(Object object) {
         return choicesModel.isValidChoice(object);
-    }
-
-    /** Returns true if the popup contains choices (history notwithstanding). */
-    public boolean hasChoices() {
-        return !choicesModel.isEmpty();
-    }
-
-    /** Returns the custom choice matching the given text. */
-    public CustomChoice getCustomChoice(String s) {
-        return choicesModel.getCustomChoice(s);
     }
 
     /** Returns the current choices. */
@@ -136,8 +115,8 @@ abstract class PopupComponent implements PopupMenuListener {
      * If there is no Renderer defined, the content is stringfied and sorted -so
      * duplicates are removed-
      */
-    public void addChoices(Collection<?> choices) {
-        if (choicesModel.addContent(choices)) {
+    public void addChoices(Collection<?> choices, IParser escapeParser) {
+        if (choicesModel.addContent(choices, escapeParser)) {
             hide();
         }
     }
@@ -183,7 +162,6 @@ abstract class PopupComponent implements PopupMenuListener {
         int width = editor.getParent().getWidth() - 1;
         configurePaneSize(choicesScrollPane, width);
         configurePaneSize(historyScrollPane, width);
-        configurePaneSize(emptyPopupMark, width);
         if (editor.isValid()) {
             popup.show(editor, -editor.getLocation().x - 1, editor.getHeight());
         }
@@ -241,8 +219,8 @@ abstract class PopupComponent implements PopupMenuListener {
     /**
      * Finds -and selects- the best match to a given content, using the existing
      * history and choices.<br>
-     * It always favor content belonging to the choices list, rather than to the
-     * history list.
+     * It always favour content belonging to the choices list, rather than to
+     * the history list.
      *
      * @param  hint          an object used to select the match. If the content
      *                       is text-based (there is no Renderer defined), the
@@ -255,11 +233,14 @@ abstract class PopupComponent implements PopupMenuListener {
      *                       choice/history starts with the given hint string,
      *                       smaller hint substrings are used, unless
      *                       perfectMatch is true
+     *                       
+     * @return null if not match found, or a valid Match otherwise, with non
+     *         null content
      */
-    public String selectBestMatch(Object hint, boolean perfectMatch) {
-        Match historyMatch = historyModel.getClosestMatch(hint, perfectMatch);
+    public ChoiceMatch selectBestMatch(Object hint, boolean perfectMatch) {
+    	ChoiceMatch historyMatch = historyModel.getClosestMatch(hint, perfectMatch);
         if (choicesModel.getSize() > 0) {
-            Match match = choicesModel.getClosestMatch(hint,
+            ChoiceMatch match = choicesModel.getClosestMatch(hint,
                     perfectMatch || historyMatch.exact);
             if (isVisible() && (match.index >= 0)) {
                 choicesList.ensureIndexIsVisible(match.index);
@@ -273,10 +254,9 @@ abstract class PopupComponent implements PopupMenuListener {
                         select(match.index);
                     }
 
-                    return choicesModel.getElementAt(match.index).toString();
                 }
 
-                return null;
+                return match;
             }
         }
 
@@ -285,11 +265,18 @@ abstract class PopupComponent implements PopupMenuListener {
                 focusHistory();
                 select(historyMatch.index);
             }
-
-            return historyModel.getElementAt(historyMatch.index).toString();
         }
-
-        return null;
+        
+        return historyMatch;
+    }
+    
+    /** 
+     * Returns the text that could complete the given string<br>
+     * The completion string is the larger string that matches all existing
+     * options starting with the given string.
+     */
+    public String getCompletion(String s){
+    	return choicesModel.getCompletion(s, historyModel.getList());
     }
 
     /**
@@ -297,8 +284,7 @@ abstract class PopupComponent implements PopupMenuListener {
      * elements are displayed
      */
     public void setPopupFocused(boolean set) {
-        if ((set != listRenderer.isFocusOnList())
-                && !emptyPopupMark.isVisible()) {
+        if (set != listRenderer.isFocusOnList()) {
             listRenderer.setFocusOnList(set);
             focusedList.repaint();
         }
@@ -306,8 +292,7 @@ abstract class PopupComponent implements PopupMenuListener {
 
     /** Returns true if the focus is currently on the popup. */
     public boolean isPopupFocused() {
-        return isVisible() && listRenderer.isFocusOnList()
-                && !emptyPopupMark.isVisible();
+        return isVisible() && listRenderer.isFocusOnList();
     }
 
     /** @see  IFilterEditor#setMaxHistory(int) */
@@ -449,8 +434,6 @@ abstract class PopupComponent implements PopupMenuListener {
         historyList.setSelectionForeground(look.getSelectionForeground());
         historyList.setFont(look.getFont());
 
-        emptyPopupMark.setBackground(look.getSelectionBackground());
-
         popup.setBorder(BorderFactory.createLineBorder(look.getGridColor(), 1));
 
         separator.setForeground(look.getGridColor());
@@ -561,7 +544,6 @@ abstract class PopupComponent implements PopupMenuListener {
         ensureListRowsHeight();
 
         separator = new JSeparator();
-        emptyPopupMark = new EmptyPopup();
 
         popup = new JPopupMenu();
         popup.setLayout(new BorderLayout());
@@ -571,10 +553,7 @@ abstract class PopupComponent implements PopupMenuListener {
 
         historyScrollPane = createScrollPane(historyList);
 
-        JPanel inner = new JPanel(new BorderLayout());
-        inner.add(emptyPopupMark, BorderLayout.NORTH);
-        inner.add(historyScrollPane, BorderLayout.CENTER);
-        popup.add(inner, BorderLayout.NORTH);
+        popup.add(historyScrollPane, BorderLayout.NORTH);
         popup.add(separator, BorderLayout.CENTER);
         popup.add(choicesScrollPane, BorderLayout.SOUTH);
         popup.setDoubleBuffered(true);
@@ -617,14 +596,12 @@ abstract class PopupComponent implements PopupMenuListener {
             historyScrollPane.setPreferredSize(null);
         }
 
-        if (showChoices) {
+        if (showChoices) { //in fact, there are always choices
             choicesList.setVisibleRowCount(maxChoices);
             choicesScrollPane.setPreferredSize(null);
         }
 
         separator.setVisible(showHistory && showChoices);
-        // if there is no history and no choices, show the empty space content
-        emptyPopupMark.setVisible(!showHistory && !showChoices);
     }
 
     private JScrollPane createScrollPane(JList list) {
@@ -664,25 +641,6 @@ abstract class PopupComponent implements PopupMenuListener {
         return ret;
     }
 
-    /** Class behaving as a small separator of fixed height. */
-    final static class EmptyPopup extends JComponent {
-        private static final long serialVersionUID = 7927091558851809637L;
-        Dimension size = new Dimension(0, 4);
-
-        @Override public Dimension getPreferredSize() {
-            return size;
-        }
-
-        @Override public void setPreferredSize(Dimension preferredSize) {
-            this.size = preferredSize;
-        }
-
-        @Override protected void paintComponent(Graphics g) {
-            g.setColor(getBackground());
-            g.fillRect(0, 0, getWidth(), getHeight());
-        }
-    }
-
     /**
      * The mouse handler will select automatically the choice under the mouse,
      * and passes directly the focus to the popup under the mouse.
@@ -711,76 +669,5 @@ abstract class PopupComponent implements PopupMenuListener {
             choiceSelected(object);
             hide();
         }
-    }
-
-    /** Class to find matches in the lists (history / choices). */
-    static class Match {
-        // index in the list. Will be -1 if the content is empty or a fullMatch
-        // is required and cannot be found
-        int index;
-
-        // length of the string that is matched. On fullMatch calls, this length
-        // is the passed string's length
-        int len;
-        // exact is true if the given index corresponds to an string that fully
-        // matches the passed string
-        boolean exact;
-
-        public Match() {
-            // default constructor, required
-        }
-
-        public Match(int index) {
-            this.index = index;
-            exact = index != -1;
-        }
-
-        public static Match findOnUnsortedContent(List       content,
-                                                  int        len,
-                                                  Comparator strComparator,
-                                                  String     strStart,
-                                                  boolean    fullMatch) {
-            int strLen = strStart.length();
-            Match ret = new Match(-1);
-            while (len-- > 0) {
-                String use = content.get(len).toString();
-                int matchLen = getMatchingLength(strStart, use, strComparator);
-                if ((matchLen > ret.len) || (ret.len == 0)) {
-                    ret.index = len;
-                    ret.len = matchLen;
-                    if ((matchLen == strLen) && (use.length() == strLen)) {
-                        ret.exact = true;
-
-                        return ret;
-                    }
-                }
-            }
-
-            if (fullMatch) {
-                ret.index = -1;
-                ret.len = 0;
-            }
-
-            return ret;
-        }
-
-        /** Returns the number of characters matching between two strings. */
-        public static int getMatchingLength(String     a,
-                                            String     b,
-                                            Comparator stringComparator) {
-            int max = Math.min(a.length(), b.length());
-            for (int i = 0; i < max; i++) {
-                char f = a.charAt(i);
-                char s = b.charAt(i);
-                if ((f != s)
-                        && (stringComparator.compare(String.valueOf(f),
-                                String.valueOf(s)) != 0)) {
-                    return i;
-                }
-            }
-
-            return max;
-        }
-
     }
 }

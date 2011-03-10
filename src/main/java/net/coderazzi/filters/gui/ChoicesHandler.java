@@ -25,8 +25,11 @@
 
 package net.coderazzi.filters.gui;
 
+import java.text.Format;
+
 import javax.swing.JTable;
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -39,10 +42,11 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
  * Interface implemented by the classes that handle the choices on each {@link
  * FilterEditor}.
  */
-abstract class ChoicesHandler implements TableModelListener {
+abstract class ChoicesHandler implements TableModelListener, Runnable {
 
     private TableModel listenedModel;
     protected FiltersHandler handler;
+    private boolean runScheduled;
 
     protected ChoicesHandler(FiltersHandler handler) {
         this.handler = handler;
@@ -61,8 +65,12 @@ abstract class ChoicesHandler implements TableModelListener {
     /** Reports a {@link FilterEditor} update. */
     public abstract void editorUpdated(FilterEditor editor);
 
-    /** Reports a {@link IFilter} update. */
-    public abstract void filterUpdated(IFilter filter);
+    /** 
+     * Reports a {@link IFilter} update.
+     * @param retInfoRequired set to true if the return value is required
+     * @return true if the filter let pass any row 
+     */
+    public abstract boolean filterUpdated(IFilter filter, boolean retInfoRequired);
 
     /**
      * Reports the beginning or end of {@link IFilter} add/remove operations.
@@ -74,8 +82,11 @@ abstract class ChoicesHandler implements TableModelListener {
 
     /** Call triggered after all filters become disabled. */
     public abstract void allFiltersDisabled();
+    
+    /** Ensures that instant changes are propagated */
+    public abstract void consolidateFilterChanges(int modelIndex);
 
-    /** Reports a table update. */
+    /** Reports a table update.*/
     protected abstract void tableUpdated(TableModel model,
                                          int        eventType,
                                          int        firstRow,
@@ -86,9 +97,20 @@ abstract class ChoicesHandler implements TableModelListener {
         int firstRow = e.getFirstRow();
         if (firstRow != TableModelEvent.HEADER_ROW) {
             TableModel model = (TableModel) e.getSource();
-            int lastRow = Math.min(model.getRowCount() - 1, e.getLastRow());
-            tableUpdated(model, e.getType(), firstRow, lastRow, e.getColumn());
+            tableUpdated(model, e.getType(), firstRow, e.getLastRow(), e.getColumn());
+        	if (!runScheduled){
+        		runScheduled=true;
+        		//invoke later filtersHandler.tableUpdated, as perhaps the 
+        		//row sorter hasn't been updated its status
+        		SwingUtilities.invokeLater(this);
+        	}
         }
+    }
+    
+    /** {@link Runnable} interface */
+    @Override public void run() {
+    	runScheduled = false;
+    	handler.tableUpdated();
     }
 
     /**
@@ -112,6 +134,56 @@ abstract class ChoicesHandler implements TableModelListener {
         } else if (listenedModel != null) {
             listenedModel.removeTableModelListener(this);
             listenedModel = null;
+        }
+    }
+
+    /**
+     * Basic RowFilter.Entry instance, used internally to handle the
+     * RowFilter default filtering.
+     */
+    static protected class RowEntry extends RowFilter.Entry {
+        private TableModel model;
+        private int count;
+        private Format formatters[];
+        public int row;
+
+        public RowEntry(TableModel model, FilterEditor editors[]) {
+            this.model = model;
+            this.count = model.getColumnCount();
+
+            int len = editors.length;
+            formatters = new Format[len];
+            while (len-- > 0) {
+                formatters[len] = editors[len].getFormat();
+            }
+        }
+
+        public int getModelRowCount() {
+            return model.getRowCount();
+        }
+
+        public Format[] getFormatters() {
+            return formatters;
+        }
+
+        @Override public Object getIdentifier() {
+            return row;
+        }
+
+        @Override public TableModel getModel() {
+            return model;
+        }
+
+        @Override public Object getValue(int index) {
+            return model.getValueAt(row, index);
+        }
+
+        @Override public int getValueCount() {
+            return count;
+        }
+
+        @Override public String getStringValue(int index) {
+            return formatters[index].format(getValue(index));
         }
     }
 

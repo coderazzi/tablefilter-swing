@@ -26,12 +26,10 @@
 package net.coderazzi.filters.gui;
 
 import java.text.Format;
-
 import java.util.Comparator;
 import java.util.Set;
 
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import net.coderazzi.filters.IFilter;
 
@@ -67,9 +65,10 @@ public interface IFilterEditor {
     /**
      * Using autoChoices, the choices displayed on the popup menu are
      * automatically extracted from the associated {@link TableModel}.<br>
-     * For editors associated to boolean or short enumerations, setting the
-     * AutoChoices automatically changes the editable flag: it is set to true
-     * for DISABLED values, false otherwise.
+     * For editors associated to boolean or short enumerations, if
+     * AutoCompletion is not set, setting the AutoChoices automatically 
+     * changes the editable flag to true, unless AutoChoices has the
+     * DISABLED value
      */
     void setAutoChoices(AutoChoices mode);
 
@@ -115,8 +114,6 @@ public interface IFilterEditor {
     /**
      * Sets the {@link Comparator} required to compare (and sort) instances of
      * the associated class in the table model.<br>
-     * It is initially retrieved from the {@link IParserModel}, and set also in
-     * the underlying {@link TableRowSorter} associated to the table.<br>
      * Setting a comparator to null resets the used comparator (i.e: the
      * comparator is never null)
      */
@@ -124,6 +121,18 @@ public interface IFilterEditor {
 
     /** Returns the associated {@link Comparator}, which can nver be null. */
     Comparator getComparator();
+
+    /** Sets the auto completion flag. */
+    public void setAutoCompletion(boolean enable);
+
+    /** Returns the auto completion flag. */
+    boolean isAutoCompletion();
+
+    /** Sets the instant filtering flag. */
+    public void setInstantFiltering(boolean enable);
+
+    /** Returns the instant filtering flag. */
+    boolean isInstantFiltering();
 
     /**
      * Limits the history size.<br>

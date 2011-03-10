@@ -169,15 +169,22 @@ class HistoryListModel extends AbstractListModel {
         return maxHistory;
     }
 
+    /** Returns the history as a list. */
+    public List getList() {
+        return history;
+    }
+
     /** @see  PopupComponent#selectBestMatch(Object, boolean) */
-    public PopupComponent.Match getClosestMatch(Object hint, boolean exact) {
+    public ChoiceMatch getClosestMatch(Object hint, boolean exact) {
+    	ChoiceMatch ret;
         if ((stringComparator != null) && (hint instanceof String)) {
-            return PopupComponent.Match.findOnUnsortedContent(shownHistory,
+            ret = ChoiceMatch.findOnUnsortedContent(shownHistory,
                     shownHistory.size(), stringComparator, (String) hint,
                     exact);
+        } else {
+        	ret = ChoiceMatch.findExactOnContent(shownHistory, hint);
         }
-
-        return new PopupComponent.Match(shownHistory.indexOf(hint));
+        return ret;
     }
 
 }

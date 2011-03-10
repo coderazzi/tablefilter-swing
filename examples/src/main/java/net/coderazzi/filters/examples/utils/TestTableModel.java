@@ -26,8 +26,10 @@ package net.coderazzi.filters.examples.utils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -59,6 +61,7 @@ public class TestTableModel extends AbstractTableModel {
 
     private static boolean changedModel;
     private List<TestData> data;
+    private Set<TestData> modifiedTestData = new HashSet<TestData>();
     private int columnsOrder[];
 
 
@@ -97,11 +100,13 @@ public class TestTableModel extends AbstractTableModel {
         fireTableRowsInserted(0, 0);
     }
 
-    public void removeTestData() {
+    public TestData removeTestData() {
+    	TestData ret=null;
         if (data.size() > 0) {
-            data.remove(0);
+            ret=data.remove(0);
             fireTableRowsDeleted(0, 0);
         }
+        return ret;
     }
 
     private int[] getRandomOrder() {
@@ -160,6 +165,10 @@ public class TestTableModel extends AbstractTableModel {
 
         return -1;
     }
+    
+    public boolean isModified(TestData td){
+    	return modifiedTestData.contains(td);
+    }
 
     @Override public int getColumnCount() {
         return changedModel ? columnNames.length : 5;
@@ -210,8 +219,15 @@ public class TestTableModel extends AbstractTableModel {
                                      int    rowIndex,
                                      int    columnIndex) {
 
-        data.get(rowIndex).male = (Boolean) value;
-        fireTableRowsUpdated(rowIndex, rowIndex);
+    	TestData td = data.get(rowIndex);
+    	Boolean set = (Boolean) value;
+    	if (td.male!=set){
+    		if (!modifiedTestData.add(td)){
+    			modifiedTestData.remove(td);
+    		}
+	        td.male = set;
+	        fireTableRowsUpdated(rowIndex, rowIndex);
+    	}
     }
 
     @Override public Class<?> getColumnClass(int columnIndex) {

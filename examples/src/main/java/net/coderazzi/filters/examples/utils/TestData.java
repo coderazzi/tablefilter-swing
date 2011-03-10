@@ -54,7 +54,7 @@ public class TestData {
             "Hugh", "James", "Keane", "Kenneth", "Landon", ">Lee", "Lincoln",
             "Maxwell", "Miller", "Nash", "Nelson", "Norman", "Oswald", "Perry",
             "Prentice", "=Ralph", "Raymond", "Richard", "Robert", "Scott",
-            "Spencer", "Stanley", "Sutton", "Taylor", "Thorne", "Truman",
+            "Spencer", "Stanley", "Sut*ton", "Taylor", "Thorne", "Truman",
             "Tyler", "Wallace",
         };
 
@@ -87,7 +87,7 @@ public class TestData {
             "Ross", "Henderson", "Coleman", "Jenkins", "Perry", "Powell",
             "Long", "Patterson", "Hughes", "Flores", "Washington", "Butler",
             "Simmons", "Foster", "Gonzales", "Bryant", "Alexander", "Russell",
-            "Griffin", "Diaz", "Hayes"
+            "Griffin", "Diaz*", "Hayes*"
         };
 
     static List<Flag> served = new ArrayList<Flag>();
@@ -267,7 +267,7 @@ public class TestData {
     private String getFirstName(boolean male) {
         String source[] = male ? maleNames : femaleNames;
 
-        return source[random.nextInt(source.length - 1)];
+        return source[random.nextInt(source.length)];
     }
 
     private String getName(String firstName) {
@@ -276,7 +276,7 @@ public class TestData {
 
     private String getSurname() {
 
-        return familyNames[random.nextInt(familyNames.length - 1)];
+        return familyNames[random.nextInt(familyNames.length)];
     }
 
     private Club getClub() {

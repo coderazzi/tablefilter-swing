@@ -25,7 +25,10 @@
 
 package net.coderazzi.filters.gui;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.RowFilter;
@@ -43,6 +46,10 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
 class NonAdaptiveChoicesHandler extends ChoicesHandler {
 
     private boolean interrupted = true;
+    //it is needed to map the filters to its editors
+    private Map<IFilter, FilterEditor> filtersMap = new HashMap<IFilter, FilterEditor>();
+    //entry used to filter rows
+    private RowEntry rowEntry;
 
     public NonAdaptiveChoicesHandler(FiltersHandler handler) {
         super(handler);
@@ -55,12 +62,12 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
     @Override public boolean setInterrupted(boolean interrupted) {
         if (this.interrupted != interrupted) {
             this.interrupted = interrupted;
-            if (interrupted) {
-                setEnableTableModelEvents(false);
-            } else {
+            setEnableTableModelEvents(!interrupted);
+            if (!interrupted) {
                 for (FilterEditor editor : handler.getEditors()) {
                     editorUpdated(editor);
                 }
+                initialiseFiltersInfo();
             }
         }
 
@@ -73,12 +80,31 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
         }
     }
 
-    @Override public void filterUpdated(IFilter filter) {
-        // nothing to do
+    @Override public boolean filterUpdated(IFilter iFilter, boolean retInfoRequired) {
+    	//if return value is not required, do not bother checking for it, as
+    	//there is nothing to do with filter updates normally
+    	if (retInfoRequired){
+    		if (!iFilter.isEnabled()){
+    			return false;
+    		}
+    		rowEntry.row = handler.getTable().getModel().getRowCount();
+    		if (rowEntry.row>0){
+    			while (rowEntry.row-->0){
+	            	if (iFilter.include(rowEntry)){
+	            		return true;
+	            	}
+    			}
+    			return false;
+    		}
+    	}
+        return true;
     }
 
     @Override public void filterOperation(boolean start) {
         handler.enableNotifications(!start);
+        if (!start && !interrupted){
+        	initialiseFiltersInfo();
+        }
     }
 
     @Override public void filterEnabled(IFilter filter) {
@@ -89,10 +115,17 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
                 break;
             }
         }
+        if (!interrupted){
+        	setEnableTableModelEvents(true);
+        }
     }
 
     @Override public void allFiltersDisabled() {
         setEnableTableModelEvents(false);
+    }
+    
+    @Override public void consolidateFilterChanges(int modelIndex) {
+    	//nothing to do
     }
 
     @Override public void tableUpdated(TableModel model,
@@ -108,7 +141,7 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
                 setChoicesFromModel(editor, model);
             }
         } else {
-            boolean handled = false;
+            lastRow = Math.min(model.getRowCount() - 1, lastRow);
             for (FilterEditor editor : handler.getEditors()) {
                 if (editor.isEnabled()
                         && (AutoChoices.ENABLED == editor.getAutoChoices())) {
@@ -122,17 +155,7 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
                     } else {
                         setChoicesFromModel(editor, model);
                     }
-
-                    handled = true;
                 }
-            }
-
-            if (!handled) {
-                // lazy mode: if the instance was listening to table model
-                // events and all editors became AutoChoices.DISABLED, the
-                // instance will keep listening for table model events, until
-                // it discovers that it does not need it.
-                setEnableTableModelEvents(false);
             }
         }
     }
@@ -164,11 +187,9 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
                         choices.add(each);
                     }
                 }
-
                 editor.setChoices(choices);
             } else {
                 setChoicesFromModel(editor, model);
-                setEnableTableModelEvents(true);
             }
         }
     }
@@ -195,4 +216,20 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
 
         return fill;
     }
+
+    /** Initialise structures related to the filters and editors */
+    private void initialiseFiltersInfo() {
+    	//recreate the filtersMap
+    	filtersMap.clear();
+    	
+    	if (handler.getTable()!=null){
+	        for (FilterEditor fe : handler.getEditors()){
+	        	filtersMap.put(fe.getFilter(), fe);
+	        }
+	        //and the RowEntry 
+	        Collection<FilterEditor> eds = handler.getEditors();
+	        rowEntry = new RowEntry(handler.getTable().getModel(), eds.toArray(new FilterEditor[eds.size()]));
+    	}
+    }
+
 }

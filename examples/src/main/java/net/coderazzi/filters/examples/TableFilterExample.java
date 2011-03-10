@@ -63,7 +63,9 @@ import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -87,13 +89,14 @@ import net.coderazzi.filters.gui.TableFilterHeader.Position;
 @SuppressWarnings("serial")
 public class TableFilterExample extends JFrame {
 
-    private static final String USE_TABLE_RENDERER = "use table renderer";
-    private static final String RECOVER_COLUMN = "Recover column ";
-    private static final String MAX_HISTORY_LENGTH = "max history length";
-    private static final String IGNORE_CASE = "ignore case";
-    private static final String ENABLED = "enabled";
-    private static final String EDITABLE = "editable";
     private static final String AUTO_CHOICES = "auto choices";
+    private static final String AUTO_COMPLETION = "auto completion";
+    private static final String EDITABLE = "editable";
+    private static final String ENABLED = "enabled";
+    private static final String IGNORE_CASE = "ignore case";
+    private static final String INSTANT_FILTERING = "instant filtering";
+    private static final String MAX_HISTORY_LENGTH = "max history length";
+    private static final String USE_TABLE_RENDERER = "use table renderer";
 
     TestTableModel    tableModel;
     JTable            table;
@@ -105,6 +108,7 @@ public class TableFilterExample extends JFrame {
     JCheckBoxMenuItem countrySpecialSorter;
     JCheckBoxMenuItem enableUserFilter;
     IFilter           userFilter;
+    boolean           useMaleCustomChoices;
 
     public TableFilterExample() {
         super("Table Filter Example");
@@ -237,16 +241,15 @@ public class TableFilterExample extends JFrame {
         autoResize.setSelected(table.getAutoResizeMode()
                 != JTable.AUTO_RESIZE_OFF);
 
-        final AbstractAction removeElement = new AbstractAction(
-                "Remove top row") {
+        final JMenuItem removeElement = new JMenuItem(new AbstractAction("Remove top row") {
 
             @Override public void actionPerformed(ActionEvent e) {
-                tableModel.removeTestData();
+            	tableModel.removeTestData();
                 if (tableModel.getRowCount() == 0) {
                     ((JComponent) e.getSource()).setEnabled(false);
                 }
             }
-        };
+        });
 
         JMenu tableMenu = new JMenu("Table");
         tableMenu.setMnemonic(KeyEvent.VK_T);
@@ -266,7 +269,7 @@ public class TableFilterExample extends JFrame {
                     }
                 }));
 
-        tableMenu.add(new JMenuItem(removeElement));
+        tableMenu.add(removeElement);
         tableMenu.addSeparator();
         tableMenu.add(autoResize);
         tableMenu.addSeparator();
@@ -307,16 +310,14 @@ public class TableFilterExample extends JFrame {
                     }
                 });
 
-        JCheckBoxMenuItem ignoreCase = new JCheckBoxMenuItem(new AbstractAction(
-                    IGNORE_CASE) {
-                    @Override public void actionPerformed(ActionEvent e) {
-                        JCheckBoxMenuItem source = (JCheckBoxMenuItem)
-                            e.getSource();
-                        filterHeader.getParserModel().setIgnoreCase(
-                            source.isSelected());
-                        updateFiltersInfo();
-                    }
-                });
+        JCheckBoxMenuItem visible = new JCheckBoxMenuItem(new AbstractAction(
+        "visible") {
+        @Override public void actionPerformed(ActionEvent e) {
+            JCheckBoxMenuItem source = (JCheckBoxMenuItem)
+                e.getSource();
+            filterHeader.setVisible(source.isSelected());
+        }
+    });
 
         JCheckBoxMenuItem adaptiveChoices = new JCheckBoxMenuItem(
                 new AbstractAction("adaptive choices") {
@@ -328,21 +329,50 @@ public class TableFilterExample extends JFrame {
                     }
                 });
 
-        allEnabled = new JCheckBoxMenuItem(new AbstractAction(ENABLED) {
+        JCheckBoxMenuItem autoCompletion = new JCheckBoxMenuItem(
+                new AbstractAction(AUTO_COMPLETION) {
                     @Override public void actionPerformed(ActionEvent e) {
                         JCheckBoxMenuItem source = (JCheckBoxMenuItem)
                             e.getSource();
-                        filterHeader.setEnabled(source.isSelected());
+                        filterHeader.setAutoCompletion(source.isSelected());
                         updateFiltersInfo();
                     }
                 });
 
-        JCheckBoxMenuItem visible = new JCheckBoxMenuItem(new AbstractAction(
-                    "visible") {
+        allEnabled = new JCheckBoxMenuItem(new AbstractAction(ENABLED) {
+            @Override public void actionPerformed(ActionEvent e) {
+                JCheckBoxMenuItem source = (JCheckBoxMenuItem)
+                    e.getSource();
+                filterHeader.setEnabled(source.isSelected());
+                updateFiltersInfo();
+            }
+        });
+
+        JCheckBoxMenuItem filterOnUpdates = new JCheckBoxMenuItem(new AbstractAction("filter on updates") {
+                @Override public void actionPerformed(ActionEvent e) {
+                    JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
+                    filterHeader.setFilterOnUpdates(source.isSelected());
+                }
+            });
+
+        JCheckBoxMenuItem ignoreCase = new JCheckBoxMenuItem(new AbstractAction(
+                    IGNORE_CASE) {
                     @Override public void actionPerformed(ActionEvent e) {
                         JCheckBoxMenuItem source = (JCheckBoxMenuItem)
                             e.getSource();
-                        filterHeader.setVisible(source.isSelected());
+                        filterHeader.getParserModel().setIgnoreCase(
+                            source.isSelected());
+                        updateFiltersInfo();
+                    }
+                });
+
+        JCheckBoxMenuItem instantFiltering = new JCheckBoxMenuItem(
+                new AbstractAction(INSTANT_FILTERING) {
+                    @Override public void actionPerformed(ActionEvent e) {
+                        JCheckBoxMenuItem source = (JCheckBoxMenuItem)
+                            e.getSource();
+                        filterHeader.setInstantFiltering(source.isSelected());
+                        updateFiltersInfo();
                     }
                 });
 
@@ -356,15 +386,24 @@ public class TableFilterExample extends JFrame {
         ignoreCase.setMnemonic(KeyEvent.VK_C);
         ignoreCase.setSelected(filterHeader.getParserModel().isIgnoreCase());
         adaptiveChoices.setSelected(filterHeader.isAdaptiveChoices());
+        instantFiltering.setSelected(filterHeader.isInstantFiltering());
+        autoCompletion.setSelected(filterHeader.isAutoCompletion());
         allEnabled.setSelected(filterHeader.isEnabled());
         visible.setSelected(filterHeader.isVisible());
+        filterOnUpdates.setSelected(filterHeader.isFilterOnUpdates());
 
         JMenu ret = new JMenu("Filter Header");
         ret.setMnemonic(KeyEvent.VK_H);
         ret.add(onUse);
+        ret.add(visible);
+        ret.add(createPositionMenu());
         ret.addSeparator();
-        ret.add(ignoreCase);
         ret.add(adaptiveChoices);
+        ret.add(autoCompletion);
+        ret.add(allEnabled);
+        ret.add(filterOnUpdates);
+        ret.add(ignoreCase);
+        ret.add(instantFiltering);
         ret.add(createAutoChoicesMenu(filterHeader.getAutoChoices(),
                 new AutoChoicesSet() {
                     @Override public void setAutoChoices(AutoChoices ao) {
@@ -372,10 +411,7 @@ public class TableFilterExample extends JFrame {
                         updateFiltersInfo();
                     }
                 }));
-        ret.add(allEnabled);
         ret.addSeparator();
-        ret.add(visible);
-        ret.add(createPositionMenu());
         ret.add(createAppearanceMenu());
         ret.add(createMaxRowsMenu());
         ret.add(createMaxHistoryMenu(null));
@@ -585,6 +621,16 @@ public class TableFilterExample extends JFrame {
                         }
                     }
                 }));
+        ret.add(new JMenuItem(new AbstractAction("warning color ...") {
+            @Override public void actionPerformed(ActionEvent e) {
+                Color ret = JColorChooser.showDialog(
+                        TableFilterExample.this, "Select warning color",
+                        filterHeader.getWarningForeground());
+                if (ret != null) {
+                    filterHeader.setWarningForeground(ret);
+                }
+            }
+        }));
         ret.add(new JMenuItem(
                 new AbstractAction("selection foreground ...") {
                     @Override public void actionPerformed(ActionEvent e) {
@@ -624,18 +670,14 @@ public class TableFilterExample extends JFrame {
         ret.addSeparator();
         ret.add(createFontSizeMenu());
 
+        ret.addSeparator();
+        ret.add(createRowSizeMenu());
+        
         return ret;
     }
 
     void addColumnToFiltersMenu(final IFilterEditor editor, final String name) {
         JMenu menu = (JMenu) getMenu(filtersMenu, name, false);
-        menu.add(createAutoChoicesMenu(editor.getAutoChoices(),
-                new AutoChoicesSet() {
-                    @Override public void setAutoChoices(AutoChoices ao) {
-                        editor.setAutoChoices(ao);
-                        updateFilter(editor, name);
-                    }
-                }));
 
         JCheckBoxMenuItem editable = new JCheckBoxMenuItem(EDITABLE,
                 editor.isEditable());
@@ -660,20 +702,50 @@ public class TableFilterExample extends JFrame {
             });
         menu.add(enabled);
 
+        menu.add(createAutoChoicesMenu(editor.getAutoChoices(),
+                new AutoChoicesSet() {
+                    @Override public void setAutoChoices(AutoChoices ao) {
+                        editor.setAutoChoices(ao);
+                        updateFilter(editor, name);
+                    }
+                }));
+        menu.addSeparator();
+
+        JCheckBoxMenuItem autoCompletion = new JCheckBoxMenuItem(AUTO_COMPLETION,
+                editor.isAutoCompletion());
+        autoCompletion.addActionListener(new ActionListener() {
+                @Override public void actionPerformed(ActionEvent e) {
+                    JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
+                    editor.setAutoCompletion(source.isSelected());
+                }
+            });
+        menu.add(autoCompletion);
+
         JCheckBoxMenuItem ignoreCase = new JCheckBoxMenuItem(IGNORE_CASE,
                 editor.isIgnoreCase());
         ignoreCase.addActionListener(new ActionListener() {
                 @Override public void actionPerformed(ActionEvent e) {
                     JCheckBoxMenuItem source = (JCheckBoxMenuItem)
                         e.getSource();
-                    boolean           ignoreCase = source.isSelected();
-                    editor.setIgnoreCase(ignoreCase);
+                    editor.setIgnoreCase(source.isSelected());
                 }
             });
         menu.add(ignoreCase);
+
+        JCheckBoxMenuItem instantFiltering = new JCheckBoxMenuItem(INSTANT_FILTERING,
+                editor.isInstantFiltering());
+        instantFiltering.addActionListener(new ActionListener() {
+                @Override public void actionPerformed(ActionEvent e) {
+                    JCheckBoxMenuItem source = (JCheckBoxMenuItem)
+                        e.getSource();
+                    editor.setInstantFiltering(source.isSelected());
+                }
+            });
+        menu.add(instantFiltering);
+
         menu.addSeparator();
 
-        if (name.equalsIgnoreCase("country")) {
+        if (name.equalsIgnoreCase(TestTableModel.COUNTRY)) {
             JCheckBoxMenuItem useFlagRenderer = new JCheckBoxMenuItem(
                     USE_TABLE_RENDERER, true);
             useFlagRenderer.addItemListener(new ItemListener() {
@@ -688,6 +760,20 @@ public class TableFilterExample extends JFrame {
                 });
 
             menu.add(useFlagRenderer);
+        }
+
+        if (name.equalsIgnoreCase(TestTableModel.MALE)) {
+            JCheckBoxMenuItem maleCC = new JCheckBoxMenuItem(
+                    "Specific custom choices", useMaleCustomChoices);
+            maleCC.addItemListener(new ItemListener() {
+
+                    @Override public void itemStateChanged(ItemEvent e) {
+                    	useMaleCustomChoices = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                    	setupCustomChoicesOnMaleColumn();
+                    }
+                });
+
+            menu.add(maleCC);
         }
 
         menu.add(createMaxHistoryMenu(editor));
@@ -709,19 +795,19 @@ public class TableFilterExample extends JFrame {
     }
 
     void createFilterColumnRecovery(final TableColumn tc) {
-        final String title = RECOVER_COLUMN + (String) tc.getHeaderValue();
+        final String title = "Recover column " + (String) tc.getHeaderValue();
         JMenuItem    item = new JMenuItem(new AbstractAction(title) {
                     @Override public void actionPerformed(ActionEvent e) {
                         table.getColumnModel().addColumn(tc);
                         getMenu(filtersMenu, title, true);
                         if (TestTableModel.AGE.equals(tc.getHeaderValue())) {
                             customizeAgeColumn();
-                        } else if (TestTableModel.COUNTRY.equals(
-                                    tc.getHeaderValue())) {
+                        } else if (TestTableModel.COUNTRY.equals(tc.getHeaderValue())) {
                             customizeCountryColumn();
-                        } else if (TestTableModel.DATE.equals(
-                                    tc.getHeaderValue())) {
+                        } else if (TestTableModel.DATE.equals(tc.getHeaderValue())) {
                             customizeDateColumn();
+                        } else if (TestTableModel.MALE.equals(tc.getHeaderValue())) {
+                        	customizeMaleColumn();
                         }
                     }
                 });
@@ -809,6 +895,32 @@ public class TableFilterExample extends JFrame {
                     @Override public void actionPerformed(ActionEvent e) {
                         filterHeader.setFont(
                             filterHeader.getFont().deriveFont((float) (size)));
+                    }
+                });
+    }
+
+    private JMenu createRowSizeMenu() {
+        int         RELATIVE_SIZES[] = { -2, 0, 4, 10, 20, 40};
+        int         size = filterHeader.getRowHeightDelta();
+        JMenu       ret = new JMenu("row height delta");
+        ButtonGroup group = new ButtonGroup();
+        for (int i : RELATIVE_SIZES) {
+            JRadioButtonMenuItem item = createRowSizeMenuItem(i);
+            ret.add(item);
+            group.add(item);
+            if (i == size) {
+                item.setSelected(true);
+            }
+        }
+
+        return ret;
+    }
+
+    private JRadioButtonMenuItem createRowSizeMenuItem(final int size) {
+        return new JRadioButtonMenuItem(new AbstractAction(
+                    String.valueOf(size)) {
+                    @Override public void actionPerformed(ActionEvent e) {
+                        filterHeader.setRowHeightDelta(size);
                     }
                 });
     }
@@ -943,6 +1055,86 @@ public class TableFilterExample extends JFrame {
         }
     }
 
+    void customizeMaleColumn() {
+        int maleColumnView = getColumnView(TestTableModel.MALE);
+
+        if (maleColumnView != -1) {        	
+            table.getColumnModel().getColumn(maleColumnView).setCellRenderer(
+                new TableCellRenderer(){
+                    TableCellRenderer delegate = table.getDefaultRenderer(Boolean.class);
+                    Border redBorder = BorderFactory.createLineBorder(Color.red);
+
+                    @Override public Component getTableCellRendererComponent(JTable table,
+                                                                   Object value,
+                                                                   boolean isSelected,
+                                                                   boolean hasFocus,
+                                                                   int row,
+                                                                   int column) {
+                        JComponent c = (JComponent) delegate.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                        int modelRow = table.convertRowIndexToModel(row);
+                        if (tableModel.isModified(tableModel.getRow(modelRow))) {
+                            c.setBorder(BorderFactory.createCompoundBorder(c.getBorder(), redBorder));
+                        }
+                        return c;
+                    }                	
+                });
+            setupCustomChoicesOnMaleColumn();
+        }
+    }
+
+    void setupCustomChoicesOnMaleColumn() {
+        int maleColumn = tableModel.getColumn(TestTableModel.MALE);
+
+        if (maleColumn != -1) {
+            IFilterEditor editor = filterHeader.getFilterEditor(maleColumn);
+            Set<CustomChoice> choices = new HashSet<CustomChoice>();
+        	if (useMaleCustomChoices){
+            	//specific code.
+            	//the checkbox for male/female can be modified.
+            	//if the associated filter is set to true or false, updating this
+            	//checkbox value would make the row vanish
+            	//To avoid that, we setup specific custom choices that do not
+            	//filter out modified values
+				CustomChoice obsoleteChoice = new CustomChoice("True +") {
+	
+					@Override public RowFilter getFilter(IFilterEditor fe) {
+						return new RowFilter() {
+							@Override public boolean include(Entry entry) {
+								int row = (Integer) entry.getIdentifier();
+								TestData td = tableModel.getRow(row);
+								return td.male || tableModel.isModified(td);
+							}
+						};
+					}
+				};
+	
+				CustomChoice nonObsoleteChoice = new CustomChoice("False +") {
+	
+					@Override public RowFilter getFilter(IFilterEditor fe) {
+						return new RowFilter() {
+							@Override public boolean include(Entry entry) {
+								int row = (Integer) entry.getIdentifier();
+								TestData td = tableModel.getRow(row);
+								return !td.male || tableModel.isModified(td);
+							}
+						};
+					}
+				};
+	
+	            choices.add(obsoleteChoice);
+	            choices.add(nonObsoleteChoice);
+	            editor.setAutoChoices(AutoChoices.DISABLED);
+	            editor.setEditable(false);
+	            editor.setCustomChoices(choices);
+        	} else {
+	            editor.setCustomChoices(choices);
+	            editor.setAutoChoices(AutoChoices.ENUMS);
+	            editor.setEditable(true);
+        	}
+            updateFilter(editor, TestTableModel.MALE);
+        }
+    }
+
     void customizeDateColumn() {
         int datesColumnView = getColumnView(TestTableModel.DATE);
 
@@ -979,6 +1171,7 @@ public class TableFilterExample extends JFrame {
 
     void customizeTable() {
         if (filterHeader.getTable() != null) {
+            customizeMaleColumn();
             customizeCountryColumn();
             customizeAgeColumn();
             customizeDateColumn();
@@ -992,7 +1185,7 @@ public class TableFilterExample extends JFrame {
     }
 
     void setPosition(Position position) {
-        if (filterHeader.getPosition() == Position.NONE) {
+        if (filterHeader.getPosition() == Position.NONE && filterHeaderPanel!=null) {
             filterHeaderPanel.remove(filterHeader);
             tablePanel.remove(filterHeaderPanel);
             tablePanel.revalidate();

@@ -56,11 +56,9 @@ public class OrFilter extends ComposedFilter {
                 if (filter.include(rowEntry)) {
                     return true;
                 }
-
                 ret = false;
             }
         }
-
         return ret;
     }
 }

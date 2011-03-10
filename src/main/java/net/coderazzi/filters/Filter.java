@@ -79,7 +79,7 @@ abstract public class Filter extends RowFilter implements IFilter {
      * Method to be called by subclasses to report to the observers that the
      * filter has changed.
      */
-    protected void reportFilterUpdatedToObservers() {
+    public void reportFilterUpdatedToObservers() {
         for (IFilterObserver obs
                 : new ArrayList<IFilterObserver>(filterObservers)) {
             obs.filterUpdated(this);
