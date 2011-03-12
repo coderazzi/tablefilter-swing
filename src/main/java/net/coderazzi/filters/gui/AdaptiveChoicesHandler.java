@@ -315,7 +315,10 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
         /** Extract the choices due to a filter update on the given position */
         public void propagateChanges(int modelPosition) {
             int width = editorHandles.length;
-            switchHandle(getEditorHandle(modelPosition), --width);
+            int handle = getEditorHandle(modelPosition);
+            if (handle>=0){
+            	switchHandle(handle, --width);
+            }
             extractChoices(width, 0, -1);
         }
 

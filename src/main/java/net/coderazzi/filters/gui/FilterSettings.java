@@ -88,7 +88,7 @@ public class FilterSettings {
 
     /** If true, table updates trigger filter updates*/
     public static boolean filterOnUpdates = Boolean.parseBoolean(getString(
-            "FilterOnUpdates", "false"));
+            "FilterOnUpdates", "true"));
 
     /** 
      * Setting to add / decrease height to the filter row.<br>
