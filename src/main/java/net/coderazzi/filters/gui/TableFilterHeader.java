@@ -183,6 +183,7 @@ public class TableFilterHeader extends JPanel {
     /** Full constructor. */
     public TableFilterHeader(JTable table, IParserModel parserModel) {
         super(new BorderLayout());
+        add(new JPanel(), BorderLayout.CENTER); //do not take all width
         if (parserModel == null) {
             parserModel = FilterSettings.newParserModel();
         }
@@ -818,7 +819,7 @@ public class TableFilterHeader extends JPanel {
         removeController();
         columnsController = new FilterColumnsControllerPanel(getFont(),
                 getForeground(), getBackground());
-        add(columnsController, BorderLayout.CENTER);
+        add(columnsController, BorderLayout.WEST);
         revalidate();
         filtersHandler.enableNotifications(true);
     }
@@ -1079,6 +1080,10 @@ public class TableFilterHeader extends JPanel {
         }
 
         @Override public Dimension getPreferredSize() {
+        	JTable table = getTable();
+        	if (table!=null){
+        		preferredSize.width=table.getWidth();
+        	}
             return preferredSize;
         }
 
