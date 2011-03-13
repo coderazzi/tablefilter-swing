@@ -44,9 +44,13 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
  */
 abstract class ChoicesHandler implements TableModelListener, Runnable {
 
-    private TableModel listenedModel;
     protected FiltersHandler handler;
+    /** The model being listened to handle model changes */
+    private TableModel listenedModel;
+    /** this variable is true to signal an update to the FiltersHandler */
     private boolean runScheduled;
+    /** this variable is true if last unreported changes was an update */
+    private boolean reportUpdate;
 
     protected ChoicesHandler(FiltersHandler handler) {
         this.handler = handler;
@@ -98,6 +102,7 @@ abstract class ChoicesHandler implements TableModelListener, Runnable {
         if (firstRow != TableModelEvent.HEADER_ROW) {
             TableModel model = (TableModel) e.getSource();
             tableUpdated(model, e.getType(), firstRow, e.getLastRow(), e.getColumn());
+            reportUpdate = e.getType()==TableModelEvent.UPDATE;
         	if (!runScheduled){
         		runScheduled=true;
         		//invoke later filtersHandler.tableUpdated, as perhaps the 
@@ -110,7 +115,7 @@ abstract class ChoicesHandler implements TableModelListener, Runnable {
     /** {@link Runnable} interface */
     @Override public void run() {
     	runScheduled = false;
-    	handler.tableUpdated();
+    	handler.tableUpdated(reportUpdate);
     }
 
     /**

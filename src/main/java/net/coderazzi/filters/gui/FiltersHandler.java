@@ -462,17 +462,17 @@ public class FiltersHandler extends AndFilter
     }
     
     /** Report that the table is updated */
-    public void tableUpdated(){
-    	if (filterOnUpdates){
+    public void tableUpdated(boolean lastChangeIsUpdate){
+    	if (lastChangeIsUpdate && filterOnUpdates){
     		//if filterOnUpdates, it is needed to reapply the filter
     		//however, the underlying row sorter can be already sorting on
     		//updates; in that case, the filtering happens all the same
     		if (autoSelector.sorter==null || !autoSelector.sorter.getSortsOnUpdates()){
     			updateTableFilter();
+    			return;
     		}    		
-    	} else {
-    		checkWarningState();
-    	}
+    	} 
+    	checkWarningState();
     }
 
     /** Verifies if the current filter is hiding all table' rows */
