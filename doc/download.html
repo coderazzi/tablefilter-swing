@@ -15,8 +15,8 @@
   
     <p>
       <span class="mark">TableFilter</span> is open source, under 
-      <a href='#license'>MIT license</a>. Its latest version, 4.0.0, has been
-      released the 16th February 2011.
+      <a href='#license'>MIT license</a>. Its latest version, 4.1.0, has been
+      released the 14th March 2011.
     </p>
     
     <ul>
@@ -25,7 +25,7 @@
 	       		<li>Available at Google Code, as the project 
 	       			<a href='http://code.google.com/p/tablefilter-swing/'>tablefilter-swing</a></li>
 	   			<li>Alternatively, they can be downloaded directly as a
-	   				single zip file:<a href='download/tablefilter-src.zip'>tablefilter-src.zip</a></li>
+	   				single zip file:<a href='download/tablefilter-src-4-1-0.zip'>tablefilter-src.zip</a></li>
 	       	</ul>
        	</li>
     	<li><span class='mark'>Binaries</span>:
@@ -42,14 +42,14 @@
 			   		javadoc) can be downloaded directly from the maven repository. The
 			   		last versions are hosted at:
 			   		<ul>
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/4.0.0/'>
-			   		 	Version 4.0.0</a></li> 
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.0.0/'>
-			   		 	Version 4.0.0 for Java 5</a></li> 
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/4.1.0/'>
+			   		 	Version 4.1.0</a></li> 
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.1.0/'>
+			   		 	Version 4.1.0 for Java 5</a></li> 
 				    </ul>
 	    		</li>
-	    		<li>Note that version 4.x is not API compatible with version 3.x; previous releases
-	    		    are available at:
+	    		<li>Note that version 4.x is not API compatible with version 3.x; latest 3.x release
+	    		    is available at:
 			   		<ul>
 			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/3.1.2/'>
 			   		 	Version 3.1.2</a></li> 
@@ -59,15 +59,7 @@
 	    		</li>
 	    	</ul>
     	</li> 
-    	<li><span class='mark'>Previous versions</span>: please note that version 
-    		3.0 is a major rewriting of the library and breaks compatibility 
-    		with previous versions. For this reason, the latest 2.x version 
-    		is still available here:
- 	        <ul>
-		    	<li><a href='download/tablefilter-v2.2.0.zip'>Version 2.2.0 (obsolete)</a></li>
-		        <li><a href='download/tablefilter5-v2.2.0.zip'>Version 2.2.0 for Java 5 (obsolete)</a></li>
-		    </ul>
-    	</li> 
+    	<li>All versions are available in source/binary form on this <a href='download'>folder</a>.</li>
     </ul>
     
     
@@ -117,6 +109,38 @@ THE SOFTWARE.</pre>
     </p>
 
   <h2><a name="history">History</a></h2>
+    <h3>Version 4.1.0 ( 14th March 2011 ) </h3>
+       
+    	<p><span class='mark'>Instant filtering</span>: filtering happens as
+    	the user inputs text; implemented after 
+    	<a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=4'>requirement</a>.</p>
+  			
+    	<p><span class='mark'>Auto completion</span> on editable filter editors: 
+    	So far was only provided, and required, for non editable
+   		editors. Now, it can be setup (it is by default) on editable editors.</p>
+  			
+    	<p><span class='mark'>Warning feedback color</span>: 
+    	added special color to signal that the filters are hiding the table's 
+    	rows. This functionality is not available on the Java 5 version.</p>
+  			
+    	<p>Added method
+    	<a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setFilterOnUpdates(boolean)'>setFilterOnUpdates</a>
+    	 to trigger or not filter updates when the underlying table model changes. 
+    	 Not available on the Java5 version.</p>
+    	 
+    	<p>Possibility to define the height of a filter row (by delta over the
+    	default value), functionality implemented after 
+    	<a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=2'>requirement</a>.</p>
+  			
+    	<p>Solved bug where the model is added after attaching the filter header: see
+    	<a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=7'>issue</a>.</p>
+  			
+    	<p>Solved bug where autochoices on booleans or enums would be incomplete</p>
+
+    	<p>Solved bug on adaptive choices: updating the table would not correctly setup the choices of editors with filters</p>
+  			
+  	</h3>
+  
     <h3>Version 4.0.0 ( 16th February 2011 ) </h3>
        
     	<p>The version 4.x presents, mostly, the same GUI as on version 3.1. 

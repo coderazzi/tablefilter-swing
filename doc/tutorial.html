@@ -10,9 +10,11 @@
       <ul>
         <li><a href='#header'>Filter Header</a></li>
         <li><a href='#editor'>Filter Editor</a></li>
-        <li><a href='#custom'>Custom choices</a></li>
         <li><a href='#parser'>Filter expressions</a></li>
+        <li><a href='#parsermodel'>Parser Model</a></li>
         <li><a href='#types'>Custom types</a></li>
+        <li><a href='#custom'>Custom choices</a></li>
+        <li><a href='#also'>Additional functionality</a></li>
         <li><a href='#settings'>Settings</a></li>
         <li><a href='#examples'>Examples</a></li>
       </ul>
@@ -130,35 +132,6 @@
     <pre>filterHeader.setBackground(Color.lightGray);</pre> 
      
   
-	<h2><a name='custom'>Custom Choices</a></h2>
-	
-	<p>CustomChoices, represented by class 
-	<a href='api/net/coderazzi/filters/gui/CustomChoice.html'>CustomChoice</a>,
-	are choices whose functionality and appearance are fully defined by the
-	library's user.</p>
-	
-	<p>Custom choices are always listed at the beginning of the filter editor
-	choices. The next image shows 2 standard choices, plus 4 user-defined ones:</p>
-	
-	<p><img src="images/cchoice.png" class="centered"></p>
-			
-	<p>The two standard choices on this example are the empty filter and the
-	match empty filter, represented with the label <span class='mark'>=</span>
-	and an empty cell icon. The 4 choices below -below 20 to over 35- are
-	defined by the user, who must implement the filter logic. When the user
-	enters the text  <span class='mark'>over 35</span>, the text is not parsed
-	by the usual expression parser, but matched with the custom choice and its
-	filter applied.</p>
-	
-	<p>It is possible to define the overall look of the custom choices by
-	providing a specific 
-	<a href='api/net/coderazzi/filters/gui/CustomChoiceDecorator.html'>CustomChoiceDecorator</a>.
-	Such a decorator has no full freedom to render the custom choice, but it
-	can modify attributes such as colors or text, and specify how to decorate
-	the custom choice -usually displaying its associated icon-. The default
-	decorator displays the choice's text in italic, and its associated icon
-	centered, unless it overlaps with the text.</p>
-	
     <h2><a name='parser'>Filter expressions</a></h2>
      
     <p>
@@ -203,6 +176,8 @@
       </ul>		     
      <p>
      
+	<h2><a name='parsermodel'>Parser Model</a></h2>
+	
      <p>A parser is created by the registered 
      <a href='api/net/coderazzi/filters/gui/IParserModel.html'>IParserModel</a> 
      implementation -any filter header can define its own model-. This model
@@ -219,7 +194,16 @@
         this and the <a href='api/net/coderazzi/filters/gui/IParserModel.html#setComparator(java.lang.Class, java.util.Comparator)'>setComparator</a>
         method are normally required to use custom types.
         </li>
-     </ul> 
+     </ul>
+     
+     <p>Note that both methods are also available directly on the <a href='api/net/coderazzi/filters/gui/IFilterEditor.html'>IFilterEditor</a>
+     interface, so it is possible to modify each editor on its own.</p> 
+
+
+	<p>The parser model is responsible to create the 
+	<a href='api/net/coderazzi/filters/gui/IParser.html'>IParser</a> instance
+	associated to each filter editor; it is therefore possible to define different
+	IParser instances with alternative parsing expressions.</p>
 
 
      <h2><a name='types'>Custom types</a></h2>
@@ -254,7 +238,75 @@
      </p>
 
 
+	<h2><a name='custom'>Custom Choices</a></h2>
+	
+	<p>CustomChoices, represented by class 
+	<a href='api/net/coderazzi/filters/gui/CustomChoice.html'>CustomChoice</a>,
+	are choices whose functionality and appearance are fully defined by the
+	library's user.</p>
+	
+	<p>Custom choices are always listed at the beginning of the filter editor
+	choices. The next image shows 2 standard choices, plus 4 user-defined ones:</p>
+	
+	<p><img src="images/cchoice.png" class="centered"></p>
+			
+	<p>The two standard choices on this example are the empty filter and the
+	match empty filter, represented with the label <span class='mark'>=</span>
+	and an empty cell icon. The 4 choices below -below 20 to over 35- are
+	defined by the user, who must implement the filter logic. When the user
+	enters the text  <span class='mark'>over 35</span>, the text is not parsed
+	by the usual expression parser, but matched with the custom choice and its
+	filter applied.</p>
+	
+	<p>It is possible to define the overall look of the custom choices by
+	providing a specific 
+	<a href='api/net/coderazzi/filters/gui/CustomChoiceDecorator.html'>CustomChoiceDecorator</a>.
+	Such a decorator has no full freedom to render the custom choice, but it
+	can modify attributes such as colors or text, and specify how to decorate
+	the custom choice -usually displaying its associated icon-. The default
+	decorator displays the choice's text in italic, and its associated icon
+	centered, unless it overlaps with the text.</p>
+	
+     <h2><a name='also'>Additional functionality</a></h2>
+     
+     <p>Since version 4.0, the choices displayed on each editor's popup 
+     can be <span class='mark'>adaptives</span>, so that only relevant choices are 
+     displayed. This functionality can be setup at header's level, using the method
+     <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setAdaptiveChoices(boolean)'>TableFilterHeader.setAdaptiveChoices</a></p>
 
+     <p>Version 4.1 has introduced <span class='mark'>autocompletion</span> on all filter editors; on
+     previous releases, only non editable editors would have autocompletion,
+     limiting the input to one of the available choices. Autocompletion works
+     by providing the more complete text matching all the available choices.
+     It can be defined at header level, using the method
+     <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setAutoCompletion(boolean)'>TableFilterHeader.setAutoCompletion</a>,
+     or directly at <a href='api/net/coderazzi/filters/gui/IFilterEditor.html'>IFilterEditor</a> level.
+     </p> 
+     
+     <p>Also from version 4.1, the library supports <span class='mark'>instant filtering</span>:
+     the filter is applied as the user enters the text. The exact implementation
+     and behaviour of this functionality depends on the registered
+     <a href='api/net/coderazzi/filters/gui/IParser.html'>IParser</a> instance.
+     By default, instant filtering applies on expressions including no operators,
+     and it considers the input expression as the starting text of the final
+     expression. This functionality can be defined at header level, using the method
+     <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setInstantFiltering(boolean)'>TableFilterHeader.setInstantFiltering</a>,
+     or directly at <a href='api/net/coderazzi/filters/gui/IFilterEditor.html'>IFilterEditor</a> level.</p>
+     
+     <p>The library provides specific feedback to signal that the current
+     editor's contents hide all the table rows, by displaying the editors text
+     with a specific color (warning color). With instant filtering, this warning
+     is only set on the current editor, and implies that the filter is not applied
+     unless the user specifically presses the Enter key or moves the focus away.
+     This behaviour is helpful to avoid sudden vanishing of the table rows if the
+     user enters some wrong character during the edition.</p> 
+     
+     <p>Table changes are automatically handled by the library. In all cases
+     but updates, filtering is reapplied on changes; for updates, filtering
+     is also applied by default, although it can be disabled via
+     <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setFilterOnUpdates(boolean)'>TableFilterHeader.setFilterOnUpdates</a>
+     </p>
+     
      <h2><a name='settings'>Settings</a></h2>
      
      <p>
@@ -264,24 +316,53 @@
      </p>
      
      <ul>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#adaptiveChoices'>adaptiveChoices</a>,
+	     true by default, sets or unsets the adaptive choices functionality.</li>
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#autoChoices'>autoChoices</a>,
 	     false by default, defines whether the editors should automatically extract the options from
 	     the associated table models.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#autoCompletion'>autoCompletion</a>,
+	     true by default, defines the auto completion functionality on editable text editors 
+	     (non editable editors have auto completion always on).</li>
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#autoSelection'>autoSelection</a>,
 	     true by default, defines whether the filter will automatically select a row when that row is
 	     the only one remaining in the table after a filter operation.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#backgroundColor'>backgroundColor</a> color.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#customChoiceDecoratorClass'>customChoiceDecoratorClass</a> defines
+	     the class implementing the default custom choices decoration.</li>
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#dateFormat'>dateFormat</a>,
 	     used by the parser, as detailed <a href='#types'>above</a></li>
-	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#backgroundColor'>backgroundColor</a> color. There are
-	     settings for all the colors and fonts used in the filter header</li>
-	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#headerPosition '>headerPosition </a>,
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#disabledBackgroundColor'>disabledBackgroundColor</a> color.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#disabledColor'>disabledColor</a> color.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#errorColor'>errorColor</a> color.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#filterOnUpdates'>filterOnUpdates</a> defines
+	     whether the filters should be reapplied on table updates.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#filterRowHeightDelta'>filterRowHeightDelta</a> 
+	     is a setting to add / decrease height to the filter row.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#font'>font</a>.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#foregroundColor'>foregroundColor</a> color.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#gridColor'>gridColor</a> color.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#headerPosition'>headerPosition </a>,
 	     whether to locate the filter header just above or below the table's header, or wheter the
 	     placement will be done manually by the programmer.</li>
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#ignoreCase'>ignoreCase</a></li>
-	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#maxPopupHistory'>maxPopupHistory</a>,
-	     used by all the filter editors.</li>
-	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#maxVisiblePopupRows '>maxVisiblePopupRows </a>,
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#instantFiltering'>instantFiltering</a>, 
+	     whether to enable instant filtering, true by default.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#ignoreCase'>ignoreCase</a></li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#matchEmptyFilterIcon'>matchEmptyFilterIcon</a>,
+	     path to the resource with the icon for empty matches.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#matchEmptyFilterString'>matchEmptyFilterString</a>,
+	     the string defining the empty match custom choice.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#maxPopupHistory'>maxPopupHistory </a>,
+	     the maximum size of the history when no choices are present.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#maxVisiblePopupRows'>maxVisiblePopupRows </a>,
 	     used to limit the size of the popup menus in the filter editors.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#parserModelClass'>parserModelClass</a> defines
+	     the class implementing the default parser model.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#selectionBackgroundColor'>selectionBackgroundColor</a> color.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#selectionColor'>selectionColor</a> color.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#selectionForegroundColor'>selectionForegroundColor</a> color.</li>
+	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#warningColor'>warningColor</a> color.</li>
      </ul>
 
 
