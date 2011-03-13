@@ -25,11 +25,8 @@
 package net.coderazzi.filters.examples.utils;
 
 import java.awt.image.BufferedImage;
-
 import java.io.ByteArrayOutputStream;
-
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -167,14 +164,6 @@ public class TestData {
             }
 
             return redAmount;
-        }
-    }
-
-    public static class RedComparator implements Comparator<Flag> {
-        @Override public int compare(Flag o1, Flag o2) {
-            double d = o1.getRedAmount() - o2.getRedAmount();
-
-            return (d == 0) ? 0 : ((d < 0) ? -1 : 1);
         }
     }
 
