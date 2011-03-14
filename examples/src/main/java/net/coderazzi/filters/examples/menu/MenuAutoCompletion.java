@@ -28,31 +28,30 @@ package net.coderazzi.filters.examples.menu;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuAutoCompletion extends AbstractMenuCheckBoxAction {
-	
-	public static String NAME ="auto completion";
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private IFilterEditor editor;
-	
-	/**
-	 * @param editor can be null to act on the FilterHeader
-	 */
-	public MenuAutoCompletion(ActionHandler main, IFilterEditor editor) {
-		super(NAME, main);
-		this.editor = editor;
-		setSelected(editor==null? main.getFilterHeader().isAutoCompletion() : editor.isAutoCompletion());
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		if (editor==null){
-			main.getFilterHeader().setAutoCompletion(selected);
-			main.updateFiltersInfo();
-		} else {
-			editor.setAutoCompletion(selected);
-		}
-	}
+
+    public static String NAME = "auto completion";
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private IFilterEditor editor;
+
+    /** @param  editor  can be null to act on the FilterHeader */
+    public MenuAutoCompletion(ActionHandler main, IFilterEditor editor) {
+        super(NAME, main);
+        this.editor = editor;
+        setSelected((editor == null) ? main.getFilterHeader()
+                    .isAutoCompletion() : editor.isAutoCompletion());
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        if (editor == null) {
+            main.getFilterHeader().setAutoCompletion(selected);
+            main.updateFiltersInfo();
+        } else {
+            editor.setAutoCompletion(selected);
+        }
+    }
 
 }

@@ -157,7 +157,7 @@ class PositionHelper implements PropertyChangeListener {
                 Container gp = p.getParent();
                 if (gp instanceof JScrollPane) {
                     JScrollPane scrollPane = (JScrollPane) gp;
-                    JViewport viewport = scrollPane.getViewport();
+                    JViewport   viewport = scrollPane.getViewport();
                     if ((viewport != null) && (viewport.getView() == table)) {
                         setUp(scrollPane);
                         previousTableViewport = p;

@@ -28,23 +28,23 @@ package net.coderazzi.filters.examples.menu;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuEditable extends AbstractMenuCheckBoxAction {
-	
-	public static String NAME ="editable";
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private IFilterEditor editor;
-	
-	public MenuEditable(ActionHandler main, IFilterEditor editor) {
-		super(NAME, main);
-		this.editor = editor;
-		setSelected(editor.isEditable());
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		editor.setEditable(selected);
-	}
+
+    public static String NAME = "editable";
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private IFilterEditor editor;
+
+    public MenuEditable(ActionHandler main, IFilterEditor editor) {
+        super(NAME, main);
+        this.editor = editor;
+        setSelected(editor.isEditable());
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        editor.setEditable(selected);
+    }
 
 }

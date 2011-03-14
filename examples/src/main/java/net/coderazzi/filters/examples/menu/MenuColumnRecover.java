@@ -31,21 +31,21 @@ import javax.swing.table.TableColumn;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
-/**Recover a column, customizing the associated table columns*/
+
+/** Recover a column, customizing the associated table columns. */
 public class MenuColumnRecover extends AbstractMenuAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private TableColumn tc;
-	
-	public MenuColumnRecover(ActionHandler main, TableColumn tc) {
-		super("Recover column " + (String) tc.getHeaderValue(), main);
-		this.tc = tc;
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		main.getTable().getColumnModel().addColumn(tc);
-	}
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private TableColumn tc;
+
+    public MenuColumnRecover(ActionHandler main, TableColumn tc) {
+        super("Recover column " + (String) tc.getHeaderValue(), main);
+        this.tc = tc;
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        main.getTable().getColumnModel().addColumn(tc);
+    }
 
 }

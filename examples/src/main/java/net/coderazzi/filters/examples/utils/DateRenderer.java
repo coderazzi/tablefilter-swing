@@ -25,31 +25,36 @@
 package net.coderazzi.filters.examples.utils;
 
 import java.awt.Component;
+
 import java.text.Format;
+
 import java.util.Date;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 
-public class DateRenderer extends DefaultTableCellRenderer{
+public class DateRenderer extends DefaultTableCellRenderer {
 
-	private static final long serialVersionUID = 8042527267257156699L;
-	
-	private Format parser;
-	
-	public DateRenderer(Format parser){
-		this.parser=parser;
-	}
+    private static final long serialVersionUID = 8042527267257156699L;
 
-	@Override public Component getTableCellRendererComponent(
-			JTable table, Object value, boolean isSelected,
-			boolean hasFocus, int row, int column) {
-		if (value instanceof Date) {
-			value = parser.format(value);
-		}
+    private Format parser;
 
-		return super.getTableCellRendererComponent(table,
-				value, isSelected, hasFocus, row, column);
-	}
+    public DateRenderer(Format parser) {
+        this.parser = parser;
+    }
+
+    @Override public Component getTableCellRendererComponent(JTable  table,
+                                                             Object  value,
+                                                             boolean isSelected,
+                                                             boolean hasFocus,
+                                                             int     row,
+                                                             int     column) {
+        if (value instanceof Date) {
+            value = parser.format(value);
+        }
+
+        return super.getTableCellRendererComponent(table, value, isSelected,
+                hasFocus, row, column);
+    }
 }

@@ -27,6 +27,7 @@ package net.coderazzi.filters.examples.menu;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,49 +41,52 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuLookAndFeel extends JMenu implements ActionListener {
-	
-	private static final long serialVersionUID = -6772023653226757860L;
-	
-	private ActionHandler main;
-	private Map<String, String> lookMap = new HashMap<String, String>();
 
-	public MenuLookAndFeel(ActionHandler main) {
-		super("Look And Feel");
-		this.main = main;
+    private static final long serialVersionUID = -6772023653226757860L;
 
-		LookAndFeel now = UIManager.getLookAndFeel();
-		ButtonGroup group = new ButtonGroup();
+    private ActionHandler       main;
+    private Map<String, String> lookMap = new HashMap<String, String>();
 
-		for (LookAndFeelInfo lfi : UIManager.getInstalledLookAndFeels()) {
-			lookMap.put(lfi.getName(), lfi.getClassName());
-			JRadioButtonMenuItem item = new JRadioButtonMenuItem(lfi.getName());
-			item.addActionListener(this);
-			group.add(item);
-			this.add(item);
-			if (lfi.getName().equals(now.getName())) {
-				item.setSelected(true);
-			}
-		}
+    public MenuLookAndFeel(ActionHandler main) {
+        super("Look And Feel");
+        this.main = main;
 
-		if (group.getButtonCount() < 2) {
-			this.setEnabled(false);
-		}
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		String className = lookMap.get(((JRadioButtonMenuItem)e.getSource()).getText());
-		if (className!=null){
-			try {
-				UIManager.setLookAndFeel(className);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				System.exit(0);
-			}
-		}
-		SwingUtilities.updateComponentTreeUI(main.getJFrame());
-		main.getJFrame().pack();
-	}
-	
+        LookAndFeel now = UIManager.getLookAndFeel();
+        ButtonGroup group = new ButtonGroup();
+
+        for (LookAndFeelInfo lfi : UIManager.getInstalledLookAndFeels()) {
+            lookMap.put(lfi.getName(), lfi.getClassName());
+
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(lfi.getName());
+            item.addActionListener(this);
+            group.add(item);
+            this.add(item);
+            if (lfi.getName().equals(now.getName())) {
+                item.setSelected(true);
+            }
+        }
+
+        if (group.getButtonCount() < 2) {
+            this.setEnabled(false);
+        }
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        String className = lookMap.get(((JRadioButtonMenuItem) e.getSource())
+                    .getText());
+        if (className != null) {
+            try {
+                UIManager.setLookAndFeel(className);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                System.exit(0);
+            }
+        }
+
+        SwingUtilities.updateComponentTreeUI(main.getJFrame());
+        main.getJFrame().pack();
+    }
+
 }

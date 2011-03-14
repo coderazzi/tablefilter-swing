@@ -69,8 +69,8 @@ public class FlagRenderer extends JLabel implements ChoiceRenderer,
                                                     Object        value,
                                                     boolean       isSelected) {
         Component ret = setup(value);
-        editor.getLook().setupComponent(ret, isSelected,
-            editor.getFilter().isEnabled());
+        editor.getLook()
+            .setupComponent(ret, isSelected, editor.getFilter().isEnabled());
 
         return ret;
     }

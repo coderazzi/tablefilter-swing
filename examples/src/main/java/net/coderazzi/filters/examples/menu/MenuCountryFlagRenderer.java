@@ -29,24 +29,24 @@ import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.examples.utils.FlagRenderer;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuCountryFlagRenderer extends AbstractMenuCheckBoxAction {
-	
-	public static String NAME ="use table renderer";
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private IFilterEditor editor;
-	
-	public MenuCountryFlagRenderer(ActionHandler main, IFilterEditor editor) {
-		super(NAME, main);
-		this.editor = editor;
-		setSelected(true);
-		actionPerformed(true);
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		editor.setRenderer(selected? new FlagRenderer() : null);
-	}
+
+    public static String NAME = "use table renderer";
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private IFilterEditor editor;
+
+    public MenuCountryFlagRenderer(ActionHandler main, IFilterEditor editor) {
+        super(NAME, main);
+        this.editor = editor;
+        setSelected(true);
+        actionPerformed(true);
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        editor.setRenderer(selected ? new FlagRenderer() : null);
+    }
 
 }

@@ -30,23 +30,23 @@ import java.awt.event.ActionEvent;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.examples.utils.EventsWindow;
 
+
 public class MenuEventsWindow extends AbstractMenuAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private EventsWindow window;
-	
-	public MenuEventsWindow(ActionHandler main) {
-		super("events window", main);
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if ((window == null) || !window.isVisible()) {
-			window = new EventsWindow(main.getJFrame(), main.getFilterHeader());
-			window.setVisible(true);
-		} else {
-			window.requestFocus();
-		}
-	}
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private EventsWindow window;
+
+    public MenuEventsWindow(ActionHandler main) {
+        super("events window", main);
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        if ((window == null) || !window.isVisible()) {
+            window = new EventsWindow(main.getJFrame(), main.getFilterHeader());
+            window.setVisible(true);
+        } else {
+            window.requestFocus();
+        }
+    }
 }

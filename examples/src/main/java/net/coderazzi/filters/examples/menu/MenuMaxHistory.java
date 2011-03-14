@@ -35,46 +35,48 @@ import javax.swing.JRadioButtonMenuItem;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuMaxHistory extends JMenu implements ActionListener {
-	
-	public static String NAME ="max history length";
-	
-	private static final long serialVersionUID = -6772023653226757860L;
-	
-	private ActionHandler main;
-	private IFilterEditor editor;
 
-	/**
-	 * @param editor set to null if the menu applies to the filter header
-	 */
-	public MenuMaxHistory(ActionHandler main, IFilterEditor editor) {
-		super(NAME);
-		this.main = main;
-		this.editor = editor;
-		int current = (editor == null) ? main.getFilterHeader().getMaxHistory() : 
-			editor.getMaxHistory();
+    public static String NAME = "max history length";
 
-		ButtonGroup group = new ButtonGroup();
-		for (int i =0; i<10; i++) {
-			JRadioButtonMenuItem item = new JRadioButtonMenuItem(String.valueOf(i));
-			item.addActionListener(this);
-			group.add(item);
-			if (current==i) {
-				item.setSelected(true);
-			}
-			this.add(item);
-		}
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		int value = Integer.valueOf(((JRadioButtonMenuItem)e.getSource()).getText());
-		if (editor==null){
-			main.getFilterHeader().setMaxHistory(value);
-			main.updateFiltersInfo();
-		} else {
-			editor.setMaxHistory(value);
-		}
-	}
-	
+    private static final long serialVersionUID = -6772023653226757860L;
+
+    private ActionHandler main;
+    private IFilterEditor editor;
+
+    /** @param  editor  set to null if the menu applies to the filter header */
+    public MenuMaxHistory(ActionHandler main, IFilterEditor editor) {
+        super(NAME);
+        this.main = main;
+        this.editor = editor;
+
+        int current = (editor == null) ? main.getFilterHeader().getMaxHistory()
+                                       : editor.getMaxHistory();
+
+        ButtonGroup group = new ButtonGroup();
+        for (int i = 0; i < 10; i++) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(String.valueOf(
+                        i));
+            item.addActionListener(this);
+            group.add(item);
+            if (current == i) {
+                item.setSelected(true);
+            }
+
+            this.add(item);
+        }
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        int value = Integer.valueOf(((JRadioButtonMenuItem) e.getSource())
+                    .getText());
+        if (editor == null) {
+            main.getFilterHeader().setMaxHistory(value);
+            main.updateFiltersInfo();
+        } else {
+            editor.setMaxHistory(value);
+        }
+    }
+
 }

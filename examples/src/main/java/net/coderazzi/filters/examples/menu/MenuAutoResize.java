@@ -29,19 +29,22 @@ import javax.swing.JTable;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuAutoResize extends AbstractMenuCheckBoxAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	public MenuAutoResize(ActionHandler main) {
-		super("Auto resize", main);
-		setSelected(main.getTable().getAutoResizeMode() != JTable.AUTO_RESIZE_OFF);
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		main.getTable().setAutoResizeMode(selected ? JTable.AUTO_RESIZE_ALL_COLUMNS : JTable.AUTO_RESIZE_OFF);
-		main.getTable().doLayout();
-	}
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    public MenuAutoResize(ActionHandler main) {
+        super("Auto resize", main);
+        setSelected(main.getTable().getAutoResizeMode()
+                != JTable.AUTO_RESIZE_OFF);
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        main.getTable()
+            .setAutoResizeMode(selected ? JTable.AUTO_RESIZE_ALL_COLUMNS
+                                        : JTable.AUTO_RESIZE_OFF);
+        main.getTable().doLayout();
+    }
 
 }

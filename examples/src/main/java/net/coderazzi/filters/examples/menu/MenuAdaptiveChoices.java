@@ -27,21 +27,21 @@ package net.coderazzi.filters.examples.menu;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuAdaptiveChoices extends AbstractMenuCheckBoxAction {
-	
-	public static String NAME ="adaptive choices";
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	public MenuAdaptiveChoices(ActionHandler main) {
-		super(NAME, main);
-		setSelected(main.getFilterHeader().isAdaptiveChoices());
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		main.getFilterHeader().setAdaptiveChoices(selected);
-		main.updateFiltersInfo();
-	}
+
+    public static String NAME = "adaptive choices";
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    public MenuAdaptiveChoices(ActionHandler main) {
+        super(NAME, main);
+        setSelected(main.getFilterHeader().isAdaptiveChoices());
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        main.getFilterHeader().setAdaptiveChoices(selected);
+        main.updateFiltersInfo();
+    }
 
 }

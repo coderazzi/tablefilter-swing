@@ -28,31 +28,31 @@ package net.coderazzi.filters.examples.menu;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuIgnoreCase extends AbstractMenuCheckBoxAction {
-	
-	public static String NAME ="ignore case";
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private IFilterEditor editor;
-	
-	/**
-	 * @param editor can be null to act on the FilterHeader
-	 */
-	public MenuIgnoreCase(ActionHandler main, IFilterEditor editor) {
-		super(NAME, main);
-		this.editor = editor;
-		setSelected( editor==null? main.getFilterHeader().getParserModel().isIgnoreCase() : editor.isIgnoreCase());
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		if (editor==null){
-			main.getFilterHeader().getParserModel().setIgnoreCase(selected);
-			main.updateFiltersInfo();			
-		} else {
-			editor.setIgnoreCase(selected);
-		}
-	}
+
+    public static String NAME = "ignore case";
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private IFilterEditor editor;
+
+    /** @param  editor  can be null to act on the FilterHeader */
+    public MenuIgnoreCase(ActionHandler main, IFilterEditor editor) {
+        super(NAME, main);
+        this.editor = editor;
+        setSelected((editor == null)
+                ? main.getFilterHeader().getParserModel().isIgnoreCase()
+                : editor.isIgnoreCase());
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        if (editor == null) {
+            main.getFilterHeader().getParserModel().setIgnoreCase(selected);
+            main.updateFiltersInfo();
+        } else {
+            editor.setIgnoreCase(selected);
+        }
+    }
 
 }

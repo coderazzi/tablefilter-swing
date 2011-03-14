@@ -31,16 +31,17 @@ import javax.swing.JMenuItem;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
-abstract class AbstractMenuAction extends JMenuItem implements ActionListener{
-	
-	private static final long serialVersionUID = 7907436305283586667L;
-	
-	protected ActionHandler main;
 
-	public AbstractMenuAction(String title, ActionHandler listener) {
-		super(title);
-		this.main = listener;
-		addActionListener(this);
-	}
-	
+abstract class AbstractMenuAction extends JMenuItem implements ActionListener {
+
+    private static final long serialVersionUID = 7907436305283586667L;
+
+    protected ActionHandler main;
+
+    public AbstractMenuAction(String title, ActionHandler listener) {
+        super(title);
+        this.main = listener;
+        addActionListener(this);
+    }
+
 }

@@ -30,22 +30,23 @@ import java.awt.event.ActionEvent;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.examples.utils.TestData;
 
-/** Adds a new element (male / female) to the table model */
+
+/** Adds a new element (male / female) to the table model. */
 public class MenuModelAdd extends AbstractMenuAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private boolean male;
-	
-	public MenuModelAdd(ActionHandler main, boolean male) {
-		super("Create "+(male? "" : "fe")+"male row [first position]", main);
-		this.male=male;		
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		TestData td = new TestData();
-		td.male = male;
-		main.getTableModel().addTestData(td);
-	}
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private boolean male;
+
+    public MenuModelAdd(ActionHandler main, boolean male) {
+        super("Create " + (male ? "" : "fe") + "male row [first position]",
+            main);
+        this.male = male;
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        TestData td = new TestData();
+        td.male = male;
+        main.getTableModel().addTestData(td);
+    }
 }

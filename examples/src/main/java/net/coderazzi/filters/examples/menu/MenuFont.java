@@ -34,34 +34,41 @@ import javax.swing.JRadioButtonMenuItem;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuFont extends JMenu implements ActionListener {
-	
-	private static final long serialVersionUID = -6772023653226757860L;
-	private static final int RELATIVE_FONT_SIZES[] = { -2, -1, 0, 1, 2, 4, 8, 16 };
-	
-	private ActionHandler main;
 
-	public MenuFont(ActionHandler listener) {
-		super("font size");
-		this.main = listener;
-		int size = main.getFilterHeader().getFont().getSize();
+    private static final long serialVersionUID = -6772023653226757860L;
+    private static final int  RELATIVE_FONT_SIZES[] = {
+            -2, -1, 0, 1, 2, 4, 8, 16
+        };
 
-		ButtonGroup group = new ButtonGroup();
-		for (int i : RELATIVE_FONT_SIZES) {
-			JRadioButtonMenuItem item = new JRadioButtonMenuItem(String.valueOf(size+ i));
-			item.addActionListener(this);
-			this.add(item);
-			group.add(item);
-			if (i == 0) {
-				item.setSelected(true);
-			}
-		}
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		int size = Integer.valueOf(((JRadioButtonMenuItem)e.getSource()).getText());
-		main.getFilterHeader().setFont(main.getFilterHeader().getFont().deriveFont((float) (size)));
-	}
-	
+    private ActionHandler main;
+
+    public MenuFont(ActionHandler listener) {
+        super("font size");
+        this.main = listener;
+
+        int size = main.getFilterHeader().getFont().getSize();
+
+        ButtonGroup group = new ButtonGroup();
+        for (int i : RELATIVE_FONT_SIZES) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(String.valueOf(
+                        size + i));
+            item.addActionListener(this);
+            this.add(item);
+            group.add(item);
+            if (i == 0) {
+                item.setSelected(true);
+            }
+        }
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        int size = Integer.valueOf(((JRadioButtonMenuItem) e.getSource())
+                    .getText());
+        main.getFilterHeader()
+            .setFont(main.getFilterHeader().getFont().deriveFont(
+                    (float) (size)));
+    }
+
 }

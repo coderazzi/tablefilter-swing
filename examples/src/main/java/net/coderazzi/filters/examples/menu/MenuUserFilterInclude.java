@@ -28,24 +28,24 @@ package net.coderazzi.filters.examples.menu;
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuUserFilterInclude extends AbstractMenuCheckBoxAction {
 
-	private static final long serialVersionUID = 9137226745345048519L;
-	private IFilter userFilter;
+    private static final long serialVersionUID = 9137226745345048519L;
+    private IFilter           userFilter;
 
-	public MenuUserFilterInclude(ActionHandler main, IFilter userFilter) {
-		super("include in header", main);
-		this.userFilter = userFilter;
-		setSelected(false);
-	}
+    public MenuUserFilterInclude(ActionHandler main, IFilter userFilter) {
+        super("include in header", main);
+        this.userFilter = userFilter;
+        setSelected(false);
+    }
 
-	@Override
-	protected void actionPerformed(boolean selected) {
-		if (selected) {
-			main.getFilterHeader().addFilter(userFilter);
-		} else {
-			main.getFilterHeader().removeFilter(userFilter);
-		}
-	}
+    @Override protected void actionPerformed(boolean selected) {
+        if (selected) {
+            main.getFilterHeader().addFilter(userFilter);
+        } else {
+            main.getFilterHeader().removeFilter(userFilter);
+        }
+    }
 
 }

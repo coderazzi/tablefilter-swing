@@ -154,7 +154,7 @@ abstract public class DateComparator implements Comparator<Date> {
 
         @Override long time() {
             return (calendar.get(Calendar.YEAR) * 12)
-                + calendar.get(Calendar.MONTH);
+                    + calendar.get(Calendar.MONTH);
         }
     }
 
@@ -166,7 +166,7 @@ abstract public class DateComparator implements Comparator<Date> {
 
         @Override long time() {
             return (calendar.get(Calendar.YEAR) * 400)
-                + calendar.get(Calendar.DAY_OF_YEAR);
+                    + calendar.get(Calendar.DAY_OF_YEAR);
         }
     }
 }

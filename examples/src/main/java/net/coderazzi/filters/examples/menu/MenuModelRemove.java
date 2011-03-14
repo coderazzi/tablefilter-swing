@@ -26,6 +26,7 @@
 package net.coderazzi.filters.examples.menu;
 
 import java.awt.event.ActionEvent;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -35,41 +36,40 @@ import javax.swing.table.TableModel;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
-/** Removes the elements from the model (top row)*/
-public class MenuModelRemove extends AbstractMenuAction  implements PropertyChangeListener, TableModelListener {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	private TableModel registeredModel;
-	
-	public MenuModelRemove(ActionHandler main) {
-		super("Remove top row", main);
-		main.getTable().addPropertyChangeListener("model", this);
-		registerModel();
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		main.getTableModel().removeTestData();
-	}
 
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-		registeredModel.removeTableModelListener(this);
-		registerModel();
-	}
-	
-	@Override
-	public void tableChanged(TableModelEvent e) {
-		if (registeredModel.getRowCount()==0){
-			setEnabled(false);
-		} else if (!isEnabled()){
-			setEnabled(true);
-		}
-	}
-	
-	private void registerModel(){
-		registeredModel = main.getTable().getModel();
-		registeredModel.addTableModelListener(this);		
-	}
+/** Removes the elements from the model (top row). */
+public class MenuModelRemove extends AbstractMenuAction
+    implements PropertyChangeListener, TableModelListener {
+
+    private static final long serialVersionUID = 9137226745345048519L;
+    private TableModel        registeredModel;
+
+    public MenuModelRemove(ActionHandler main) {
+        super("Remove top row", main);
+        main.getTable().addPropertyChangeListener("model", this);
+        registerModel();
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        main.getTableModel().removeTestData();
+    }
+
+    @Override public void propertyChange(PropertyChangeEvent evt) {
+        registeredModel.removeTableModelListener(this);
+        registerModel();
+    }
+
+    @Override public void tableChanged(TableModelEvent e) {
+        if (registeredModel.getRowCount() == 0) {
+            setEnabled(false);
+        } else if (!isEnabled()) {
+            setEnabled(true);
+        }
+    }
+
+    private void registerModel() {
+        registeredModel = main.getTable().getModel();
+        registeredModel.addTableModelListener(this);
+    }
 
 }

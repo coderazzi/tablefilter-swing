@@ -27,22 +27,22 @@ package net.coderazzi.filters.examples.menu;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuHeaderOnUse extends AbstractMenuCheckBoxAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	public MenuHeaderOnUse(ActionHandler main) {
-		super("on use", main);
-		setSelected(true);
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		if (selected) {
-			main.getFilterHeader().setTable(main.getTable());
-		} else {
-			main.getFilterHeader().setTable(null);
-		}
-	}
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    public MenuHeaderOnUse(ActionHandler main) {
+        super("on use", main);
+        setSelected(true);
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        if (selected) {
+            main.getFilterHeader().setTable(main.getTable());
+        } else {
+            main.getFilterHeader().setTable(null);
+        }
+    }
 
 }

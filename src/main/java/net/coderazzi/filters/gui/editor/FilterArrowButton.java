@@ -38,13 +38,13 @@ import net.coderazzi.filters.gui.Look;
 /** Custom implementation of the arrow used to display the popup menu. */
 final class FilterArrowButton extends JButton {
     private static final long serialVersionUID = -777416843479142582L;
-    private final static int MIN_X = 6;
-    private final static int MIN_Y = 6;
-    private final static int FILL_X[] = { 0, 3, 6 };
-    private final static int FILL_Y[] = { 0, 5, 0 };
+    private final static int  MIN_X = 6;
+    private final static int  MIN_Y = 6;
+    private final static int  FILL_X[] = { 0, 3, 6 };
+    private final static int  FILL_Y[] = { 0, 5, 0 };
 
     private boolean focus;
-    private Look look;
+    private Look    look;
 
     public void setLook(Look look) {
         this.look = look;

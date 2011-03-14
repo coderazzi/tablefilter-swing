@@ -27,18 +27,18 @@ package net.coderazzi.filters.examples.menu;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuFilterOnUpdates extends AbstractMenuCheckBoxAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	public MenuFilterOnUpdates(ActionHandler main) {
-		super("filter on updates", main);
-		setSelected(main.getFilterHeader().isFilterOnUpdates());
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		main.getFilterHeader().setFilterOnUpdates(selected);
-	}
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    public MenuFilterOnUpdates(ActionHandler main) {
+        super("filter on updates", main);
+        setSelected(main.getFilterHeader().isFilterOnUpdates());
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        main.getFilterHeader().setFilterOnUpdates(selected);
+    }
 
 }

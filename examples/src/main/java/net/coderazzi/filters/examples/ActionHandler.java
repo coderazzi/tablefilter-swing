@@ -33,19 +33,22 @@ import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.TableFilterHeader;
 
-/** Public interface of the {@link TableFilterExample} */
-public interface ActionHandler {
 
-	TableFilterHeader getFilterHeader();
-	TestTableModel getTableModel();
-	JMenu getFilterMenu();
-	JTable getTable();
-	JFrame getJFrame();
-	void setTableModel(TestTableModel model);
-	/** Update the enabled flag associated to the filter header */
-	void updateEnabledFlag();
-	/** Updates the filter information associated to all editors */
-	void updateFiltersInfo();
-	/** Updates the filter information associated to the given editor */
-	void updateFilterInfo(IFilterEditor editor, String columnName);
+/** Public interface of the {@link TableFilterExample}. */
+public interface ActionHandler {
+    TableFilterHeader getFilterHeader();
+    TestTableModel getTableModel();
+    JMenu getFilterMenu();
+    JTable getTable();
+    JFrame getJFrame();
+    void setTableModel(TestTableModel model);
+
+    /** Update the enabled flag associated to the filter header. */
+    void updateEnabledFlag();
+
+    /** Updates the filter information associated to all editors. */
+    void updateFiltersInfo();
+
+    /** Updates the filter information associated to the given editor. */
+    void updateFilterInfo(IFilterEditor editor, String columnName);
 }

@@ -33,7 +33,9 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.text.Format;
+
 import java.util.Collection;
 import java.util.Comparator;
 
@@ -60,17 +62,17 @@ import net.coderazzi.filters.gui.Look;
  */
 abstract class PopupComponent implements PopupMenuListener {
 
-    private JPopupMenu popup;
+    private JPopupMenu             popup;
     private FilterListCellRenderer listRenderer;
-    private JScrollPane choicesScrollPane;
-    private JScrollPane historyScrollPane;
-    private JSeparator separator;
+    private JScrollPane            choicesScrollPane;
+    private JScrollPane            historyScrollPane;
+    private JSeparator             separator;
 
     private ChoicesListModel choicesModel;
     private HistoryListModel historyModel;
 
     /**
-     * cancelReason contains the source of the event that cancelled last time 
+     * cancelReason contains the source of the event that cancelled last time
      * the popup menu.
      */
     private Object cancelReason;
@@ -222,23 +224,24 @@ abstract class PopupComponent implements PopupMenuListener {
      * It always favour content belonging to the choices list, rather than to
      * the history list.
      *
-     * @param  hint          an object used to select the match. If the content
-     *                       is text-based (there is no Renderer defined), the
-     *                       hint is considered the start of the string, and the
-     *                       best match should start with the given hint). If
-     *                       the content is not text-based, only exact matches
-     *                       are returned, no matter the value of the parameter
-     *                       perfectMatch
-     * @param  perfectMatch  when the content is text-based, if no
-     *                       choice/history starts with the given hint string,
-     *                       smaller hint substrings are used, unless
-     *                       perfectMatch is true
-     *                       
-     * @return null if not match found, or a valid Match otherwise, with non
-     *         null content
+     * @param   hint          an object used to select the match. If the content
+     *                        is text-based (there is no Renderer defined), the
+     *                        hint is considered the start of the string, and
+     *                        the best match should start with the given hint).
+     *                        If the content is not text-based, only exact
+     *                        matches are returned, no matter the value of the
+     *                        parameter perfectMatch
+     * @param   perfectMatch  when the content is text-based, if no
+     *                        choice/history starts with the given hint string,
+     *                        smaller hint substrings are used, unless
+     *                        perfectMatch is true
+     *
+     * @return  null if not match found, or a valid Match otherwise, with non
+     *          null content
      */
     public ChoiceMatch selectBestMatch(Object hint, boolean perfectMatch) {
-    	ChoiceMatch historyMatch = historyModel.getClosestMatch(hint, perfectMatch);
+        ChoiceMatch historyMatch = historyModel.getClosestMatch(hint,
+                perfectMatch);
         if (choicesModel.getSize() > 0) {
             ChoiceMatch match = choicesModel.getClosestMatch(hint,
                     perfectMatch || historyMatch.exact);
@@ -266,17 +269,17 @@ abstract class PopupComponent implements PopupMenuListener {
                 select(historyMatch.index);
             }
         }
-        
+
         return historyMatch;
     }
-    
-    /** 
+
+    /**
      * Returns the text that could complete the given string<br>
      * The completion string is the larger string that matches all existing
      * options starting with the given string.
      */
-    public String getCompletion(String s){
-    	return choicesModel.getCompletion(s, historyModel.getList());
+    public String getCompletion(String s) {
+        return choicesModel.getCompletion(s, historyModel.getList());
     }
 
     /**
@@ -596,7 +599,7 @@ abstract class PopupComponent implements PopupMenuListener {
             historyScrollPane.setPreferredSize(null);
         }
 
-        if (showChoices) { //in fact, there are always choices
+        if (showChoices) { // in fact, there are always choices
             choicesList.setVisibleRowCount(maxChoices);
             choicesScrollPane.setPreferredSize(null);
         }

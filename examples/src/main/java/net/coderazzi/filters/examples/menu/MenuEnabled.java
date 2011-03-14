@@ -28,32 +28,31 @@ package net.coderazzi.filters.examples.menu;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuEnabled extends AbstractMenuCheckBoxAction {
-	
-	public static String NAME ="enabled";
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private IFilterEditor editor;
-	
-	/**
-	 * @param editor can be null to act on the FilterHeader
-	 */
-	public MenuEnabled(ActionHandler main, IFilterEditor editor) {
-		super(NAME, main);
-		this.editor = editor;
-		setSelected( editor==null? main.getFilterHeader().isEnabled() : editor.getFilter().isEnabled());
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		if (editor==null){
-			main.getFilterHeader().setEnabled(selected);
-			main.updateFiltersInfo();			
-		} else {
-			editor.getFilter().setEnabled(selected);
-			main.updateEnabledFlag();
-		}
-	}
+
+    public static String NAME = "enabled";
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private IFilterEditor editor;
+
+    /** @param  editor  can be null to act on the FilterHeader */
+    public MenuEnabled(ActionHandler main, IFilterEditor editor) {
+        super(NAME, main);
+        this.editor = editor;
+        setSelected((editor == null) ? main.getFilterHeader().isEnabled()
+                                     : editor.getFilter().isEnabled());
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        if (editor == null) {
+            main.getFilterHeader().setEnabled(selected);
+            main.updateFiltersInfo();
+        } else {
+            editor.getFilter().setEnabled(selected);
+            main.updateEnabledFlag();
+        }
+    }
 
 }

@@ -32,24 +32,24 @@ import javax.swing.table.TableColumnModel;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuColumnRemove extends AbstractMenuAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private String columnName;
-	
-	public MenuColumnRemove(ActionHandler main, String columnName) {
-		super("Remove this column", main);
-		this.columnName=columnName;
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		TableColumnModel model = main.getTable().getColumnModel();
-		TableColumn tc = model.getColumn(model.getColumnIndex(columnName));
-		model.removeColumn(tc);
-		//remove the column, but add a menu item to recover it
-		main.getFilterMenu().add(new MenuColumnRecover(main, tc));
-	}
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private String columnName;
+
+    public MenuColumnRemove(ActionHandler main, String columnName) {
+        super("Remove this column", main);
+        this.columnName = columnName;
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        TableColumnModel model = main.getTable().getColumnModel();
+        TableColumn      tc = model.getColumn(model.getColumnIndex(columnName));
+        model.removeColumn(tc);
+        // remove the column, but add a menu item to recover it
+        main.getFilterMenu().add(new MenuColumnRecover(main, tc));
+    }
 
 }

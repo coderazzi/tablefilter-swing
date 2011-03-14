@@ -29,42 +29,40 @@ import java.util.Comparator;
 
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.examples.utils.TestData;
-import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.examples.utils.TestData.Flag;
+import net.coderazzi.filters.examples.utils.TestTableModel;
+
 
 public class MenuCountrySpecialSorter extends AbstractMenuCheckBoxAction {
 
-	private static final long serialVersionUID = 9137226745345048519L;
+    private static final long serialVersionUID = 9137226745345048519L;
 
-	public MenuCountrySpecialSorter(ActionHandler main) {
-		super("country column sorted by red proportion", main);
-		setSelected(false);
-	}
+    public MenuCountrySpecialSorter(ActionHandler main) {
+        super("country column sorted by red proportion", main);
+        setSelected(false);
+    }
 
-	@Override
-	protected void actionPerformed(boolean set) {
-		int column = main.getTableModel().getColumn(TestTableModel.COUNTRY);
-		if (main.getTable().convertColumnIndexToView(column) != -1) {
-			Comparator<TestData.Flag> comp = set ? new RedComparator()
-					: new DefaultComparator();
-			main.getFilterHeader().getFilterEditor(column).setComparator(comp);
-		}
-	}
+    @Override protected void actionPerformed(boolean set) {
+        int column = main.getTableModel().getColumn(TestTableModel.COUNTRY);
+        if (main.getTable().convertColumnIndexToView(column) != -1) {
+            Comparator<TestData.Flag> comp = set ? new RedComparator()
+                                                 : new DefaultComparator();
+            main.getFilterHeader().getFilterEditor(column).setComparator(comp);
+        }
+    }
 
-	public static class RedComparator implements Comparator<Flag> {
-		@Override
-		public int compare(Flag o1, Flag o2) {
-			double d = o1.getRedAmount() - o2.getRedAmount();
+    public static class RedComparator implements Comparator<Flag> {
+        @Override public int compare(Flag o1, Flag o2) {
+            double d = o1.getRedAmount() - o2.getRedAmount();
 
-			return (d == 0) ? 0 : ((d < 0) ? -1 : 1);
-		}
-	}
+            return (d == 0) ? 0 : ((d < 0) ? -1 : 1);
+        }
+    }
 
-	public static class DefaultComparator implements Comparator<Flag> {
-		@Override
-		public int compare(Flag o1, Flag o2) {
-			return o1.toString().compareTo(o2.toString());
-		}
-	}
+    public static class DefaultComparator implements Comparator<Flag> {
+        @Override public int compare(Flag o1, Flag o2) {
+            return o1.toString().compareTo(o2.toString());
+        }
+    }
 
 }

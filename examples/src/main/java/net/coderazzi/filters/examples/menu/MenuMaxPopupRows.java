@@ -34,34 +34,37 @@ import javax.swing.JRadioButtonMenuItem;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuMaxPopupRows extends JMenu implements ActionListener {
-	
-	private static final long serialVersionUID = -6772023653226757860L;
-	
-	private ActionHandler main;
 
-	public MenuMaxPopupRows(ActionHandler main) {
-		super("max visible rows on popup");
-		this.main = main;
-		int select = main.getFilterHeader().getMaxVisibleRows();
+    private static final long serialVersionUID = -6772023653226757860L;
 
-		ButtonGroup group = new ButtonGroup();
-		for (int i = 4; i < 16; i++) {
-			JRadioButtonMenuItem item = new JRadioButtonMenuItem(String.valueOf(i));
-			item.addActionListener(this);
-			this.add(item);
-			group.add(item);
-			if (i == select) {
-				item.setSelected(true);
-			}
-		}
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		int size = Integer.valueOf(((JRadioButtonMenuItem)e.getSource()).getText());
-		main.getFilterHeader().setMaxVisibleRows(size);
-		main.updateFiltersInfo();
-	}
-	
+    private ActionHandler main;
+
+    public MenuMaxPopupRows(ActionHandler main) {
+        super("max visible rows on popup");
+        this.main = main;
+
+        int select = main.getFilterHeader().getMaxVisibleRows();
+
+        ButtonGroup group = new ButtonGroup();
+        for (int i = 4; i < 16; i++) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(String.valueOf(
+                        i));
+            item.addActionListener(this);
+            this.add(item);
+            group.add(item);
+            if (i == select) {
+                item.setSelected(true);
+            }
+        }
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        int size = Integer.valueOf(((JRadioButtonMenuItem) e.getSource())
+                    .getText());
+        main.getFilterHeader().setMaxVisibleRows(size);
+        main.updateFiltersInfo();
+    }
+
 }

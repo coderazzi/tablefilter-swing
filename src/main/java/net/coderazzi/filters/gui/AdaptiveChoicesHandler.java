@@ -26,6 +26,7 @@
 package net.coderazzi.filters.gui;
 
 import java.text.Format;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +53,7 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
 class AdaptiveChoicesHandler extends ChoicesHandler {
 
     private AdaptiveChoicesSupport adaptiveSupport;
-    private boolean interrupted = true;
+    private boolean                interrupted = true;
 
     public AdaptiveChoicesHandler(FiltersHandler handler) {
         super(handler);
@@ -89,9 +90,10 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
         }
     }
 
-    @Override public boolean filterUpdated(IFilter filter, boolean retInfoRequired) {
-    	//nothing to do with retInfoRequired, always return the value
-    	return adaptiveSupport==null || adaptiveSupport.update(filter);
+    @Override public boolean filterUpdated(IFilter filter,
+                                           boolean retInfoRequired) {
+        // nothing to do with retInfoRequired, always return the value
+        return (adaptiveSupport == null) || adaptiveSupport.update(filter);
     }
 
     @Override public void filterOperation(boolean start) {
@@ -119,7 +121,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             handler.updateTableFilter();
         }
     }
-    
+
     @Override public void consolidateFilterChanges(int modelIndex) {
         if (adaptiveSupport != null) {
             adaptiveSupport.propagateChanges(modelIndex);
@@ -127,19 +129,21 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
     }
 
     @Override public void tableUpdated(TableModel model,
-                                         int        eventType,
-                                         int        firstRow,
-                                         int        lastRow,
-                                         int        column) {
-    	if (adaptiveSupport!=null){ 
-    		adaptiveSupport.tableChanged(eventType, firstRow, lastRow, column);
-    	}
+                                       int        eventType,
+                                       int        firstRow,
+                                       int        lastRow,
+                                       int        column) {
+        if (adaptiveSupport != null) {
+            adaptiveSupport.tableChanged(eventType, firstRow, lastRow, column);
+        }
     }
 
     /** Creates the associated {@link AdaptiveChoicesSupport} instance. */
     private void createAdaptiveChoicesSupport() {
         Collection<FilterEditor> eds = handler.getEditors();
-        adaptiveSupport = new AdaptiveChoicesSupport(handler.getTable() .getModel(), eds.toArray(new FilterEditor[eds.size()]), handler.getFilters());
+        adaptiveSupport = new AdaptiveChoicesSupport(handler.getTable()
+                    .getModel(), eds.toArray(new FilterEditor[eds.size()]),
+                handler.getFilters());
         setEnableTableModelEvents(true);
     }
 
@@ -200,7 +204,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
 
             // note: modelColumns could be different from editors.length if some
             // column has been removed from the model
-            filters = new RowInfo.Filter[allFilters.size() + modelColumns - edLen];
+            filters =
+                new RowInfo.Filter[allFilters.size() + modelColumns - edLen];
             for (int i = 0; i < modelColumns; i++) {
                 filters[i] = null;
             }
@@ -231,14 +236,11 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                                  int column) {
             if (column != TableModelEvent.ALL_COLUMNS) {
                 rowsUpdated(firstRow, lastRow, column);
-            } 
-            else if (event == TableModelEvent.UPDATE) {
+            } else if (event == TableModelEvent.UPDATE) {
                 rowsUpdated(firstRow, lastRow, TableModelEvent.ALL_COLUMNS);
-            } 
-            else if (event == TableModelEvent.INSERT) {
+            } else if (event == TableModelEvent.INSERT) {
                 rowsAdded(firstRow, lastRow);
-            }
-            else if (event == TableModelEvent.DELETE) {
+            } else if (event == TableModelEvent.DELETE) {
                 rowsDeleted(firstRow, lastRow);
             }
         }
@@ -257,6 +259,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                     }
                 }
             }
+
             extractChoices(editorHandles.length, firstRow, lastRow);
         }
 
@@ -265,7 +268,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
          */
         private void rowsUpdated(int firstRow, int lastRow, int column) {
 
-        	RowInfo.Filter filter = (column == TableModelEvent.ALL_COLUMNS)
+            RowInfo.Filter filter = (column == TableModelEvent.ALL_COLUMNS)
                 ? null : filters[column];
             while (firstRow <= lastRow) {
                 RowInfo row = rows.get(firstRow);
@@ -281,90 +284,99 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                 }
             }
 
-            //reread all the model
+            // reread all the model
             extractChoices(editorHandles.length, 0, -1);
         }
 
-        /** Handles a table model event after some rows are deleted */
+        /** Handles a table model event after some rows are deleted. */
         private void rowsDeleted(int firstRow, int lastRow) {
             rows.subList(firstRow, lastRow + 1).clear();
             extractChoices(editorHandles.length, 0, -1);
         }
 
-        /** 
+        /**
          * Handles a change on a filter.
-         * @return true if the update leaves any row in the filter
+         *
+         * @return  true if the update leaves any row in the filter
          */
         public boolean update(IFilter iFilter) {
             RowInfo.Filter filter = getFilter(iFilter);
-            int update = updateRowInfo(filter, iFilter);
-            boolean changed = 1==(update & 1);
+            int            update = updateRowInfo(filter, iFilter);
+            boolean        changed = 1 == (update & 1);
 
             if (changed) {
-            	//only propagate changes if this is not an editor
-            	//or the editor has no focus (is still editing)
-            	if (editorHandles.length >= filter.column ||
-            		!editorHandles[filter.column].editor.isEditing()){
-            		propagateChanges(filter.column);
-            	}
+                // only propagate changes if this is not an editor
+                // or the editor has no focus (is still editing)
+                if ((editorHandles.length >= filter.column)
+                        || !editorHandles[filter.column].editor.isEditing()) {
+                    propagateChanges(filter.column);
+                }
             }
-            
-            return (update & 2)==2;
+
+            return (update & 2) == 2;
         }
-        
-        /** Extract the choices due to a filter update on the given position */
+
+        /** Extract the choices due to a filter update on the given position. */
         public void propagateChanges(int modelPosition) {
             int width = editorHandles.length;
             int handle = getEditorHandle(modelPosition);
-            if (handle>=0){
-            	switchHandle(handle, --width);
+            if (handle >= 0) {
+                switchHandle(handle, --width);
             }
+
             extractChoices(width, 0, -1);
         }
 
         /** Reports an update on the properties of an editor. */
         public void editorUpdated(FilterEditor fe) {
-        	int column = fe.getModelIndex();
+            int column = fe.getModelIndex();
             int editorHandle = getEditorHandle(column);
-            
-            //invoke the editor update call
-            editorHandles[editorHandle].updateFormatter(rowEntry.getModel(), rowEntry.getFormatters());
-            
+
+            // invoke the editor update call
+            editorHandles[editorHandle].updateFormatter(rowEntry.getModel(),
+                rowEntry.getFormatters());
+
             int width;
-            
-            //and update the filter for this editor
-            int updateRowInfo = updateRowInfo(filters[fe.getModelIndex()], fe.getFilter());
-            if (1==(1 & updateRowInfo)) {
-            	//if changed, update all editor choices
+
+            // and update the filter for this editor
+            int updateRowInfo = updateRowInfo(filters[fe.getModelIndex()],
+                    fe.getFilter());
+            if (1 == (1 & updateRowInfo)) {
+                // if changed, update all editor choices
                 width = editorHandles.length;
             } else {
                 // update only the associated editor, move it at the beginning
                 switchHandle(editorHandle, 0);
                 width = 1;
             }
+
             extractChoices(width, 0, -1);
         }
-        
-        /** 
-         * Handles a change on a filter, updating the RowInfo array
-         * @return an integer where the lower bit is 0 if the update implies
-         *         no changes, and the next bit is 0 is the filter clears the
-         *         whole table (i.e: no row passes the filter)
-         **/
+
+        /**
+         * Handles a change on a filter, updating the RowInfo array.
+         *
+         * @return  an integer where the lower bit is 0 if the update implies no
+         *          changes, and the next bit is 0 is the filter clears the
+         *          whole table (i.e: no row passes the filter)
+         */
         private int updateRowInfo(RowInfo.Filter filter, IFilter iFilter) {
-            int changedBit=0;
-            int anyBitSet=1;
+            int changedBit = 0;
+            int anyBitSet = 1;
             rowEntry.row = 0;
             for (RowInfo ri : rows) {
-            	boolean set = !iFilter.isEnabled() || iFilter.include(rowEntry);
-            	if (filter.set(ri, set)){
-            		changedBit=1;
-            	}
-            	if (set){
-            		anyBitSet=2;
-            	}
+                boolean set = !iFilter.isEnabled() || iFilter.include(rowEntry);
+                if (filter.set(ri, set)) {
+                    changedBit = 1;
+                }
+
+                if (set) {
+                    anyBitSet = 2;
+                }
+
                 rowEntry.row++;
             }
+
             return changedBit | anyBitSet;
         }
 
@@ -405,7 +417,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             }
 
             boolean fullMode = (firstRow == 0) && (lastRow == rows);
-            int check = handles;
+            int     check = handles;
             for (int i = 0; i < check;) {
                 if (editorHandles[i].startIteration(fullMode)) {
                     // if startIteration returns true, this editor will require
@@ -497,7 +509,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             /** Temporal variable for maxChoices, inside an iteration. */
             private int maxIterationChoices;
 
-            /** The choices defined for the editor, with its filter.*/
+            /** The choices defined for the editor, with its filter. */
             private Map<CustomChoice, RowFilter> customChoices;
 
             /** On an iteration, the choices not yet added. */
@@ -506,7 +518,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             /** The choices that will be set on the editor. */
             private Set choices = new HashSet();
 
-            /** Single constructor */
+            /** Single constructor. */
             public EditorHandle(FilterEditor editor, TableModel model) {
                 this.editor = editor;
                 this.column = editor.getModelIndex();
@@ -524,19 +536,20 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             private void init(TableModel model) {
                 Set<CustomChoice> choices = editor.getCustomChoices();
                 if (AutoChoices.DISABLED == editor.getAutoChoices()) {
-                    maxChoices=1; //consider empty
+                    maxChoices = 1;     // consider empty
                 } else {
-	                Class<?> c = model.getColumnClass(column);
-	                if (c.equals(Boolean.class)) {
-	                    maxChoices = 4; //consider empty and null
-	                } else {
-	                    Object o[] = c.getEnumConstants();
-	                    maxChoices = (o == null) ? Integer.MAX_VALUE : o.length+2;
-	                }
+                    Class<?> c = model.getColumnClass(column);
+                    if (c.equals(Boolean.class)) {
+                        maxChoices = 4; // consider empty and null
+                    } else {
+                        Object o[] = c.getEnumConstants();
+                        maxChoices = (o == null) ? Integer.MAX_VALUE
+                                                 : (o.length + 2);
+                    }
                 }
 
                 if (choices.isEmpty()) {
-                	customChoices=null;
+                    customChoices = null;
                 } else {
                     customChoices = new HashMap<CustomChoice, RowFilter>();
                     for (CustomChoice cc : choices) {
@@ -571,7 +584,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                         : new HashMap<CustomChoice, RowFilter>(customChoices);
                     maxIterationChoices = maxChoices;
                 } else {
-                    maxIterationChoices = maxChoices - editor.getChoices().size();
+                    maxIterationChoices = maxChoices
+                            - editor.getChoices().size();
                 }
 
                 return maxIterationChoices == 0;
@@ -586,7 +600,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
              */
             public boolean handleRow(RowEntry entry) {
                 if (!missingChoices.isEmpty()) {
-                    Iterator<Map.Entry<CustomChoice, RowFilter>> it = missingChoices.entrySet().iterator();
+                    Iterator<Map.Entry<CustomChoice, RowFilter>> it =
+                        missingChoices.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry<CustomChoice, RowFilter> o = it.next();
                         if (o.getValue().include(entry)) {
@@ -625,7 +640,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
          */
         static class RowInfo {
             static final byte SET = (byte) 255;
-            byte info[];
+            byte              info[];
 
             RowInfo(int columns) {
                 int length = 1 + (columns >> 3);
@@ -651,8 +666,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             static class Filter {
                 private int col;
                 private int bit;
-                int column;
-                IFilter filter;
+                int         column;
+                IFilter     filter;
 
                 Filter(IFilter filter, int column) {
                     this.column = column;
@@ -665,9 +680,10 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                     return !filter.isEnabled() || filter.include(rowEntry);
                 }
 
-                /** 
-                 * Sets or unsets the given row
-                 * @return true if it implies a change 
+                /**
+                 * Sets or unsets the given row.
+                 *
+                 * @return  true if it implies a change
                  */
                 public boolean set(RowInfo row, boolean set) {
                     byte info[] = row.info;
@@ -686,7 +702,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                  * exception of THIS column, are set to 1.
                  */
                 public boolean is(RowInfo row) {
-                    byte info[] = row.info;
+                    byte    info[] = row.info;
                     boolean now = 0 != (info[col] & bit);
                     set(row, true);
 

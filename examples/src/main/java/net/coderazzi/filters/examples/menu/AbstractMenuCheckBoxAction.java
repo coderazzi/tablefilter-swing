@@ -32,24 +32,25 @@ import javax.swing.JCheckBoxMenuItem;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
-abstract class AbstractMenuCheckBoxAction extends JCheckBoxMenuItem implements ActionListener{
-	
-	private static final long serialVersionUID = -6772023653226757860L;
-	
-	protected ActionHandler main;
 
-	public AbstractMenuCheckBoxAction(String title, ActionHandler listener) {
-		super(title);
-		this.main = listener;
-		addActionListener(this);
-	}
-	
-	@Override
-	public final void actionPerformed(ActionEvent e) {
-		JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
-		actionPerformed(source.isSelected());
-	}
-	
-	protected abstract void actionPerformed(boolean selected);
-	
+abstract class AbstractMenuCheckBoxAction extends JCheckBoxMenuItem
+    implements ActionListener {
+
+    private static final long serialVersionUID = -6772023653226757860L;
+
+    protected ActionHandler main;
+
+    public AbstractMenuCheckBoxAction(String title, ActionHandler listener) {
+        super(title);
+        this.main = listener;
+        addActionListener(this);
+    }
+
+    @Override public final void actionPerformed(ActionEvent e) {
+        JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
+        actionPerformed(source.isSelected());
+    }
+
+    protected abstract void actionPerformed(boolean selected);
+
 }

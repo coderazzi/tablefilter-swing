@@ -54,13 +54,13 @@ import net.coderazzi.filters.gui.TableFilterHeader;
 public class EventsWindow extends JDialog implements IFilterHeaderObserver,
     PropertyChangeListener {
 
-    TableModel tableModel;
+    TableModel                  tableModel;
     private static final String EXCLUDED = "Excluded";
     private static final String CREATED = "Created";
-    static String COLUMN_NAMES[] = {
+    static String               COLUMN_NAMES[] = {
             "Event", "Column", "{Content|Event}.type", "Value"
         };
-    static Class<?> COLUMN_CLASSES[] = {
+    static Class<?>             COLUMN_CLASSES[] = {
             String.class, String.class, String.class, String.class
         };
 
@@ -125,7 +125,7 @@ public class EventsWindow extends JDialog implements IFilterHeaderObserver,
                 int     row,
                 int     column) {
             Object o = tableModel.getValueAt(row, 0);
-            Color c;
+            Color  c;
             if (o.equals(CREATED)) {
                 c = Color.GREEN;
             } else if (o.equals(EXCLUDED)) {

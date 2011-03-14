@@ -32,34 +32,34 @@ import javax.swing.JMenu;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.examples.utils.TestTableModel;
 
-/** Change width or model directly */
-public class MenuModelChange extends AbstractMenuAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private boolean onlyChangeWidth;
-	
-	public MenuModelChange(ActionHandler main, boolean onlyChangeWidth) {
-		super(onlyChangeWidth? "Change model width" : "Use new model", main);
-		this.onlyChangeWidth = onlyChangeWidth;		
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		reinitFiltersMenu();
-		if (onlyChangeWidth){
-			main.getTableModel().changeModel(main.getTable());
-		} else {
-			main.setTableModel(TestTableModel.createTestTableModel());
-		}
-	}
 
-	void reinitFiltersMenu() {
-		JMenu filterMenu = main.getFilterMenu();
-		int pos = filterMenu.getItemCount();
-		while (pos-- > 2) {
-			filterMenu.remove(filterMenu.getItem(pos));
-		}
-	}
+/** Change width or model directly. */
+public class MenuModelChange extends AbstractMenuAction {
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private boolean onlyChangeWidth;
+
+    public MenuModelChange(ActionHandler main, boolean onlyChangeWidth) {
+        super(onlyChangeWidth ? "Change model width" : "Use new model", main);
+        this.onlyChangeWidth = onlyChangeWidth;
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        reinitFiltersMenu();
+        if (onlyChangeWidth) {
+            main.getTableModel().changeModel(main.getTable());
+        } else {
+            main.setTableModel(TestTableModel.createTestTableModel());
+        }
+    }
+
+    void reinitFiltersMenu() {
+        JMenu filterMenu = main.getFilterMenu();
+        int   pos = filterMenu.getItemCount();
+        while (pos-- > 2) {
+            filterMenu.remove(filterMenu.getItem(pos));
+        }
+    }
 
 }

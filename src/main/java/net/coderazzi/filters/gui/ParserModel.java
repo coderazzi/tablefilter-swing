@@ -109,9 +109,9 @@ public class ParserModel implements IParserModel {
         // its type is not a primitive Otherwise, it is used the editor's format
         // (or the primitive format), and the editor's comparator, which is
         // never null
-        boolean ignoreCase = editor.isIgnoreCase();
-        Class cl = editor.getModelClass();
-        Format fmt = (cl == String.class) ? null : editor.getFormat();
+        boolean    ignoreCase = editor.isIgnoreCase();
+        Class      cl = editor.getModelClass();
+        Format     fmt = (cl == String.class) ? null : editor.getFormat();
         Comparator cmp = (fmt == null) ? null : editor.getComparator();
 
         return new Parser(fmt, cmp, getStringComparator(ignoreCase), ignoreCase,

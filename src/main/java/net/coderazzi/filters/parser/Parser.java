@@ -27,6 +27,7 @@ package net.coderazzi.filters.parser;
 
 import java.text.Format;
 import java.text.ParseException;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,16 +79,16 @@ import net.coderazzi.filters.IParser;
  */
 public class Parser implements IParser {
 
-    FormatWrapper format;
-    Comparator comparator;
-    boolean ignoreCase;
-    Comparator<String> stringComparator;
-    int modelIndex;
+    FormatWrapper                        format;
+    Comparator                           comparator;
+    boolean                              ignoreCase;
+    Comparator<String>                   stringComparator;
+    int                                  modelIndex;
     private static Map<String, IOperand> operands;
-    private static IOperand wildcardOperand;
-    private static WildcardOperand instantOperand;
-    private static Pattern expressionMatcher;
-    private static StringBuilder escapeBuffer = new StringBuilder();
+    private static IOperand              wildcardOperand;
+    private static WildcardOperand       instantOperand;
+    private static Pattern               expressionMatcher;
+    private static StringBuilder         escapeBuffer = new StringBuilder();
 
     public Parser(Format             format,
                   Comparator         classComparator,
@@ -101,7 +102,7 @@ public class Parser implements IParser {
         this.modelIndex = modelIndex;
     }
 
-    /** {@link IParser} interface */
+    /** {@link IParser} interface. */
     @Override public RowFilter parseText(String expression)
                                   throws ParseException {
         Matcher matcher = expressionMatcher.matcher(expression);
@@ -109,7 +110,7 @@ public class Parser implements IParser {
             // all expressions match!
             IOperand op = operands.get(matcher.group(1));
             if (op == null) {
-            	//note that instant does not apply if there is an operator!
+                // note that instant does not apply if there is an operator!
                 op = wildcardOperand;
             }
 
@@ -118,88 +119,99 @@ public class Parser implements IParser {
 
         return null;
     }
-    
-    /** {@link IParser} interface */
-	@Override public InstantFilter parseInstantText(String expression)
-			throws ParseException {
-		Matcher matcher = expressionMatcher.matcher(expression);
-		if (matcher.matches()) {
-			// all expressions match!
-			IOperand op = operands.get(matcher.group(1));
-			if (op == null) {
-				// note that instant does not apply if there is an operator!
-				op = instantOperand;
-			}
-			InstantFilter ret = new InstantFilter();
-			ret.filter = op.create(this, matcher.group(3));
-			ret.expression = op==instantOperand? instantOperand.getAppliedExpression(expression) : expression;
-			return ret;
-		}
 
-		return null;
-	}
+    /** {@link IParser} interface. */
+    @Override public InstantFilter parseInstantText(String expression)
+                                             throws ParseException {
+        Matcher matcher = expressionMatcher.matcher(expression);
+        if (matcher.matches()) {
+            // all expressions match!
+            IOperand op = operands.get(matcher.group(1));
+            if (op == null) {
+                // note that instant does not apply if there is an operator!
+                op = instantOperand;
+            }
 
-    /** {@link IParser} interface */
+            InstantFilter ret = new InstantFilter();
+            ret.filter = op.create(this, matcher.group(3));
+            ret.expression = (op == instantOperand)
+                ? instantOperand.getAppliedExpression(expression) : expression;
+
+            return ret;
+        }
+
+        return null;
+    }
+
+    /** {@link IParser} interface. */
     @Override public String escape(String expression) {
         Matcher matcher = expressionMatcher.matcher(expression);
-        if (matcher.matches()){
-	        String operator = matcher.group(1);
-	        int lastAdded=0;
-	        if (operator!=null){
-	        	escapeBuffer.append('\\').append(operator);
-	        	expression=matcher.group(2);
-	        }
-	        int total=expression.length();
-			for (int i = 0; i<total; i++){
-				char ch = expression.charAt(i);
-				if (ch=='*' || ch=='?' || ch=='\\'){
-					escapeBuffer.append(expression.substring(lastAdded, i));
-					escapeBuffer.append('\\').append(ch);
-					lastAdded=i+1;
-				}
-			}
-			if (escapeBuffer.length()>0){
-				escapeBuffer.append(expression.substring(lastAdded, total));
-				expression = escapeBuffer.toString();
-				escapeBuffer.delete(0, escapeBuffer.length());
-			}
+        if (matcher.matches()) {
+            String operator = matcher.group(1);
+            int    lastAdded = 0;
+            if (operator != null) {
+                escapeBuffer.append('\\').append(operator);
+                expression = matcher.group(2);
+            }
+
+            int total = expression.length();
+            for (int i = 0; i < total; i++) {
+                char ch = expression.charAt(i);
+                if ((ch == '*') || (ch == '?') || (ch == '\\')) {
+                    escapeBuffer.append(expression.substring(lastAdded, i));
+                    escapeBuffer.append('\\').append(ch);
+                    lastAdded = i + 1;
+                }
+            }
+
+            if (escapeBuffer.length() > 0) {
+                escapeBuffer.append(expression.substring(lastAdded, total));
+                expression = escapeBuffer.toString();
+                escapeBuffer.delete(0, escapeBuffer.length());
+            }
         }
+
         return expression;
     }
-    
+
     /** Internal interface, to be implemented by all operands. */
     interface IOperand {
         RowFilter create(Parser self, String right) throws ParseException;
     }
 
-    /** IOperand for comparison operations */
+    /** IOperand for comparison operations. */
     abstract static class ComparisonOperand implements IOperand {
         abstract boolean matches(int comparison);
 
-        /** {@link IOperand} interface*/
+        /** {@link IOperand} interface. */
         @Override public RowFilter create(Parser self, String right)
                                    throws ParseException {
-        	
+
             if (right != null) {
-	            if (self.comparator == null) {
-	                return createStringOperator(right, self.modelIndex, self.format, self.stringComparator);
-	            }
-	            Object o = self.format.parseObject(right);
-	            if (o != null) {
-	                return createOperator(o, self.modelIndex, self.comparator);
-	            }
+                if (self.comparator == null) {
+                    return createStringOperator(right, self.modelIndex,
+                            self.format, self.stringComparator);
+                }
+
+                Object o = self.format.parseObject(right);
+                if (o != null) {
+                    return createOperator(o, self.modelIndex, self.comparator);
+                }
             }
+
             throw new ParseException("", 0);
         }
 
-        /** Operator fine for given type, apply it */
+        /** Operator fine for given type, apply it. */
         private RowFilter createOperator(final Object     right,
                                          final int        modelIndex,
                                          final Comparator comparator) {
             return new RowFilter() {
                 @Override public boolean include(Entry entry) {
                     Object left = entry.getValue(modelIndex);
-                    return (left != null) && matches(comparator.compare(left, right));
+
+                    return (left != null)
+                            && matches(comparator.compare(left, right));
                 }
             };
         }
@@ -216,28 +228,32 @@ public class Parser implements IParser {
                     if (left == null) {
                         return false;
                     }
+
                     String s = format.format(left);
-                    return (s.length() > 0) && matches(stringComparator.compare(s, right));
+
+                    return (s.length() > 0)
+                            && matches(stringComparator.compare(s, right));
                 }
             };
         }
     }
 
-    /** IOperand for equal/unequal operations */
+    /** IOperand for equal/unequal operations. */
     static class EqualOperand implements IOperand {
 
         boolean expected;
 
         /**
-         * Single constructor
-         * @param expected true if the operand expects the equal operation
-         * to succeed
+         * Single constructor.
+         *
+         * @param  expected  true if the operand expects the equal operation to
+         *                   succeed
          */
         public EqualOperand(boolean expected) {
             this.expected = expected;
         }
 
-        /** {@link IOperand} interface*/
+        /** {@link IOperand} interface. */
         @Override public RowFilter create(Parser self, String right)
                                    throws ParseException {
             if (self.comparator == null) {
@@ -257,13 +273,13 @@ public class Parser implements IParser {
             return createOperator(o, self.modelIndex, self.comparator);
         }
 
-        /** Operator fine for given type, apply it */
+        /** Operator fine for given type, apply it. */
         private RowFilter createOperator(final Object     right,
                                          final int        modelIndex,
                                          final Comparator comparator) {
             return new RowFilter() {
                 @Override public boolean include(Entry entry) {
-                    Object left = entry.getValue(modelIndex);
+                    Object  left = entry.getValue(modelIndex);
                     boolean value = (left != null)
                             && (0 == comparator.compare(left, right));
 
@@ -272,7 +288,7 @@ public class Parser implements IParser {
             };
         }
 
-        /** No right operand give, comparing against 'null' */
+        /** No right operand give, comparing against 'null'. */
         private RowFilter createNullOperator(final int modelIndex) {
             return new RowFilter() {
                 @Override public boolean include(Entry entry) {
@@ -294,30 +310,32 @@ public class Parser implements IParser {
                     Object left = entry.getValue(modelIndex);
                     String value = format.format(left);
 
-                    return expected = (stringComparator.compare(value, right) == 0);
+                    return expected = (stringComparator.compare(value, right)
+                                    == 0);
                 }
             };
         }
     }
 
-    /** Operand for regular expressions */
+    /** Operand for regular expressions. */
     static class REOperand implements IOperand {
         boolean equals;
 
         /**
-         * Single constructor
-         * @param equals true if the operand expects the regular expression
-         * matching to succeed
+         * Single constructor.
+         *
+         * @param  equals  true if the operand expects the regular expression
+         *                 matching to succeed
          */
         public REOperand(boolean equals) {
             this.equals = equals;
         }
 
-        /** {@link IOperand} interface*/
+        /** {@link IOperand} interface. */
         @Override public RowFilter create(Parser self, String right)
                                    throws ParseException {
-        	final Pattern pattern = getPattern(right, self.ignoreCase);
-            final int modelIndex = self.modelIndex;
+            final Pattern       pattern = getPattern(right, self.ignoreCase);
+            final int           modelIndex = self.modelIndex;
             final FormatWrapper format = self.format;
 
             return new RowFilter() {
@@ -331,59 +349,61 @@ public class Parser implements IParser {
             };
         }
 
-        /** 
+        /**
          * Returns the {@link Pattern} instance associated to the provided
-         * expression. 
+         * expression.
          */
         protected Pattern getPattern(String expression, boolean ignoreCase)
                               throws ParseException {
             try {
-                return Pattern.compile(expression, ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
+                return Pattern.compile(expression,
+                        ignoreCase ? Pattern.CASE_INSENSITIVE : 0);
             } catch (PatternSyntaxException pse) {
                 throw new ParseException("", pse.getIndex());
             }
         }
     }
 
-    /** Operand for wildcard expressions */
+    /** Operand for wildcard expressions. */
     static class WildcardOperand extends REOperand {
-    	
-    	private boolean instant;
-    	private boolean instantApplied;
 
-    	/** Constructor for instant operand */
+        private boolean instant;
+        private boolean instantApplied;
+
+        /** Constructor for instant operand. */
         public WildcardOperand() {
             super(true);
             this.instant = true;
         }
 
-        /** Constructor for equal/unequal simple regular expression */
+        /** Constructor for equal/unequal simple regular expression. */
         public WildcardOperand(boolean equals) {
             super(equals);
         }
-        
-        /** 
-         * After the operand is used, this method returns the expression that 
-         * has been really applied to obtain the filter
+
+        /**
+         * After the operand is used, this method returns the expression that
+         * has been really applied to obtain the filter.
          */
-        public String getAppliedExpression(String baseExpression){
-        	if (instantApplied){
-        		return baseExpression+"*";
-        	}
-        	return baseExpression;
+        public String getAppliedExpression(String baseExpression) {
+            if (instantApplied) {
+                return baseExpression + "*";
+            }
+
+            return baseExpression;
         }
 
-        /** {@link REOperand} interface */
+        /** {@link REOperand} interface. */
         @Override protected Pattern getPattern(String  right,
                                                boolean ignoreCase)
                                         throws ParseException {
             return super.getPattern(convertToRE(right), ignoreCase);
         }
-        
-        /** Converts a wildcard expression into a regular expression */
+
+        /** Converts a wildcard expression into a regular expression. */
         protected String convertToRE(String s) {
             StringBuilder sb = new StringBuilder();
-            boolean escaped = false;
+            boolean       escaped = false;
             instantApplied = false;
 
             for (char c : s.toCharArray()) {
@@ -445,13 +465,13 @@ public class Parser implements IParser {
                     break;
                 }
             }
-            
-            if (instant){
-            	int l = sb.length();
-            	if (l<2 || !sb.substring(l-2).equals(".*")){
-                	instantApplied=true;
-            		sb.append(".*");
-            	}
+
+            if (instant) {
+                int l = sb.length();
+                if ((l < 2) || !sb.substring(l - 2).equals(".*")) {
+                    instantApplied = true;
+                    sb.append(".*");
+                }
             }
 
             return sb.toString();
@@ -497,7 +517,7 @@ public class Parser implements IParser {
         instantOperand = new WildcardOperand();
     }
 
-    /** Helper class to deal with null formats */
+    /** Helper class to deal with null formats. */
     static class FormatWrapper {
         Format format;
 

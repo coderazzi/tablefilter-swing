@@ -28,31 +28,31 @@ package net.coderazzi.filters.examples.menu;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuInstantFiltering extends AbstractMenuCheckBoxAction {
-	
-	public static String NAME ="instant filtering";
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private IFilterEditor editor;
-	
-	/**
-	 * @param editor can be null to act on the FilterHeader
-	 */
-	public MenuInstantFiltering(ActionHandler main, IFilterEditor editor) {
-		super(NAME, main);
-		this.editor = editor;
-		setSelected(editor==null? main.getFilterHeader().isInstantFiltering() : editor.isInstantFiltering());
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		if (editor==null){
-			main.getFilterHeader().setInstantFiltering(selected);
-			main.updateFiltersInfo();
-		} else {
-			editor.setInstantFiltering(selected);
-		}
-	}
+
+    public static String NAME = "instant filtering";
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private IFilterEditor editor;
+
+    /** @param  editor  can be null to act on the FilterHeader */
+    public MenuInstantFiltering(ActionHandler main, IFilterEditor editor) {
+        super(NAME, main);
+        this.editor = editor;
+        setSelected((editor == null)
+                ? main.getFilterHeader().isInstantFiltering()
+                : editor.isInstantFiltering());
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        if (editor == null) {
+            main.getFilterHeader().setInstantFiltering(selected);
+            main.updateFiltersInfo();
+        } else {
+            editor.setInstantFiltering(selected);
+        }
+    }
 
 }

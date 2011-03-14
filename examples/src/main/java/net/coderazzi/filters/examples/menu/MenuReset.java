@@ -30,28 +30,26 @@ import java.awt.event.ActionEvent;
 import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuReset extends AbstractMenuAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private IFilterEditor editor;
-	
-	/**
-	 * @param editor set to null if the menu applies to the filter header
-	 */
-	public MenuReset(ActionHandler main, IFilterEditor editor) {
-		super("reset", main);
-		this.editor = editor;
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (editor==null){
-			main.getFilterHeader().resetFilter();
-			main.updateFiltersInfo();			
-		} else {
-			editor.resetFilter();
-		}
-	}
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    private IFilterEditor editor;
+
+    /** @param  editor  set to null if the menu applies to the filter header */
+    public MenuReset(ActionHandler main, IFilterEditor editor) {
+        super("reset", main);
+        this.editor = editor;
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        if (editor == null) {
+            main.getFilterHeader().resetFilter();
+            main.updateFiltersInfo();
+        } else {
+            editor.resetFilter();
+        }
+    }
 
 }

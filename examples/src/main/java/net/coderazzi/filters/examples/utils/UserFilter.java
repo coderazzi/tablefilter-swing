@@ -28,17 +28,18 @@ package net.coderazzi.filters.examples.utils;
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.examples.ActionHandler;
 
-public class UserFilter extends Filter{
-	
-	private ActionHandler main;
-	
-	public UserFilter(ActionHandler main){
-		this.main = main;
-	}
 
-	@Override
-	public boolean include(Entry entry) {
-		int n = main.getTableModel().getColumn(TestTableModel.NAME);
-		return n==-1 || -1 != entry.getStringValue(n).indexOf('e');
-	}
+public class UserFilter extends Filter {
+
+    private ActionHandler main;
+
+    public UserFilter(ActionHandler main) {
+        this.main = main;
+    }
+
+    @Override public boolean include(Entry entry) {
+        int n = main.getTableModel().getColumn(TestTableModel.NAME);
+
+        return (n == -1) || (-1 != entry.getStringValue(n).indexOf('e'));
+    }
 }

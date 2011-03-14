@@ -34,34 +34,37 @@ import javax.swing.JRadioButtonMenuItem;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MenuRowSize extends JMenu implements ActionListener {
-	
-	private static final long serialVersionUID = -6772023653226757860L;
-	private static final int RELATIVE_SIZES[] = { -4, 0, 4, 10, 20, 40 };
-	
-	private ActionHandler main;
 
-	public MenuRowSize(ActionHandler listener) {
-		super("row height delta");
-		this.main = listener;
-		int size = main.getFilterHeader().getRowHeightDelta();
+    private static final long serialVersionUID = -6772023653226757860L;
+    private static final int  RELATIVE_SIZES[] = { -4, 0, 4, 10, 20, 40 };
 
-		ButtonGroup group = new ButtonGroup();
-		for (int i : RELATIVE_SIZES) {
-			JRadioButtonMenuItem item = new JRadioButtonMenuItem(String.valueOf(i));
-			item.addActionListener(this);
-			this.add(item);
-			group.add(item);
-			if (i == size) {
-				item.setSelected(true);
-			}
-		}
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		int size = Integer.valueOf(((JRadioButtonMenuItem)e.getSource()).getText());
-		main.getFilterHeader().setRowHeightDelta(size);
-	}
-	
+    private ActionHandler main;
+
+    public MenuRowSize(ActionHandler listener) {
+        super("row height delta");
+        this.main = listener;
+
+        int size = main.getFilterHeader().getRowHeightDelta();
+
+        ButtonGroup group = new ButtonGroup();
+        for (int i : RELATIVE_SIZES) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(String.valueOf(
+                        i));
+            item.addActionListener(this);
+            this.add(item);
+            group.add(item);
+            if (i == size) {
+                item.setSelected(true);
+            }
+        }
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        int size = Integer.valueOf(((JRadioButtonMenuItem) e.getSource())
+                    .getText());
+        main.getFilterHeader().setRowHeightDelta(size);
+    }
+
 }

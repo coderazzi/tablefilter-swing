@@ -32,18 +32,19 @@ import java.awt.Font;
 
 /** Class representing the current {@link TableFilterHeader} appearance. */
 public class Look {
-    Color background;
-    Color disabledBackground;
-    Color disabledForeground;
-    Color errorForeground;
-    Color foreground;
-    Color gridColor;
-    Color selectionBackground;
-    Color selectionForeground;
-    Color textSelection;
-    Color warningForeground;
-    Font font;
-    int maxVisiblePopupRows = FilterSettings.maxVisiblePopupRows;
+    Color                 background;
+    Color                 disabledBackground;
+    Color                 disabledForeground;
+    Color                 errorForeground;
+    Color                 foreground;
+    Color                 gridColor;
+    Color                 selectionBackground;
+    Color                 selectionForeground;
+    Color                 textSelection;
+    Color                 warningForeground;
+    Font                  font;
+    int                   maxVisiblePopupRows =
+        FilterSettings.maxVisiblePopupRows;
     CustomChoiceDecorator customChoiceDecorator = FilterSettings
             .newCustomChoiceDecorator();
 
@@ -52,7 +53,7 @@ public class Look {
         return background;
     }
 
-    /** Returns the registered {@link CustomChoiceDecorator} */
+    /** Returns the registered {@link CustomChoiceDecorator}. */
     public CustomChoiceDecorator getCustomChoiceDecorator() {
         return customChoiceDecorator;
     }
@@ -85,7 +86,7 @@ public class Look {
         return foreground;
     }
 
-    /** Returns the color set by default for the header's grid.*/
+    /** Returns the color set by default for the header's grid. */
     public Color getGridColor() {
         return gridColor;
     }
@@ -105,7 +106,7 @@ public class Look {
         return selectionForeground;
     }
 
-    /** Returns the color set by default as text selection on filters */
+    /** Returns the color set by default as text selection on filters. */
     public Color getTextSelection() {
         return textSelection;
     }

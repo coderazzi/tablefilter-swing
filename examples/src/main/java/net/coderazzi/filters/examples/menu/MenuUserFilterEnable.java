@@ -29,26 +29,26 @@ import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterObserver;
 import net.coderazzi.filters.examples.ActionHandler;
 
-public class MenuUserFilterEnable extends AbstractMenuCheckBoxAction implements IFilterObserver{
 
-	private static final long serialVersionUID = 9137226745345048519L;
-	private IFilter userFilter;
+public class MenuUserFilterEnable extends AbstractMenuCheckBoxAction
+    implements IFilterObserver {
 
-	public MenuUserFilterEnable(ActionHandler main, IFilter userFilter) {
-		super("enable", main);
-		this.userFilter = userFilter;
-		setSelected(userFilter.isEnabled());
-		userFilter.addFilterObserver(this);
-	}
+    private static final long serialVersionUID = 9137226745345048519L;
+    private IFilter           userFilter;
 
-	@Override
-	protected void actionPerformed(boolean selected) {
-		userFilter.setEnabled(selected);
-	}
-	
-	@Override
-	public void filterUpdated(IFilter obs) {
-		setSelected(userFilter.isEnabled());
-	}
+    public MenuUserFilterEnable(ActionHandler main, IFilter userFilter) {
+        super("enable", main);
+        this.userFilter = userFilter;
+        setSelected(userFilter.isEnabled());
+        userFilter.addFilterObserver(this);
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        userFilter.setEnabled(selected);
+    }
+
+    @Override public void filterUpdated(IFilter obs) {
+        setSelected(userFilter.isEnabled());
+    }
 
 }

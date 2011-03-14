@@ -29,17 +29,16 @@ import net.coderazzi.filters.examples.ActionHandler;
 
 
 public class MenuHeaderVisible extends AbstractMenuCheckBoxAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	public MenuHeaderVisible(ActionHandler main) {
-		super("visible", main);
-		setSelected(main.getFilterHeader().isVisible());
-	}
-	
-	@Override
-	protected void actionPerformed(boolean selected) {
-		main.getFilterHeader().setVisible(selected);
-	}
+
+    private static final long serialVersionUID = 9137226745345048519L;
+
+    public MenuHeaderVisible(ActionHandler main) {
+        super("visible", main);
+        setSelected(main.getFilterHeader().isVisible());
+    }
+
+    @Override protected void actionPerformed(boolean selected) {
+        main.getFilterHeader().setVisible(selected);
+    }
 
 }

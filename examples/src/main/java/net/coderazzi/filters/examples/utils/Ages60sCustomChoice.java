@@ -28,6 +28,7 @@ package net.coderazzi.filters.examples.utils;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -41,53 +42,55 @@ import net.coderazzi.filters.examples.TableFilterExample;
 import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class Ages60sCustomChoice extends CustomChoice {
-	Calendar cal = Calendar.getInstance();
+    Calendar cal = Calendar.getInstance();
 
-	public Ages60sCustomChoice() {
-		super("sixties", new ImageIcon(
-				TableFilterExample.class.getResource("resources/60.png")));
-	}
+    public Ages60sCustomChoice() {
+        super("sixties",
+            new ImageIcon(
+                TableFilterExample.class.getResource("resources/60.png")));
+    }
 
-	@Override
-	public RowFilter getFilter(IFilterEditor editor) {
-		final int modelIndex = editor.getModelIndex();
+    @Override public RowFilter getFilter(IFilterEditor editor) {
+        final int modelIndex = editor.getModelIndex();
 
-		return new RowFilter() {
-			@Override
-			public boolean include(RowFilter.Entry entry) {
-				Object o = entry.getValue(modelIndex);
-				if (o instanceof Date) {
-					cal.setTime((Date) o);
+        return new RowFilter() {
+            @Override public boolean include(RowFilter.Entry entry) {
+                Object o = entry.getValue(modelIndex);
+                if (o instanceof Date) {
+                    cal.setTime((Date) o);
 
-					int year = cal.get(Calendar.YEAR);
+                    int year = cal.get(Calendar.YEAR);
 
-					return (year >= 1960) && (year < 1969);
-				}
+                    return (year >= 1960) && (year < 1969);
+                }
 
-				return false;
-			}
-		};
-	}
+                return false;
+            }
+        };
+    }
 
-	@Override
-	public void decorateComponent(IFilterEditor editor, boolean isSelected,
-			JComponent c, Graphics g) {
-		Icon icon = getIcon();
-		if (icon != null) {
-			Icon use;
-			if (c.isEnabled()) {
-				use = icon;
-			} else {
-				use = UIManager.getLookAndFeel().getDisabledIcon(c, icon);
-			}
+    @Override public void decorateComponent(IFilterEditor editor,
+                                            boolean       isSelected,
+                                            JComponent    c,
+                                            Graphics      g) {
+        Icon icon = getIcon();
+        if (icon != null) {
+            Icon use;
+            if (c.isEnabled()) {
+                use = icon;
+            } else {
+                use = UIManager.getLookAndFeel().getDisabledIcon(c, icon);
+            }
 
-			Font font = editor.getLook().getCustomChoiceDecorator()
-					.getFont(this, editor, isSelected);
-			FontMetrics metrics = g.getFontMetrics(font);
-			int x = c.getWidth() - metrics.stringWidth(this.toString());
-			int y = (c.getHeight() - use.getIconHeight()) / 2;
-			use.paintIcon(c, g, x, y);
-		}
-	}
+            Font        font = editor.getLook()
+                    .getCustomChoiceDecorator()
+                    .getFont(this, editor, isSelected);
+            FontMetrics metrics = g.getFontMetrics(font);
+            int         x = c.getWidth() - metrics.stringWidth(this.toString());
+            int         y = (c.getHeight() - use.getIconHeight()) / 2;
+            use.paintIcon(c, g, x, y);
+        }
+    }
 }

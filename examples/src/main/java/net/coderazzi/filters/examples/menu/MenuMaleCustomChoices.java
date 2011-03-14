@@ -37,72 +37,73 @@ import net.coderazzi.filters.gui.AutoChoices;
 import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuMaleCustomChoices extends AbstractMenuCheckBoxAction {
-	
-	private static final long serialVersionUID = 9137226745345048519L;
-	
-	private IFilterEditor editor;
-	
-	public MenuMaleCustomChoices(ActionHandler main, IFilterEditor editor) {
-		super("Specific custom choices", main);
-		this.editor = editor;
-	}
-	
-	@Override
-	public void actionPerformed(boolean selected) {
-		Set<CustomChoice> choices = new HashSet<CustomChoice>();
-		if (selected) {
-			// specific code.
-			// the checkbox for male/female can be modified.
-			// if the associated filter is set to true or false, updating
-			// this
-			// checkbox value would make the row vanish
-			// To avoid that, we setup specific custom choices that do not
-			// filter out modified values
-			CustomChoice obsoleteChoice = new CustomChoice("True +") {
 
-				@Override
-				public RowFilter getFilter(IFilterEditor fe) {
-					return new RowFilter() {
-						@Override
-						public boolean include(Entry entry) {
-							int row = (Integer) entry.getIdentifier();
-							TestTableModel tm = main.getTableModel();
-							TestData td = tm.getRow(row);
-							return td.male || tm.isModified(td);
-						}
-					};
-				}
-			};
+    private static final long serialVersionUID = 9137226745345048519L;
 
-			CustomChoice nonObsoleteChoice = new CustomChoice("False +") {
+    private IFilterEditor editor;
 
-				@Override
-				public RowFilter getFilter(IFilterEditor fe) {
-					return new RowFilter() {
-						@Override
-						public boolean include(Entry entry) {
-							int row = (Integer) entry.getIdentifier();
-							TestTableModel tm = main.getTableModel();
-							TestData td = tm.getRow(row);
-							return !td.male || tm.isModified(td);
-						}
-					};
-				}
-			};
+    public MenuMaleCustomChoices(ActionHandler main, IFilterEditor editor) {
+        super("Specific custom choices", main);
+        this.editor = editor;
+    }
 
-			choices.add(obsoleteChoice);
-			choices.add(nonObsoleteChoice);
-			editor.setAutoChoices(AutoChoices.DISABLED);
-			editor.setEditable(false);
-			editor.setCustomChoices(choices);
-		} else {
-			editor.setCustomChoices(choices);
-			editor.setAutoChoices(AutoChoices.ENUMS);
-			editor.setEditable(true);
-		}
-		main.updateFilterInfo(editor, TestTableModel.MALE);
-	}
+    @Override public void actionPerformed(boolean selected) {
+        Set<CustomChoice> choices = new HashSet<CustomChoice>();
+        if (selected) {
+            // specific code.
+            // the checkbox for male/female can be modified.
+            // if the associated filter is set to true or false, updating
+            // this
+            // checkbox value would make the row vanish
+            // To avoid that, we setup specific custom choices that do not
+            // filter out modified values
+            CustomChoice obsoleteChoice = new CustomChoice("True +") {
+
+                @Override public RowFilter getFilter(IFilterEditor fe) {
+                    return new RowFilter() {
+                        @Override public boolean include(Entry entry) {
+                            int            row = (Integer)
+                                entry.getIdentifier();
+                            TestTableModel tm = main.getTableModel();
+                            TestData       td = tm.getRow(row);
+
+                            return td.male || tm.isModified(td);
+                        }
+                    };
+                }
+            };
+
+            CustomChoice nonObsoleteChoice = new CustomChoice("False +") {
+
+                @Override public RowFilter getFilter(IFilterEditor fe) {
+                    return new RowFilter() {
+                        @Override public boolean include(Entry entry) {
+                            int            row = (Integer)
+                                entry.getIdentifier();
+                            TestTableModel tm = main.getTableModel();
+                            TestData       td = tm.getRow(row);
+
+                            return !td.male || tm.isModified(td);
+                        }
+                    };
+                }
+            };
+
+            choices.add(obsoleteChoice);
+            choices.add(nonObsoleteChoice);
+            editor.setAutoChoices(AutoChoices.DISABLED);
+            editor.setEditable(false);
+            editor.setCustomChoices(choices);
+        } else {
+            editor.setCustomChoices(choices);
+            editor.setAutoChoices(AutoChoices.ENUMS);
+            editor.setEditable(true);
+        }
+
+        main.updateFilterInfo(editor, TestTableModel.MALE);
+    }
 
 
 }

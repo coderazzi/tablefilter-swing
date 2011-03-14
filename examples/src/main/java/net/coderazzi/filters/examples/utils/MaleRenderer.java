@@ -35,30 +35,35 @@ import javax.swing.table.TableCellRenderer;
 
 import net.coderazzi.filters.examples.ActionHandler;
 
+
 public class MaleRenderer implements TableCellRenderer {
 
-	private static final long serialVersionUID = 8042527267257156699L;
+    private static final long serialVersionUID = 8042527267257156699L;
 
-	private ActionHandler main;
-	private Border redBorder;
-	private TableCellRenderer delegate;
-	
-	public MaleRenderer(ActionHandler main) {
-		this.main = main;
-		delegate = main.getTable().getDefaultRenderer(Boolean.class);
-		redBorder = BorderFactory.createLineBorder(Color.red);
-	}
+    private ActionHandler     main;
+    private Border            redBorder;
+    private TableCellRenderer delegate;
 
-	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value,
-			boolean isSelected, boolean hasFocus, int row, int column) {
-		JComponent c = (JComponent) delegate.getTableCellRendererComponent(
-				table, value, isSelected, hasFocus, row, column);
-		int modelRow = table.convertRowIndexToModel(row);
-		TestTableModel tm = main.getTableModel();
-		if (tm.isModified(tm.getRow(modelRow))) {
-			c.setBorder(redBorder);
-		}
-		return c;
-	}
+    public MaleRenderer(ActionHandler main) {
+        this.main = main;
+        delegate = main.getTable().getDefaultRenderer(Boolean.class);
+        redBorder = BorderFactory.createLineBorder(Color.red);
+    }
+
+    @Override public Component getTableCellRendererComponent(JTable  table,
+                                                             Object  value,
+                                                             boolean isSelected,
+                                                             boolean hasFocus,
+                                                             int     row,
+                                                             int     column) {
+        JComponent     c = (JComponent) delegate.getTableCellRendererComponent(
+                table, value, isSelected, hasFocus, row, column);
+        int            modelRow = table.convertRowIndexToModel(row);
+        TestTableModel tm = main.getTableModel();
+        if (tm.isModified(tm.getRow(modelRow))) {
+            c.setBorder(redBorder);
+        }
+
+        return c;
+    }
 }

@@ -36,54 +36,59 @@ import net.coderazzi.filters.examples.ActionHandler;
 import net.coderazzi.filters.gui.AutoChoices;
 import net.coderazzi.filters.gui.IFilterEditor;
 
+
 public class MenuAutoChoices extends JMenu implements ActionListener {
-	
-	public static String NAME ="auto choices";
-	
-	private static final long serialVersionUID = -6772023653226757860L;
-	
-	private ActionHandler main;
-	private IFilterEditor editor;
 
-	/**
-	 * @param editor set to null if the menu applies to the filter header
-	 */
-	public MenuAutoChoices(ActionHandler listener, IFilterEditor editor) {
-		super(NAME);
-		this.main = listener;
-		this.editor = editor;
-		AutoChoices preselected = editor==null? listener.getFilterHeader().getAutoChoices() : editor.getAutoChoices();
+    public static String NAME = "auto choices";
 
-		ButtonGroup group = new ButtonGroup();
-		for (AutoChoices ao : AutoChoices.values()) {
-			JRadioButtonMenuItem item = new JRadioButtonMenuItem(ao.toString().toLowerCase());
-			item.addActionListener(this);
-			group.add(item);
-			if (preselected == ao) {
-				item.setSelected(true);
-			}
-			this.add(item);
-		}
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		AutoChoices ao = getAutoChoice(((JRadioButtonMenuItem)e.getSource()).getText());
-		if (editor==null){
-			main.getFilterHeader().setAutoChoices(ao);
-		} else {
-			editor.setAutoChoices(ao);
-		}
-	}
-	
-	private AutoChoices getAutoChoice(String lowerText){
-		for (AutoChoices a : AutoChoices.values()){
-			if (a.toString().toLowerCase().equals(lowerText)){
-				return a;
-			}
-		}
-		return null;
-		
-	}
-	
+    private static final long serialVersionUID = -6772023653226757860L;
+
+    private ActionHandler main;
+    private IFilterEditor editor;
+
+    /** @param  editor  set to null if the menu applies to the filter header */
+    public MenuAutoChoices(ActionHandler listener, IFilterEditor editor) {
+        super(NAME);
+        this.main = listener;
+        this.editor = editor;
+
+        AutoChoices preselected = (editor == null)
+            ? listener.getFilterHeader().getAutoChoices()
+            : editor.getAutoChoices();
+
+        ButtonGroup group = new ButtonGroup();
+        for (AutoChoices ao : AutoChoices.values()) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(ao.toString()
+                        .toLowerCase());
+            item.addActionListener(this);
+            group.add(item);
+            if (preselected == ao) {
+                item.setSelected(true);
+            }
+
+            this.add(item);
+        }
+    }
+
+    @Override public void actionPerformed(ActionEvent e) {
+        AutoChoices ao = getAutoChoice(((JRadioButtonMenuItem) e.getSource())
+                    .getText());
+        if (editor == null) {
+            main.getFilterHeader().setAutoChoices(ao);
+        } else {
+            editor.setAutoChoices(ao);
+        }
+    }
+
+    private AutoChoices getAutoChoice(String lowerText) {
+        for (AutoChoices a : AutoChoices.values()) {
+            if (a.toString().toLowerCase().equals(lowerText)) {
+                return a;
+            }
+        }
+
+        return null;
+
+    }
+
 }

@@ -46,9 +46,10 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
 class NonAdaptiveChoicesHandler extends ChoicesHandler {
 
     private boolean interrupted = true;
-    //it is needed to map the filters to its editors
-    private Map<IFilter, FilterEditor> filtersMap = new HashMap<IFilter, FilterEditor>();
-    //entry used to filter rows
+    // it is needed to map the filters to its editors
+    private Map<IFilter, FilterEditor> filtersMap =
+        new HashMap<IFilter, FilterEditor>();
+    // entry used to filter rows
     private RowEntry rowEntry;
 
     public NonAdaptiveChoicesHandler(FiltersHandler handler) {
@@ -67,6 +68,7 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
                 for (FilterEditor editor : handler.getEditors()) {
                     editorUpdated(editor);
                 }
+
                 initialiseFiltersInfo();
             }
         }
@@ -80,30 +82,34 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
         }
     }
 
-    @Override public boolean filterUpdated(IFilter iFilter, boolean retInfoRequired) {
-    	//if return value is not required, do not bother checking for it, as
-    	//there is nothing to do with filter updates normally
-    	if (retInfoRequired){
-    		if (!iFilter.isEnabled()){
-    			return false;
-    		}
-    		rowEntry.row = handler.getTable().getModel().getRowCount();
-    		if (rowEntry.row>0){
-    			while (rowEntry.row-->0){
-	            	if (iFilter.include(rowEntry)){
-	            		return true;
-	            	}
-    			}
-    			return false;
-    		}
-    	}
+    @Override public boolean filterUpdated(IFilter iFilter,
+                                           boolean retInfoRequired) {
+        // if return value is not required, do not bother checking for it, as
+        // there is nothing to do with filter updates normally
+        if (retInfoRequired) {
+            if (!iFilter.isEnabled()) {
+                return false;
+            }
+
+            rowEntry.row = handler.getTable().getModel().getRowCount();
+            if (rowEntry.row > 0) {
+                while (rowEntry.row-- > 0) {
+                    if (iFilter.include(rowEntry)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
         return true;
     }
 
     @Override public void filterOperation(boolean start) {
         handler.enableNotifications(!start);
-        if (!start && !interrupted){
-        	initialiseFiltersInfo();
+        if (!start && !interrupted) {
+            initialiseFiltersInfo();
         }
     }
 
@@ -115,17 +121,18 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
                 break;
             }
         }
-        if (!interrupted){
-        	setEnableTableModelEvents(true);
+
+        if (!interrupted) {
+            setEnableTableModelEvents(true);
         }
     }
 
     @Override public void allFiltersDisabled() {
         setEnableTableModelEvents(false);
     }
-    
+
     @Override public void consolidateFilterChanges(int modelIndex) {
-    	//nothing to do
+        // nothing to do
     }
 
     @Override public void tableUpdated(TableModel model,
@@ -171,8 +178,8 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
             editor.setChoices(editor.getCustomChoices());
         } else {
             TableModel model = handler.getTable().getModel();
-            Class<?> c = model.getColumnClass(editor.getModelIndex());
-            boolean asEnum = c.equals(Boolean.class) || c.isEnum();
+            Class<?>   c = model.getColumnClass(editor.getModelIndex());
+            boolean    asEnum = c.equals(Boolean.class) || c.isEnum();
             if (asEnum && (autoChoices != AutoChoices.ENUMS)) {
                 editor.setAutoChoices(AutoChoices.ENUMS);
             } else if (!asEnum && (autoChoices == AutoChoices.ENUMS)) {
@@ -187,6 +194,7 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
                         choices.add(each);
                     }
                 }
+
                 editor.setChoices(choices);
             } else {
                 setChoicesFromModel(editor, model);
@@ -217,19 +225,21 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
         return fill;
     }
 
-    /** Initialise structures related to the filters and editors */
+    /** Initialise structures related to the filters and editors. */
     private void initialiseFiltersInfo() {
-    	//recreate the filtersMap
-    	filtersMap.clear();
-    	
-    	if (handler.getTable()!=null){
-	        for (FilterEditor fe : handler.getEditors()){
-	        	filtersMap.put(fe.getFilter(), fe);
-	        }
-	        //and the RowEntry 
-	        Collection<FilterEditor> eds = handler.getEditors();
-	        rowEntry = new RowEntry(handler.getTable().getModel(), eds.toArray(new FilterEditor[eds.size()]));
-    	}
+        // recreate the filtersMap
+        filtersMap.clear();
+
+        if (handler.getTable() != null) {
+            for (FilterEditor fe : handler.getEditors()) {
+                filtersMap.put(fe.getFilter(), fe);
+            }
+
+            // and the RowEntry
+            Collection<FilterEditor> eds = handler.getEditors();
+            rowEntry = new RowEntry(handler.getTable().getModel(),
+                    eds.toArray(new FilterEditor[eds.size()]));
+        }
     }
 
 }
