@@ -3,7 +3,7 @@
 	<groupId>net.coderazzi</groupId>
 	<artifactId>tablefilter-swing</artifactId>
 	<packaging>jar</packaging>
-	<version>4.1.0</version>
+	<version>4.1.0-SNAPSHOT</version>
 	<name>tablefilter-swing</name>
 	<description>TableFilter is a set of Swing components to support user-driven filtering on table.</description>
 	<url>http://coderazzi.net/tablefilter</url>
@@ -28,9 +28,9 @@
 		<url>http://code.google.com/p/tablefilter-swing/issues/list</url>
 	</issueManagement>
 	<scm>
-		<url>scm:hg:file:///development/workspace/tablefilter-swing</url>
-		<connection>scm:hg:file:///development/workspace/tablefilter-swing</connection>
-		<developerConnection>scm:hg:file:///development/workspace/tablefilter-swing</developerConnection>
+		<url>scm:hg:file:///home/luismi/development/workspace/tablefilter-swing</url>
+		<connection>scm:hg:file:///home/luismi/development/workspace/tablefilter-swing</connection>
+		<developerConnection>scm:hg:file:///home/luismi/development/workspace/tablefilter-swing</developerConnection>
 	</scm>
 	<dependencies>
 		<dependency>
@@ -56,7 +56,7 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.1</version>
 				<configuration>
-					<tagBase>file:///development/workspace/tablefilter-swing</tagBase>
+					<tagBase>file:///home/luismi/development/workspace/tablefilter-swing</tagBase>
 					<mavenExecutorId>forked-path</mavenExecutorId>
 				</configuration>
 			</plugin>
