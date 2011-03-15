@@ -32,7 +32,7 @@ import net.coderazzi.filters.examples.ActionHandler;
 public class MenuUserFilterInclude extends AbstractMenuCheckBoxAction {
 
     private static final long serialVersionUID = 9137226745345048519L;
-    private IFilter           userFilter;
+    private IFilter userFilter;
 
     public MenuUserFilterInclude(ActionHandler main, IFilter userFilter) {
         super("include in header", main);

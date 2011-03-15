@@ -60,11 +60,11 @@ import net.coderazzi.filters.gui.CustomChoice;
 public class ChoicesListModel extends AbstractListModel {
 
     private static final long serialVersionUID = 3523952153693100563L;
-    private List              content;
-    private Format            format;
-    private int               customChoices;
-    boolean                   useFormatter;
-    Comparator                comparator;
+    private List content;
+    private Format format;
+    private int customChoices;
+    boolean useFormatter;
+    Comparator comparator;
 
     public ChoicesListModel() {
         this.content = new ArrayList();
@@ -123,7 +123,7 @@ public class ChoicesListModel extends AbstractListModel {
         }
 
         String ret = base;
-        int    len = base.length();
+        int len = base.length();
         pos = customChoices - pos - 1;
         if (pos < cs) {
             String use = content.get(pos).toString();
@@ -156,7 +156,7 @@ public class ChoicesListModel extends AbstractListModel {
         for (List l : use) {
             for (Object o : l) {
                 String s = o.toString();
-                int    m = ChoiceMatch.getMatchingLength(ret, s, comparator);
+                int m = ChoiceMatch.getMatchingLength(ret, s, comparator);
                 if (m == len) {
                     if (ret != base) {
                         return ""; // exact match!
@@ -279,7 +279,7 @@ public class ChoicesListModel extends AbstractListModel {
                     int suggested = customChoices - pos - 1;
                     if (suggested < content.size()) {
                         String suggestion = content.get(suggested).toString();
-                        int    len = ChoiceMatch.getMatchingLength(strStart,
+                        int len = ChoiceMatch.getMatchingLength(strStart,
                                 suggestion, comparator);
                         if ((len > ret.len) || (ret.len == 0)) {
                             ret.index = suggested;
@@ -289,7 +289,7 @@ public class ChoicesListModel extends AbstractListModel {
                     // if suggested is in the custom choices, no need to try
                     if (--suggested >= customChoices) {
                         String suggestion = content.get(suggested).toString();
-                        int    len = ChoiceMatch.getMatchingLength(strStart,
+                        int len = ChoiceMatch.getMatchingLength(strStart,
                                 suggestion, comparator);
                         if ((len > ret.len) || (ret.len == 0)) {
                             ret.index = suggested;
@@ -315,7 +315,7 @@ public class ChoicesListModel extends AbstractListModel {
                 if (o2 instanceof CustomChoice) {
                     CustomChoice c1 = (CustomChoice) o1;
                     CustomChoice c2 = (CustomChoice) o2;
-                    int          ret = c1.getPrecedence() - c2.getPrecedence();
+                    int ret = c1.getPrecedence() - c2.getPrecedence();
                     if (ret == 0) {
                         if (useFormatter) {
                             // in this case, the comparator is string comparator

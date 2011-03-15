@@ -106,10 +106,10 @@ abstract class ChoicesHandler implements TableModelListener, Runnable {
     @Override public void tableChanged(TableModelEvent e) {
         int firstRow = e.getFirstRow();
         if (firstRow != TableModelEvent.HEADER_ROW) {
+            int type = e.getType();
             TableModel model = (TableModel) e.getSource();
-            tableUpdated(model, e.getType(), firstRow, e.getLastRow(),
-                e.getColumn());
-            reportUpdate = e.getType() == TableModelEvent.UPDATE;
+            tableUpdated(model, type, firstRow, e.getLastRow(), e.getColumn());
+            reportUpdate = type == TableModelEvent.UPDATE;
             if (!runScheduled) {
                 runScheduled = true;
                 // invoke later filtersHandler.tableUpdated, as perhaps the
@@ -155,9 +155,9 @@ abstract class ChoicesHandler implements TableModelListener, Runnable {
      */
     static protected class RowEntry extends RowFilter.Entry {
         private TableModel model;
-        private int        count;
-        private Format     formatters[];
-        public int         row;
+        private int count;
+        private Format formatters[];
+        public int row;
 
         public RowEntry(TableModel model, FilterEditor editors[]) {
             this.model = model;

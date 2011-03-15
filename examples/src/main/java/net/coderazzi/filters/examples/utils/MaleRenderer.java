@@ -40,8 +40,8 @@ public class MaleRenderer implements TableCellRenderer {
 
     private static final long serialVersionUID = 8042527267257156699L;
 
-    private ActionHandler     main;
-    private Border            redBorder;
+    private ActionHandler main;
+    private Border redBorder;
     private TableCellRenderer delegate;
 
     public MaleRenderer(ActionHandler main) {
@@ -56,9 +56,9 @@ public class MaleRenderer implements TableCellRenderer {
                                                              boolean hasFocus,
                                                              int     row,
                                                              int     column) {
-        JComponent     c = (JComponent) delegate.getTableCellRendererComponent(
+        JComponent c = (JComponent) delegate.getTableCellRendererComponent(
                 table, value, isSelected, hasFocus, row, column);
-        int            modelRow = table.convertRowIndexToModel(row);
+        int modelRow = table.convertRowIndexToModel(row);
         TestTableModel tm = main.getTableModel();
         if (tm.isModified(tm.getRow(modelRow))) {
             c.setBorder(redBorder);

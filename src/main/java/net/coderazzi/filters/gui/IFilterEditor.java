@@ -88,11 +88,7 @@ public interface IFilterEditor {
      */
     void setEditable(boolean enable);
 
-    /**
-     * Returns the editable flag.
-     *
-     * @see  #setEditable(boolean)
-     */
+    /** Returns the editable flag. */
     boolean isEditable();
 
     /** Sets the ignore case flag. */
@@ -119,7 +115,7 @@ public interface IFilterEditor {
      */
     void setComparator(Comparator comparator);
 
-    /** Returns the associated {@link Comparator}, which can nver be null. */
+    /** Returns the associated {@link Comparator}, which can never be null. */
     Comparator getComparator();
 
     /** Sets the auto completion flag. */
@@ -153,7 +149,7 @@ public interface IFilterEditor {
     /**
      * Sets the {@link ChoiceRenderer} for the choices / history.
      *
-     * <p>It also affectes to how the content is rendered<br>
+     * <p>It also affects to how the content is rendered<br>
      * If not null, the content cannot be text-edited anymore</p>
      *
      * @param  renderer

@@ -68,10 +68,7 @@ class PositionHelper implements PropertyChangeListener {
     }
 
 
-    /**
-     * <p>Defines the behaviour of the header concerning its position related to
-     * the table.</p>
-     */
+    /** Sets the position of the header related to the table. */
     public void setPosition(Position location) {
         this.location = location;
 
@@ -157,7 +154,7 @@ class PositionHelper implements PropertyChangeListener {
                 Container gp = p.getParent();
                 if (gp instanceof JScrollPane) {
                     JScrollPane scrollPane = (JScrollPane) gp;
-                    JViewport   viewport = scrollPane.getViewport();
+                    JViewport viewport = scrollPane.getViewport();
                     if ((viewport != null) && (viewport.getView() == table)) {
                         setUp(scrollPane);
                         previousTableViewport = p;

@@ -42,7 +42,7 @@ public class MenuModelRemove extends AbstractMenuAction
     implements PropertyChangeListener, TableModelListener {
 
     private static final long serialVersionUID = 9137226745345048519L;
-    private TableModel        registeredModel;
+    private TableModel registeredModel;
 
     public MenuModelRemove(ActionHandler main) {
         super("Remove top row", main);

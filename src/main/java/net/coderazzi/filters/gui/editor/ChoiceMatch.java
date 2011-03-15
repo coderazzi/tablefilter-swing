@@ -68,19 +68,18 @@ class ChoiceMatch {
                                                     Comparator strComparator,
                                                     String     strStart,
                                                     boolean    fullMatch) {
-        int         strLen = strStart.length();
+        int strLen = strStart.length();
         ChoiceMatch ret = new ChoiceMatch();
         while (len-- > 0) {
             ret.content = content.get(len);
 
             String str = ret.content.toString();
-            int    matchLen = getMatchingLength(strStart, str, strComparator);
+            int matchLen = getMatchingLength(strStart, str, strComparator);
             if ((matchLen > ret.len) || (ret.len == 0)) {
                 ret.index = len;
                 ret.len = matchLen;
                 if ((matchLen == strLen) && (str.length() == strLen)) {
                     ret.exact = true;
-
                     return ret;
                 }
             }

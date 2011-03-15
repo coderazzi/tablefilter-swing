@@ -46,7 +46,7 @@ public class MenuLookAndFeel extends JMenu implements ActionListener {
 
     private static final long serialVersionUID = -6772023653226757860L;
 
-    private ActionHandler       main;
+    private ActionHandler main;
     private Map<String, String> lookMap = new HashMap<String, String>();
 
     public MenuLookAndFeel(ActionHandler main) {

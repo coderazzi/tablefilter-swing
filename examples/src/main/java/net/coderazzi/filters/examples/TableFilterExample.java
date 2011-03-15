@@ -95,11 +95,11 @@ public class TableFilterExample extends JFrame implements ActionHandler {
 
     private static final long serialVersionUID = 382439526043424294L;
 
-    private TestTableModel    tableModel;
-    private JTable            table;
+    private TestTableModel tableModel;
+    private JTable table;
     private TableFilterHeader filterHeader;
     private JCheckBoxMenuItem allEnabled;
-    JMenu                     filtersMenu;
+    JMenu filtersMenu;
 
     public TableFilterExample() {
         super("Table Filter Example");
@@ -242,7 +242,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
 
     /** Method to handle the information associated to a (new) filter editor. */
     void handleNewColumn(IFilterEditor editor, TableColumn tc) {
-        String  name = (String) tc.getHeaderValue();
+        String name = (String) tc.getHeaderValue();
         boolean countryColumn = name.equalsIgnoreCase(TestTableModel.COUNTRY);
         boolean maleColumn = name.equalsIgnoreCase(TestTableModel.MALE);
 
@@ -329,7 +329,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
     /** {@link ActionHandler} interface. */
     @Override public void updateFiltersInfo() {
         TableColumnModel model = table.getColumnModel();
-        int              n = model.getColumnCount();
+        int n = model.getColumnCount();
         while (n-- > 0) {
             TableColumn tc = model.getColumn(n);
             updateFilterInfo(filterHeader.getFilterEditor(tc.getModelIndex()),
@@ -358,8 +358,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
                 editor.getAutoChoices().toString().toLowerCase(), false))
             .setSelected(true);
 
-        JMenu                historyMenu = (JMenu) getMenu(menu,
-                MenuMaxHistory.NAME, false);
+        JMenu historyMenu = (JMenu) getMenu(menu, MenuMaxHistory.NAME, false);
         JRadioButtonMenuItem item = ((JRadioButtonMenuItem) getMenu(historyMenu,
                     String.valueOf(editor.getMaxHistory()), false));
         if (item != null) {

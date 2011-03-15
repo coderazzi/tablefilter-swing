@@ -45,14 +45,13 @@ import net.coderazzi.filters.gui.TableFilterHeader.Position;
 
 public class MenuPosition extends JMenu implements ActionListener {
 
-    private static final long                  serialVersionUID =
-        -6772023653226757860L;
+    private static final long serialVersionUID = -6772023653226757860L;
     private static final Map<String, Position> options =
         new HashMap<String, Position>();
 
     private ActionHandler main;
-    private JPanel        filterHeaderPanel;
-    private JPanel        tablePanel;
+    private JPanel filterHeaderPanel;
+    private JPanel tablePanel;
 
     public MenuPosition(ActionHandler main, JPanel tablePanel) {
         super("position");
@@ -62,7 +61,7 @@ public class MenuPosition extends JMenu implements ActionListener {
         options.put("inline (automatic)", Position.INLINE);
         options.put("bottom (manual)", Position.NONE);
 
-        Position    select = main.getFilterHeader().getPosition();
+        Position select = main.getFilterHeader().getPosition();
         ButtonGroup group = new ButtonGroup();
         for (Map.Entry<String, Position> s : options.entrySet()) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(s.getKey());

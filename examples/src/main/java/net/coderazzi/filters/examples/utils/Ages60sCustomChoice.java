@@ -84,12 +84,12 @@ public class Ages60sCustomChoice extends CustomChoice {
                 use = UIManager.getLookAndFeel().getDisabledIcon(c, icon);
             }
 
-            Font        font = editor.getLook()
+            Font font = editor.getLook()
                     .getCustomChoiceDecorator()
                     .getFont(this, editor, isSelected);
             FontMetrics metrics = g.getFontMetrics(font);
-            int         x = c.getWidth() - metrics.stringWidth(this.toString());
-            int         y = (c.getHeight() - use.getIconHeight()) / 2;
+            int x = c.getWidth() - metrics.stringWidth(this.toString());
+            int y = (c.getHeight() - use.getIconHeight()) / 2;
             use.paintIcon(c, g, x, y);
         }
     }

@@ -41,8 +41,7 @@ import javax.swing.RowFilter;
 abstract public class Filter extends RowFilter implements IFilter {
 
     /** The set of currently subscribed observers. */
-    private Set<IFilterObserver> filterObservers =
-        new HashSet<IFilterObserver>();
+    private Set<IFilterObserver> observers = new HashSet<IFilterObserver>();
 
     /** The enabled state. */
     private boolean enabled = true;
@@ -62,17 +61,17 @@ abstract public class Filter extends RowFilter implements IFilter {
 
     /** @see  IFilter#addFilterObserver(IFilterObserver) */
     @Override public void addFilterObserver(IFilterObserver observer) {
-        filterObservers.add(observer);
+        observers.add(observer);
     }
 
     /** @see  IFilter#removeFilterObserver(IFilterObserver) */
     @Override public void removeFilterObserver(IFilterObserver observer) {
-        filterObservers.remove(observer);
+        observers.remove(observer);
     }
 
     /** Returns all the registered {@link IFilterObserver} instances. */
     public Set<IFilterObserver> getFilterObservers() {
-        return new HashSet<IFilterObserver>(filterObservers);
+        return new HashSet<IFilterObserver>(observers);
     }
 
     /**
@@ -80,8 +79,7 @@ abstract public class Filter extends RowFilter implements IFilter {
      * filter has changed.
      */
     public void reportFilterUpdatedToObservers() {
-        for (IFilterObserver obs
-                : new ArrayList<IFilterObserver>(filterObservers)) {
+        for (IFilterObserver obs : new ArrayList<IFilterObserver>(observers)) {
             obs.filterUpdated(this);
         }
     }

@@ -67,9 +67,8 @@ public class FilterSettings {
     public static Color backgroundColor = getColor("BackgroundColor", null);
 
     /**
-     * The class defining the generic {@link IParserModel}<br>
+     * The class defining the generic {@link CustomChoiceDecorator}<br>
      * It must have a default constructor.<br>
-     * It corresponds to the property ParserModel.class
      */
     public static Class<? extends CustomChoiceDecorator> customChoiceDecoratorClass;
 

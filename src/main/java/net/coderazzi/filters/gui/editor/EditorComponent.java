@@ -70,19 +70,19 @@ public class EditorComponent extends JTextField {
     private static final long serialVersionUID = -2196080442586435546L;
 
     private Controller controller;
-    private boolean    focus;
-    boolean            instantFilteringEnabled;
-    boolean            autoCompletionEnabled;
-    boolean            warning;
-    FilterEditor       filterEditor;
-    PopupComponent     popupComponent;
+    private boolean focus;
+    boolean instantFiltering;
+    boolean autoCompletionEnabled;
+    boolean warning;
+    FilterEditor filterEditor;
+    PopupComponent popup;
 
     public EditorComponent(FilterEditor   editor,
                            PopupComponent popupComponent) {
         super(15); // created with 15 columns
         this.filterEditor = editor;
-        this.popupComponent = popupComponent;
-        this.controller = new EditableTextController();
+        this.popup = popupComponent;
+        this.controller = new EditableTC();
     }
 
     @Override public void setUI(TextUI ui) {
@@ -143,17 +143,17 @@ public class EditorComponent extends JTextField {
 
     /** Returns the editable flag. */
     public boolean isEditableContent() {
-        return controller instanceof EditableTextController;
+        return controller instanceof EditableTC;
     }
 
     /** Sets the instant filtering flag. */
     public void setInstantFiltering(boolean enable) {
-        this.instantFilteringEnabled = enable;
+        this.instantFiltering = enable;
     }
 
     /** Returns the instant filtering flag. */
     public boolean isInstantFiltering() {
-        return instantFilteringEnabled;
+        return instantFiltering;
     }
 
     /** Sets the auto completion flag. */
@@ -169,12 +169,11 @@ public class EditorComponent extends JTextField {
     /** Sets the text mode and editable flag. */
     public void setTextMode(boolean editable) {
         if (controller != null) {
-            if (editable && (controller instanceof EditableTextController)) {
+            if (editable && (controller instanceof EditableTC)) {
                 return;
             }
 
-            if (!editable
-                    && (controller instanceof NonEditableTextController)) {
+            if (!editable && (controller instanceof NonEditableTC)) {
                 return;
             }
 
@@ -182,9 +181,9 @@ public class EditorComponent extends JTextField {
         }
 
         if (editable) {
-            controller = new EditableTextController();
+            controller = new EditableTC();
         } else {
-            controller = new NonEditableTextController();
+            controller = new NonEditableTC();
         }
 
         updateParser();
@@ -244,7 +243,7 @@ public class EditorComponent extends JTextField {
     }
 
     Look prepareComponentLook(CustomChoice cc) {
-        return popupComponent.getFilterRenderer()
+        return popup.getFilterRenderer()
                 .prepareComponentLook(this, isFocused(), cc);
     }
 
@@ -295,10 +294,10 @@ public class EditorComponent extends JTextField {
     private class RenderedController extends MouseAdapter
         implements Controller {
 
-        private Object           content = CustomChoice.MATCH_ALL;
+        private Object content = CustomChoice.MATCH_ALL;
         private CellRendererPane painter = new CellRendererPane();
-        RowFilter                filter;
-        Object                   cachedContent = content;
+        RowFilter filter;
+        Object cache = content;
 
         RenderedController() {
             addMouseListener(this);
@@ -306,7 +305,7 @@ public class EditorComponent extends JTextField {
         }
 
         @Override public void paintComponent(Graphics g) {
-            Component c = popupComponent.getFilterRenderer()
+            Component c = popup.getFilterRenderer()
                     .getCellRendererComponent(content, getWidth(), isFocused());
             painter.paintComponent(g, c, EditorComponent.this, 0, 0, getWidth(),
                 getHeight());
@@ -340,11 +339,10 @@ public class EditorComponent extends JTextField {
 
         @Override public void consolidateFilter() {
             Object currentContent = getContent();
-            if (currentContent != cachedContent) {
-                cachedContent = currentContent;
-                if (cachedContent instanceof CustomChoice) {
-                    filter = ((CustomChoice) cachedContent).getFilter(
-                            filterEditor);
+            if (currentContent != cache) {
+                cache = currentContent;
+                if (cache instanceof CustomChoice) {
+                    filter = ((CustomChoice) cache).getFilter(filterEditor);
                 } else {
                     filter = new RowFilter() {
                         @Override public boolean include(
@@ -352,8 +350,8 @@ public class EditorComponent extends JTextField {
                             Object val = entry.getValue(
                                     filterEditor.getModelIndex());
 
-                            return (val == null) ? (cachedContent == null)
-                                                 : val.equals(cachedContent);
+                            return (val == null) ? (cache == null)
+                                                 : val.equals(cache);
                         }
                     };
                 }
@@ -391,8 +389,8 @@ public class EditorComponent extends JTextField {
         private Object content;
         // the filter associated to the content variable
         private RowFilter filter;
-        private boolean   error;
-        private boolean   useCustomDecoration;
+        private boolean error;
+        private boolean decorate;
 
         TextController() {
             setEditable(true);
@@ -413,7 +411,7 @@ public class EditorComponent extends JTextField {
 
         @Override public void paintComponent(Graphics g) {
             superPaintComponent(g);
-            if (useCustomDecoration && (content instanceof CustomChoice)) {
+            if (decorate && (content instanceof CustomChoice)) {
                 filterEditor.getLook()
                     .getCustomChoiceDecorator()
                     .decorateComponent((CustomChoice) content, filterEditor,
@@ -426,7 +424,7 @@ public class EditorComponent extends JTextField {
         }
 
         @Override public void setContent(Object content) {
-            String      text;
+            String text;
             ChoiceMatch match = new ChoiceMatch();
             match.exact = true;
             if (content instanceof CustomChoice) {
@@ -434,9 +432,8 @@ public class EditorComponent extends JTextField {
                 text = ((CustomChoice) content).toString();
                 match.content = content;
             } else {
-                Format format = filterEditor.getFormat();
-                text = (format == null) ? content.toString()
-                                        : format.format(content);
+                Format fmt = filterEditor.getFormat();
+                text = (fmt == null) ? content.toString() : fmt.format(content);
                 match.content = text;
             }
 
@@ -446,7 +443,7 @@ public class EditorComponent extends JTextField {
         }
 
         @Override public Object getContent() {
-            if (!instantFilteringEnabled) {
+            if (!instantFiltering) {
                 // in this case, the content is not always updated,
                 // try an update now, if needed
                 String ret = getText();
@@ -463,7 +460,7 @@ public class EditorComponent extends JTextField {
         }
 
         @Override public void consolidateFilter() {
-            if (instantFilteringEnabled) {
+            if (instantFiltering) {
                 // with instant filtering, the filter could be the instant
                 // expression (normally the test + '*'). If this is the case,
                 // show it
@@ -485,10 +482,9 @@ public class EditorComponent extends JTextField {
         }
 
         @Override public void updateLook() {
-            CustomChoice cc =
-                (useCustomDecoration && (content instanceof CustomChoice))
+            CustomChoice cc = (decorate && (content instanceof CustomChoice))
                 ? (CustomChoice) content : null;
-            Look         look = prepareComponentLook(cc);
+            Look look = prepareComponentLook(cc);
             if (isEnabled() && (error || warning)) {
                 Color foreground = error ? look.getErrorForeground()
                                          : look.getWarningForeground();
@@ -513,7 +509,7 @@ public class EditorComponent extends JTextField {
             // if the user moves the cursor on the editor, the focus passes
             // automatically back to the editor (from the popup)
             if (isEnabled()) {
-                popupComponent.setPopupFocused(false);
+                popup.setPopupFocused(false);
                 deactivateCustomDecoration();
             }
         }
@@ -530,16 +526,16 @@ public class EditorComponent extends JTextField {
 
         /** Returns the best match for a given hint. */
         protected ChoiceMatch getBestMatch(String hint) {
-            ChoiceMatch ret = popupComponent.selectBestMatch(hint, false);
-            popupComponent.setPopupFocused(false);
+            ChoiceMatch ret = popup.selectBestMatch(hint, false);
+            popup.setPopupFocused(false);
 
             return ret;
         }
 
         /** Returns an exact match for a given hint. */
         protected ChoiceMatch getExactMatch(String hint) {
-            ChoiceMatch ret = popupComponent.selectBestMatch(hint, true);
-            popupComponent.setPopupFocused(false);
+            ChoiceMatch ret = popup.selectBestMatch(hint, true);
+            popup.setPopupFocused(false);
 
             return ret;
         }
@@ -550,8 +546,8 @@ public class EditorComponent extends JTextField {
          */
         private boolean activateCustomDecoration() {
             boolean ret = false;
-            if (!useCustomDecoration && (content instanceof CustomChoice)) {
-                useCustomDecoration = true;
+            if (!decorate && (content instanceof CustomChoice)) {
+                decorate = true;
                 updateLook();
                 repaint();
                 ret = true;
@@ -562,8 +558,8 @@ public class EditorComponent extends JTextField {
 
         /** Deactivates the custom decoration. */
         protected void deactivateCustomDecoration() {
-            if (useCustomDecoration) {
-                useCustomDecoration = false;
+            if (decorate) {
+                decorate = false;
                 updateLook();
                 repaint();
             }
@@ -586,7 +582,7 @@ public class EditorComponent extends JTextField {
                                     ChoiceMatch match,
                                     boolean     userUpdate) {
             RowFilter currentFilter = filter;
-            boolean   error = false;
+            boolean error = false;
             if (text == null) {
                 match = null;
                 text = getText();
@@ -601,12 +597,12 @@ public class EditorComponent extends JTextField {
                 if (match.exact) {
                     content = match.content;
                     if (match.content instanceof CustomChoice) {
-                        filter = ((CustomChoice) content).getFilter(
-                                filterEditor);
+                        CustomChoice cc = (CustomChoice) content;
+                        filter = cc.getFilter(filterEditor);
                     } else {
                         filter = textParser.parseText(escapeText(text));
                     }
-                } else if (instantFilteringEnabled && userUpdate) {
+                } else if (instantFiltering && userUpdate) {
                     boolean parseInstant = true;
                     if (filterEditor.getAutoChoices() == AutoChoices.DISABLED) {
                         // in this case, we really need to try an update
@@ -671,11 +667,11 @@ public class EditorComponent extends JTextField {
 
 
     /** TextController for editable content. */
-    private class EditableTextController extends TextController {
+    private class EditableTC extends TextController {
 
-        EditableTextController() {
-            ((AbstractDocument) getDocument()).setDocumentFilter(
-                new ControllerDocumentFilter());
+        EditableTC() {
+            AbstractDocument ad = ((AbstractDocument) getDocument());
+            ad.setDocumentFilter(new ControllerDocumentFilter());
         }
 
         @Override public void detach() {
@@ -729,8 +725,8 @@ public class EditorComponent extends JTextField {
                     // autocompletion is only triggered if the user inputs
                     // a character at the end of the current text
                     if (now.length() == (offset + length)) {
-                        String completion = popupComponent.getCompletion(
-                                now.substring(0, offset) + text);
+                        String completion = popup.getCompletion(now.substring(0,
+                                    offset) + text);
                         text += completion;
                         moveCaretLeft = completion.length();
                     }
@@ -777,9 +773,9 @@ public class EditorComponent extends JTextField {
                     String text = getText();
                     // the best match is anyway obtained to select the proper
                     // choice on the popup
-                    if (instantFilteringEnabled || popupComponent.isVisible()) {
+                    if (instantFiltering || popup.isVisible()) {
                         ChoiceMatch match = getBestMatch(text);
-                        if (instantFilteringEnabled) {
+                        if (instantFiltering) {
                             updateFilter(text, match, true);
                         }
                     }
@@ -790,11 +786,11 @@ public class EditorComponent extends JTextField {
 
 
     /** TextController for non editable content. */
-    private class NonEditableTextController extends TextController {
+    private class NonEditableTC extends TextController {
 
-        NonEditableTextController() {
-            ((AbstractDocument) getDocument()).setDocumentFilter(
-                new ControllerDocumentFilter());
+        NonEditableTC() {
+            AbstractDocument ad = ((AbstractDocument) getDocument());
+            ad.setDocumentFilter(new ControllerDocumentFilter());
         }
 
         @Override public void detach() {
@@ -843,13 +839,11 @@ public class EditorComponent extends JTextField {
                                           String       text,
                                           AttributeSet attrs)
                                    throws BadLocationException {
-                String      buffer = getText();
-                String      newContentBegin = buffer.substring(0, offset)
-                        + text;
-                String      newContent = newContentBegin
-                        + buffer.substring(offset + length);
+                String buffer = getText();
+                String begin = buffer.substring(0, offset) + text;
+                String newContent = begin + buffer.substring(offset + length);
                 ChoiceMatch match = getBestMatch(newContent);
-                String      proposal = null;
+                String proposal = null;
                 if (match.exact) {
                     proposal = match.content.toString();
                 } else {
@@ -858,7 +852,7 @@ public class EditorComponent extends JTextField {
                     // now 'c', the code above would imply getting "seccond",
                     // which is probably wrong, so we try now to get a proposal
                     // starting at 'sec' ['sec|ond']
-                    ChoiceMatch match2 = getExactMatch(newContentBegin);
+                    ChoiceMatch match2 = getExactMatch(begin);
                     if (match2.exact) {
                         match = match2;
                         proposal = match.content.toString();
@@ -868,12 +862,13 @@ public class EditorComponent extends JTextField {
                         proposal = match.content.toString();
                         // on text content, the string comparator cannot
                         // be null
-                        if ((proposal.length() < newContentBegin.length())
-                                || (0
-                                    != popupComponent.getStringComparator()
-                                    .compare(newContentBegin,
-                                        proposal.substring(0,
-                                            newContentBegin.length())))) {
+                        if (proposal.length() < begin.length()) {
+                            return;
+                        }
+
+                        Comparator<String> cst = popup.getStringComparator();
+                        String prpBegin = proposal.substring(0, begin.length());
+                        if (0 != cst.compare(begin, prpBegin)) {
                             return;
                         }
                     }
@@ -890,7 +885,7 @@ public class EditorComponent extends JTextField {
                 moveCaretPosition(Math.min(len, caret));
                 deactivateCustomDecoration();
 
-                if (userUpdate && instantFilteringEnabled) {
+                if (userUpdate && instantFiltering) {
                     match.exact = true;
                     updateFilter(proposal, match, true);
                 }
@@ -900,10 +895,10 @@ public class EditorComponent extends JTextField {
                                          int          offset,
                                          int          length)
                                   throws BadLocationException {
-                int         caret = getCaret().getDot();
-                int         mark = getCaret().getMark();
-                String      buffer = getText();
-                String      newContent = buffer.substring(0, offset)
+                int caret = getCaret().getDot();
+                int mark = getCaret().getMark();
+                String buffer = getText();
+                String newContent = buffer.substring(0, offset)
                         + buffer.substring(offset + length);
                 ChoiceMatch match = getBestMatch(newContent);
                 if (match.content == null) {
@@ -912,15 +907,12 @@ public class EditorComponent extends JTextField {
 
                 String proposal = match.content.toString();
                 // on text content, this comparator cannot be null
-                Comparator<String> comparator =
-                    popupComponent.getStringComparator();
-                if (!match.exact
-                        || (0 != comparator.compare(newContent, proposal))) {
+                Comparator<String> cmp = popup.getStringComparator();
+                if (!match.exact || (0 != cmp.compare(newContent, proposal))) {
                     if (
-                        ChoiceMatch.getMatchingLength(proposal, newContent,
-                                comparator)
+                        ChoiceMatch.getMatchingLength(proposal, newContent, cmp)
                             <= ChoiceMatch.getMatchingLength(buffer, newContent,
-                                comparator)) {
+                                cmp)) {
                         proposal = buffer;
                     }
                 }
@@ -954,8 +946,7 @@ public class EditorComponent extends JTextField {
                 moveCaretPosition(Math.min(len, caret));
                 deactivateCustomDecoration();
 
-                if (userUpdate && instantFilteringEnabled
-                        && (proposal != buffer)) {
+                if (userUpdate && instantFiltering && (proposal != buffer)) {
                     match.exact = true;
                     updateFilter(proposal, match, true);
                 }

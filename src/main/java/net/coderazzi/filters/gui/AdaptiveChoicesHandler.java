@@ -53,7 +53,7 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
 class AdaptiveChoicesHandler extends ChoicesHandler {
 
     private AdaptiveChoicesSupport adaptiveSupport;
-    private boolean                interrupted = true;
+    private boolean interrupted = true;
 
     public AdaptiveChoicesHandler(FiltersHandler handler) {
         super(handler);
@@ -141,9 +141,9 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
     /** Creates the associated {@link AdaptiveChoicesSupport} instance. */
     private void createAdaptiveChoicesSupport() {
         Collection<FilterEditor> eds = handler.getEditors();
+        FilterEditor array[] = eds.toArray(new FilterEditor[eds.size()]);
         adaptiveSupport = new AdaptiveChoicesSupport(handler.getTable()
-                    .getModel(), eds.toArray(new FilterEditor[eds.size()]),
-                handler.getFilters());
+                    .getModel(), array, handler.getFilters());
         setEnableTableModelEvents(true);
     }
 
@@ -197,16 +197,15 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                                       FilterEditor editors[],
                                       Set<IFilter> allFilters) {
             // note that the allFilters set will be modified
-            int modelColumns = model.getColumnCount();
+            int columns = model.getColumnCount();
             int edLen = editors.length;
             rows = new ArrayList<RowInfo>(model.getRowCount() + 1);
             editorHandles = new EditorHandle[edLen];
 
-            // note: modelColumns could be different from editors.length if some
+            // note: columns could be different from editors.length if some
             // column has been removed from the model
-            filters =
-                new RowInfo.Filter[allFilters.size() + modelColumns - edLen];
-            for (int i = 0; i < modelColumns; i++) {
+            filters = new RowInfo.Filter[allFilters.size() + columns - edLen];
+            for (int i = 0; i < columns; i++) {
                 filters[i] = null;
             }
 
@@ -220,9 +219,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             }
 
             for (IFilter filter : allFilters) {
-                filters[modelColumns] = new RowInfo.Filter(filter,
-                        modelColumns);
-                modelColumns++;
+                filters[columns] = new RowInfo.Filter(filter, columns);
+                columns++;
             }
 
             rowEntry = new RowEntry(model, editors);
@@ -301,8 +299,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
          */
         public boolean update(IFilter iFilter) {
             RowInfo.Filter filter = getFilter(iFilter);
-            int            update = updateRowInfo(filter, iFilter);
-            boolean        changed = 1 == (update & 1);
+            int update = updateRowInfo(filter, iFilter);
+            boolean changed = 1 == (update & 1);
 
             if (changed) {
                 // only propagate changes if this is not an editor
@@ -417,7 +415,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             }
 
             boolean fullMode = (firstRow == 0) && (lastRow == rows);
-            int     check = handles;
+            int check = handles;
             for (int i = 0; i < check;) {
                 if (editorHandles[i].startIteration(fullMode)) {
                     // if startIteration returns true, this editor will require
@@ -446,7 +444,6 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                     EditorHandle handle = editorHandles[i++];
                     if (filters[handle.column].is(row)) {
                         if (handle.handleRow(rowEntry)) {
-
                             // if handleRow returns true, this editor will
                             // require no additional iteration (move it to the
                             // end) if no handles remain, just return
@@ -578,14 +575,13 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                 }
 
                 choices.clear();
+                maxIterationChoices = maxChoices;
                 if (fullMode) {
                     missingChoices = (customChoices == null)
                         ? Collections.EMPTY_MAP
                         : new HashMap<CustomChoice, RowFilter>(customChoices);
-                    maxIterationChoices = maxChoices;
                 } else {
-                    maxIterationChoices = maxChoices
-                            - editor.getChoices().size();
+                    maxIterationChoices -= editor.getChoices().size();
                 }
 
                 return maxIterationChoices == 0;
@@ -640,7 +636,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
          */
         static class RowInfo {
             static final byte SET = (byte) 255;
-            byte              info[];
+            byte info[];
 
             RowInfo(int columns) {
                 int length = 1 + (columns >> 3);
@@ -666,8 +662,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             static class Filter {
                 private int col;
                 private int bit;
-                int         column;
-                IFilter     filter;
+                int column;
+                IFilter filter;
 
                 Filter(IFilter filter, int column) {
                     this.column = column;
@@ -702,7 +698,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                  * exception of THIS column, are set to 1.
                  */
                 public boolean is(RowInfo row) {
-                    byte    info[] = row.info;
+                    byte info[] = row.info;
                     boolean now = 0 != (info[col] & bit);
                     set(row, true);
 

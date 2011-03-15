@@ -71,25 +71,25 @@ import net.coderazzi.filters.gui.Look;
 class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 
     private static final long serialVersionUID = 6736940091246039334L;
-    private final static int  X_MARGIN_ARROW = 1;
-    private final static int  WIDTH_ARROW = 5;
-    private final static int  HEIGHT_ARROW = 6; // must be even
-    private final static int  X[] = { 0, WIDTH_ARROW, 0 };
-    private final static int  Y[] = { 0, HEIGHT_ARROW / 2, HEIGHT_ARROW };
+    private final static int X_MARGIN_ARROW = 1;
+    private final static int WIDTH_ARROW = 5;
+    private final static int HEIGHT_ARROW = 6; // must be even
+    private final static int X[] = { 0, WIDTH_ARROW, 0 };
+    private final static int Y[] = { 0, HEIGHT_ARROW / 2, HEIGHT_ARROW };
 
     private CellRendererPane painter = new CellRendererPane();
-    private JList            referenceList;
-    private Component        inner;
-    private Color            arrowColor;
+    private JList referenceList;
+    private Component inner;
+    private Color arrowColor;
 
     private boolean showArrow;
     private boolean focusOnList;
-    private int     xDeltaBase;
-    private int     width;
+    private int xDeltaBase;
+    private int width;
 
-    IFilterEditor  editor;
-    Color          fg;
-    Color          bg;
+    IFilterEditor editor;
+    Color fg;
+    Color bg;
     ChoiceRenderer renderer;
 
     private class DefaultRenderer extends JLabel implements ListCellRenderer {
@@ -97,7 +97,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
         private static final long serialVersionUID = 5837846455371777058L;
 
         CustomChoice currentCustomChoice;
-        boolean      isSelected;
+        boolean isSelected;
 
         public DefaultRenderer(JList referenceList) {
             setOpaque(true);
@@ -210,12 +210,12 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
     public Look prepareComponentLook(Component    c,
                                      boolean      selected,
                                      CustomChoice cc) {
-        Look                  look = editor.getLook();
-        Color                 background;
-        Color                 foreground;
+        Look look = editor.getLook();
+        Color background;
+        Color foreground;
         CustomChoiceDecorator decorator = (cc == null)
             ? null : look.getCustomChoiceDecorator();
-        Font                  font = (decorator == null)
+        Font font = (decorator == null)
             ? look.getFont() : decorator.getFont(cc, editor, selected);
         if (!c.isEnabled()) {
             foreground = look.getDisabledForeground();
@@ -251,13 +251,12 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
     private void setupRenderer(JList   list,
                                Object  value,
                                int     index,
-                               boolean isSelected,
+                               boolean selected,
                                boolean cellHasFocus) {
         inner = null;
         if (renderer != null) {
             try {
-                inner = renderer.getRendererComponent(editor, value,
-                        isSelected);
+                inner = renderer.getRendererComponent(editor, value, selected);
             } catch (Exception ex) {
                 // inner still null
             }
@@ -265,7 +264,7 @@ class FilterListCellRenderer extends JComponent implements ListCellRenderer {
 
         if (inner == null) {
             inner = defaultRenderer.getListCellRendererComponent(list, value,
-                    index, isSelected, cellHasFocus);
+                    index, selected, cellHasFocus);
         }
     }
 

@@ -178,8 +178,8 @@ class NonAdaptiveChoicesHandler extends ChoicesHandler {
             editor.setChoices(editor.getCustomChoices());
         } else {
             TableModel model = handler.getTable().getModel();
-            Class<?>   c = model.getColumnClass(editor.getModelIndex());
-            boolean    asEnum = c.equals(Boolean.class) || c.isEnum();
+            Class<?> c = model.getColumnClass(editor.getModelIndex());
+            boolean asEnum = c.equals(Boolean.class) || c.isEnum();
             if (asEnum && (autoChoices != AutoChoices.ENUMS)) {
                 editor.setAutoChoices(AutoChoices.ENUMS);
             } else if (!asEnum && (autoChoices == AutoChoices.ENUMS)) {

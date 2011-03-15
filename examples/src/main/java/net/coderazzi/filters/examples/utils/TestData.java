@@ -131,7 +131,7 @@ public class TestData {
 
     public static class Flag extends ImageIcon {
         private static final long serialVersionUID = 1242769439980562528L;
-        private Double            redAmount;
+        private Double redAmount;
 
         Flag(byte array[]) {
             super(array);
@@ -169,14 +169,14 @@ public class TestData {
         }
     }
 
-    public String  name;
-    public String  firstName;
+    public String name;
+    public String firstName;
     public Integer age;
     public Boolean male;
-    public Tutor   tutor;
-    public Flag    flag;
-    public Club    club;
-    public Date    date;
+    public Tutor tutor;
+    public Flag flag;
+    public Club club;
+    public Date date;
 
     public TestData() {
         // 1 out of 64 can be with unknown age (null)
@@ -214,13 +214,13 @@ public class TestData {
     static void getAllIcons() {
         allIcons = new ArrayList<Flag>();
         try {
-            Pattern               p = Pattern.compile("gif/(.+)\\.gif");
-            ZipInputStream        zip = new ZipInputStream(TestData.class
+            Pattern p = Pattern.compile("gif/(.+)\\.gif");
+            ZipInputStream zip = new ZipInputStream(TestData.class
                         .getResourceAsStream(
                             "/net/coderazzi/filters/examples/resources/famfamfam_flag_icons.zip"));
-            ZipEntry              entry;
+            ZipEntry entry;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte                  buffer[] = new byte[16384];
+            byte buffer[] = new byte[16384];
 
             while ((entry = zip.getNextEntry()) != null) {
                 Matcher m = p.matcher(entry.getName());

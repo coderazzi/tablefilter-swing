@@ -46,7 +46,7 @@ public class MenuColumnRemove extends AbstractMenuAction {
 
     @Override public void actionPerformed(ActionEvent e) {
         TableColumnModel model = main.getTable().getColumnModel();
-        TableColumn      tc = model.getColumn(model.getColumnIndex(columnName));
+        TableColumn tc = model.getColumn(model.getColumnIndex(columnName));
         model.removeColumn(tc);
         // remove the column, but add a menu item to recover it
         main.getFilterMenu().add(new MenuColumnRecover(main, tc));

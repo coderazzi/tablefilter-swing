@@ -62,11 +62,11 @@ import net.coderazzi.filters.gui.Look;
  */
 abstract class PopupComponent implements PopupMenuListener {
 
-    private JPopupMenu             popup;
+    private JPopupMenu popup;
     private FilterListCellRenderer listRenderer;
-    private JScrollPane            choicesScrollPane;
-    private JScrollPane            historyScrollPane;
-    private JSeparator             separator;
+    private JScrollPane choicesScrollPane;
+    private JScrollPane historyScrollPane;
+    private JSeparator separator;
 
     private ChoicesListModel choicesModel;
     private HistoryListModel historyModel;
@@ -92,9 +92,7 @@ abstract class PopupComponent implements PopupMenuListener {
         createGui(editor);
     }
 
-    /**
-     * Invoked when the user select an element in the choices or history lists.
-     */
+    /** Invoked when the user select an element. */
     protected abstract void choiceSelected(Object selection);
 
     /** Returns the current selection -can be history or and choices-. */
@@ -224,33 +222,29 @@ abstract class PopupComponent implements PopupMenuListener {
      * It always favour content belonging to the choices list, rather than to
      * the history list.
      *
-     * @param   hint          an object used to select the match. If the content
-     *                        is text-based (there is no Renderer defined), the
-     *                        hint is considered the start of the string, and
-     *                        the best match should start with the given hint).
-     *                        If the content is not text-based, only exact
-     *                        matches are returned, no matter the value of the
-     *                        parameter perfectMatch
-     * @param   perfectMatch  when the content is text-based, if no
-     *                        choice/history starts with the given hint string,
-     *                        smaller hint substrings are used, unless
-     *                        perfectMatch is true
+     * @param   hint   an object used to select the match. If the content is
+     *                 text-based (there is no Renderer defined), the hint is
+     *                 considered the start of the string, and the best match
+     *                 should start with the given hint). If the content is not
+     *                 text-based, only exact matches are returned, no matter
+     *                 the value of the parameter perfectMatch
+     * @param   exact  when the content is text-based, if no choice/history
+     *                 starts with the given hint string, smaller hint
+     *                 substrings are used, unless perfectMatch is true
      *
      * @return  null if not match found, or a valid Match otherwise, with non
      *          null content
      */
-    public ChoiceMatch selectBestMatch(Object hint, boolean perfectMatch) {
-        ChoiceMatch historyMatch = historyModel.getClosestMatch(hint,
-                perfectMatch);
+    public ChoiceMatch selectBestMatch(Object hint, boolean exact) {
+        ChoiceMatch hMatch = historyModel.getClosestMatch(hint, exact);
         if (choicesModel.getSize() > 0) {
             ChoiceMatch match = choicesModel.getClosestMatch(hint,
-                    perfectMatch || historyMatch.exact);
+                    exact || hMatch.exact);
             if (isVisible() && (match.index >= 0)) {
                 choicesList.ensureIndexIsVisible(match.index);
             }
 
-            if (match.exact
-                    || (!historyMatch.exact && (match.len >= historyMatch.len))) {
+            if (match.exact || (!hMatch.exact && (match.len >= hMatch.len))) {
                 if (match.index >= 0) {
                     if (isVisible()) {
                         focusChoices();
@@ -263,14 +257,14 @@ abstract class PopupComponent implements PopupMenuListener {
             }
         }
 
-        if (historyMatch.index != -1) {
+        if (hMatch.index != -1) {
             if (isVisible()) {
                 focusHistory();
-                select(historyMatch.index);
+                select(hMatch.index);
             }
         }
 
-        return historyMatch;
+        return hMatch;
     }
 
     /**
@@ -388,14 +382,13 @@ abstract class PopupComponent implements PopupMenuListener {
 
             select(focusedList.getLastVisibleIndex());
         } else {
-            int last = choicesList.getLastVisibleIndex();
-            if (last == choicesList.getSelectedIndex()) {
-                last = Math.min(last + last
-                            - choicesList.getFirstVisibleIndex(),
+            int lst = choicesList.getLastVisibleIndex();
+            if (lst == choicesList.getSelectedIndex()) {
+                lst = Math.min(lst + lst - choicesList.getFirstVisibleIndex(),
                         choicesModel.getSize() - 1);
             }
 
-            select(last);
+            select(lst);
         }
     }
 
@@ -403,22 +396,20 @@ abstract class PopupComponent implements PopupMenuListener {
      * Moves up a page, or to the first element in the history list, if needed.
      */
     public void selectUpPage() {
-        int select = 0;
+        int r = 0;
         if (!isFocusInHistory()) {
             int selected = choicesList.getSelectedIndex();
             if (canSwitchToHistory() && (selected == 0)) {
                 focusHistory();
             } else {
-                select = choicesList.getFirstVisibleIndex();
-                if (select == selected) {
-                    select = Math.max(0,
-                            select + select
-                                - choicesList.getLastVisibleIndex());
+                r = choicesList.getFirstVisibleIndex();
+                if (r == selected) {
+                    r = Math.max(0, r + r - choicesList.getLastVisibleIndex());
                 }
             }
         }
 
-        select(select);
+        select(r);
     }
 
     /** Sets the colors schema. */

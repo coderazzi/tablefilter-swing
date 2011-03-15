@@ -85,20 +85,20 @@ import net.coderazzi.filters.parser.DateComparator;
 public class FilterEditor extends JComponent implements IFilterEditor {
 
     private static final long serialVersionUID = 6908400421021655278L;
-    private EditorBorder      border = new EditorBorder();
+    private EditorBorder border = new EditorBorder();
     private Set<CustomChoice> customChoices;
-    private AutoChoices       autoChoices;
-    private Format            format;
-    private Comparator        comparator;
-    private boolean           ignoreCase;
-    private Class             modelClass;
+    private AutoChoices autoChoices;
+    private Format format;
+    private Comparator comparator;
+    private boolean ignoreCase;
+    private Class modelClass;
 
-    FiltersHandler    filtersHandler;
+    FiltersHandler filtersHandler;
     FilterArrowButton downButton = new FilterArrowButton();
-    EditorFilter      filter = new EditorFilter();
-    EditorComponent   editor;
-    PopupComponent    popup;
-    int               modelIndex;
+    EditorFilter filter = new EditorFilter();
+    EditorComponent editor;
+    PopupComponent popup;
+    int modelIndex;
 
     public FilterEditor(FiltersHandler filtersHandler,
                         int            modelIndex,
@@ -485,8 +485,8 @@ public class FilterEditor extends JComponent implements IFilterEditor {
                 return false;
             }
 
-            if (null
-                    == popup.selectBestMatch(editor.getContent(), false).content) {
+            ChoiceMatch cm = popup.selectBestMatch(editor.getContent(), false);
+            if (cm.content == null) {
                 // select ANYTHING
                 popup.selectBestMatch("", false);
             }
@@ -809,20 +809,18 @@ public class FilterEditor extends JComponent implements IFilterEditor {
      * filter changes).
      */
     final class EditorFilter extends Filter {
-        RowFilter delegateFilter;
-        boolean   toBeConsolidated;
-        boolean   reportOnConsolidation;
+        RowFilter delegate;
+        boolean toBeConsolidated;
+        boolean reportOnConsolidation;
 
         @Override public boolean include(RowFilter.Entry entry) {
-            return (delegateFilter == null) ? true
-                                            : delegateFilter.include(entry);
+            return (delegate == null) ? true : delegate.include(entry);
         }
 
         @Override public void setEnabled(boolean enable) {
             if (enable != isEnabled()) {
                 setEditorEnabled(enable);
-                delegateFilter = enable ? editor.getFilter() : null;
-
+                delegate = enable ? editor.getFilter() : null;
                 super.setEnabled(enable);
             }
         }
@@ -830,8 +828,8 @@ public class FilterEditor extends JComponent implements IFilterEditor {
         /** Reports an update on the associated filter. */
         public void editorFilterUpdated(RowFilter filter) {
             if (isEnabled()) {
-                if (filter != delegateFilter) {
-                    delegateFilter = filter;
+                if (filter != delegate) {
+                    delegate = filter;
                     reportFilterUpdatedToObservers();
                     reportOnConsolidation = false;
                     if (editor.isFocused()) {
@@ -848,7 +846,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
          * filter let pass rows (does not filter all out)
          */
         public boolean attemptEditorFilterUpdate(RowFilter filter) {
-            delegateFilter = filter;
+            delegate = filter;
 
             boolean ret = filtersHandler.applyEditorFilter(this);
             if (ret) {

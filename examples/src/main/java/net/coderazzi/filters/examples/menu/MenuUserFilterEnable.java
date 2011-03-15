@@ -34,7 +34,7 @@ public class MenuUserFilterEnable extends AbstractMenuCheckBoxAction
     implements IFilterObserver {
 
     private static final long serialVersionUID = 9137226745345048519L;
-    private IFilter           userFilter;
+    private IFilter userFilter;
 
     public MenuUserFilterEnable(ActionHandler main, IFilter userFilter) {
         super("enable", main);

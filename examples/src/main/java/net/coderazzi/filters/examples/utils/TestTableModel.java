@@ -50,7 +50,7 @@ public class TestTableModel extends AbstractTableModel {
     public static final String LCNAME = "Nickname";
     public static final String DATE = "Date";
 
-    private static String         columnNames[] = {
+    private static String columnNames[] = {
             NAME, AGE, MALE, TUTOR, COUNTRY, CLUB, LCNAME, DATE
         };
     private static final Class<?> columnTypes[] = {
@@ -61,8 +61,8 @@ public class TestTableModel extends AbstractTableModel {
 
     private static boolean changedModel;
     private List<TestData> data;
-    private Set<TestData>  modifiedTestData = new HashSet<TestData>();
-    private int            columnsOrder[];
+    private Set<TestData> modifiedTestData = new HashSet<TestData>();
+    private int columnsOrder[];
 
 
     public static TestTableModel createTestTableModel() {
@@ -111,10 +111,10 @@ public class TestTableModel extends AbstractTableModel {
     }
 
     private int[] getRandomOrder() {
-        Random        random = new Random();
-        int           n[] = new int[columnNames.length];
+        Random random = new Random();
+        int n[] = new int[columnNames.length];
         List<Integer> l = new ArrayList<Integer>();
-        int           prior = getColumnCount();
+        int prior = getColumnCount();
         n[0] = 0; // keep always first column as the name
         for (int i = 1; i < prior; i++) {
             l.add(new Integer(i));
@@ -221,7 +221,7 @@ public class TestTableModel extends AbstractTableModel {
                                      int    columnIndex) {
 
         TestData td = data.get(rowIndex);
-        Boolean  set = (Boolean) value;
+        Boolean set = (Boolean) value;
         if (td.male != set) {
             if (!modifiedTestData.add(td)) {
                 modifiedTestData.remove(td);

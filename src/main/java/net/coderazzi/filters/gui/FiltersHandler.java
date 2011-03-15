@@ -181,7 +181,7 @@ public class FiltersHandler extends AndFilter
      * IParserModel}.
      */
     @Override public void propertyChange(PropertyChangeEvent evt) {
-        Class   target;
+        Class target;
         boolean formatChange = false;
         if (evt.getPropertyName() == IParserModel.IGNORE_CASE_PROPERTY) {
             target = null;
@@ -538,26 +538,25 @@ public class FiltersHandler extends AndFilter
                 this.sorter = null;
             }
 
-            TableRowSorter sorter;
+            TableRowSorter rs;
             try {
-                sorter = (table == null)
-                    ? null : (TableRowSorter) table.getRowSorter();
+                rs = (table == null) ? null
+                                      : (TableRowSorter) table.getRowSorter();
             } catch (ClassCastException ccex) {
                 throw new RuntimeException(
                     "Invalid RowSorter on JTable: filter header requires a TableRowSorter class");
             }
 
             if ((table != null)
-                    && ((sorter == null)
-                        || (sorter.getModel() != table.getModel()))) {
+                    && ((rs == null) || (rs.getModel() != table.getModel()))) {
                 this.sorter = new TableRowSorter(table.getModel());
                 table.setRowSorter(this.sorter);
             } else {
-                this.sorter = sorter;
-                if (sorter != null) {
+                this.sorter = rs;
+                if (rs != null) {
                     notifyUpdatedFilter();
                     if (autoSelection) {
-                        sorter.addRowSorterListener(this);
+                        rs.addRowSorterListener(this);
                     }
                 }
             }

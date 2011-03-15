@@ -56,7 +56,7 @@ public class MenuModelChange extends AbstractMenuAction {
 
     void reinitFiltersMenu() {
         JMenu filterMenu = main.getFilterMenu();
-        int   pos = filterMenu.getItemCount();
+        int pos = filterMenu.getItemCount();
         while (pos-- > 2) {
             filterMenu.remove(filterMenu.getItem(pos));
         }

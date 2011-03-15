@@ -169,11 +169,7 @@ public class TableFilterHeader extends JPanel {
         }
     };
 
-    /**
-     * Constructor; the object is functional after a table is attached.
-     *
-     * @see  TableFilterHeader#setTable(JTable)
-     */
+    /** Basic constructor, requires an attached table */
     public TableFilterHeader() {
         this(null, null);
     }
@@ -362,10 +358,7 @@ public class TableFilterHeader extends JPanel {
         return (filtersHandler == null) || filtersHandler.isEnabled();
     }
 
-    /**
-     * <p>Defines the behaviour of the header concerning its position related to
-     * the table.</p>
-     */
+    /** Sets the position of the header related to the table. */
     public void setPosition(Position location) {
         positionHelper.setPosition(location);
     }
@@ -682,8 +675,8 @@ public class TableFilterHeader extends JPanel {
             c = FilterSettings.backgroundColor;
             if (c == null) {
                 JTable table = getTable();
-                Color  background = table.getBackground();
-                Color  header = table.getTableHeader().getBackground();
+                Color background = table.getBackground();
+                Color header = table.getTableHeader().getBackground();
                 c = new Color((header.getRed() + background.getRed()) / 2,
                         (header.getGreen() + background.getGreen()) / 2,
                         (header.getBlue() + background.getBlue()) / 2);
@@ -882,7 +875,7 @@ public class TableFilterHeader extends JPanel {
             this.tableColumnModel = getTable().getColumnModel();
 
             boolean enabled = filtersHandler.isEnabled();
-            int     count = tableColumnModel.getColumnCount();
+            int count = tableColumnModel.getColumnCount();
             columns = new ArrayList<FilterColumnPanel>(count);
 
             for (int i = 0; i < count; i++) {
@@ -918,9 +911,8 @@ public class TableFilterHeader extends JPanel {
 
         /** Creates the FilterColumnPanel for the given column number. */
         private void createColumn(int columnView, boolean enableIt) {
-            int               columnModel = getTable()
-                    .convertColumnIndexToModel(columnView);
-            FilterEditor      editor = createEditor(columnModel, enableIt);
+            int columnModel = getTable().convertColumnIndexToModel(columnView);
+            FilterEditor editor = createEditor(columnModel, enableIt);
             FilterColumnPanel column = new FilterColumnPanel(
                     tableColumnModel.getColumn(columnView), editor);
             column.updateHeight();

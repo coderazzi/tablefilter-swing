@@ -38,7 +38,7 @@ import net.coderazzi.filters.examples.ActionHandler;
 public class MenuFont extends JMenu implements ActionListener {
 
     private static final long serialVersionUID = -6772023653226757860L;
-    private static final int  RELATIVE_FONT_SIZES[] = {
+    private static final int RELATIVE_FONT_SIZES[] = {
             -2, -1, 0, 1, 2, 4, 8, 16
         };
 

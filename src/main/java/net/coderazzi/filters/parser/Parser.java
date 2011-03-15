@@ -79,16 +79,16 @@ import net.coderazzi.filters.IParser;
  */
 public class Parser implements IParser {
 
-    FormatWrapper                        format;
-    Comparator                           comparator;
-    boolean                              ignoreCase;
-    Comparator<String>                   stringComparator;
-    int                                  modelIndex;
+    FormatWrapper format;
+    Comparator comparator;
+    boolean ignoreCase;
+    Comparator<String> stringComparator;
+    int modelIndex;
     private static Map<String, IOperand> operands;
-    private static IOperand              wildcardOperand;
-    private static WildcardOperand       instantOperand;
-    private static Pattern               expressionMatcher;
-    private static StringBuilder         escapeBuffer = new StringBuilder();
+    private static IOperand wildcardOperand;
+    private static WildcardOperand instantOperand;
+    private static Pattern expressionMatcher;
+    private static StringBuilder escapeBuffer = new StringBuilder();
 
     public Parser(Format             format,
                   Comparator         classComparator,
@@ -148,7 +148,7 @@ public class Parser implements IParser {
         Matcher matcher = expressionMatcher.matcher(expression);
         if (matcher.matches()) {
             String operator = matcher.group(1);
-            int    lastAdded = 0;
+            int lastAdded = 0;
             if (operator != null) {
                 escapeBuffer.append('\\').append(operator);
                 expression = matcher.group(2);
@@ -279,7 +279,7 @@ public class Parser implements IParser {
                                          final Comparator comparator) {
             return new RowFilter() {
                 @Override public boolean include(Entry entry) {
-                    Object  left = entry.getValue(modelIndex);
+                    Object left = entry.getValue(modelIndex);
                     boolean value = (left != null)
                             && (0 == comparator.compare(left, right));
 
@@ -334,8 +334,8 @@ public class Parser implements IParser {
         /** {@link IOperand} interface. */
         @Override public RowFilter create(Parser self, String right)
                                    throws ParseException {
-            final Pattern       pattern = getPattern(right, self.ignoreCase);
-            final int           modelIndex = self.modelIndex;
+            final Pattern pattern = getPattern(right, self.ignoreCase);
+            final int modelIndex = self.modelIndex;
             final FormatWrapper format = self.format;
 
             return new RowFilter() {
@@ -403,7 +403,7 @@ public class Parser implements IParser {
         /** Converts a wildcard expression into a regular expression. */
         protected String convertToRE(String s) {
             StringBuilder sb = new StringBuilder();
-            boolean       escaped = false;
+            boolean escaped = false;
             instantApplied = false;
 
             for (char c : s.toCharArray()) {

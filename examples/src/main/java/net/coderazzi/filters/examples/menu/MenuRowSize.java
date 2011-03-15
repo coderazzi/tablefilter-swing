@@ -38,7 +38,7 @@ import net.coderazzi.filters.examples.ActionHandler;
 public class MenuRowSize extends JMenu implements ActionListener {
 
     private static final long serialVersionUID = -6772023653226757860L;
-    private static final int  RELATIVE_SIZES[] = { -4, 0, 4, 10, 20, 40 };
+    private static final int RELATIVE_SIZES[] = { -4, 0, 4, 10, 20, 40 };
 
     private ActionHandler main;
 

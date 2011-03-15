@@ -44,11 +44,11 @@ import net.coderazzi.filters.gui.CustomChoice;
  */
 class HistoryListModel extends AbstractListModel {
     private static final long serialVersionUID = -374115548677017807L;
-    private List<Object>      history = new ArrayList<Object>();
-    private List<Object>      shownHistory = history;
-    private Object            lastAdded;
-    private Comparator        stringComparator;
-    private int               maxHistory;
+    private List<Object> history = new ArrayList<Object>();
+    private List<Object> shownHistory = history;
+    private Object lastAdded;
+    private Comparator stringComparator;
+    private int maxHistory;
 
     /**
      * Specifies how to handle the content. If there is a string comparator,
@@ -85,7 +85,6 @@ class HistoryListModel extends AbstractListModel {
 
             shownHistory.remove(index);
             fireIntervalAdded(this, index, index);
-
             return true;
         }
 
