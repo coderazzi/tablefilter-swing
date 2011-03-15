@@ -301,10 +301,18 @@
      This behaviour is helpful to avoid sudden vanishing of the table rows if the
      user enters some wrong character during the edition.</p> 
      
-     <p>Table changes are automatically handled by the library. In all cases
-     but updates, filtering is reapplied on changes; for updates, filtering
-     is also applied by default, although it can be disabled via
-     <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setFilterOnUpdates(boolean)'>TableFilterHeader.setFilterOnUpdates</a>
+     <p>Table changes are automatically handled by the library; in case of
+     updates, the table row sorter associated to the table can be updated or
+     not (by default, the swing behaviour is not to update it). In this case,
+     an update will not trigger a table re-sorting and the filter updates
+     will not be propagated. To reverse this behaviour, it is needed to
+     invoke the method <a href='http://java.sun.com/javase/6/docs/api/javax/swing/DefaultRowSorter.html?is-external=true#setSortsOnUpdates(boolean)'>
+     DefaultRowSorter.setSortOnUpdates</a>. TableFilter facilitates this
+     operation by providing the method
+     <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setFilterOnUpdates(boolean)'>TableFilterHeader.setFilterOnUpdates</a>,
+     which effectively sets/unsets the sort on updates flag. In addition,
+     it sets this flag to true by default.
+      
      </p>
      
      <h2><a name='settings'>Settings</a></h2>
