@@ -72,7 +72,7 @@ public class EditorComponent extends JTextField {
     private Controller controller;
     private boolean focus;
     boolean instantFiltering;
-    boolean autoCompletionEnabled;
+    boolean autoCompletion;
     boolean warning;
     FilterEditor filterEditor;
     PopupComponent popup;
@@ -158,12 +158,12 @@ public class EditorComponent extends JTextField {
 
     /** Sets the auto completion flag. */
     public void setAutoCompletion(boolean enable) {
-        this.autoCompletionEnabled = enable;
+        this.autoCompletion = enable;
     }
 
     /** Returns the auto completion flag. */
     public boolean isAutoCompletion() {
-        return autoCompletionEnabled;
+        return autoCompletion;
     }
 
     /** Sets the text mode and editable flag. */
@@ -426,7 +426,6 @@ public class EditorComponent extends JTextField {
         @Override public void setContent(Object content) {
             String text;
             ChoiceMatch match = new ChoiceMatch();
-            match.exact = true;
             if (content instanceof CustomChoice) {
                 // never escape custom choices
                 text = ((CustomChoice) content).toString();
@@ -437,6 +436,7 @@ public class EditorComponent extends JTextField {
                 match.content = text;
             }
 
+            match.exact = true; //avoid interpretation
             setEditorText(text);
             updateFilter(text, match, false);
             activateCustomDecoration();
@@ -719,14 +719,13 @@ public class EditorComponent extends JTextField {
                                           AttributeSet attrs)
                                    throws BadLocationException {
                 int moveCaretLeft = 0;
-                if (autoCompletionEnabled && userUpdate
-                        && (text.length() == 1)) {
+                if (autoCompletion && userUpdate && (text.length() == 1)) {
                     String now = getText();
                     // autocompletion is only triggered if the user inputs
                     // a character at the end of the current text
                     if (now.length() == (offset + length)) {
-                        String completion = popup.getCompletion(now.substring(0,
-                                    offset) + text);
+                    	String begin = now.substring(0, offset) + text;
+                        String completion = popup.getCompletion(begin);
                         text += completion;
                         moveCaretLeft = completion.length();
                     }
@@ -839,6 +838,12 @@ public class EditorComponent extends JTextField {
                                           String       text,
                                           AttributeSet attrs)
                                    throws BadLocationException {
+            	if (!userUpdate){
+            		//content set from outside, go with it
+            		super.replace(fb, offset, length, text, attrs);
+            		return;
+            	}
+            	
                 String buffer = getText();
                 String begin = buffer.substring(0, offset) + text;
                 String newContent = begin + buffer.substring(offset + length);
@@ -874,9 +879,7 @@ public class EditorComponent extends JTextField {
                     }
                 }
 
-                int caret = userUpdate
-                    ? (1 + Math.min(getCaret().getDot(), getCaret().getMark()))
-                    : 0;
+                int caret = 1 + Math.min(getCaret().getDot(), getCaret().getMark());
 
                 super.replace(fb, 0, buffer.length(), proposal, attrs);
 
@@ -885,7 +888,7 @@ public class EditorComponent extends JTextField {
                 moveCaretPosition(Math.min(len, caret));
                 deactivateCustomDecoration();
 
-                if (userUpdate && instantFiltering) {
+                if (instantFiltering) {
                     match.exact = true;
                     updateFilter(proposal, match, true);
                 }
