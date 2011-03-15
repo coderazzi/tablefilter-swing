@@ -27,7 +27,6 @@ package net.coderazzi.filters.gui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -115,7 +114,7 @@ public class FiltersHandler extends AndFilter
     /** The associated filter model. */
     private Filter applyingFilter;
 
-    /** If true, table updates trigger filter updates. */
+    /** If true, table updates trigger filter and sort updates. */
     private boolean filterOnUpdates = FilterSettings.filterOnUpdates;
 
     /** If true, the current filter hides all the rows. */
@@ -243,25 +242,22 @@ public class FiltersHandler extends AndFilter
         return autoChoices;
     }
 
-    /** Sets the filter on updates flag. */
+    /**
+     * Sets the filter on updates flag.<br>
+     * It sets the sortOnUpdates flag on the underlying {@link TableRowSorter}
+     *
+     * @see  TableRowSorter#setSortsOnUpdates(boolean)
+     */
     public void setFilterOnUpdates(boolean enable) {
         this.filterOnUpdates = enable;
+        if (autoSelector.sorter !=null){
+        	autoSelector.sorter.setSortsOnUpdates(enable);
+        }
     }
 
-    /**
-     * Returns true if the filter is reapplied on updates<br>
-     * Note that, if the underlying {@link TableRowSorter} has set the
-     * sortOnUpdates flag (@link {@link
-     * TableRowSorter#setSortsOnUpdates(boolean)} this method will return true
-     * independent of the value set on {@link #setFilterOnUpdates(boolean)}.
-     */
+    /** Returns true if the filter is reapplied on updates. */
     public boolean isFilterOnUpdates() {
-        boolean ret = filterOnUpdates;
-        if (!ret && (autoSelector.sorter != null)) {
-            ret = autoSelector.sorter.getSortsOnUpdates();
-        }
-
-        return ret;
+        return filterOnUpdates;
     }
 
     /** Sets the adaptive choices mode. */
@@ -468,19 +464,7 @@ public class FiltersHandler extends AndFilter
     }
 
     /** Report that the table is updated. */
-    public void tableUpdated(boolean lastChangeIsUpdate) {
-        if (lastChangeIsUpdate && filterOnUpdates) {
-            // if filterOnUpdates, it is needed to reapply the filter
-            // however, the underlying row sorter can be already sorting on
-            // updates; in that case, the filtering happens all the same
-            if ((autoSelector.sorter == null)
-                    || !autoSelector.sorter.getSortsOnUpdates()) {
-                updateTableFilter();
-
-                return;
-            }
-        }
-
+    public void tableUpdated() {
         checkWarningState();
     }
 
@@ -538,26 +522,30 @@ public class FiltersHandler extends AndFilter
                 this.sorter = null;
             }
 
-            TableRowSorter rs;
+            TableRowSorter tableRowSorter;
             try {
-                rs = (table == null) ? null
-                                      : (TableRowSorter) table.getRowSorter();
+                tableRowSorter = (table == null)
+                    ? null : (TableRowSorter) table.getRowSorter();
             } catch (ClassCastException ccex) {
                 throw new RuntimeException(
                     "Invalid RowSorter on JTable: filter header requires a TableRowSorter class");
             }
 
             if ((table != null)
-                    && ((rs == null) || (rs.getModel() != table.getModel()))) {
+                    && ((tableRowSorter == null)
+                        || (tableRowSorter.getModel() != table.getModel()))) {
                 this.sorter = new TableRowSorter(table.getModel());
-                table.setRowSorter(this.sorter);
+                //with next call, this method will be reinvoked
+                table.setRowSorter(this.sorter); 
             } else {
-                this.sorter = rs;
-                if (rs != null) {
+                this.sorter = tableRowSorter;
+                if (tableRowSorter != null) {
                     notifyUpdatedFilter();
                     if (autoSelection) {
-                        rs.addRowSorterListener(this);
+                        tableRowSorter.addRowSorterListener(this);
                     }
+                    //update sort on updates flag
+                    setFilterOnUpdates(isFilterOnUpdates());
                 }
             }
         }

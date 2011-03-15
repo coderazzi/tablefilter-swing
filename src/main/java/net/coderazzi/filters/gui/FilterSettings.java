@@ -85,7 +85,7 @@ public class FilterSettings {
     /** Header's error color. */
     public static Color errorColor = getColor("ErrorColor", null);
 
-    /** If true, table updates trigger filter updates. */
+    /** If true, table updates trigger filter and sort updates. */
     public static boolean filterOnUpdates = Boolean.parseBoolean(getString(
                 "FilterOnUpdates", "true"));
 

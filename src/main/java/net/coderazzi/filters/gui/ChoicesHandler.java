@@ -52,9 +52,6 @@ abstract class ChoicesHandler implements TableModelListener, Runnable {
     /** this variable is true to signal an update to the FiltersHandler. */
     private boolean runScheduled;
 
-    /** this variable is true if last unreported changes was an update. */
-    private boolean reportUpdate;
-
     protected ChoicesHandler(FiltersHandler handler) {
         this.handler = handler;
     }
@@ -109,7 +106,6 @@ abstract class ChoicesHandler implements TableModelListener, Runnable {
             int type = e.getType();
             TableModel model = (TableModel) e.getSource();
             tableUpdated(model, type, firstRow, e.getLastRow(), e.getColumn());
-            reportUpdate = type == TableModelEvent.UPDATE;
             if (!runScheduled) {
                 runScheduled = true;
                 // invoke later filtersHandler.tableUpdated, as perhaps the
@@ -122,7 +118,7 @@ abstract class ChoicesHandler implements TableModelListener, Runnable {
     /** {@link Runnable} interface. */
     @Override public void run() {
         runScheduled = false;
-        handler.tableUpdated(reportUpdate);
+        handler.tableUpdated();
     }
 
     /**

@@ -315,20 +315,16 @@ public class TableFilterHeader extends JPanel {
 
     /**
      * Sets the filter on updates flag.<br>
-     * If not set, a table update does not trigger any filtering -new rows, for
-     * example, are not filtered out.
+     * It sets the sortOnUpdates flag on the underlying {@link TableRowSorter};
+     * it is, in fact, just a helper to set this flag without accessing
+     * directly the row sorter.
+     * @see TableRowSorter#setSortsOnUpdates(boolean) 
      */
     public void setFilterOnUpdates(boolean enable) {
         filtersHandler.setFilterOnUpdates(enable);
     }
 
-    /**
-     * Returns true if the filter is reapplied on updates<br>
-     * Note that, if the underlying {@link TableRowSorter} has set the
-     * sortOnUpdates flag (@link {@link
-     * TableRowSorter#setSortsOnUpdates(boolean)} this method will return true
-     * independent of the value set on {@link #setFilterOnUpdates(boolean)}.
-     */
+    /** Returns true if the filter is reapplied on updates. */
     public boolean isFilterOnUpdates() {
         return filtersHandler.isFilterOnUpdates();
     }
