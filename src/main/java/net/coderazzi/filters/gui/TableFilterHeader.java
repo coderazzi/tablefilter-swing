@@ -44,6 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.DefaultRowSorter;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -53,7 +54,6 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableRowSorter;
 
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterObserver;
@@ -169,7 +169,7 @@ public class TableFilterHeader extends JPanel {
         }
     };
 
-    /** Basic constructor, requires an attached table */
+    /** Basic constructor, requires an attached table. */
     public TableFilterHeader() {
         this(null, null);
     }
@@ -277,8 +277,9 @@ public class TableFilterHeader extends JPanel {
 
     /**
      * Enables instant filtering, as the user edits the filter's text<br>
-     * The exact way the instant filtering works depends on the associated {@see
-     * IParser#parseInstantText(String)} implementation.
+     * The exact way the instant filtering works depends on the associated.
+     *
+     * @see  IParser#parseInstantText(String)
      */
     public void setInstantFiltering(boolean enable) {
         if (this.instantFilteringEnabled != enable) {
@@ -315,10 +316,11 @@ public class TableFilterHeader extends JPanel {
 
     /**
      * Sets the filter on updates flag.<br>
-     * It sets the sortOnUpdates flag on the underlying {@link TableRowSorter};
-     * it is, in fact, just a helper to set this flag without accessing
-     * directly the row sorter.
-     * @see TableRowSorter#setSortsOnUpdates(boolean) 
+     * It sets the sortOnUpdates flag on the underlying {@link DefaultRowSorter}
+     * it is, in fact, just a helper to set this flag without accessing directly
+     * the row sorter.
+     *
+     * @see  DefaultRowSorter#setSortsOnUpdates(boolean)
      */
     public void setFilterOnUpdates(boolean enable) {
         filtersHandler.setFilterOnUpdates(enable);
@@ -885,7 +887,7 @@ public class TableFilterHeader extends JPanel {
             tableColumnModel.addColumnModelListener(this);
         }
 
-        /** {@see Iterable} interface. */
+        /** {@link Iterable} interface. */
         @Override public Iterator<FilterEditor> iterator() {
             final Iterator<FilterColumnPanel> it = columns.iterator();
 

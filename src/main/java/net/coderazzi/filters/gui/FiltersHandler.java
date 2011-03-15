@@ -27,10 +27,12 @@ package net.coderazzi.filters.gui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.DefaultRowSorter;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
@@ -244,14 +246,14 @@ public class FiltersHandler extends AndFilter
 
     /**
      * Sets the filter on updates flag.<br>
-     * It sets the sortOnUpdates flag on the underlying {@link TableRowSorter}
+     * It sets the sortOnUpdates flag on the underlying {@link DefaultRowSorter}
      *
-     * @see  TableRowSorter#setSortsOnUpdates(boolean)
+     * @see  DefaultRowSorter#setSortsOnUpdates(boolean)
      */
     public void setFilterOnUpdates(boolean enable) {
         this.filterOnUpdates = enable;
-        if (autoSelector.sorter !=null){
-        	autoSelector.sorter.setSortsOnUpdates(enable);
+        if (autoSelector.sorter != null) {
+            autoSelector.sorter.setSortsOnUpdates(enable);
         }
     }
 
@@ -491,7 +493,7 @@ public class FiltersHandler extends AndFilter
         PropertyChangeListener {
 
         /** The associated sorter, if any. */
-        TableRowSorter sorter;
+        DefaultRowSorter sorter;
 
         /** Autoselection mode *. */
         boolean autoSelection = FilterSettings.autoSelection;
@@ -522,21 +524,21 @@ public class FiltersHandler extends AndFilter
                 this.sorter = null;
             }
 
-            TableRowSorter tableRowSorter;
+            DefaultRowSorter tableRowSorter;
             try {
                 tableRowSorter = (table == null)
-                    ? null : (TableRowSorter) table.getRowSorter();
+                    ? null : (DefaultRowSorter) table.getRowSorter();
             } catch (ClassCastException ccex) {
                 throw new RuntimeException(
-                    "Invalid RowSorter on JTable: filter header requires a TableRowSorter class");
+                    "Invalid RowSorter on JTable: filter header requires a DefaultRowSorter class");
             }
 
             if ((table != null)
                     && ((tableRowSorter == null)
                         || (tableRowSorter.getModel() != table.getModel()))) {
                 this.sorter = new TableRowSorter(table.getModel());
-                //with next call, this method will be reinvoked
-                table.setRowSorter(this.sorter); 
+                // with next call, this method will be reinvoked
+                table.setRowSorter(this.sorter);
             } else {
                 this.sorter = tableRowSorter;
                 if (tableRowSorter != null) {
@@ -544,7 +546,7 @@ public class FiltersHandler extends AndFilter
                     if (autoSelection) {
                         tableRowSorter.addRowSorterListener(this);
                     }
-                    //update sort on updates flag
+                    // update sort on updates flag
                     setFilterOnUpdates(isFilterOnUpdates());
                 }
             }
