@@ -69,8 +69,7 @@
 			   source='1.6' 
 			   debug='off' 
 			   srcdir='examples/src/main/java' 
-			   includes='**/*.java'
-		       excludes='**/bugs/*.java'/>
+			   includes='**/*.java' />
 		<jar destfile='${example-jar}'> 
 			<fileset dir='${tmp-bin}'
 				     includes='net/coderazzi/filters/**/*.class'/>
