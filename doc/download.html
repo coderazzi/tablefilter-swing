@@ -15,8 +15,9 @@
   
     <p>
       <span class="mark">TableFilter</span> is open source, under 
-      <a href='#license'>MIT license</a>. Its latest version, 4.1.1, has been
-      released the 15th March 2011.
+      <a href='#license'>MIT license</a>. Its latest version, 4.1.2, has been
+      released the 23rd March 2011. The changelog is available 
+      <a href='#history'>below</a>
     </p>
     
     <ul>
@@ -25,7 +26,7 @@
 	       		<li>Available at Google Code, as the project 
 	       			<a href='http://code.google.com/p/tablefilter-swing/'>tablefilter-swing</a></li>
 	   			<li>Alternatively, they can be downloaded directly as a
-	   				single zip file:<a href='download/tablefilter-src-v4.1.1.zip'>tablefilter-src-v4.1.1.zip</a></li>
+	   				single zip file:<a href='download/tablefilter-src-4-1-2.zip'>tablefilter-src-4-1-2.zip</a></li>
 	       	</ul>
        	</li>
     	<li><span class='mark'>Binaries</span>:
@@ -42,10 +43,10 @@
 			   		javadoc) can be downloaded directly from the maven repository. The
 			   		last versions are hosted at:
 			   		<ul>
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/4.1.1/'>
-			   		 	Version 4.1.1</a></li> 
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.1.1/'>
-			   		 	Version 4.1.1 for Java 5</a></li> 
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/4.1.2/'>
+			   		 	Version 4.1.2</a></li> 
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.1.2/'>
+			   		 	Version 4.1.2 for Java 5</a></li> 
 				    </ul>
 	    		</li>
 	    		<li>Note that version 4.x is not API compatible with version 3.x; latest 3.x release
@@ -110,6 +111,26 @@ THE SOFTWARE.</pre>
 
   <h2><a name="history">History</a></h2>
   
+    <h3>Version 4.1.2 ( 23rd March 2011 ) </h3>
+       
+    	<p>Solved bug where enabled adaptive choices cause 
+    	ArrayIndexOutOfBoundsException when table model is changed: see
+    	<a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=8'>issue</a>.</p>
+  			
+    	<p>Solved bug on slow progress with instant filtering + adaptive choices, 
+    	resulting in performance degradation: see
+    	<a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=11'>issue</a>.</p>
+
+    	<p>Solved bug where wildcard expressions, if case insensitive, fail on
+    	Unicode characters: see
+    	<a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=12'>issue</a>.</p>
+    	
+    	<p>Collators comparisons have been removed from the library: 
+		collators were never used on regular expressions
+ 		or wildcard expressions, resulting in inconsistent behaviour.</p>
+ 		
+		<p>Added document on library's performance.</p> 		
+  			
     <h3>Version 4.1.1 ( 15th March 2011 ) </h3>
        
     	<p>Solved bug: previous version would fail to set the content on a

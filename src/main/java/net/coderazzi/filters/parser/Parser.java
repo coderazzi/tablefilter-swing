@@ -356,7 +356,10 @@ public class Parser implements IParser {
         protected Pattern getPattern(String expression, boolean ignoreCase)
                               throws ParseException {
             try {
-                return Pattern.compile(expression, ignoreCase ? Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE : 0);
+                return Pattern.compile(expression,
+                        ignoreCase
+                            ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)
+                            : 0);
             } catch (PatternSyntaxException pse) {
                 throw new ParseException("", pse.getIndex());
             }

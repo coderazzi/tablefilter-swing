@@ -1,0 +1,281 @@
+<html>
+<head>
+<title>TableFilter - Performance</title>
+<link rel="stylesheet" type="text/css" href="tablefilter.css">
+</head>
+<body><div id='content'>
+
+  <h1>Performance of the TableFilter</h1>
+
+  <ul>
+    <li><a href='#basics'>Basics: the sorting performance</a></li>
+    <li><a href='#minimum'>Minimum settings performance</a></li>
+    <li><a href='#parsing'>Parsing performance</a></li>
+    <li><a href='#autochoices'>AutoChoices performance</a></li>
+    <li><a href='#updates'>AutoChoices and performance on model updates</a></li>
+    <li><a href='#adaptive'>Adaptive choices with enabled auto choices</a></li>
+    <li><a href='#summary'>Summary</a></li>
+  </ul>
+
+<p>This page tries to provide information on the overhead that the system
+experiences when using a table filter header. In some cases, the 
+programmer will need to disable some of the features in the filter, in order
+to achieve a better, smoother experience.</p>
+
+<p>The sections below contain specific memory requirements and measures of time
+to show the performance of the filter header on multiple scenarios. Those
+numbers are, however, specific to the example and to the machine where they
+have been executed, and their main value is to understand the relative
+performance as the library features are enabled or disabled.</p>
+
+<p>The example used is, in most cases, the TableFilterExample class released 
+with this library's source code, on its basic model, with 5 columns. 
+The computer used is, explicitly, and old Pentium D820 (dual core), with 2 GB, 
+from late 2006.</p>
+ 
+<p>Note: The scenarios using 1 million of rows are executed with the 
+JVM setting -Xmx1500M.  (JVM is 32 bits)</p>
+
+
+
+  <h2><a name='basics'>Basics: the sorting performance</a></h2>
+
+<p>The filter header is applied on top of the sorting functionality provided in 
+swing. The sorting is done always on the GUI event thread, and, depending on the
+table size, it could be considered slow. Note that, being used the GUI event 
+thread, the whole GUI freezes until the sorting finishes; although even 1 
+second affects negatively the application usability, the benefits of the
+associated action (in this case the sorting) surely offset the drawbacks. 
+Subjectively, a couple of seconds already exceeds the maximum time that any 
+action should last before the system produces a proper feedback 
+(in this case, showing the sorted / filtered table).</p> 
+
+<p>The following list shows the required times to sort a table of several sizes.
+The test is done on the TableFilterExample application delivered with
+the library's source code, disabling the filter header (using therefore only
+the sorting capabilities of swing). The sorting is applied on a column 
+containing strings, in average 12 characters long, being unique up to
+10.000 of those strings; other types, like integers, would likely be sorted
+in shorter times:</p>
+
+<pre>   1000 rows:    50 ms
+  10000 rows:   400 ms
+ 100000 rows:  5500 ms 
+1000000 rows: 77819 ms</pre>
+
+<p>It requires approximately 1.5 seconds when the table has 30.000 rows, time 
+long enough to start thinking 'Have I pressed the button?'. Sorting a table 
+with a million rows is just an exercise on patience, the programmer should find
+alternative ways to present a reduced set of the information.</p>
+
+<p>These measures do not imply that the swing JTable component cannot be used on
+tables larger than 30.000 rows, only that the user would benefit of a faster 
+computer, and will likely experience a frozen GUI on specific actions (anyway 
+the user  will probably  prefer this frozen GUI than lacking the possibility to
+sort these tables).</p>
+
+<p>This discussion could now go into different directions, like proposing some
+sorting mechanisms invoked on separated threads, but this would add other
+interface headaches on its own (and would not't be compatible with existing 
+Swing applications, as the table models should become thread-safe, which is
+currently not the case).</p>
+
+
+
+<h2><a name='minimum'>Minimum settings performance</a></h2>
+
+<p>To observe now the overhead of the TableFilterHeader, the most basic 
+scenario corresponds to the filter header with autoChoices and
+adaptiveChoices disabled:</p>
+
+<pre>FilterSettings.adaptiveChoices=false;
+FilterSettings.autoChoices=AutoChoices.DISABLED;</pre>
+    	
+<p>These are the settings requiring less resources from the system: requires no
+added memory to hold the choices on each column, or computing time to extract
+and process those choices.</p> 
+
+<p>Anyway, the simple operation of associating a filter header to a table
+requires some memory and computing time:</p>
+
+<pre>A1-      10 rows:  0.05 Mb, 184 ms
+A2-     100 rows:  0.06 Mb, 187 ms
+A3-    1000 rows:  0.07 Mb, 190 ms
+A4-   10000 rows:  0.27 Mb, 189 ms
+A5-  100000 rows:  2.58 Mb, 242 ms
+A6- 1000000 rows: 23.18 Mb, 634 ms</pre>
+
+<p>However, this memory/time is not used directly by the filter header; instead,
+setting the filter header implies activating the sorting 
+capabilities of the JTable, and this activation requires resources:
+the reason why memory increases with the number of rows
+lies on the internal structures used by the TableSorter to handle the table.
+Said otherwise: not using the filter header and triggering a sorting on any 
+table's column will require the given computing time and most of the memory 
+(some memory is definitely used by the filter header's components).</p>
+
+<p>Obviously, the table model affects these times; for example, using the
+same example, with the model containing 8 columns instead of 5, 
+the measures for 10.000 rows read as:</p>
+
+<pre>A5b- 100000 rows: 2.72 Mb, 333 ms (versus 2.58 Mb / 242 ms)</pre>
+
+
+
+<h2><a name='parsing'>Parsing performance</a></h2>
+
+<p>Computing time is definitely required when the user enters an expression on 
+any of the filter editors. This time has two components: the filtering itself,
+plus its impact on the current sorting. The worse filter is, therefore,
+the filter that does not't filter out any rows, as the subsequent sorting
+will apply on the whole set of rows. Effectively, setting the content to '*'
+on a string column that is not sorted implies following filtering times:</p>
+
+<pre>A7- 10000 rows:    240 ms
+A8- 100000 rows:   837 ms
+A9- 1000000 rows: 2193 ms</pre> 
+
+<p>If the column has no string type, filtering implies always a type conversion;
+how this happens depends on the parser being used. If the default library's
+parser is used, there are two possibilities:</p>
+
+<ul>
+<li>The expression introduced by the user is parsed, and the included expression
+   converted into the type of the column. For example, if the user enters the
+   expression '&gt; 123' on an integer column, the text '123' is converted into 
+   the integer 123, and the filtering involves comparing integers, which should
+   be a fast operation.</li>
+
+<li>The expression introduced by the user is handled as a string (ultimately a
+   regular expression), and the filtering involves regular expression matching
+   along the whole column's contents. If the column type is not a String, there
+   must be a conversion to String on each column value before matching the
+   regular expression. This operation is obviously slower than using the 
+   column's type.</li>
+</ul>
+
+<p>The first option only happens when the user enters an operator, and the 
+column type is a primitive or the programmer has provided valid Format and
+Comparator instances for the type. This is why,
+on a column with type Integer, it is faster to introduce as expression 
+'= 111' than '111'. Nevertheless, in most cases, the time difference can be 
+dismissed without bothering the user with these details.</p>
+
+<p>Anyway, the parser is not used in this way on every case:</p> 
+
+<ul>
+<li>If the filter editor is not editable, the filtering corresponds to always 
+    use the operand '='.</li>
+<li>If the user chooses a custom filter, the filtering is done
+   through the filter of the custom choice, so no parser is involved.</li>
+</ul>
+
+
+
+<h2><a name='autochoices'>AutoChoices performance</a></h2>
+
+<p>The first feature to improve the filter header usability is to enable the 
+auto choices (which happens by default): each filter editor shows all
+the possible choices, as extracted from the table.</p>
+
+<p>In this case, there is already a significant overhead, mostly in time: 
+the filter handler must extract all the unique values from the table, and,
+in most cases, convert them into strings; then, it must sort those strings
+(unless the column includes a renderer on the filter editor).
+The overhead depends therefore on the number of columns, the number of unique 
+elements per column, the type associated to that column and the performance 
+of the string conversion for that type.</p>
+
+<p>So, in addition to the normal overhead of attaching the table to the filter
+header, it must be included the time/memory required to extract the choices
+on each column. Following measures apply for different scenarios, with a table
+with 100.000 rows:</p>
+
+<pre>A- String column:   9400 unique values: 220 ms.
+B- Date column:    16750 unique values: 379 ms.
+C- Integer column:    26 unique values:  20 ms.</pre>
+
+<p>Only a small percentage subset of this time goes into extracting values from
+the table: what is more important here is the number of unique elements per
+column.</p>
+
+<p>To understand the performance on the whole table, the overall overhead is
+calculated by adding the time required to extract the autochoices on each
+column (where autochoices are enabled).</p>
+
+
+
+<h2><a name='updates'>AutoChoices and performance on model updates</a></h2>
+
+<p>If auto choices are enabled, model updates imply some additional work on the
+filter header.</p> 
+
+<p>Adding a row to the model has little impact, but removing a row implies 
+extracting the choices for all the columns, the same as updating a row. If
+a cell is updated, only the choices for that column are extracted.</p>
+
+<p>The main problem on this behaviour lies on the sequencing of such operations.
+A GUI operation can be translated into several model updates: for example, 
+removing 3 rows and updating another. In this case, the choices are extracted
+from the model ONCE for each suboperation; it can be more effective in this case
+to disable the filter header, perform the operations and the enable again the
+filter header: the choices are only extracted once.</p>
+
+
+
+
+<h2><a name='adaptive'>Adaptive choices with enabled auto choices</a></h2>
+
+<p>The final setting with big impact on the performance is the adaptive choices
+flag. If enabled, as it is by default, choices are automatically updated to
+only display the available ones (an unavailable choice is a choice that
+would filter out all the rows).</p>
+
+<p>It is not needed to activate the AutoChoices feature to have adaptive
+choices. In this case, the adaptive behaviour happens on the custom choices 
+provided by the programmer. This section relates, however, to the most useful
+scenario, when auto choices are enabled.</p>
+
+<p>Enabling adaptive choices requires more memory, as the filter header keeps,
+to improve performance, internal structures with the filtering state. On the
+positive side, these structures allow faster filtering times (checks to 
+verify if a cell is filtered in or out are done exactly once). Next table
+shows the initialisation times and memory required for scenarios with
+adaptive choices enabled vs the same scenario without adaptive choices (both
+with auto choices enabled):</p>
+
+<pre>B1-    1000 rows:  0.22 Mb,  180 ms &lt;-- versus --&gt;  0.14 Mb,  220 ms.
+B2-   10000 rows:  1.37 Mb,  385 ms &lt;-- versus --&gt;  0.72 Mb,  735 ms
+B3-  100000 rows:  7.27 Mb,  755 ms &lt;-- versus --&gt;  3.63 Mb, 1709 ms
+B4- 1000000 rows: 58.77 Mb, 3100 ms &lt;-- versus --&gt; 23.87 Mb, 4332 ms.</pre>
+
+<p>Two results are obvious: required space doubles, and initialisation time is
+significantly decreased when adaptive choices is enabled; note that this 
+example does not contain more than 10.000 unique values, which is the reason
+why the times does not increase much more on cases B3 and B4.</p>
+
+<p>The negative performance impact from the adaptive choices lies on the 
+extraction of the available choices that happen dynamically. A change on
+the filter expression of one editor requires extracting the available choices
+of the other editors, whose times have been already measured above.</p>
+
+
+<h2><a name='summary'>Summary</a></h2>
+
+In general, most tables whose size is manageable for sorting can be
+smoothly handled with the Table Filter.
+
+Enabling AutoChoices implies additional work on the system. If a column
+contains a high percentage of unique elements, the programmer should disable
+the AutoChoices for that column; note, also, that the support provided by the
+autoChoices to the user decreases as the number of choices increases. 
+
+AdaptiveOptions requires additional memory, proportional to the size of the 
+row. When the user updates the filter on any column, the autochoices of all
+the other columns are re-extracted, so the same advice given on the paragraph
+above applies here. If the user experiences an uncomfortable delay when
+applying a filter, it should be evaluated whether to disable the 
+adaptiveOptions.
+
+</div></body>
+</html>

@@ -63,9 +63,9 @@ public class TestTableModel extends AbstractTableModel {
     private List<TestData> data;
     private Set<TestData> modifiedTestData = new HashSet<TestData>();
     private int columnsOrder[];
-    
-    public static void setLargeModel(boolean enable){
-    	expectedWidth = enable? 8 : 5;
+
+    public static void setLargeModel(boolean enable) {
+        expectedWidth = enable ? 8 : 5;
     }
 
 
@@ -111,7 +111,7 @@ public class TestTableModel extends AbstractTableModel {
         TestData ret = null;
         if (data.size() > 0) {
             ret = data.get(0);
-            ret.male=!ret.male;
+            ret.male = !ret.male;
             fireTableRowsUpdated(0, 0);
         }
 
@@ -153,7 +153,7 @@ public class TestTableModel extends AbstractTableModel {
         }
 
         columnsOrder = newColumnsOrder;
-        setLargeModel(expectedWidth<8);
+        setLargeModel(expectedWidth < 8);
         fireTableStructureChanged();
     }
 
@@ -165,10 +165,10 @@ public class TestTableModel extends AbstractTableModel {
     public TestData getRow(int row) {
         return data.get(row);
     }
-    
-    public void updateData(int rows){
-    	data = getTestData(rows);
-    	fireTableDataChanged();
+
+    public void updateData(int rows) {
+        data = getTestData(rows);
+        fireTableDataChanged();
     }
 
     public int getMaxColumnCount() {

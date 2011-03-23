@@ -26,6 +26,7 @@ package net.coderazzi.filters.examples;
 
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -94,8 +95,8 @@ import net.coderazzi.filters.gui.TableFilterHeader;
 public class TableFilterExample extends JFrame implements ActionHandler {
 
     private static final long serialVersionUID = 382439526043424294L;
-    
-    private static final int DEFAULT_MODEL_ROWS=1000;
+
+    private static final int DEFAULT_MODEL_ROWS = 1000;
 
     private TestTableModel tableModel;
     private JTable table;
@@ -346,7 +347,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
                                            String        columnName) {
         JMenu menu = (JMenu) getMenu(filtersMenu, columnName, false);
         ((JCheckBoxMenuItem) getMenu(menu, MenuAutoCompletion.NAME, false))
-        	.setSelected(editor.isAutoCompletion());
+            .setSelected(editor.isAutoCompletion());
         ((JCheckBoxMenuItem) getMenu(menu, MenuEditable.NAME, false))
             .setSelected(editor.isEditable());
         ((JCheckBoxMenuItem) getMenu(menu, MenuEnabled.NAME, false))
@@ -398,9 +399,9 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         TableFilterExample frame = new TableFilterExample(modelRows);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
-        frame.setVisible(true);    	
+        frame.setVisible(true);
     }
-    
+
     public final static void main(String args[]) {
         FilterSettings.autoChoices = AutoChoices.ENABLED;
         init(DEFAULT_MODEL_ROWS);

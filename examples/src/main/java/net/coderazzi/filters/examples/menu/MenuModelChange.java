@@ -40,33 +40,33 @@ public class MenuModelChange extends AbstractMenuAction {
     private int newModelRows;
 
     public MenuModelChange(ActionHandler main, int modelRows) {
-        super(modelRows==-1 ? "Change rows number ..." : "Use new model ...", main);
+        super((modelRows == -1) ? "Change rows number ..."
+                                : "Use new model ...", main);
         this.newModelRows = modelRows;
     }
 
     @Override public void actionPerformed(ActionEvent e) {
-    	String rows=null;
-    	try{
-	        if (newModelRows==-1) {
-	        	rows = JOptionPane.showInputDialog(main.getJFrame(), 
-	        			"Number of rows:");
-	        	if (rows!=null){
-        			int iRows = Integer.valueOf(rows);
-    				main.getTableModel().updateData(iRows);
-	        	}
-	        } else {
-	        	rows = JOptionPane.showInputDialog(main.getJFrame(), 
-	        			"Number of rows:", new Integer(newModelRows));
-	        	if (rows!=null){
-        			newModelRows = Integer.valueOf(rows);
-        			main.initTableModel(newModelRows);
-	        	}
-	        }
-		}
-		catch(NumberFormatException ex){
-			JOptionPane.showMessageDialog(main.getJFrame(), 
-					"Invalid integer: "+rows);
-		}
+        String rows = null;
+        try {
+            if (newModelRows == -1) {
+                rows = JOptionPane.showInputDialog(main.getJFrame(),
+                        "Number of rows:");
+                if (rows != null) {
+                    int iRows = Integer.valueOf(rows);
+                    main.getTableModel().updateData(iRows);
+                }
+            } else {
+                rows = JOptionPane.showInputDialog(main.getJFrame(),
+                        "Number of rows:", new Integer(newModelRows));
+                if (rows != null) {
+                    newModelRows = Integer.valueOf(rows);
+                    main.initTableModel(newModelRows);
+                }
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(main.getJFrame(),
+                "Invalid integer: " + rows);
+        }
     }
 
 }

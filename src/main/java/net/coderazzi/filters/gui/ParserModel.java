@@ -27,12 +27,14 @@ package net.coderazzi.filters.gui;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -198,25 +200,28 @@ public class ParserModel implements IParserModel {
         return stringComparator(noCase);
     }
 
-    /** Returns a default singleton comparator for the given case flag. */ 
+    /** Returns a default singleton comparator for the given case flag. */
     public static Comparator<String> stringComparator(boolean ignoreCase) {
         if (ignoreCase) {
             if (icStrComparator == null) {
-            	icStrComparator = new Comparator<String>() {			
-    				@Override public int compare(String o1, String o2) {
-    					return o1.compareToIgnoreCase(o2);
-    				}
-        		};
+                icStrComparator = new Comparator<String>() {
+                    @Override public int compare(String o1, String o2) {
+                        return o1.compareToIgnoreCase(o2);
+                    }
+                };
             }
+
             return icStrComparator;
         }
+
         if (strComparator == null) {
-        	strComparator = new Comparator<String>() {			
-				@Override public int compare(String o1, String o2) {
-					return o1.compareTo(o2);
-				}
-    		};
+            strComparator = new Comparator<String>() {
+                @Override public int compare(String o1, String o2) {
+                    return o1.compareTo(o2);
+                }
+            };
         }
+
         return strComparator;
     }
 
