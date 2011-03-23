@@ -90,12 +90,12 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     private AutoChoices autoChoices;
     private Format format;
     private Comparator comparator;
-    private boolean ignoreCase;
     private Class modelClass;
+    private boolean ignoreCase;
 
-    FiltersHandler filtersHandler;
     FilterArrowButton downButton = new FilterArrowButton();
     EditorFilter filter = new EditorFilter();
+    FiltersHandler filtersHandler;
     EditorComponent editor;
     PopupComponent popup;
     int modelIndex;
@@ -162,7 +162,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
     /** IFilterEditor method. */
     @Override public void setContent(Object content) {
-        setEditorContent((content == null) ? CustomChoice.MATCH_ALL : content);
+        setEditorContent((content == null || "".equals(content)) ? CustomChoice.MATCH_ALL : content);
     }
 
     /** IFilterEditor method. */
@@ -261,8 +261,8 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
     /** IFilterEditor method. */
     @Override public void setComparator(Comparator comparator) {
-        // the comparator is only used for rendered content, and also
-        // included on the table sorter
+        // the comparator is used for sorting rendered choices, and for
+    	// comparison operations on the text parser
         if ((comparator != this.comparator) && (comparator != null)) {
             this.comparator = comparator;
 

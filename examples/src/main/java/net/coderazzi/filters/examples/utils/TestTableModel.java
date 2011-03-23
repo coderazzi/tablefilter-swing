@@ -50,7 +50,7 @@ public class TestTableModel extends AbstractTableModel {
     public static final String LCNAME = "Nickname";
     public static final String DATE = "Date";
 
-    private static String columnNames[] = {
+    public static String columnNames[] = {
             NAME, AGE, MALE, TUTOR, COUNTRY, CLUB, LCNAME, DATE
         };
     private static final Class<?> columnTypes[] = {
@@ -59,17 +59,22 @@ public class TestTableModel extends AbstractTableModel {
         };
 
 
-    private static boolean changedModel;
+    private static int expectedWidth = 5;
     private List<TestData> data;
     private Set<TestData> modifiedTestData = new HashSet<TestData>();
     private int columnsOrder[];
-
-
-    public static TestTableModel createTestTableModel() {
-        return createTestTableModel(1000);
+    
+    public static void setLargeModel(boolean enable){
+    	expectedWidth = enable? 8 : 5;
     }
 
+
     public static TestTableModel createTestTableModel(int elements) {
+        return new TestTableModel(getTestData(elements));
+    }
+
+
+    private static List<TestData> getTestData(int elements) {
         TestData.resetRandomness();
 
         List<TestData> ltd = new ArrayList<TestData>();
@@ -78,15 +83,7 @@ public class TestTableModel extends AbstractTableModel {
             ltd.add(new TestData());
         }
 
-        return new TestTableModel(ltd);
-
-    }
-
-
-    public static TestTableModel createLargeTestTableModel(int elements) {
-        changedModel = true;
-
-        return createTestTableModel(elements);
+        return ltd;
     }
 
 
@@ -105,6 +102,17 @@ public class TestTableModel extends AbstractTableModel {
         if (data.size() > 0) {
             ret = data.remove(0);
             fireTableRowsDeleted(0, 0);
+        }
+
+        return ret;
+    }
+
+    public TestData updateTestData() {
+        TestData ret = null;
+        if (data.size() > 0) {
+            ret = data.get(0);
+            ret.male=!ret.male;
+            fireTableRowsUpdated(0, 0);
         }
 
         return ret;
@@ -145,12 +153,22 @@ public class TestTableModel extends AbstractTableModel {
         }
 
         columnsOrder = newColumnsOrder;
-        changedModel = !changedModel;
+        setLargeModel(expectedWidth<8);
+        fireTableStructureChanged();
+    }
+
+    public void shuffleModel() {
+        columnsOrder = getRandomOrder();
         fireTableStructureChanged();
     }
 
     public TestData getRow(int row) {
         return data.get(row);
+    }
+    
+    public void updateData(int rows){
+    	data = getTestData(rows);
+    	fireTableDataChanged();
     }
 
     public int getMaxColumnCount() {
@@ -172,7 +190,7 @@ public class TestTableModel extends AbstractTableModel {
     }
 
     @Override public int getColumnCount() {
-        return changedModel ? columnNames.length : 5;
+        return expectedWidth;
     }
 
     @Override public int getRowCount() {

@@ -41,7 +41,7 @@ public interface ActionHandler {
     JMenu getFilterMenu();
     JTable getTable();
     JFrame getJFrame();
-    void setTableModel(TestTableModel model);
+    void initTableModel(int rows);
 
     /** Update the enabled flag associated to the filter header. */
     void updateEnabledFlag();

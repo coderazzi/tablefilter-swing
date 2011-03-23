@@ -27,15 +27,12 @@ package net.coderazzi.filters.gui;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
-import java.text.Collator;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,11 +60,11 @@ public class ParserModel implements IParserModel {
     private static Map<Class, Format> basicFormats =
         new HashMap<Class, Format>();
 
-    /** String comparators, case dependent. */
-    private static Comparator<String> collator;
+    /** String comparator, case dependent. */
+    private static Comparator<String> strComparator;
 
-    /** String comparators, ignoring case. */
-    private static Comparator<String> icCollator;
+    /** String comparator, ignoring case. */
+    private static Comparator<String> icStrComparator;
 
     /** Formats defined for the model. */
     private Map<Class, Format> formats = new HashMap<Class, Format>();
@@ -167,7 +164,7 @@ public class ParserModel implements IParserModel {
         Comparator ret = comparators.get(cl);
         if (ret == null) {
             if (cl == String.class) {
-                ret = stringComparator(ignoreCase);
+                ret = getStringComparator(ignoreCase);
             } else if (Comparable.class.isAssignableFrom(cl)) {
                 ret = COMPARABLE_COMPARATOR;
             } else {
@@ -197,33 +194,30 @@ public class ParserModel implements IParserModel {
         }
     }
 
-    @Override public Comparator<String> getStringComparator(
-            boolean ignoreCase) {
-        return stringComparator(ignoreCase);
+    @Override public Comparator<String> getStringComparator(boolean noCase) {
+        return stringComparator(noCase);
     }
 
-    private static Comparator<String> stringComparator(boolean ignoreCase) {
+    /** Returns a default singleton comparator for the given case flag. */ 
+    public static Comparator<String> stringComparator(boolean ignoreCase) {
         if (ignoreCase) {
-            if (icCollator == null) {
-                icCollator = createStringComparator(true);
+            if (icStrComparator == null) {
+            	icStrComparator = new Comparator<String>() {			
+    				@Override public int compare(String o1, String o2) {
+    					return o1.compareToIgnoreCase(o2);
+    				}
+        		};
             }
-
-            return icCollator;
+            return icStrComparator;
         }
-
-        if (collator == null) {
-            collator = createStringComparator(false);
+        if (strComparator == null) {
+        	strComparator = new Comparator<String>() {			
+				@Override public int compare(String o1, String o2) {
+					return o1.compareTo(o2);
+				}
+    		};
         }
-
-        return collator;
-    }
-
-    private static Comparator<String> createStringComparator(
-            boolean ignoreCase) {
-        Collator ret = Collator.getInstance();
-        ret.setStrength(ignoreCase ? Collator.SECONDARY : Collator.TERTIARY);
-
-        return (Comparator) ret;
+        return strComparator;
     }
 
     /** Returns the {@link Format} defined for every FilterModel. */

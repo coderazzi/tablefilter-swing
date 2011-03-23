@@ -26,7 +26,6 @@ package net.coderazzi.filters.examples;
 
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -68,6 +67,7 @@ import net.coderazzi.filters.examples.menu.MenuMaxHistory;
 import net.coderazzi.filters.examples.menu.MenuMaxPopupRows;
 import net.coderazzi.filters.examples.menu.MenuModelAdd;
 import net.coderazzi.filters.examples.menu.MenuModelChange;
+import net.coderazzi.filters.examples.menu.MenuModelColumnsChange;
 import net.coderazzi.filters.examples.menu.MenuModelRemove;
 import net.coderazzi.filters.examples.menu.MenuPosition;
 import net.coderazzi.filters.examples.menu.MenuReset;
@@ -94,6 +94,8 @@ import net.coderazzi.filters.gui.TableFilterHeader;
 public class TableFilterExample extends JFrame implements ActionHandler {
 
     private static final long serialVersionUID = 382439526043424294L;
+    
+    private static final int DEFAULT_MODEL_ROWS=1000;
 
     private TestTableModel tableModel;
     private JTable table;
@@ -101,17 +103,17 @@ public class TableFilterExample extends JFrame implements ActionHandler {
     private JCheckBoxMenuItem allEnabled;
     JMenu filtersMenu;
 
-    public TableFilterExample() {
+    public TableFilterExample(int modelRows) {
         super("Table Filter Example");
 
-        JPanel tablePanel = createGui();
+        JPanel tablePanel = createGui(modelRows);
         getContentPane().add(tablePanel);
-        setJMenuBar(createMenu(tablePanel));
+        setJMenuBar(createMenu(tablePanel, modelRows));
         filterHeader.setTable(table);
     }
 
-    private JPanel createGui() {
-        tableModel = TestTableModel.createTestTableModel();
+    private JPanel createGui(int modelRows) {
+        tableModel = TestTableModel.createTestTableModel(modelRows);
         table = new JTable(tableModel);
 
         JPanel tablePanel = new JPanel(new BorderLayout());
@@ -149,9 +151,9 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         return tablePanel;
     }
 
-    private JMenuBar createMenu(JPanel tablePanel) {
+    private JMenuBar createMenu(JPanel tablePanel, int modelRows) {
         JMenuBar menu = new JMenuBar();
-        menu.add(createTableMenu());
+        menu.add(createTableMenu(modelRows));
         menu.add(createHeaderMenu(tablePanel));
         menu.add(createFiltersMenu());
         menu.add(createMiscellaneousMenu());
@@ -159,7 +161,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         return menu;
     }
 
-    private JMenu createTableMenu() {
+    private JMenu createTableMenu(int modelRows) {
         JMenu tableMenu = new JMenu("Table");
         tableMenu.setMnemonic(KeyEvent.VK_T);
         tableMenu.add(new MenuModelAdd(this, true));
@@ -168,8 +170,10 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         tableMenu.addSeparator();
         tableMenu.add(new MenuAutoResize(this));
         tableMenu.addSeparator();
-        tableMenu.add(new MenuModelChange(this, true));
-        tableMenu.add(new MenuModelChange(this, false));
+        tableMenu.add(new MenuModelChange(this, modelRows));
+        tableMenu.add(new MenuModelChange(this, -1));
+        tableMenu.add(new MenuModelColumnsChange(this, false));
+        tableMenu.add(new MenuModelColumnsChange(this, true));
 
         return tableMenu;
     }
@@ -295,8 +299,8 @@ public class TableFilterExample extends JFrame implements ActionHandler {
     }
 
     /** {@link ActionHandler} interface. */
-    @Override public void setTableModel(TestTableModel model) {
-        this.tableModel = model;
+    @Override public void initTableModel(int rows) {
+        this.tableModel = TestTableModel.createTestTableModel(rows);
         table.setModel(tableModel);
     }
 
@@ -341,14 +345,14 @@ public class TableFilterExample extends JFrame implements ActionHandler {
     @Override public void updateFilterInfo(IFilterEditor editor,
                                            String        columnName) {
         JMenu menu = (JMenu) getMenu(filtersMenu, columnName, false);
+        ((JCheckBoxMenuItem) getMenu(menu, MenuAutoCompletion.NAME, false))
+        	.setSelected(editor.isAutoCompletion());
         ((JCheckBoxMenuItem) getMenu(menu, MenuEditable.NAME, false))
             .setSelected(editor.isEditable());
         ((JCheckBoxMenuItem) getMenu(menu, MenuEnabled.NAME, false))
             .setSelected(editor.getFilter().isEnabled());
         ((JCheckBoxMenuItem) getMenu(menu, MenuIgnoreCase.NAME, false))
             .setSelected(editor.isIgnoreCase());
-        ((JCheckBoxMenuItem) getMenu(menu, MenuAutoCompletion.NAME, false))
-            .setSelected(editor.isAutoCompletion());
         ((JCheckBoxMenuItem) getMenu(menu, MenuInstantFiltering.NAME, false))
             .setSelected(editor.isInstantFiltering());
 
@@ -390,13 +394,16 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         return ret;
     }
 
-    public final static void main(String args[]) {
-        FilterSettings.autoChoices = AutoChoices.ENABLED;
-
-        TableFilterExample frame = new TableFilterExample();
+    public final static void init(int modelRows) {
+        TableFilterExample frame = new TableFilterExample(modelRows);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
-        frame.setVisible(true);
+        frame.setVisible(true);    	
+    }
+    
+    public final static void main(String args[]) {
+        FilterSettings.autoChoices = AutoChoices.ENABLED;
+        init(DEFAULT_MODEL_ROWS);
     }
 
 }

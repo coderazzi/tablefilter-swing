@@ -27,10 +27,9 @@ package net.coderazzi.filters.examples.menu;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 
 import net.coderazzi.filters.examples.ActionHandler;
-import net.coderazzi.filters.examples.utils.TestTableModel;
 
 
 /** Change width or model directly. */
@@ -38,28 +37,36 @@ public class MenuModelChange extends AbstractMenuAction {
 
     private static final long serialVersionUID = 9137226745345048519L;
 
-    private boolean onlyChangeWidth;
+    private int newModelRows;
 
-    public MenuModelChange(ActionHandler main, boolean onlyChangeWidth) {
-        super(onlyChangeWidth ? "Change model width" : "Use new model", main);
-        this.onlyChangeWidth = onlyChangeWidth;
+    public MenuModelChange(ActionHandler main, int modelRows) {
+        super(modelRows==-1 ? "Change rows number ..." : "Use new model ...", main);
+        this.newModelRows = modelRows;
     }
 
     @Override public void actionPerformed(ActionEvent e) {
-        reinitFiltersMenu();
-        if (onlyChangeWidth) {
-            main.getTableModel().changeModel(main.getTable());
-        } else {
-            main.setTableModel(TestTableModel.createTestTableModel());
-        }
-    }
-
-    void reinitFiltersMenu() {
-        JMenu filterMenu = main.getFilterMenu();
-        int pos = filterMenu.getItemCount();
-        while (pos-- > 2) {
-            filterMenu.remove(filterMenu.getItem(pos));
-        }
+    	String rows=null;
+    	try{
+	        if (newModelRows==-1) {
+	        	rows = JOptionPane.showInputDialog(main.getJFrame(), 
+	        			"Number of rows:");
+	        	if (rows!=null){
+        			int iRows = Integer.valueOf(rows);
+    				main.getTableModel().updateData(iRows);
+	        	}
+	        } else {
+	        	rows = JOptionPane.showInputDialog(main.getJFrame(), 
+	        			"Number of rows:", new Integer(newModelRows));
+	        	if (rows!=null){
+        			newModelRows = Integer.valueOf(rows);
+        			main.initTableModel(newModelRows);
+	        	}
+	        }
+		}
+		catch(NumberFormatException ex){
+			JOptionPane.showMessageDialog(main.getJFrame(), 
+					"Invalid integer: "+rows);
+		}
     }
 
 }

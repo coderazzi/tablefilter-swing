@@ -111,11 +111,14 @@ public interface IFilterEditor {
      * Sets the {@link Comparator} required to compare (and sort) instances of
      * the associated class in the table model.<br>
      * Setting a comparator to null resets the used comparator (i.e: the
-     * comparator is never null)
+     * comparator is never null)<br>
+     * On renderer editors, the comparator is used to sort the choices in the
+     * popup menu; on text editors,the comparator is used to compare
+     * instances when the user enters a comparison operator as filter. 
      */
     void setComparator(Comparator comparator);
 
-    /** Returns the associated {@link Comparator}, which can never be null. */
+    /** Returns the associated {@link Comparator}, which is never null. */
     Comparator getComparator();
 
     /** Sets the auto completion flag. */

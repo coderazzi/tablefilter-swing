@@ -46,18 +46,24 @@ public class TestData {
 
     private static Random random = new Random();
 
-    static final String maleNames[] = {
-            "alfred", "Alvin", "Blake", "BOb", "Brandon", "BUd", "Burton",
+    static final String maleNames[] = { //50 names
+            "alfred", //specifically lower case 
+            "Alvin", "Blake", "BOb", "Brandon", 
+            "BUd", "Burton", //to check ignore case
             "Charles", "Clark", "Dale", "Damon", "Darren", "Dustin", "edward",
             "Elton", "Fletcher", "forrester", "Gary", "Harley", "Harold",
-            "Hugh", "James", "Keane", "Kenneth", "Landon", ">Lee", "Lincoln",
-            "Maxwell", "Miller", "Nash", "Nelson", "Norman", "Oswald", "Perry",
-            "Prentice", "=Ralph", "Raymond", "Richard", "Robert", "Scott",
-            "Spencer", "Stanley", "Sut*ton", "Taylor", "Thorne", "Truman",
-            "Tyler", "Wallace",
+            "Hugh", "James", "Keane", "Kenneth", "Landon", 
+            "Ländon", "LÄndon", //to verify unicode
+            ">Lee", //to verify inclusion of operators on name 
+            "Lincoln", "Maxwell", "Miller", "Nash", "Nelson", "Norman", 
+            "Oswald", "Perry", "Prentice", 
+            "=Ralph", //to verify inclusion of operators on name
+            "Raymond", "Richard", "Robert", "Scott", "Spencer", "Stanley", 
+            "Sut*ton", //to verify impact of wildcards on name
+            "Taylor", "Thorne", "Truman", "Tyler", "Wallace",
         };
 
-    static final String femaleNames[] = {
+    static final String femaleNames[] = { //49 names
             "Aida", "Ashley", "Audrey", "Beverly", "Brenda", "Brook", "Cameron",
             "Carling", "Chelsea", "Dale", "Dawn", "Devon", "Dustin", "Erika",
             "Farrah", "Harmony", "Hazel", "Heather", "Holly", "Jamie", "Joyce",
@@ -70,7 +76,7 @@ public class TestData {
 
     // source:
     // http://en.wikipedia.org/wiki/List_of_most_common_surnames#United_States
-    static final String familyNames[] = {
+    static final String familyNames[] = { //100 names
             "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller",
             "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson",
             "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez",

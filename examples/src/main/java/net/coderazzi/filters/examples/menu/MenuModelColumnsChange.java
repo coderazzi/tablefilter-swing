@@ -25,22 +25,29 @@
 
 package net.coderazzi.filters.examples.menu;
 
+import java.awt.event.ActionEvent;
+
 import net.coderazzi.filters.examples.ActionHandler;
 
 
-public class MenuAdaptiveChoices extends AbstractMenuCheckBoxAction {
-
-    public static String NAME = "adaptive choices";
+/** Change model width or shuffle model structure. */
+public class MenuModelColumnsChange extends AbstractMenuAction {
 
     private static final long serialVersionUID = 9137226745345048519L;
 
-    public MenuAdaptiveChoices(ActionHandler main) {
-        super(NAME, main);
-        setSelected(main.getFilterHeader().isAdaptiveChoices());
+    private boolean shuffle;
+
+    public MenuModelColumnsChange(ActionHandler main, boolean shuffle) {
+        super(shuffle? "Shuffle model structure" : "Change model width", main);
+        this.shuffle = shuffle;
     }
 
-    @Override protected void actionPerformed(boolean selected) {
-        main.getFilterHeader().setAdaptiveChoices(selected);
+    @Override public void actionPerformed(ActionEvent e) {
+        if (shuffle) {
+            main.getTableModel().shuffleModel();
+        } else {
+        	//change model width
+            main.getTableModel().changeModel(main.getTable());
+        } 
     }
-
 }
