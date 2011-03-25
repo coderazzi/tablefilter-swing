@@ -28,6 +28,7 @@
 	    	     notree="false" 
 	    	     source="1.6" 
 	    	     sourcepath="src/main/java" 
+	    	     excludepackagenames='net.coderazzi.filters.gui.editor'
 	    	     splitindex="true" 
 	    	     use="true" 
 	    	     version="true">
@@ -47,6 +48,7 @@
 	    	     notree="false" 
 	    	     source="1.5" 
 	    	     sourcepath="../tablefilter-swing-java5/src/main/java" 
+	    	     excludepackagenames='net.coderazzi.filters.gui.editor'
 	    	     splitindex="true" 
 	    	     use="true" 
 	    	     version="true">

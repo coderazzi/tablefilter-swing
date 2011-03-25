@@ -57,7 +57,7 @@ import net.coderazzi.filters.gui.CustomChoice;
  * done therefore linearly -with obvious performance drawbacks in cases with
  * many many custom choices-.</p>
  */
-public class ChoicesListModel extends AbstractListModel {
+class ChoicesListModel extends AbstractListModel {
 
     private static final long serialVersionUID = 3523952153693100563L;
     private List content;

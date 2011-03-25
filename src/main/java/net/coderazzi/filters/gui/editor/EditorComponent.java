@@ -65,7 +65,7 @@ import net.coderazzi.filters.gui.Look;
  * <p>The underlying component is a {@link JTextField}, even when the content is
  * rendered.</p>
  */
-public class EditorComponent extends JTextField {
+class EditorComponent extends JTextField {
 
     private static final long serialVersionUID = -2196080442586435546L;
 
