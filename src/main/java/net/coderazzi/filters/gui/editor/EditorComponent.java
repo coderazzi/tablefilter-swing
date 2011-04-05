@@ -38,6 +38,7 @@ import java.text.Format;
 import java.text.ParseException;
 
 import java.util.Comparator;
+import java.util.regex.Pattern;
 
 import javax.swing.CellRendererPane;
 import javax.swing.JTextField;
@@ -76,6 +77,7 @@ class EditorComponent extends JTextField {
     boolean warning;
     FilterEditor filterEditor;
     PopupComponent popup;
+    static final Pattern newLinePattern = Pattern.compile("[\n\r\t\f]"); 
 
     public EditorComponent(FilterEditor   editor,
                            PopupComponent popupComponent) {
@@ -719,7 +721,11 @@ class EditorComponent extends JTextField {
                                           AttributeSet attrs)
                                    throws BadLocationException {
                 int moveCaretLeft = 0;
-                if (autoCompletion && userUpdate && (text.length() == 1)) {
+                boolean singleCharacter = text.length() == 1;
+                //avoid new lines, etc, see
+                //http://code.google.com/p/tablefilter-swing/issues/detail?id=13
+            	text = newLinePattern.matcher(text).replaceAll(" ");
+                if (autoCompletion && userUpdate && singleCharacter) {
                     String now = getText();
                     // autocompletion is only triggered if the user inputs
                     // a character at the end of the current text
@@ -729,7 +735,7 @@ class EditorComponent extends JTextField {
                         text += completion;
                         moveCaretLeft = completion.length();
                     }
-                }
+                } 
 
                 super.replace(fb, offset, length, text, attrs);
                 editorUpdated();
@@ -843,8 +849,8 @@ class EditorComponent extends JTextField {
             		super.replace(fb, offset, length, text, attrs);
             		return;
             	}
-            	
-                String buffer = getText();
+
+            	String buffer = getText();
                 String begin = buffer.substring(0, offset) + text;
                 String newContent = begin + buffer.substring(offset + length);
                 ChoiceMatch match = getBestMatch(newContent);
