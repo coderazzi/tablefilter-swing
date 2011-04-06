@@ -542,15 +542,17 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             private void init(TableModel model) {
                 Set<CustomChoice> choices = editor.getCustomChoices();
                 if (AutoChoices.DISABLED == editor.getAutoChoices()) {
-                    maxChoices = 1;     // consider empty
+                    maxChoices = 0;
                 } else {
                     Class<?> c = model.getColumnClass(column);
                     if (c.equals(Boolean.class)) {
-                        maxChoices = 4; // consider empty and null
+                    	// consider true and false (plus null!)
+                        maxChoices = 3;
                     } else {
+                    	// consider enum constants, plus null
                         Object o[] = c.getEnumConstants();
                         maxChoices = (o == null) ? Integer.MAX_VALUE
-                                                 : (o.length + 2);
+                                                 : (o.length + 1);
                     }
                 }
 
@@ -593,7 +595,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                     maxIterationChoices -= editor.getChoices().size();
                 }
 
-                return maxIterationChoices == 0;
+                return maxIterationChoices <= 0;
             }
 
             /**
@@ -618,7 +620,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
 
                 if (AutoChoices.DISABLED != editor.getAutoChoices()) {
                     choices.add(entry.getValue(column));
-                }
+                } 
 
                 return maxIterationChoices == choices.size();
             }
