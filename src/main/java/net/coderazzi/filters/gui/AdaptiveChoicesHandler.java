@@ -508,7 +508,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
 
             /** The associated FilterEditor. */
             FilterEditor editor;
-
+            
             /** The maximum number of choices the editor can have (enums). */
             private int maxChoices;
 
@@ -542,7 +542,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             private void init(TableModel model) {
                 Set<CustomChoice> choices = editor.getCustomChoices();
                 if (AutoChoices.DISABLED == editor.getAutoChoices()) {
-                    maxChoices = 0;
+                    maxChoices = 0; 
                 } else {
                     Class<?> c = model.getColumnClass(column);
                     if (c.equals(Boolean.class)) {
@@ -551,8 +551,16 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                     } else {
                     	// consider enum constants, plus null
                         Object o[] = c.getEnumConstants();
-                        maxChoices = (o == null) ? Integer.MAX_VALUE
-                                                 : (o.length + 1);
+                        if (o == null){
+                        	// no enum, only handle ENABLED
+                            if (AutoChoices.ENUMS == editor.getAutoChoices()) {
+                                maxChoices = 0;
+                            } else {                            	
+                                maxChoices = Integer.MAX_VALUE;
+                            }
+                        } else {
+                        	maxChoices = o.length + 1;
+                        }
                     }
                 }
 
@@ -618,7 +626,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                     }
                 }
 
-                if (AutoChoices.DISABLED != editor.getAutoChoices()) {
+                if (maxChoices > 0) { // otherwise, no care for column's value
                     choices.add(entry.getValue(column));
                 } 
 
