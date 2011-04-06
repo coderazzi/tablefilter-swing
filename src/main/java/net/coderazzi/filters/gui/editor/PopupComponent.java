@@ -31,6 +31,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -47,6 +50,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
@@ -62,14 +66,15 @@ import net.coderazzi.filters.gui.Look;
  */
 abstract class PopupComponent implements PopupMenuListener {
 
-    private JPopupMenu popup;
     private FilterListCellRenderer listRenderer;
     private JScrollPane choicesScrollPane;
     private JScrollPane historyScrollPane;
     private JSeparator separator;
+    private EditorBoundsWatcher editorBoundsWatcher = new EditorBoundsWatcher();
 
     private ChoicesListModel choicesModel;
     private HistoryListModel historyModel;
+    JPopupMenu popup;
 
     /**
      * cancelReason contains the source of the event that cancelled last time
@@ -159,11 +164,8 @@ abstract class PopupComponent implements PopupMenuListener {
         prepareGui();
         setPopupFocused(false);
 
-        int width = editor.getParent().getWidth() - 1;
-        configurePaneSize(choicesScrollPane, width);
-        configurePaneSize(historyScrollPane, width);
         if (editor.isValid()) {
-            popup.show(editor, -editor.getLocation().x - 1, editor.getHeight());
+            editorBoundsWatcher.displayPopup(editor);
         }
 
         // Not yet knowing the focus, but the call to select (immediately after,
@@ -175,13 +177,7 @@ abstract class PopupComponent implements PopupMenuListener {
 
     /** Hides the popup, returning false it was already hidden. */
     public boolean hide() {
-        if (isVisible()) {
-            popup.setVisible(false);
-
-            return true;
-        }
-
-        return false;
+        return editorBoundsWatcher.displayPopup(null);
     }
 
     public FilterListCellRenderer getFilterRenderer() {
@@ -488,6 +484,13 @@ abstract class PopupComponent implements PopupMenuListener {
         return focusedList == historyList;
     }
 
+    /** Configures the popup panes to have the editor width. */
+    void reconfigurePanes(Component editor) {
+        int width = editor.getParent().getWidth() - 1;
+        configurePaneSize(choicesScrollPane, width);
+        configurePaneSize(historyScrollPane, width);
+    }
+
     /** Configures the passed pane to have the given preferred width. */
     private void configurePaneSize(JComponent pane, int width) {
         Dimension size = pane.getPreferredSize();
@@ -662,6 +665,64 @@ abstract class PopupComponent implements PopupMenuListener {
         private void listSelection(Object object) {
             choiceSelected(object);
             hide();
+        }
+    }
+
+    /** Class to track changes in position or size on the popup's editor. */
+    final class EditorBoundsWatcher extends ComponentAdapter {
+
+        private Component ed;
+
+        /**
+         * Displays or hides the popup, associated to the given editor.
+         *
+         * @param   editor  null to hide the popup
+         *
+         * @return  true if editor is null and the popup was visible
+         */
+        public boolean displayPopup(Component editor) {
+            if (editor != ed) {
+                if (ed != null) {
+                    ed.removeComponentListener(this);
+                }
+
+                ed = editor;
+                if (ed != null) {
+                    ed.addComponentListener(this);
+                }
+            }
+
+            if (ed != null) {
+                reconfigurePanes(ed);
+                popup.show(ed, -ed.getLocation().x - 1, ed.getHeight());
+            } else if (popup.isVisible()) {
+                popup.setVisible(false);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void handleChange() {
+            if (popup.isVisible()) {
+                Point p = new Point(-ed.getLocation().x - 1, ed.getHeight());
+                SwingUtilities.convertPointToScreen(p, ed);
+                popup.setLocation(p);
+                reconfigurePanes(ed);
+                popup.revalidate();
+                popup.setSize(popup.getPreferredSize().width,
+                    popup.getHeight());
+            } else {
+                displayPopup(null);
+            }
+        }
+
+        @Override public void componentMoved(ComponentEvent e) {
+            handleChange();
+        }
+
+        @Override public void componentResized(ComponentEvent e) {
+            handleChange();
         }
     }
 }
