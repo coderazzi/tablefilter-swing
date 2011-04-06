@@ -483,7 +483,7 @@ public class Parser implements IParser {
 
     static {
         expressionMatcher = Pattern.compile(
-                "^(>=|<=|<>|!~|~~|>|<|=|~|!)?(\\s*(.*))$");
+                "^(>=|<=|<>|!~|~~|>|<|=|~|!)?(\\s*(.*))$", Pattern.MULTILINE);
 
         operands = new HashMap<String, IOperand>();
         operands.put("~~", new REOperand(true));
