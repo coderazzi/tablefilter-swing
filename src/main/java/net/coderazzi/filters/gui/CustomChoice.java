@@ -29,8 +29,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-
 import java.text.Format;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -99,6 +101,67 @@ public abstract class CustomChoice {
             };
         }
     };
+
+    /**
+     * Creates a set of CustomChoice instances, one for each provided choice.
+     * The representation for each choice is the stringfied representation of
+     * the passed instance.
+     */
+    public static Set<CustomChoice> createSet(Object choices[]) {
+        Set<CustomChoice> ret = new HashSet<CustomChoice>();
+        for (Object o : choices) {
+            ret.add(create(o, o.toString()));
+        }
+
+        return ret;
+    }
+
+    /**
+     * Creates a set of CustomChoice instances, one for each provided choice.
+     * The representation for each choice is the stringfied representation of
+     * the passed instance.
+     */
+    public static Set<CustomChoice> createSet(Collection choices) {
+        Set<CustomChoice> ret = new HashSet<CustomChoice>();
+        for (Object o : choices) {
+            ret.add(create(o, o.toString()));
+        }
+
+        return ret;
+    }
+
+    /**
+     * Creates a CustomChoice that matches the given object; its stringfied
+     * format is the representation shown to the user.
+     */
+    public static CustomChoice create(Object choice) {
+        return create(choice, choice.toString());
+    }
+
+    /**
+     * Creates a CustomChoice that matches the given object, with the provided
+     * representation.
+     */
+    public static CustomChoice create(final Object choice, String repr) {
+        return new CustomChoice(repr) {
+            @Override public RowFilter getFilter(final IFilterEditor editor) {
+                final int index = editor.getModelIndex();
+                final String string = (choice instanceof String)
+                    ? (String) choice : null;
+                return new RowFilter() {
+                    @Override public boolean include(Entry entry) {
+                        Object o = entry.getValue(index);
+                        if ((string != null) && (o instanceof String)
+                                && editor.isIgnoreCase()) {
+                            return string.equalsIgnoreCase((String) o);
+                        }
+
+                        return choice.equals(o);
+                    }
+                };
+            }
+        };
+    }
 
     private Icon icon;
     private String str;

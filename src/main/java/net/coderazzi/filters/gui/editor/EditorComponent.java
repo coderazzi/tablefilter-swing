@@ -77,7 +77,7 @@ class EditorComponent extends JTextField {
     boolean warning;
     FilterEditor filterEditor;
     PopupComponent popup;
-    static final Pattern newLinePattern = Pattern.compile("[\n\r\t\f]"); 
+    static final Pattern newLinePattern = Pattern.compile("[\n\r\t\f]");
 
     public EditorComponent(FilterEditor   editor,
                            PopupComponent popupComponent) {
@@ -114,7 +114,7 @@ class EditorComponent extends JTextField {
 
     /**
      * Returns the filter associated to the current content.<br>
-     * Always invoked after {@link EditorComponent#consolidateFilter()} 
+     * Always invoked after {@link EditorComponent#consolidateFilter()}
      */
     public RowFilter getFilter() {
         return controller.getFilter();
@@ -433,12 +433,18 @@ class EditorComponent extends JTextField {
                 text = ((CustomChoice) content).toString();
                 match.content = content;
             } else {
-                Format fmt = filterEditor.getFormat();
-                text = (fmt == null) ? content.toString() : fmt.format(content);
+                if (content instanceof String) {
+                    text = (String) content;
+                } else {
+                    Format fmt = filterEditor.getFormat();
+                    text = (fmt == null) ? content.toString()
+                                         : fmt.format(content);
+                }
+
                 match.content = text;
             }
 
-            match.exact = true; //avoid interpretation
+            match.exact = true; // avoid interpretation
             setEditorText(text);
             updateFilter(text, match, false);
             activateCustomDecoration();
@@ -722,20 +728,20 @@ class EditorComponent extends JTextField {
                                    throws BadLocationException {
                 int moveCaretLeft = 0;
                 boolean singleCharacter = text.length() == 1;
-                //avoid new lines, etc, see
-                //http://code.google.com/p/tablefilter-swing/issues/detail?id=13
-            	text = newLinePattern.matcher(text).replaceAll(" ");
+                // avoid new lines, etc, see
+                // http://code.google.com/p/tablefilter-swing/issues/detail?id=13
+                text = newLinePattern.matcher(text).replaceAll(" ");
                 if (autoCompletion && userUpdate && singleCharacter) {
                     String now = getText();
                     // autocompletion is only triggered if the user inputs
                     // a character at the end of the current text
                     if (now.length() == (offset + length)) {
-                    	String begin = now.substring(0, offset) + text;
+                        String begin = now.substring(0, offset) + text;
                         String completion = popup.getCompletion(begin);
                         text += completion;
                         moveCaretLeft = completion.length();
                     }
-                } 
+                }
 
                 super.replace(fb, offset, length, text, attrs);
                 editorUpdated();
@@ -844,13 +850,13 @@ class EditorComponent extends JTextField {
                                           String       text,
                                           AttributeSet attrs)
                                    throws BadLocationException {
-            	if (!userUpdate){
-            		//content set from outside, go with it
-            		super.replace(fb, offset, length, text, attrs);
-            		return;
-            	}
+                if (!userUpdate) {
+                    // content set from outside, go with it
+                    super.replace(fb, offset, length, text, attrs);
+                    return;
+                }
 
-            	String buffer = getText();
+                String buffer = getText();
                 String begin = buffer.substring(0, offset) + text;
                 String newContent = begin + buffer.substring(offset + length);
                 ChoiceMatch match = getBestMatch(newContent);
@@ -885,7 +891,8 @@ class EditorComponent extends JTextField {
                     }
                 }
 
-                int caret = 1 + Math.min(getCaret().getDot(), getCaret().getMark());
+                int caret = 1
+                        + Math.min(getCaret().getDot(), getCaret().getMark());
 
                 super.replace(fb, 0, buffer.length(), proposal, attrs);
 
