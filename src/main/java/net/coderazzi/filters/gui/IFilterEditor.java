@@ -81,6 +81,15 @@ public interface IFilterEditor {
     /** Returns the current choices. */
     Set<CustomChoice> getCustomChoices();
 
+    /** 
+     * Enables or disables the user's interaction; if disabled, the control
+     * is disabled but the associated filter remains in place. 
+     */
+    void setUserInteractionEnabled(boolean enable);
+    
+    /** Returns the user interaction mode. */
+    boolean isUserInteractionEnabled();
+
     /**
      * Defines the editor, if text based -i.e., without associated {@link
      * ChoiceRenderer}, as editable: this flag means that the user can enter any

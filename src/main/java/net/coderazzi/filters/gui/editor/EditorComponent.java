@@ -53,7 +53,6 @@ import javax.swing.text.DocumentFilter;
 
 import net.coderazzi.filters.IParser;
 import net.coderazzi.filters.IParser.InstantFilter;
-import net.coderazzi.filters.gui.AutoChoices;
 import net.coderazzi.filters.gui.CustomChoice;
 import net.coderazzi.filters.gui.Look;
 
@@ -600,7 +599,6 @@ class EditorComponent extends JTextField {
                 match = getBestMatch(text);
             }
             // perform actions in a try/catch due to text parsing exceptions
-
             try {
                 if (match.exact) {
                     content = match.content;
@@ -611,21 +609,12 @@ class EditorComponent extends JTextField {
                         filter = textParser.parseText(escapeText(text));
                     }
                 } else if (instantFiltering && userUpdate) {
-                    boolean parseInstant = true;
-                    if (filterEditor.getAutoChoices() == AutoChoices.DISABLED) {
-                        // in this case, we really need to try an update
-                        // on the filter. If not disabled, the information
-                        // on the ChoiceMatch is enough to know if the current
-                        // input will filter all rows out or not
-                        filter = textParser.parseText(escapeText(text));
-                        if (filterEditor.attemptFilterUpdate(filter)) {
-                            content = text;
-                            parseInstant = false;
-                            setWarning(false);
-                        }
-                    }
-
-                    if (parseInstant) {
+                	// time to try the parseInstantText, if needed
+                    filter = textParser.parseText(escapeText(text));
+                    if (filterEditor.attemptFilterUpdate(filter)) {
+                        content = text;
+                        setWarning(false);
+                    } else {
                         InstantFilter iFilter = textParser.parseInstantText(
                                 escapeText(text));
                         content = iFilter.expression;

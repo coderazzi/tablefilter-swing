@@ -509,6 +509,9 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             /** The associated FilterEditor. */
             FilterEditor editor;
             
+            /** True if autoOptions is enabled on this editor. */
+            private boolean autoOptions;
+
             /** The maximum number of choices the editor can have (enums). */
             private int maxChoices;
 
@@ -518,7 +521,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             /** The choices defined for the editor, with its filter. */
             private Map<CustomChoice, RowFilter> customChoices;
 
-            /** On an iteration, the choices not yet added. */
+            /** On an iteration, the custom choices not yet added. */
             private Map<CustomChoice, RowFilter> missingChoices;
 
             /** The choices that will be set on the editor. */
@@ -564,6 +567,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                     }
                 }
 
+            	autoOptions = maxChoices > 0;
                 if (choices.isEmpty()) {
                     customChoices = null;
                 } else {
@@ -626,7 +630,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                     }
                 }
 
-                if (maxChoices > 0) { // otherwise, no care for column's value
+                if (autoOptions) { // otherwise, no care for column's value
                     choices.add(entry.getValue(column));
                 } 
 

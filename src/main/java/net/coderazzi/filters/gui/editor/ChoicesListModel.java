@@ -296,12 +296,7 @@ class ChoicesListModel extends AbstractListModel {
                             ret.len = len;
                         }
                     }
-
                     ret.content = content.get(ret.index);
-                    if (ret.index >= customChoices) {
-                        ret.exact = ret.content.toString().length()
-                                == strStart.length();
-                    }
                 }
             }
         }

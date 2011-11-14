@@ -15,8 +15,8 @@
   
     <p>
       <span class="mark">TableFilter</span> is open source, under 
-      <a href='#license'>MIT license</a>. Its latest version, 4.1.4, has been
-      released the 26th May 2011. The changelog is available 
+      <a href='#license'>MIT license</a>. Its latest version, 4.2.0, has been
+      released the 15th November 2011. The changelog is available 
       <a href='#history'>below</a>
     </p>
     
@@ -26,7 +26,7 @@
 	       		<li>Available at Google Code, as the project 
 	       			<a href='http://code.google.com/p/tablefilter-swing/'>tablefilter-swing</a></li>
 	   			<li>Alternatively, they can be downloaded directly as a
-	   				single zip file:<a href='download/tablefilter-src-v4.1.4.zip'>tablefilter-src-v4.1.4.zip</a></li>
+	   				single zip file:<a href='download/tablefilter-src-v4.2.0.zip'>tablefilter-src-v4.2.0.zip</a></li>
 	       	</ul>
        	</li>
     	<li><span class='mark'>Binaries</span>:
@@ -43,10 +43,10 @@
 			   		javadoc) can be downloaded directly from the maven repository. The
 			   		last versions are hosted at:
 			   		<ul>
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/4.1.4/'>
-			   		 	Version 4.1.4</a></li> 
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.1.4/'>
-			   		 	Version 4.1.4 for Java 5</a></li> 
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/4.2.0/'>
+			   		 	Version 4.2.0</a></li> 
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.2.0/'>
+			   		 	Version 4.2.0 for Java 5</a></li> 
 				    </ul>
 	    		</li>
 	    		<li>Note that version 4.x is not API compatible with version 3.x; latest 3.x release
@@ -111,7 +111,24 @@ THE SOFTWARE.</pre>
 
   <h2><a name="history">History</a></h2>
   
-    <h4>Version 4.1.4 ( 26th May 2011 )</h4>
+    <h3>Version 4.2.0 ( 11th November 2011 )</h3>
+    
+    	<p>Extended the IFilterEditor interface with two new methods to
+    	handle the user interaction with the editor; the added functionality,
+    	as requested <a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=19'>-issue 19-</a>,
+    	allows the programmer to disable the interaction with the editor 
+    	without disabling the filter set.</p>
+    
+    	<p>Solved <a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=16'>issue 16</a>,
+    	related to missing custom choices on enumeration columns.</p>
+
+    	<p>Solved <a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=20'>issue 20</a>,
+    	to properly filter content with embedded newlines.</p>
+    	
+    	<p>Solved <a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=21'>issue 21</a>,
+    	a bug associated to instant filtering.</p>
+    	       
+    <h3>Version 4.1.4 ( 26th May 2011 )</h3>
     
     	<p>Solved <a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=15'>issue 15</a>,
     	where exceptions are raised when the user selects a choice in the 

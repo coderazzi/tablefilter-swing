@@ -73,6 +73,7 @@ import net.coderazzi.filters.examples.menu.MenuModelRemove;
 import net.coderazzi.filters.examples.menu.MenuPosition;
 import net.coderazzi.filters.examples.menu.MenuReset;
 import net.coderazzi.filters.examples.menu.MenuRowSize;
+import net.coderazzi.filters.examples.menu.MenuUIEnabled;
 import net.coderazzi.filters.examples.menu.MenuUserFilterEnable;
 import net.coderazzi.filters.examples.menu.MenuUserFilterInclude;
 import net.coderazzi.filters.examples.utils.AgeCustomChoice;
@@ -271,6 +272,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         JMenu menu = (JMenu) getMenu(filtersMenu, name, false);
         menu.add(new MenuEditable(this, editor));
         menu.add(new MenuEnabled(this, editor));
+        menu.add(new MenuUIEnabled(this, editor));
         menu.add(new MenuAutoChoices(this, editor));
         menu.addSeparator();
         menu.add(new MenuAutoCompletion(this, editor));

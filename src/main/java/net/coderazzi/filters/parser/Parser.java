@@ -359,9 +359,9 @@ public class Parser implements IParser {
                               throws ParseException {
             try {
                 return Pattern.compile(expression,
-                        ignoreCase
+                        Pattern.DOTALL | (ignoreCase
                             ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE)
-                            : 0);
+                            : 0));
             } catch (PatternSyntaxException pse) {
                 throw new ParseException("", pse.getIndex());
             }
@@ -485,7 +485,7 @@ public class Parser implements IParser {
 
     static {
         expressionMatcher = Pattern.compile(
-        		"^\\s*(>=|<=|<>|!~|~~|>|<|=|~|!)?\\s*(.*)$");
+        		"^\\s*(>=|<=|<>|!~|~~|>|<|=|~|!)?\\s*(.*)$", Pattern.DOTALL);
 
         operands = new HashMap<String, IOperand>();
         operands.put("~~", new REOperand(true));
