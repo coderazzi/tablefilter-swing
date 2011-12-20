@@ -38,8 +38,6 @@ import net.coderazzi.filters.examples.ActionHandler;
 
 public class MaleRenderer implements TableCellRenderer {
 
-    private static final long serialVersionUID = 8042527267257156699L;
-
     private ActionHandler main;
     private Border redBorder;
     private TableCellRenderer delegate;

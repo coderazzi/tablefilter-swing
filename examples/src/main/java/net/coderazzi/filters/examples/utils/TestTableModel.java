@@ -49,13 +49,15 @@ public class TestTableModel extends AbstractTableModel {
     public static final String CLUB = "Club";
     public static final String LCNAME = "Nickname";
     public static final String DATE = "Date";
+    public static final String NOTE = "Notes";
 
     public static String columnNames[] = {
-            NAME, AGE, MALE, TUTOR, COUNTRY, CLUB, LCNAME, DATE
+            NAME, AGE, MALE, TUTOR, COUNTRY, CLUB, LCNAME, DATE//, NOTE
         };
     private static final Class<?> columnTypes[] = {
             String.class, Integer.class, Boolean.class, TestData.Tutor.class,
-            Flag.class, TestData.Club.class, String.class, Date.class
+            Flag.class, TestData.Club.class, String.class, 
+            Date.class//, String.class
         };
 
 
@@ -65,7 +67,7 @@ public class TestTableModel extends AbstractTableModel {
     private int columnsOrder[];
 
     public static void setLargeModel(boolean enable) {
-        expectedWidth = enable ? 8 : 5;
+        expectedWidth = enable ? columnNames.length : 5;
     }
 
 
@@ -153,7 +155,7 @@ public class TestTableModel extends AbstractTableModel {
         }
 
         columnsOrder = newColumnsOrder;
-        setLargeModel(expectedWidth < 8);
+        setLargeModel(expectedWidth < columnNames.length);
         fireTableStructureChanged();
     }
 
@@ -225,6 +227,9 @@ public class TestTableModel extends AbstractTableModel {
 
         case 7:
             return td.date;
+
+        case 8:
+            return td.note;
         }
 
         return null;

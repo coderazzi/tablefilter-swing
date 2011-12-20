@@ -30,6 +30,7 @@ import java.awt.event.KeyEvent;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
@@ -264,6 +265,11 @@ public class TableFilterExample extends JFrame implements ActionHandler {
 
             Set<CustomChoice> choices = new HashSet<CustomChoice>();
             choices.add(new Ages60sCustomChoice());
+            CustomChoice december = CustomChoice.create(
+            		Pattern.compile("\\d+/12/\\d+"));
+            december.setPrecedence(CustomChoice.DEFAULT_PRECEDENCE + 1);
+            december.setRepresentation("from December");
+            choices.add(december);
             editor.setCustomChoices(choices);
         } else if (maleColumn) {
             tc.setCellRenderer(new MaleRenderer(this));

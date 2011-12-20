@@ -183,6 +183,7 @@ public class TestData {
     public Flag flag;
     public Club club;
     public Date date;
+    public String note;
 
     public TestData() {
         // 1 out of 64 can be with unknown age (null)
@@ -215,6 +216,14 @@ public class TestData {
         // date is not exact (not everybody can be born at 00:00!)
         date = new GregorianCalendar(random.nextInt(50) + 1940,
                 random.nextInt(12), random.nextInt(28), 1, 1).getTime();
+        
+        if (random.nextBoolean() && random.nextBoolean()) {
+        	if (random.nextBoolean()) {
+        		note = "<html><i>Transferral <font color='red'>not started</font></i></html>";
+        	} else {
+        		note = "<html><i>Transferral &#34;started&#34;</i></html>";
+        	}
+        }
     }
 
     static void getAllIcons() {

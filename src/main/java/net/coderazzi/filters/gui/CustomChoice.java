@@ -33,6 +33,7 @@ import java.text.Format;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -55,7 +56,8 @@ import javax.swing.UIManager;
  *
  * <p>The order of the custom choices on the choices list can be modified with
  * the precedence attribute. By default, custom choices are sorted by their
- * textual representation.</p>
+ * textual representation. If a precedence is given, lower values are displayed
+ * first.</p>
  */
 public abstract class CustomChoice {
 
@@ -140,9 +142,31 @@ public abstract class CustomChoice {
 
     /**
      * Creates a CustomChoice that matches the given object, with the provided
-     * representation.
+     * representation.<br>
+     * The choice can be a {@link Pattern} instance, in which case it is 
+     * performed a complete regular expression match.
      */
     public static CustomChoice create(final Object choice, String repr) {
+    	if (choice instanceof Pattern){
+    		return new CustomChoice(repr) {				
+                @Override public RowFilter getFilter(final IFilterEditor ed) {
+                    final int index = ed.getModelIndex();
+                    final Pattern pattern = (Pattern) choice;
+                    return new RowFilter() {
+                        @Override public boolean include(Entry entry) {                        	
+                            Object o = entry.getValue(index);
+                            if (o==null){
+                            	return false;
+                            }
+                            Format fmt = ed.getFormat();
+                            String s = (fmt == null) ? o.toString() : 
+                            	fmt.format(o);
+                            return pattern.matcher(s).matches();
+                        }
+                    };
+                }
+			};
+    	}
         return new CustomChoice(repr) {
             @Override public RowFilter getFilter(final IFilterEditor editor) {
                 final int index = editor.getModelIndex();
@@ -228,6 +252,11 @@ public abstract class CustomChoice {
         return icon;
     }
 
+    /** Sets the associated icon.*/
+    public void setIcon(Icon icon) {
+        this.icon = icon;
+    }
+
     /**
      * Decorates the choice on the given editor.
      *
@@ -261,6 +290,24 @@ public abstract class CustomChoice {
     /** Returns the precedence value. */
     public int getPrecedence() {
         return precedence;
+    }
+
+    /** 
+     * Sets the precedence value. Choices with lower precedence are displayed
+     * first. 
+     */
+    public void setPrecedence(int precedence) {
+        this.precedence = precedence;
+    }
+
+    /** Returns the associated string. */
+    public String getRepresentation() {
+        return str;
+    }
+
+    /** Sets the representation value. */
+    public void setRepresentation(String representation) {
+        this.str = representation;
     }
 
     /** Returns the associated filter. */
