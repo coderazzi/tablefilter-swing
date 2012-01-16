@@ -376,7 +376,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
 
     /** Method invoked by the FiltersHandler to extend the choices. */
     public void addChoices(Collection<?> choices) {
-        popup.addChoices(choices, editor.getEscapeParser());
+        popup.addChoices(choices, editor.getChoicesParser());
     }
 
     /** Method called by the FiltersHandler to notify if rows are visible. */

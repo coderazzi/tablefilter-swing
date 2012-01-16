@@ -219,9 +219,14 @@ public class TestData {
         
         if (random.nextBoolean() && random.nextBoolean()) {
         	if (random.nextBoolean()) {
-        		note = "<html><i>Transferral <font color='red'>not started</font></i></html>";
-        	} else {
+        		note = "<html><i>Transferral <font color='red'>"+
+        				"not started</font></i></html>";
+        	} else if (random.nextBoolean()){
         		note = "<html><i>Transferral &#34;started&#34;</i></html>";
+        	} else if (random.nextBoolean()){
+        		note = "> *";
+        	} else {        		
+        		note = "<html><font color='red'>&gt; *</font></html>";
         	}
         }
     }

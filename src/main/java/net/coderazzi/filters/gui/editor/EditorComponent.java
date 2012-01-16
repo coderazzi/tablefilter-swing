@@ -138,8 +138,9 @@ class EditorComponent extends JTextField {
     }
 
     /** Requests the parser to escape choices, which can be null. */
-    public IParser getEscapeParser() {
-        return controller.getEscapeParser();
+    public IChoicesParser getChoicesParser() {
+        return (controller instanceof IChoicesParser)?
+        		(IChoicesParser)controller : null;
     }
 
     /** Returns the editable flag. */
@@ -265,9 +266,6 @@ class EditorComponent extends JTextField {
         /** Detaches the controller, not to be used again. */
         void detach();
 
-        /** @see  EditorComponent#getEscapeParser() */
-        IParser getEscapeParser();
-
         /** @see  EditorComponent#setContent(Object) */
         void setContent(Object content);
 
@@ -314,10 +312,6 @@ class EditorComponent extends JTextField {
 
         @Override public void detach() {
             removeMouseListener(this);
-        }
-
-        @Override public IParser getEscapeParser() {
-            return null;
         }
 
         @Override public void setContent(Object content) {
@@ -380,7 +374,8 @@ class EditorComponent extends JTextField {
 
 
     /** Parent class of controllers with text enabled edition. */
-    private abstract class TextController implements Controller, CaretListener {
+    private abstract class TextController 
+    	implements Controller, CaretListener, IChoicesParser {
 
         protected IParser textParser;
         // userUpdate is true when the content is being updated internally,
@@ -606,22 +601,22 @@ class EditorComponent extends JTextField {
                         CustomChoice cc = (CustomChoice) content;
                         filter = cc.getFilter(filterEditor);
                     } else {
-                        filter = textParser.parseText(escapeText(text));
+                        filter = textParser.parseText(parseEscape(text));
                     }
                 } else if (instantFiltering && userUpdate) {
                 	// time to try the parseInstantText, if needed
-                    filter = textParser.parseText(escapeText(text));
+                    filter = textParser.parseText(parseEscape(text));
                     if (filterEditor.attemptFilterUpdate(filter)) {
                         content = text;
                         setWarning(false);
                     } else {
                         InstantFilter iFilter = textParser.parseInstantText(
-                                escapeText(text));
+                                parseEscape(text));
                         content = iFilter.expression;
                         filter = iFilter.filter;
                     }
                 } else {
-                    filter = textParser.parseText(escapeText(text));
+                    filter = textParser.parseText(parseEscape(text));
                     content = text;
                 }
             } catch (ParseException pex) {
@@ -659,7 +654,7 @@ class EditorComponent extends JTextField {
                                                          String content);
 
         /** Method called to handle parse text before invoking the parser. */
-        abstract protected String escapeText(String text);
+        abstract protected String parseEscape(String text);
     }
 
 
@@ -675,14 +670,12 @@ class EditorComponent extends JTextField {
             super.detach();
             ((AbstractDocument) getDocument()).setDocumentFilter(null);
         }
-
-        /** Returns the current parser. */
-        @Override public IParser getEscapeParser() {
-            // the choices in the popup will appear escaped
-            return textParser;
+        
+        @Override public String escapeChoice(String s) {
+        	return textParser.escape(textParser.stripHtml(s));
         }
 
-        @Override protected String escapeText(String text) {
+        @Override protected String parseEscape(String text) {
             // content on editable fields is always escaped, so there is
             // no need to escape it again
             return text;
@@ -798,13 +791,11 @@ class EditorComponent extends JTextField {
             ((AbstractDocument) getDocument()).setDocumentFilter(null);
         }
 
-        /** Returns the current parser. */
-        @Override public IParser getEscapeParser() {
-            // on non editable content, no need to escape choices
-            return null;
+        @Override public String escapeChoice(String s) {
+        	return textParser.stripHtml(s);
         }
 
-        @Override protected String escapeText(String text) {
+        @Override protected String parseEscape(String text) {
             // choices are not escaped, escape them now therefore
             return textParser.escape(text);
         }

@@ -50,7 +50,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
-import net.coderazzi.filters.IParser;
 import net.coderazzi.filters.gui.ChoiceRenderer;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.Look;
@@ -116,8 +115,8 @@ abstract class PopupComponent implements PopupMenuListener {
      * If there is no Renderer defined, the content is stringfied and sorted -so
      * duplicates are removed-
      */
-    public void addChoices(Collection<?> choices, IParser escapeParser) {
-        if (choicesModel.addContent(choices, escapeParser)) {
+    public void addChoices(Collection<?> choices, IChoicesParser parser) {
+        if (choicesModel.addContent(choices, parser)) {
             hide();
         }
     }

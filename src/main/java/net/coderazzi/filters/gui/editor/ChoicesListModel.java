@@ -36,7 +36,6 @@ import java.util.List;
 
 import javax.swing.AbstractListModel;
 
-import net.coderazzi.filters.IParser;
 import net.coderazzi.filters.gui.CustomChoice;
 
 
@@ -203,13 +202,13 @@ class ChoicesListModel extends AbstractListModel {
     /**
      * Adds additional choices.<br>
      * If the content is text-based, the choices are converted into Strings, and
-     * sorted; if escapeParser is not null, choices are also escaped.<br>
+     * sorted; additionally, choices are also escaped.<br>
      * Otherwise, no sorting is performed, although duplicates are still
      * discarded
      *
      * @return  true if there are any changes after the operation
      */
-    public boolean addContent(Collection addedContent, IParser escapeParser) {
+    public boolean addContent(Collection addedContent, IChoicesParser parser) {
         boolean changed = false;
         for (Object o : addedContent) {
             if (!(o instanceof CustomChoice)) {
@@ -220,10 +219,8 @@ class ChoicesListModel extends AbstractListModel {
                                                 : format.format(o);
                     if (s.length() == 0) {
                         o = CustomChoice.MATCH_EMPTY;
-                    } else if (escapeParser == null) {
-                        o = s.trim();
                     } else {
-                        o = escapeParser.escape(s);
+                        o = parser.escapeChoice(s);
                     }
                 }
             }

@@ -34,6 +34,10 @@ import net.coderazzi.filters.gui.IFilterEditor;
 
 /**
  * Interface defining the requirements on text parsing for filter expressions.
+ * <br>
+ * Starting on version 4.3, the parser is also able to handle html content;
+ * in this case, the parser accepts simple text, but the created filter can
+ * be applied to Html content 
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
@@ -72,6 +76,12 @@ public interface IParser {
      * no character/operator substitutions.
      */
     String escape(String s);
+
+    /**
+     * Removes any Html content from the passed string, converting special
+     * Html characters to Java characters.
+     */
+    String stripHtml(String s);
 
     /** Helper class used on {@link IParser#parseInstantText(String)}. */
     public class InstantFilter {

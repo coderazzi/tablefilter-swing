@@ -84,6 +84,7 @@ public class Parser implements IParser {
     boolean ignoreCase;
     Comparator<String> stringComparator;
     int modelIndex;
+    static HtmlHandler htmlHandler = new HtmlHandler();
     private static Map<String, IOperand> operands;
     private static IOperand wildcardOperand;
     private static WildcardOperand instantOperand;
@@ -144,6 +145,11 @@ public class Parser implements IParser {
         throw new ParseException("", 0);
     }
 
+    /** {@link IParser} interface. */
+    @Override public String stripHtml(String expression) {
+    	return htmlHandler.stripHtml(expression);
+    }
+    
     /** {@link IParser} interface. */
     @Override public String escape(String expression) {
     	expression = expression.trim();
@@ -211,7 +217,9 @@ public class Parser implements IParser {
             return new RowFilter() {
                 @Override public boolean include(Entry entry) {
                     Object left = entry.getValue(modelIndex);
-
+                    if (left instanceof String){
+                    	left = htmlHandler.stripHtml((String)left);
+                    }
                     return (left != null)
                             && matches(comparator.compare(left, right));
                 }
@@ -282,9 +290,11 @@ public class Parser implements IParser {
             return new RowFilter() {
                 @Override public boolean include(Entry entry) {
                     Object left = entry.getValue(modelIndex);
+                    if (left instanceof String){
+                    	left = htmlHandler.stripHtml((String)left);
+                    }
                     boolean value = (left != null)
                             && (0 == comparator.compare(left, right));
-
                     return value == expected;
                 }
             };
@@ -530,8 +540,10 @@ public class Parser implements IParser {
         }
 
         public String format(Object o) {
-            return (format == null) ? ((o == null) ? "" : o.toString().trim())
-                                    : format.format(o).trim();
+        	if (format==null){
+       			return (o == null) ? "" : htmlHandler.stripHtml(o.toString());
+        	}
+        	return format.format(o).trim();
         }
 
         public Object parseObject(String content) throws ParseException {

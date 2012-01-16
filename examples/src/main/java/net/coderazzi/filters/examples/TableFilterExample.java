@@ -99,6 +99,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
     private static final long serialVersionUID = 382439526043424294L;
 
     private static final int DEFAULT_MODEL_ROWS = 1000;
+    private static final boolean START_LARGE_MODEL = false;
 
     private TestTableModel tableModel;
     private JTable table;
@@ -108,7 +109,9 @@ public class TableFilterExample extends JFrame implements ActionHandler {
 
     public TableFilterExample(int modelRows) {
         super("Table Filter Example");
-
+        if (START_LARGE_MODEL){
+        	TestTableModel.setLargeModel(true);
+        }
         JPanel tablePanel = createGui(modelRows);
         getContentPane().add(tablePanel);
         setJMenuBar(createMenu(tablePanel, modelRows));
@@ -256,6 +259,8 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         if (countryColumn) {
             tc.setCellRenderer(new FlagRenderer());
             editor.setEditable(false);
+        } else if (name.equalsIgnoreCase(TestTableModel.NOTE)) {
+        	editor.setEditable(false);
         } else if (name.equalsIgnoreCase(TestTableModel.AGE)) {
             tc.setCellRenderer(new CenteredRenderer());
             editor.setCustomChoices(AgeCustomChoice.getCustomChoices());
@@ -407,6 +412,9 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         TableFilterExample frame = new TableFilterExample(modelRows);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
+        if (START_LARGE_MODEL){
+        	frame.setSize(1200, frame.getSize().height);
+        }
         frame.setVisible(true);
     }
 
