@@ -14,6 +14,7 @@
         <li><a href='#parsermodel'>Parser Model</a></li>
         <li><a href='#types'>Custom types</a></li>
         <li><a href='#custom'>Custom choices</a></li>
+        <li><a href='#html'>Html support</a></li>
         <li><a href='#also'>Additional functionality</a></li>
         <li><a href='#settings'>Settings</a></li>
         <li><a href='#examples'>Examples</a></li>
@@ -267,6 +268,16 @@
 	decorator displays the choice's text in italic, and its associated icon
 	centered, unless it overlaps with the text.</p>
 	
+	<h2><a name='html'>Html support</a></h2>
+     
+     <p>From version 4.3, the library handles properly html content on the
+     table cells. The filter expression entered by the user is HTML agnostic,
+     but it will match the table cells with HTML content -HTML tags are excluded
+     from the search</p>
+     
+     <p>Special HTML characters on the table cells are also converted into
+     Java characters before performing the filtering.</p>
+	
      <h2><a name='also'>Additional functionality</a></h2>
      
      <p>Since version 4.0, the choices displayed on each editor's popup 
@@ -292,6 +303,10 @@
      expression. This functionality can be defined at header level, using the method
      <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setInstantFiltering(boolean)'>TableFilterHeader.setInstantFiltering</a>,
      or directly at <a href='api/net/coderazzi/filters/gui/IFilterEditor.html'>IFilterEditor</a> level.</p>
+     
+     <p>From version 4.2, it is possible to disable the user interaction on a 
+     given filter editor. The editor behaves as disabled -user cannot change it-,
+     but states active, filtering out any unmatched table rows.</p> 
      
      <p>The library provides specific feedback to signal that the current
      editor's contents hide all the table rows, by displaying the editors text
