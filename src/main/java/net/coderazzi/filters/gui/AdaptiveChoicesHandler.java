@@ -488,7 +488,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
         }
 
         @Override public boolean include(RowFilter.Entry entry) {
-            return rows.get((Integer) entry.getIdentifier()).is();
+        	RowInfo ri = rows.get((Integer) entry.getIdentifier()); 
+            return ri == null? true : ri.is(); //see issue 24 for this change
         }
 
         public boolean include(int row) {
