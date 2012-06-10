@@ -139,7 +139,7 @@
       The library is delivered with a single expression parser, which supports
       a comprehensive set of operators to define simple filtering expressions. 
       It is possible to define new parsers by implementing the
-      <a href='api/net/coderazzi/filters/gui/IParser.html'>IParser</a> interface.
+      <a href='api/net/coderazzi/filters/IParser.html'>IParser</a> interface.
     </p>
 
     <p>		
@@ -202,7 +202,7 @@
 
 
 	<p>The parser model is responsible to create the 
-	<a href='api/net/coderazzi/filters/gui/IParser.html'>IParser</a> instance
+	<a href='api/net/coderazzi/filters/IParser.html'>IParser</a> instance
 	associated to each filter editor; it is therefore possible to define different
 	IParser instances with alternative parsing expressions.</p>
 
@@ -297,7 +297,7 @@
      <p>Also from version 4.1, the library supports <span class='mark'>instant filtering</span>:
      the filter is applied as the user enters the text. The exact implementation
      and behaviour of this functionality depends on the registered
-     <a href='api/net/coderazzi/filters/gui/IParser.html'>IParser</a> instance.
+     <a href='api/net/coderazzi/filters/IParser.html'>IParser</a> instance.
      By default, instant filtering applies on expressions including no operators,
      and it considers the input expression as the starting text of the final
      expression. This functionality can be defined at header level, using the method

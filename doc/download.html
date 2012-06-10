@@ -345,7 +345,7 @@ THE SOFTWARE.</pre>
     		    The arrow to show the popup is now placed shifted to the bottom.   		    
     		</li>
     		<li>
-    			Integrated <a href="api/net/coderazzi/filters/parser/Types.html">Types</a>'s parser 
+    			Integrated Types's parser 
     			into the <a href="api/net/coderazzi/filters/gui/FilterSettings.html#types">FilterSettings</a>
     			class.    			
     		</li>
@@ -506,7 +506,7 @@ THE SOFTWARE.</pre>
 	       version 2.0.0, the inclusion was not complete and buggy in the case of
 	       some of these properties.<br>
 	       The full list of system properties that can be defined to override
-	       the default TableFilter behavior is listed <a href='properties.html'>here</a>.
+	       the default TableFilter behavior is listed <a href='tutorial.html#settings'>here</a>.
        </li>
        <li>
 	       A new <a href='examples.html#AppTestProperties'>example</a> is provided to test the extended behaviour.
@@ -524,20 +524,18 @@ THE SOFTWARE.</pre>
        <ul>	
 	        <li>
 		        Changed interface on 
-		        <a href="api/net/coderazzi/filters/gui/ITableFilterEditor.html">ITableFilterEditor</a>
+		        <a href="api/net/coderazzi/filters/gui/IFilterEditor.html">ITableFilterEditor</a>
 		        <ul>
 		            <li>It is possible to retrieve the applied filter on any table's column</li>
 		            <li>It is also possible to set dynamically the filter on any column</li>
 		            <li>Its is supported, through the use of the new 
-		            <a href="api/net/coderazzi/filters/gui/ITableFilterEditorObserver.html">ITableFilterEditorObserver</a>
+		            <a href="api/net/coderazzi/filters/gui/IFilterHeaderObserver.html">ITableFilterEditorObserver</a>
 		            interface, to be notified of changes on the filter's editor.</li>
 		        </ul>
 	        </li>
 	        <li>
-		        Changed interface on 
-		        <a href="api/net/coderazzi/filters/parser/IFilterTextParser.html">IFilterTextParser</a>,
-		        including two methods already defined in the generic implementation in 
-		        <a href="api/net/coderazzi/filters/parser/generic/FilterTextParser.html">FilterTextParser</a>:
+		        Changed interface on IFilterTextParser</a>,
+		        including two methods already defined in the generic implementation in FilterTextParser</a>:
 		        <ul>
 		            <li>Define a type builder for specific user types.</li>
 		            <li>Define a comparator for any type.</li>
@@ -545,24 +543,22 @@ THE SOFTWARE.</pre>
 	        </li>
 	        <li>
 		        Added interface on 
-		        <a href="api/net/coderazzi/filters/gui/ITableFilterHeaderObserver.html">ITableFilterHeaderObserver</a>,
+		        <a href="api/net/coderazzi/filters/gui/IFilterHeaderObserver.html">ITableFilterHeaderObserver</a>,
 		        to observe events on the <a href="api/net/coderazzi/filters/gui/TableFilterHeader.html">TableFilterHeader</a>.
 	        </li>
 	        <li>
-	        	Dates are now <a href='types.html#dates'>automatically handled</a> in the library.
+	        	Dates are now <a href='tutorial.html#types'>automatically handled</a> in the library.
 	    	</li>
 	        <li>
 		        The user can provide properties that override some default behaviours. These properties
 		        have been later redefined in 2.0.1.
 	        </li>
 	        <li>
-		        Bug solved: usage of renderers on 
-		        <a href="api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html">TableChoiceFilterEditor</a> 
+		        Bug solved: usage of renderers on TableChoiceFilterEditor</a> 
 		        would likely drive to AWT exceptions.
 	        </li>
 	        <li>
-		        Bug solved: changing the table or the model, using the 
-		        <a href="api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html">TableChoiceFilterEditor</a>
+		        Bug solved: changing the table or the model, using the TableChoiceFilterEditor</a>
 		        on a column with boolean or enumeration types, would hide all the elements, as if they would not
 		        validate the filter -even if empty-
 	        </li>
@@ -578,8 +574,7 @@ THE SOFTWARE.</pre>
 
     <h3>Version 1.5.0 ( 7th August 2009 ) </h3>
       <ul>
-       <li>Changes; this release improves on the usage of the 
-       <a href="api/net/coderazzi/filters/gui/editors/TableChoiceFilterEditor.html">TableChoiceFilterEditor</a>,
+       <li>Changes; this release improves on the usage of the TableChoiceFilterEditor</a>,
           that is, the editor filter that offers the user a list of the different options
           as found in the table model:
        <ul>
@@ -624,8 +619,7 @@ THE SOFTWARE.</pre>
        <ul>
        	<li>Automatic layout management for the filter header.
 	       	On previous versions, the user had to place manually the header in the Gui container, 
-	      as detailed <a href="header.html#manual">here</a>, while now is is enough to
-	      instantiate the header and set the associated table: 
+	      while now is is enough to instantiate the header and set the associated table: 
 		    <pre>TableFilterHeader filterHeader = new TableFilterHeader(table);</pre>
         </li>
         <li>
