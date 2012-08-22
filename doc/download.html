@@ -111,6 +111,18 @@ THE SOFTWARE.</pre>
 
   <h2><a name="history">History</a></h2>
   
+    <h3>Version 4.4.0 ( 23rd August 2012 )</h3>
+
+    	<p>Extended the IFilterEditor interface with two new methods to handle the history
+    	  on each editor: getHistory / setHistory. These methods allow the user to
+    	  add custom functionality to preserve the status of the headers across runs.
+    	  In addition, the CustomChoice class implements now the Serializable
+    	  interface, and all the CustomChoice implementations in the library
+    	  can be now safely serialized.</p>
+    
+    	<p>Solved <a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=24'>issue 24</a>,
+    	which adds a check to avoid a rare exception occurrence.</p>
+
     <h3>Version 4.3.0 ( 17th January 2012 )</h3>
     
     	<p>Solved <a href='http://code.google.com/p/tablefilter-swing/issues/detail?id=12'>issue 22</a>,
