@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -322,6 +323,17 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     @Override public int getMaxHistory() {
         return popup.getMaxHistory();
     }
+
+    /** IFilterEditor method. */
+    @Override public void setHistory(List<Object> history){
+        popup.setHistory(history);    	
+    }
+
+    /** IFilterEditor method. */
+    @Override public List<Object> getHistory(){
+    	return popup.getHistory();
+    }
+
 
     /** IFilterEditor method. */
     @Override public void setRenderer(ChoiceRenderer renderer) {

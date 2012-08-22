@@ -44,7 +44,10 @@ import net.coderazzi.filters.gui.IFilterEditor;
 
 
 public class Ages60sCustomChoice extends CustomChoice {
-    Calendar cal = Calendar.getInstance();
+
+	private static final long serialVersionUID = -1643804582570086829L;
+	
+	Calendar cal = Calendar.getInstance();
 
     public Ages60sCustomChoice() {
         super("sixties",

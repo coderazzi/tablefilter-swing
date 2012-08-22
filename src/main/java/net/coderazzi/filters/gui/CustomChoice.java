@@ -29,6 +29,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.io.Serializable;
 import java.text.Format;
 import java.util.Collection;
 import java.util.HashSet;
@@ -59,22 +60,28 @@ import javax.swing.UIManager;
  * textual representation. If a precedence is given, lower values are displayed
  * first.</p>
  */
-public abstract class CustomChoice {
+public abstract class CustomChoice implements Serializable {
 
-    public final static int DEFAULT_PRECEDENCE = 0;
+    private static final long serialVersionUID = -2894134608058210332L;
+    
+	public final static int DEFAULT_PRECEDENCE = 0;
     public final static int MATCH_ALL_PRECEDENCE = -255;
+
+    static final RowFilter passAllRawFilter = new RowFilter() {
+        @Override
+        public boolean include(RowFilter.Entry entry) {
+            return true;
+        }
+    };
 
     /** Empty filter, returns all entries. */
     public final static CustomChoice MATCH_ALL = new CustomChoice("", null,
             MATCH_ALL_PRECEDENCE) {
-        RowFilter rf = new RowFilter() {
-            @Override public boolean include(RowFilter.Entry entry) {
-                return true;
-            }
-        };
-
+        
+    	private static final long serialVersionUID = -8964761397870138666L;
+    	
         @Override public RowFilter getFilter(IFilterEditor editor) {
-            return rf;
+            return passAllRawFilter;
         }
     };
 
@@ -82,7 +89,10 @@ public abstract class CustomChoice {
     public final static CustomChoice MATCH_EMPTY = new CustomChoice(
             FilterSettings.matchEmptyFilterString,
             FilterSettings.matchEmptyFilterIcon) {
-        @Override public RowFilter getFilter(final IFilterEditor editor) {
+    	
+        private static final long serialVersionUID = 5654162608079137456L;
+
+		@Override public RowFilter getFilter(final IFilterEditor editor) {
             final int modelIndex = editor.getModelIndex();
 
             return new RowFilter() {
@@ -149,7 +159,10 @@ public abstract class CustomChoice {
     public static CustomChoice create(final Object choice, String repr) {
     	if (choice instanceof Pattern){
     		return new CustomChoice(repr) {				
-                @Override public RowFilter getFilter(final IFilterEditor ed) {
+    			
+                private static final long serialVersionUID = -3239105477862513930L;
+
+				@Override public RowFilter getFilter(final IFilterEditor ed) {
                     final int index = ed.getModelIndex();
                     final Pattern pattern = (Pattern) choice;
                     return new RowFilter() {
@@ -168,7 +181,9 @@ public abstract class CustomChoice {
 			};
     	}
         return new CustomChoice(repr) {
-            @Override public RowFilter getFilter(final IFilterEditor editor) {
+            private static final long serialVersionUID = -3573642873044716998L;
+
+			@Override public RowFilter getFilter(final IFilterEditor editor) {
                 final int index = editor.getModelIndex();
                 final String string = (choice instanceof String)
                     ? (String) choice : null;

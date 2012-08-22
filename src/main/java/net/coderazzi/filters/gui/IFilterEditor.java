@@ -28,6 +28,7 @@ package net.coderazzi.filters.gui;
 import java.text.Format;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.table.TableModel;
@@ -157,6 +158,18 @@ public interface IFilterEditor {
      * also choices
      */
     int getMaxHistory();
+
+    /**
+     * Sets the history contents.
+     * @since 4.3.1.0
+     */
+    void setHistory(List<Object> history);
+
+    /**
+     * Returns the current history contents
+     * @since 4.3.1.0
+     */
+    List<Object> getHistory();
 
     /**
      * Sets the {@link ChoiceRenderer} for the choices / history.

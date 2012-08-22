@@ -121,6 +121,8 @@ public class IssuesFrom4_1_4 extends JFrame {
 		header.setFilterOnUpdates(true);			
 		CustomChoice cc = new CustomChoice("C* | A*") {
 			
+			private static final long serialVersionUID = 5455838951562934186L;
+
 			@Override
 			public RowFilter getFilter(final IFilterEditor editor) {
 				return new RowFilter(){

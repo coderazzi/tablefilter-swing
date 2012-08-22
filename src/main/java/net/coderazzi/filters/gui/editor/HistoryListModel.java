@@ -50,6 +50,22 @@ class HistoryListModel extends AbstractListModel {
     private Comparator stringComparator;
     private int maxHistory;
 
+    /**  Initializes the model to a specific history content */
+    public void initialize(List<Object> history){
+        this.lastAdded = null;
+        this.shownHistory = history;
+        this.history.clear();
+        if (!history.isEmpty()){
+        	this.history.addAll(history.subList
+        			(0, Math.min(maxHistory, history.size())));
+        }
+    }
+    
+    /** Returns the items currently visible */
+    public List<Object> getShownHistory(){
+    	return new ArrayList<Object>(shownHistory);
+    }
+
     /**
      * Specifies how to handle the content. If there is a string comparator,
      * content is handled as strings and it is possible to look for best
@@ -98,7 +114,7 @@ class HistoryListModel extends AbstractListModel {
     /** Adds an element, Returning true if the number of elements changes. */
     public boolean add(Object st) {
         // never add the passed element (which is now selected on the
-        // editor). We will added when the next element is passed
+        // editor). We will add it when the next element is passed
         boolean ret = false;
         boolean removed = history.remove(st);
         if ((maxHistory > 0) && (lastAdded != null)
