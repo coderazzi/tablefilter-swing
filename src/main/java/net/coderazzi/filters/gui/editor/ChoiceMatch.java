@@ -75,7 +75,7 @@ class ChoiceMatch {
 
             String str = ret.content.toString();
             int matchLen = getMatchingLength(strStart, str, strComparator);
-            if ((matchLen > ret.len) || (ret.len == 0)) {
+            if (((matchLen > 0) && (matchLen >= ret.len)) || (ret.len == 0)) {
                 ret.index = len;
                 ret.len = matchLen;
                 if ((matchLen == strLen) && (str.length() == strLen)) {
