@@ -95,19 +95,25 @@ public interface CustomChoiceDecorator {
         @Override public Color getBackground(CustomChoice  choice,
                                              IFilterEditor editor,
                                              boolean       isSelected) {
-            Look look = editor.getLook();
-
-            return isSelected ? look.getSelectionBackground()
-                              : look.getBackground();
+            Color color = choice.getBackground(editor, isSelected);
+            if (color == null) {
+                Look look = editor.getLook();
+                color = isSelected ? look.getSelectionBackground() 
+                		           : look.getBackground();
+            }
+            return color;
         }
 
         @Override public Color getForeground(CustomChoice  choice,
                                              IFilterEditor editor,
                                              boolean       isSelected) {
-            Look look = editor.getLook();
-
-            return isSelected ? look.getSelectionForeground()
-                              : look.getForeground();
+            Color color = choice.getForeground(editor, isSelected);
+            if (color == null) {
+                Look look = editor.getLook();
+                color = isSelected ? look.getSelectionForeground() 
+                		           : look.getForeground();
+            }
+            return color;
         }
     }
 
