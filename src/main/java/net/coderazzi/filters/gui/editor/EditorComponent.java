@@ -462,17 +462,17 @@ class EditorComponent extends JTextField {
         }
 
         @Override public void consolidateFilter() {
-            if (instantFiltering) {
-                // with instant filtering, the filter could be the instant
-                // expression (normally the test + '*'). If this is the case,
-                // show it
-                String text = getText();
-                String content = this.content.toString();
-                if (!text.equals(content)) {
+            String text = getText();
+            String content = this.content.toString();
+            if (!text.equals(content)) {
+	            if (instantFiltering) {
+	                // with instant filtering, the filter could be the instant
+	                // expression (normally the test + '*'). If this is the case,
+	                // show it
                     consolidateInstantFilter(text, content);
-                }
-            } else {
-                updateFilter();
+	            } else {
+	                updateFilter();
+	            }
             }
             // remove now any selection and try to activate custom decoration
             getCaret().setDot(getCaret().getDot());
