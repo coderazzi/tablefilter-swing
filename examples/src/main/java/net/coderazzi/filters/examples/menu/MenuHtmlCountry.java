@@ -26,26 +26,25 @@
 package net.coderazzi.filters.examples.menu;
 
 import net.coderazzi.filters.examples.ActionHandler;
-import net.coderazzi.filters.examples.utils.TestTableModel;
-import net.coderazzi.filters.gui.ChoiceRenderer;
 import net.coderazzi.filters.gui.HtmlChoiceRenderer;
+import net.coderazzi.filters.gui.IFilterEditor;
 
 
 public class MenuHtmlCountry extends AbstractMenuCheckBoxAction {
 
     private static final long serialVersionUID = 9137226745345074319L;
+    
+    private IFilterEditor editor;
 
-    public MenuHtmlCountry(ActionHandler main) {
+    public MenuHtmlCountry(ActionHandler main, IFilterEditor editor) {
         super("use html renderer", main);
-        setSelected(false);
+        this.editor = editor;
+        setSelected(true);
+        actionPerformed(true);
     }
 
     @Override protected void actionPerformed(boolean set) {
-        int column = main.getTableModel().getColumn(TestTableModel.HTML_COUNTRY);
-        if (main.getTable().convertColumnIndexToView(column) != -1) {
-        	ChoiceRenderer r = set ? new HtmlChoiceRenderer() : null;
-            main.getFilterHeader().getFilterEditor(column).setRenderer(r);
-        }
+        editor.setRenderer(set ? new HtmlChoiceRenderer() : null);
     }
 
 }

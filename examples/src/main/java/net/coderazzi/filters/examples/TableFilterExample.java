@@ -302,7 +302,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
             menu.add(cc);
             cc.actionPerformed(false);
         } else if (name.equalsIgnoreCase(TestTableModel.HTML_COUNTRY)){
-        	menu.add(new MenuHtmlCountry(this));
+        	menu.add(new MenuHtmlCountry(this, editor));
         }
 
         menu.add(new MenuColumnRemove(this, name));
