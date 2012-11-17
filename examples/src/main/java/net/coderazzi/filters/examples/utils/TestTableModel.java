@@ -50,14 +50,16 @@ public class TestTableModel extends AbstractTableModel {
     public static final String LCNAME = "Nickname";
     public static final String DATE = "Date";
     public static final String NOTE = "Notes";
+    public static final String HTML_COUNTRY = "Country (html)";
 
     public static String columnNames[] = {
-            NAME, AGE, MALE, TUTOR, COUNTRY, CLUB, LCNAME, DATE, NOTE
+            NAME, AGE, MALE, TUTOR, COUNTRY, 
+            CLUB, LCNAME, DATE, NOTE, HTML_COUNTRY
         };
     private static final Class<?> columnTypes[] = {
             String.class, Integer.class, Boolean.class, TestData.Tutor.class,
             Flag.class, TestData.Club.class, String.class, 
-            Date.class, String.class
+            Date.class, String.class, String.class
         };
 
 
@@ -230,6 +232,9 @@ public class TestTableModel extends AbstractTableModel {
 
         case 8:
             return td.note;
+            
+        case 9:
+        	return td.htmlFlag;
         }
 
         return null;

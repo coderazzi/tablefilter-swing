@@ -61,6 +61,7 @@ import net.coderazzi.filters.examples.menu.MenuFilterOnUpdates;
 import net.coderazzi.filters.examples.menu.MenuFont;
 import net.coderazzi.filters.examples.menu.MenuHeaderOnUse;
 import net.coderazzi.filters.examples.menu.MenuHeaderVisible;
+import net.coderazzi.filters.examples.menu.MenuHtmlCountry;
 import net.coderazzi.filters.examples.menu.MenuIgnoreCase;
 import net.coderazzi.filters.examples.menu.MenuInstantFiltering;
 import net.coderazzi.filters.examples.menu.MenuLookAndFeel;
@@ -300,6 +301,8 @@ public class TableFilterExample extends JFrame implements ActionHandler {
             MenuMaleCustomChoices cc = new MenuMaleCustomChoices(this, editor);
             menu.add(cc);
             cc.actionPerformed(false);
+        } else if (name.equalsIgnoreCase(TestTableModel.HTML_COUNTRY)){
+        	menu.add(new MenuHtmlCountry(this));
         }
 
         menu.add(new MenuColumnRemove(this, name));

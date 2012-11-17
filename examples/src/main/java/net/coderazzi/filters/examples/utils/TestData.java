@@ -24,10 +24,12 @@
  */
 package net.coderazzi.filters.examples.utils;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
-
 import java.io.ByteArrayOutputStream;
-
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,6 +40,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -138,6 +141,7 @@ public class TestData {
     public static class Flag extends ImageIcon {
         private static final long serialVersionUID = 1242769439980562528L;
         private Double redAmount;
+        private String fileLocation;
 
         Flag(byte array[]) {
             super(array);
@@ -173,6 +177,26 @@ public class TestData {
 
             return redAmount;
         }
+        
+        public String getFileLocation(){
+        	if (fileLocation==null){
+        		Image img = getImage();
+        		BufferedImage bi = new BufferedImage(img.getWidth(null),
+        				img.getHeight(null),
+        				BufferedImage.TYPE_4BYTE_ABGR);
+        		Graphics2D g2 = bi.createGraphics();
+        		g2.drawImage(img, 0, 0, null);
+        		g2.dispose();
+        		try{
+        			File temp = File.createTempFile("tablefilter", ".jpg"); 
+        			ImageIO.write(bi, "jpg", temp);
+        			fileLocation = "file://"+temp.getAbsolutePath();
+        		} catch(IOException ex){
+        			fileLocation="";
+        		}
+        	}
+        	return fileLocation;
+        }
     }
 
     public String name;
@@ -184,6 +208,7 @@ public class TestData {
     public Club club;
     public Date date;
     public String note;
+    public String htmlFlag;
 
     public TestData() {
         // 1 out of 64 can be with unknown age (null)
@@ -228,6 +253,10 @@ public class TestData {
         	} else {        		
         		note = "<html><font color='red'>&gt; *</font></html>";
         	}
+        }
+        
+        if (flag!=null){
+        	htmlFlag = "<html><center><img src=\'"+flag.getFileLocation()+"\'>";
         }
     }
 
