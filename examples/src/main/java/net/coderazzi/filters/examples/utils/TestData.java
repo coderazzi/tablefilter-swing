@@ -256,7 +256,7 @@ public class TestData {
         }
         
         if (flag!=null){
-        	htmlFlag = "<html><center><img src=\'"+flag.getFileLocation()+"\'>";
+        	htmlFlag = "<html><p style='padding: 0px 16px;'><img src=\'"+flag.getFileLocation()+"\'>";
         }
     }
 
