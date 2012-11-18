@@ -24,12 +24,8 @@
  */
 package net.coderazzi.filters.examples.utils;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -40,7 +36,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -143,8 +138,9 @@ public class TestData {
         private Double redAmount;
         private String fileLocation;
 
-        Flag(byte array[]) {
+        Flag(String name, byte array[]) {
             super(array);
+            fileLocation = "http://coderazzi.net/private/flags/"+name;
         }
 
         public double getRedAmount() {
@@ -179,22 +175,6 @@ public class TestData {
         }
         
         public String getFileLocation(){
-        	if (fileLocation==null){
-        		Image img = getImage();
-        		BufferedImage bi = new BufferedImage(img.getWidth(null),
-        				img.getHeight(null),
-        				BufferedImage.TYPE_4BYTE_ABGR);
-        		Graphics2D g2 = bi.createGraphics();
-        		g2.drawImage(img, 0, 0, null);
-        		g2.dispose();
-        		try{
-        			File temp = File.createTempFile("tablefilter", ".jpg"); 
-        			ImageIO.write(bi, "jpg", temp);
-        			fileLocation = "file://"+temp.getAbsolutePath();
-        		} catch(IOException ex){
-        			fileLocation="";
-        		}
-        	}
         	return fileLocation;
         }
     }
@@ -282,7 +262,7 @@ public class TestData {
                         baos.write(buffer, 0, read);
                     }
 
-                    Flag ic = new Flag(baos.toByteArray());
+                    Flag ic = new Flag(entry.getName(), baos.toByteArray());
                     ic.setDescription(m.group(1));
                     allIcons.add(ic);
                 }
