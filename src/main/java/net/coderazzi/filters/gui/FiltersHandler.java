@@ -89,8 +89,8 @@ public class FiltersHandler extends AndFilter
      */
     private boolean pendingNotifications;
 
-    /** The autoChoices mode.* */
-    private AutoChoices autoChoices = FilterSettings.autoChoices;
+    /** The autoChoices mode. */
+    private AutoChoices autoChoices;
 
     /**
      * The class performing the autoSelection, and following sorter changes.<br>
@@ -123,8 +123,9 @@ public class FiltersHandler extends AndFilter
     private boolean onWarning;
 
     /** Only constructor. */
-    FiltersHandler() {
-
+    FiltersHandler(AutoChoices mode, IParserModel parserModel) {
+    	
+    	autoChoices = mode;
         // create an observer instance to notify the associated table when there
         // are filter changes.
         addFilterObserver(new IFilterObserver() {
@@ -133,6 +134,7 @@ public class FiltersHandler extends AndFilter
                 }
             });
         setAdaptiveChoices(FilterSettings.adaptiveChoices);
+        setParserModel(parserModel);
     }
 
     /**

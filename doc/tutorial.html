@@ -9,8 +9,9 @@
     <p>
       <ul>
         <li><a href='#header'>Filter Header</a></li>
+        <li><a href='#autochoices'>Auto Choices</a></li>
         <li><a href='#editor'>Filter Editor</a></li>
-        <li><a href='#parser'>Filter expressions</a></li>
+        <li><a href='#parser'>Filter Expressions</a></li>
         <li><a href='#parsermodel'>Parser Model</a></li>
         <li><a href='#types'>Custom types</a></li>
         <li><a href='#custom'>Custom choices</a></li>
@@ -29,7 +30,7 @@
       code:
     </p>
       
-    <pre>TableFilterHeader filterHeader = new TableFilterHeader(table);</pre>
+    <pre>TableFilterHeader filterHeader = new TableFilterHeader(table, AutoChoices.Enabled);</pre>
     
     <p>is enough to setup a filter in a table, looking like:</p>
     
@@ -133,7 +134,33 @@
     <pre>filterHeader.setBackground(Color.lightGray);</pre> 
      
   
-    <h2><a name='parser'>Filter expressions</a></h2>
+    <h2><a name='autochoices'>Auto Choices</a></h2>
+    
+    <p>
+    	It is possible to define the choices displayed for each editor in
+    	the filter header. The basic behaviour is to associate choices only to
+    	columns with boolean or enumeration classes, but it is possible to
+    	automatically extract all the unique values from a table's column as
+    	the listed choices. This is achieved by setting the mode
+    	AutoChoices.Enabled, which can be done for the whole table, or just
+    	for specific columns.</p>
+    	
+    <p>
+    	Please note that there is obviously an overhead on extracting the
+    	unique values of the table, and it is likely not very effective
+    	displaying those values if there is a great number of them. For that
+    	reason, it is recommended to only enable full auto choices for those
+    	columns having a limited number of distinct values.
+    </p>
+    
+    <p>
+        It is also possible to fully customize the displayed choices, as 
+        explained in the <a href='#custom'>custom choices</a> section.
+    </p>
+    	    	 
+    	
+
+    <h2><a name='parser'>Filter Expressions</a></h2>
      
     <p>
       The library is delivered with a single expression parser, which supports
@@ -277,6 +304,19 @@
      
      <p>Special HTML characters on the table cells are also converted into
      Java characters before performing the filtering.</p>
+     
+     <p>Starting on version 4.5, columns with html content can be properly 
+     rendered, by setting the new
+     <a href='api/net/coderazzi/filters/gui/HtmlChoiceRenderer.html'>HtmlChoiceRenderer</a>
+     as renderer for that column</p>. This operation must be performed manually,
+     that is, the library will not automatically setup a HtmlChoiceRenderer for
+     columns where html content is detected: setting up a renderer implies that
+     the associated filter editor is not editable any longer -the user can
+     only choose among the given options-.</p>
+     
+     <p>Setting up the renderer is done by invoking the method:
+     <a href='api/net/coderazzi/filters/gui/IFilterEditor.html#setRenderer(net.coderazzi.filters.gui.ChoiceRenderer)'>setRenderer</a>
+     </p>
 	
      <h2><a name='also'>Additional functionality</a></h2>
      

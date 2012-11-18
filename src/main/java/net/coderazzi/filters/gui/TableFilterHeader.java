@@ -156,7 +156,7 @@ public class TableFilterHeader extends JPanel {
      * The privately owned instance of FiltersHandler that conforms the filter
      * defined by the TableFilterHeader.
      */
-    FiltersHandler filtersHandler = new FiltersHandler();
+    FiltersHandler filtersHandler;
 
     /** The set of currently subscribed observers. */
     Set<IFilterHeaderObserver> observers = new HashSet<IFilterHeaderObserver>();
@@ -172,23 +172,36 @@ public class TableFilterHeader extends JPanel {
 
     /** Basic constructor, requires an attached table. */
     public TableFilterHeader() {
-        this(null, null);
+        this(null, null, null);
     }
 
     /** Basic constructor, using default {@link IParserModel}. */
     public TableFilterHeader(JTable table) {
-        this(table, null);
+        this(table, null, null);
+    }
+
+    /** Advanced constructor, enabling setting the {@link AutoChoices} mode */
+    public TableFilterHeader(JTable table, AutoChoices mode) {
+        this(table, null, mode);
+    }
+
+    /** Advanced constructor. */
+    public TableFilterHeader(JTable table, IParserModel parserModel) {
+    	this(table, parserModel, null);
     }
 
     /** Full constructor. */
-    public TableFilterHeader(JTable table, IParserModel parserModel) {
+    public TableFilterHeader(JTable table, IParserModel parserModel,
+    		AutoChoices mode) {
         super(new BorderLayout());
         add(new JPanel(), BorderLayout.CENTER); // do not take all width
+        if (mode == null) {
+        	mode = FilterSettings.autoChoices;
+        }
         if (parserModel == null) {
             parserModel = FilterSettings.newParserModel();
         }
-
-        filtersHandler.setParserModel(parserModel);
+        filtersHandler = new FiltersHandler(mode, parserModel);
         backgroundSet = foregroundSet = fontSet = false;
         setPosition(FilterSettings.headerPosition);
         setTable(table);
