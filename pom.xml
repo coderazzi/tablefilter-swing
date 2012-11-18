@@ -3,7 +3,7 @@
 	<groupId>net.coderazzi</groupId>
 	<artifactId>tablefilter-swing</artifactId>
 	<packaging>jar</packaging>
-	<version>4.5.0</version>
+	<version>4.5.1-SNAPSHOT</version>
 	<name>tablefilter-swing</name>
 	<description>TableFilter is a set of Swing components to support user-driven filtering on table.</description>
 	<url>http://coderazzi.net/tablefilter</url>
