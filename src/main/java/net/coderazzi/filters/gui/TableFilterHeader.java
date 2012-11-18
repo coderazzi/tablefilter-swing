@@ -206,7 +206,7 @@ public class TableFilterHeader extends JPanel {
         setPosition(FilterSettings.headerPosition);
         setTable(table);
     }
-
+    
     /** Returns the filter editor for the given column in the table model. */
     public IFilterEditor getFilterEditor(int modelColumn) {
         return (columnsController == null)
@@ -220,6 +220,11 @@ public class TableFilterHeader extends JPanel {
      *
      * <p>It will be created a row of editors, that follow the size and position
      * of each of the columns in the table.</p>
+     * 
+     * <p>Setting the parameter to null effectively de-associates the 
+     * TableFilterHeader from any previously associated table -which, unless
+     * the {@link Position} is set to NONE, also implies removing the filter
+     * header from the GUI-.</p>
      */
     public void setTable(JTable table) {
         filtersHandler.enableNotifications(false);

@@ -11,6 +11,7 @@
     <li><a href='#briefstart'>How to create a table filter</a></li>
     <li><a href='#sortingevents'>Listening for sorting events</a></li>
     <li><a href='#userfilters'>Create additional user filters</a></li>
+    <li><a href='#remove'>Remove the table filter header</a></li>
   </ul>
 
 <div class="hr">&nbsp;</div>
@@ -82,7 +83,23 @@ check.addItemListener(new ItemListener() {
 	<div class="hr">&nbsp;</div>
 
 
+    <li><a name='remove'><span class='mark'>Remove the table filter header</span></a>
+    <p>If the filter header has been including in the GUI automatically
+    -as it happens when is associated to a table, and the Position is INLINE
+    or TOP-, to remove the filter header from the GUI it is enough to
+    invoke again setTable, passing a null parameter:
+    
+    <p><pre>filterHeader.setTable(null);</pre></p>
+    
+    <p>If the filter header has been included manually in the GUI -using the
+    NONE position-, in addition to the previous call is obviously needed
+    to manually exclude the header from the GUI.</p>
+    </li>
+
+	<div class="hr">&nbsp;</div>
+
    </ul>
+
 
 
 </div></body>
