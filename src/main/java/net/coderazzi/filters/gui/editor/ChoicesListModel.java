@@ -96,7 +96,7 @@ class ChoicesListModel extends AbstractListModel {
     }
 
     /** Returns the current choices. */
-    public Collection<?> getChoices() {
+    public Collection getChoices() {
         return content;
     }
 
