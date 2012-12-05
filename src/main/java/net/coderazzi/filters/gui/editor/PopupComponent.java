@@ -101,9 +101,9 @@ abstract class PopupComponent implements PopupMenuListener {
         return focusedList.getSelectedValue();
     }
 
-    /** Returns the current choices. */
-    public Collection<?> getChoices() {
-        return choicesModel.getChoices();
+    /** Returns the current choices size. */
+    public int getChoicesSize() {
+        return choicesModel.getSize();
     }
 
     /**

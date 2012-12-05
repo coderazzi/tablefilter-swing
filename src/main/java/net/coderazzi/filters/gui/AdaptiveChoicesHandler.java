@@ -605,7 +605,7 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                         ? Collections.EMPTY_MAP
                         : new HashMap<CustomChoice, RowFilter>(customChoices);
                 } else {
-                    maxIterationChoices -= editor.getChoices().size();
+                    maxIterationChoices -= editor.getChoicesSize();
                 }
 
                 return maxIterationChoices <= 0;
