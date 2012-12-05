@@ -90,13 +90,8 @@ class ChoicesListModel extends AbstractListModel {
         fireIntervalRemoved(this, 1, size);
     }
 
-    /** Returns true if the object is a valid choice (as object, or string). */
-    public boolean isValidChoice(Object o) {
-        return content.contains(o);
-    }
-
     /** Returns the current choices. */
-    public Collection getChoices() {
+    public Collection<?> getChoices() {
         return content;
     }
 

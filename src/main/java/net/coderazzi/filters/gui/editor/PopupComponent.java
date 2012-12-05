@@ -101,11 +101,6 @@ abstract class PopupComponent implements PopupMenuListener {
         return focusedList.getSelectedValue();
     }
 
-    /** Returns true if the passed object matches an existing choice. */
-    public boolean isValidChoice(Object object) {
-        return choicesModel.isValidChoice(object);
-    }
-
     /** Returns the current choices. */
     public Collection<?> getChoices() {
         return choicesModel.getChoices();
