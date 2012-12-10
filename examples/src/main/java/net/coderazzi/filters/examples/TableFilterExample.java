@@ -47,6 +47,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.coderazzi.filters.Filter;
 import net.coderazzi.filters.examples.menu.MenuAdaptiveChoices;
+import net.coderazzi.filters.examples.menu.MenuAlphaChoicesOrder;
 import net.coderazzi.filters.examples.menu.MenuAutoChoices;
 import net.coderazzi.filters.examples.menu.MenuAutoCompletion;
 import net.coderazzi.filters.examples.menu.MenuAutoResize;
@@ -200,6 +201,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         ret.add(new MenuFilterOnUpdates(this));
         ret.add(new MenuIgnoreCase(this, null));
         ret.add(new MenuInstantFiltering(this, null));
+        ret.add(new MenuAlphaChoicesOrder(this, null));
         ret.add(new MenuAutoChoices(this, null));
         ret.addSeparator();
         ret.add(createAppearanceMenu());
@@ -290,6 +292,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         menu.add(new MenuAutoCompletion(this, editor));
         menu.add(new MenuIgnoreCase(this, editor));
         menu.add(new MenuInstantFiltering(this, editor));
+        menu.add(new MenuAlphaChoicesOrder(this, editor));
         menu.add(new MenuMaxHistory(this, editor));
         menu.addSeparator();
 
@@ -372,6 +375,10 @@ public class TableFilterExample extends JFrame implements ActionHandler {
             .setSelected(editor.isIgnoreCase());
         ((JCheckBoxMenuItem) getMenu(menu, MenuInstantFiltering.NAME, false))
             .setSelected(editor.isInstantFiltering());
+        ((JCheckBoxMenuItem) getMenu(menu, MenuUIEnabled.NAME, false))
+        	.setSelected(editor.isUserInteractionEnabled());
+        ((JCheckBoxMenuItem) getMenu(menu, MenuAlphaChoicesOrder.NAME, false))
+    		.setSelected(editor.hasAlphabeticalOrderOnChoices());
 
         JMenu autoChoicesMenu = (JMenu) getMenu(menu, MenuAutoChoices.NAME,
                 false);

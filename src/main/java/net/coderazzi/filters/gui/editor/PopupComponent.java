@@ -176,30 +176,40 @@ abstract class PopupComponent implements PopupMenuListener {
         return listRenderer;
     }
 
-    /** Specifies that the content requires no conversion to strings. */
-    public void setRenderedContent(ChoiceRenderer renderer,
-                                   Comparator     choicesComparator,
-                                   Comparator     stringComparator) {
+    /** 
+     * Specifies that the content requires no conversion to strings. 
+     * @return true if choices should be added again.
+     */
+    public boolean setRenderedContent(ChoiceRenderer renderer,
+    								  Comparator     choicesComparator,
+                                      Comparator     stringComparator) {
         hide();
         listRenderer.setUserRenderer(renderer);
         ChoicesListModel newModel = ChoicesListModel.getCustom(choicesModel, null, true, choicesComparator, stringComparator);
         if (newModel!=choicesModel){
 	        historyModel.setStringContent(null);
-            choicesList.setModel(choicesModel = newModel);        	
+            choicesList.setModel(choicesModel = newModel);
+            return true;
         }
+        return false;
     }
 
-    /** Specifies that the content is to be handled as strings. */
-    public void setStringContent(Format             format,
-    							 Comparator         choicesComparator,
-                                 Comparator<String> stringComparator) {
+    /** 
+     * Specifies that the content is to be handled as strings.
+     * @return true if choices should be added again.
+     */
+    public boolean setStringContent(Format             format,
+    								Comparator         choicesComparator,
+    								Comparator<String> stringComparator) {
         hide();
         listRenderer.setUserRenderer(null);
         ChoicesListModel newModel = ChoicesListModel.getCustom(choicesModel, format, false, choicesComparator, stringComparator);
         if (newModel!=choicesModel){
             historyModel.setStringContent(stringComparator);
-            choicesList.setModel(choicesModel = newModel);        	
+            choicesList.setModel(choicesModel = newModel);
+            return true;
         }
+        return false;
     }
 
     /**
