@@ -87,9 +87,12 @@ abstract class PopupComponent implements PopupMenuListener {
     JList historyList;
 
 
-    public PopupComponent(IFilterEditor editor) {
-        choicesModel = new ChoicesListModel();
+    public PopupComponent(IFilterEditor editor, 
+            Format format,
+            Comparator choicesComparator,
+            Comparator stringComparator) {
         historyModel = new HistoryListModel();
+        choicesModel = ChoicesListModel.getCustom(null, format, false, choicesComparator, stringComparator);         		
         createGui(editor);
     }
 
@@ -175,21 +178,27 @@ abstract class PopupComponent implements PopupMenuListener {
 
     /** Specifies that the content requires no conversion to strings. */
     public void setRenderedContent(ChoiceRenderer renderer,
-                                   Comparator     classComparator) {
+                                   Comparator     choicesComparator,
+                                   Comparator     stringComparator) {
         hide();
         listRenderer.setUserRenderer(renderer);
-        if (choicesModel.setRenderedContent(classComparator)) {
-            historyModel.setStringContent(null);
+        ChoicesListModel newModel = ChoicesListModel.getCustom(choicesModel, null, true, choicesComparator, stringComparator);
+        if (newModel!=choicesModel){
+	        historyModel.setStringContent(null);
+            choicesList.setModel(choicesModel = newModel);        	
         }
     }
 
     /** Specifies that the content is to be handled as strings. */
     public void setStringContent(Format             format,
+    							 Comparator         choicesComparator,
                                  Comparator<String> stringComparator) {
         hide();
         listRenderer.setUserRenderer(null);
-        if (choicesModel.setStringContent(format, stringComparator)) {
+        ChoicesListModel newModel = ChoicesListModel.getCustom(choicesModel, format, false, choicesComparator, stringComparator);
+        if (newModel!=choicesModel){
             historyModel.setStringContent(stringComparator);
+            choicesList.setModel(choicesModel = newModel);        	
         }
     }
 
@@ -635,7 +644,7 @@ abstract class PopupComponent implements PopupMenuListener {
 
         return ret;
     }
-
+    
     /**
      * The mouse handler will select automatically the choice under the mouse,
      * and passes directly the focus to the popup under the mouse.

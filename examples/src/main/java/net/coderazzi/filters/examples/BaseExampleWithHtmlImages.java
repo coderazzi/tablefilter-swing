@@ -42,19 +42,20 @@ import net.coderazzi.filters.examples.utils.DateRenderer;
 import net.coderazzi.filters.examples.utils.FlagRenderer;
 import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.gui.AutoChoices;
+import net.coderazzi.filters.gui.HtmlChoiceRenderer;
 import net.coderazzi.filters.gui.IFilterEditor;
 import net.coderazzi.filters.gui.TableFilterHeader;
 
 
 /** Main example showing the {@link TableFilterHeader} functionality. */
-public class BaseExample extends JFrame {
+public class BaseExampleWithHtmlImages extends JFrame {
 
     private static final long serialVersionUID = 382439526043424492L;
     
-    public BaseExample(int rows) {
+    public BaseExampleWithHtmlImages() {
         super("Table Filter Example");
-    	TestTableModel.setLargeModel(true);
-        JTable table = new JTable(TestTableModel.createTestTableModel(rows));
+    	TestTableModel.setFullModel();
+        JTable table = new JTable(TestTableModel.createTestTableModel(20));
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(new JScrollPane(table), BorderLayout.CENTER);
         tablePanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -66,6 +67,8 @@ public class BaseExample extends JFrame {
     private void setupHeader(TableFilterHeader header){
     	getEditor(header, TestTableModel.COUNTRY, new FlagRenderer())
     		.setRenderer(new FlagRenderer());
+    	getEditor(header, TestTableModel.HTML_COUNTRY, null)
+    		.setRenderer(new HtmlChoiceRenderer());
     	getEditor(header, TestTableModel.NOTE, null)
 			.setEditable(false);
     	getEditor(header, TestTableModel.AGE, new CenteredRenderer())
@@ -90,7 +93,7 @@ public class BaseExample extends JFrame {
     }
        
     public final static void main(String args[]) {
-        BaseExample frame = new BaseExample(1000);
+        BaseExampleWithHtmlImages frame = new BaseExampleWithHtmlImages();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
     	frame.setSize(1200, frame.getSize().height);

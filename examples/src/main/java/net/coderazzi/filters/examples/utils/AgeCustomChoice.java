@@ -67,9 +67,9 @@ public class AgeCustomChoice extends CustomChoice {
     public static Set<CustomChoice> getCustomChoices() {
         Set<CustomChoice> ret = new HashSet<CustomChoice>();
         ret.add(new AgeCustomChoice("below 20", 0, 19, DEFAULT_PRECEDENCE + 1));
-        ret.add(new AgeCustomChoice("20-29", 20, 29, DEFAULT_PRECEDENCE + 2));
-        ret.add(new AgeCustomChoice("30-35", 30, 34, DEFAULT_PRECEDENCE + 3));
-        ret.add(new AgeCustomChoice("over 35", 35, 100,
+        ret.add(new AgeCustomChoice("20-34", 20, 34, DEFAULT_PRECEDENCE + 2));
+        ret.add(new AgeCustomChoice("35-50", 35, 50, DEFAULT_PRECEDENCE + 3));
+        ret.add(new AgeCustomChoice("over 50", 51, 1000,
                 DEFAULT_PRECEDENCE + 4));
 
         return ret;
