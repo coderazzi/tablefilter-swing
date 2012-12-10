@@ -65,6 +65,7 @@ import net.coderazzi.filters.examples.menu.MenuHeaderVisible;
 import net.coderazzi.filters.examples.menu.MenuHtmlCountry;
 import net.coderazzi.filters.examples.menu.MenuIgnoreCase;
 import net.coderazzi.filters.examples.menu.MenuInstantFiltering;
+import net.coderazzi.filters.examples.menu.MenuInverseChoicesOrder;
 import net.coderazzi.filters.examples.menu.MenuLookAndFeel;
 import net.coderazzi.filters.examples.menu.MenuMaleCustomChoices;
 import net.coderazzi.filters.examples.menu.MenuMaxHistory;
@@ -73,6 +74,7 @@ import net.coderazzi.filters.examples.menu.MenuModelAdd;
 import net.coderazzi.filters.examples.menu.MenuModelChange;
 import net.coderazzi.filters.examples.menu.MenuModelColumnsChange;
 import net.coderazzi.filters.examples.menu.MenuModelRemove;
+import net.coderazzi.filters.examples.menu.MenuAgeOddComparator;
 import net.coderazzi.filters.examples.menu.MenuPosition;
 import net.coderazzi.filters.examples.menu.MenuReset;
 import net.coderazzi.filters.examples.menu.MenuRowSize;
@@ -84,7 +86,9 @@ import net.coderazzi.filters.examples.utils.Ages60sCustomChoice;
 import net.coderazzi.filters.examples.utils.CenteredRenderer;
 import net.coderazzi.filters.examples.utils.DateRenderer;
 import net.coderazzi.filters.examples.utils.FlagRenderer;
+import net.coderazzi.filters.examples.utils.InverseComparator;
 import net.coderazzi.filters.examples.utils.MaleRenderer;
+import net.coderazzi.filters.examples.utils.AgeOddComparator;
 import net.coderazzi.filters.examples.utils.TestTableModel;
 import net.coderazzi.filters.examples.utils.UserFilter;
 import net.coderazzi.filters.gui.AutoChoices;
@@ -255,16 +259,17 @@ public class TableFilterExample extends JFrame implements ActionHandler {
 
     /** Method to handle the information associated to a (new) filter editor. */
     void handleNewColumn(IFilterEditor editor, TableColumn tc) {
-        String name = (String) tc.getHeaderValue();
+        String name = (String) tc.getHeaderValue();        
         boolean countryColumn = name.equalsIgnoreCase(TestTableModel.COUNTRY);
         boolean maleColumn = name.equalsIgnoreCase(TestTableModel.MALE);
+        boolean ageColumn = name.equalsIgnoreCase(TestTableModel.AGE);
 
         if (countryColumn) {
             tc.setCellRenderer(new FlagRenderer());
             editor.setEditable(false);
         } else if (name.equalsIgnoreCase(TestTableModel.NOTE)) {
         	editor.setEditable(false);
-        } else if (name.equalsIgnoreCase(TestTableModel.AGE)) {
+        } else if (ageColumn) {
             tc.setCellRenderer(new CenteredRenderer());
             editor.setCustomChoices(AgeCustomChoice.getCustomChoices());
         } else if (name.equalsIgnoreCase(TestTableModel.DATE)) {
@@ -281,7 +286,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
             editor.setCustomChoices(choices);
         } else if (maleColumn) {
             tc.setCellRenderer(new MaleRenderer(this));
-        }
+        } 
 
         JMenu menu = (JMenu) getMenu(filtersMenu, name, false);
         menu.add(new MenuEditable(this, editor));
@@ -293,6 +298,10 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         menu.add(new MenuIgnoreCase(this, editor));
         menu.add(new MenuInstantFiltering(this, editor));
         menu.add(new MenuAlphaChoicesOrder(this, editor));
+        menu.add(new MenuInverseChoicesOrder(this, editor));
+        if (ageColumn){
+            menu.add(new MenuAgeOddComparator(this, editor));        	
+        }
         menu.add(new MenuMaxHistory(this, editor));
         menu.addSeparator();
 
@@ -379,6 +388,8 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         	.setSelected(editor.isUserInteractionEnabled());
         ((JCheckBoxMenuItem) getMenu(menu, MenuAlphaChoicesOrder.NAME, false))
     		.setSelected(editor.hasAlphabeticalOrderOnChoices());
+        ((JCheckBoxMenuItem) getMenu(menu, MenuInverseChoicesOrder.NAME, false))
+        	.setSelected(editor.getChoicesComparator() instanceof InverseComparator);
 
         JMenu autoChoicesMenu = (JMenu) getMenu(menu, MenuAutoChoices.NAME,
                 false);
@@ -391,6 +402,11 @@ public class TableFilterExample extends JFrame implements ActionHandler {
                     String.valueOf(editor.getMaxHistory()), false));
         if (item != null) {
             item.setSelected(true);
+        }
+        
+        if (columnName.equalsIgnoreCase(TestTableModel.AGE)){
+            ((JCheckBoxMenuItem) getMenu(menu, MenuAgeOddComparator.NAME, false))
+        		.setSelected(editor.getComparator() instanceof AgeOddComparator);        	
         }
     }
 
