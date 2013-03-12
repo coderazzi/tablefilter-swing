@@ -50,5 +50,5 @@ public interface ActionHandler {
     void updateFiltersInfo();
 
     /** Updates the filter information associated to the given editor. */
-    void updateFilterInfo(IFilterEditor editor, String columnName);
+    void updateFilterInfo(IFilterEditor editor);
 }

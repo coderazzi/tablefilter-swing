@@ -6,7 +6,8 @@
 	<property name="website-dir" 
 		      value="/Users/luismi/development/website/java/tablefilter"/>
 	
-	<target name='all' depends='copy-doc, api, api5, example, src-zip' />
+	<!--target name='all' depends='copy-doc, api, api5, example, src-zip'-->
+	<target name='all' depends='copy-doc, api, example, src-zip' />
 
 	<target name='copy-doc' depends='check'>
 		<copy todir="${website-dir}">
@@ -93,10 +94,17 @@
 		<delete dir='${tmp-bin}'/>
 	</target>
 
-	<target name='src-zip' depends='check'>
+	<!--target name='src-zip' depends='check'>
 		<zip destfile='${website-dir}/download/tablefilter-src.zip'
 			basedir='..'
 			includes='tablefilter-swing/**, tablefilter-swing-java5/**'
+			excludes='*/.hg/**, */bin/**, */target/**'/>
+	</target-->
+
+	<target name='src-zip' depends='check'>
+		<zip destfile='${website-dir}/download/tablefilter-src.zip'
+			basedir='..'
+			includes='tablefilter-swing/**'
 			excludes='*/.hg/**, */bin/**, */target/**'/>
 	</target>
 

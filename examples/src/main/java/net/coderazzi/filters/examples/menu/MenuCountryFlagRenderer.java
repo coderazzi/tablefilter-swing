@@ -47,6 +47,7 @@ public class MenuCountryFlagRenderer extends AbstractMenuCheckBoxAction {
 
     @Override protected void actionPerformed(boolean selected) {
         editor.setRenderer(selected ? new FlagRenderer() : null);
+        main.updateFilterInfo(editor);
     }
 
 }

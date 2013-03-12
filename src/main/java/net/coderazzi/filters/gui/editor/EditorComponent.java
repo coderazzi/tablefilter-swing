@@ -528,17 +528,8 @@ class EditorComponent extends JTextField {
 
         /** Returns the best match for a given hint. */
         protected ChoiceMatch getBestMatch(String hint) {
-            ChoiceMatch ret = popup.selectBestMatch(hint, false);
+            ChoiceMatch ret = popup.selectBestMatch(hint);
             popup.setPopupFocused(false);
-
-            return ret;
-        }
-
-        /** Returns an exact match for a given hint. */
-        protected ChoiceMatch getExactMatch(String hint) {
-            ChoiceMatch ret = popup.selectBestMatch(hint, true);
-            popup.setPopupFocused(false);
-
             return ret;
         }
 
@@ -849,7 +840,7 @@ class EditorComponent extends JTextField {
                     // now 'c', the code above would imply getting "seccond",
                     // which is probably wrong, so we try now to get a proposal
                     // starting at 'sec' ['sec|ond']
-                    ChoiceMatch match2 = getExactMatch(begin);
+                    ChoiceMatch match2 = getBestMatch(begin);
                     if (match2.exact) {
                         match = match2;
                         proposal = match.content.toString();

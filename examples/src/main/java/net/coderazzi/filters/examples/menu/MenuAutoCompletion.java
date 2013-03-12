@@ -51,6 +51,7 @@ public class MenuAutoCompletion extends AbstractMenuCheckBoxAction {
             main.updateFiltersInfo();
         } else {
             editor.setAutoCompletion(selected);
+            main.updateFilterInfo(editor);
         }
     }
 

@@ -104,7 +104,7 @@ public class MenuMaleCustomChoices extends AbstractMenuCheckBoxAction {
             editor.setEditable(true);
         }
 
-        main.updateFilterInfo(editor, TestTableModel.MALE);
+        main.updateFilterInfo(editor);
     }
 
 

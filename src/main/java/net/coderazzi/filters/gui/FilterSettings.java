@@ -48,10 +48,6 @@ public class FilterSettings {
     /** Whether to enable adaptive choices, true by default. */
     public static boolean adaptiveChoices = Boolean.parseBoolean(getString(
                 "AdaptiveChoices", "true"));
-    
-    /** Whether to enable adaptive choices, true by default. */
-    public static boolean alphabeticalChoiceOrder = 
-    		Boolean.parseBoolean(getString("AlphabeticalChoicesOrder", "true"));
 
     /** If and how to provide content to the editor field's choices. */
     public static AutoChoices autoChoices;

@@ -15,6 +15,7 @@
         <li><a href='#parsermodel'>Parser Model</a></li>
         <li><a href='#types'>Custom types</a></li>
         <li><a href='#custom'>Custom choices</a></li>
+        <li><a href='#compare'>Comparisons</a></li>
         <li><a href='#html'>Html support</a></li>
         <li><a href='#also'>Additional functionality</a></li>
         <li><a href='#settings'>Settings</a></li>
@@ -265,6 +266,19 @@
        <a href='api/net/coderazzi/filters/IParser.html#setFormat(java.lang.Class, java.text.Format)'>setFormat</a> method.
      </p>
 
+	<h2><a name='compare'>Comparisons</a></h2>
+
+	<p>The parser model requires a proper definition of a comparator to be able to evaluate
+	expressions involving comparisons, such as '&gt; 34'.
+	The comparator specified on a given editor is also used (since version 5.0)
+	to sort the choices -in previous versions, choices would be sorted
+	alphabetically-.	
+	</p>
+	
+	<p>It is possible to specify a different comparator to sort the choices,
+	by invoking the method <a href='api/net/coderazzi/filters/gui/IFilterEditor.html#setChoicesComparator(java.util.Comparator)'>setChoicesComparator</a>.
+	This is useful, for example, to sort these choices in inverse order.
+	</p>
 
 	<h2><a name='custom'>Custom Choices</a></h2>
 	

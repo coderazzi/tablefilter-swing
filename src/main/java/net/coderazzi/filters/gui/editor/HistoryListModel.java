@@ -38,7 +38,7 @@ import net.coderazzi.filters.gui.CustomChoice;
  * List model to handle the history in the popup menu.<br>
  * When the user specifies a Renderer, history elements are considered non-text;
  * this affects to the search algorithm to find the best matches {@link
- * PopupComponent#selectBestMatch(Object, boolean)}<br>
+ * PopupComponent#selectBestMatch(Object)}<br>
  * Otherwise, content is always pure strings (@link {@link CustomChoice} are not
  * inserted into the history)
  */
@@ -77,11 +77,6 @@ class HistoryListModel extends AbstractListModel {
             this.stringComparator = stringComparator;
             clear();
         }
-    }
-
-    /** Returns the string comparator, if provided. */
-    public Comparator<String> getStringComparator() {
-        return stringComparator;
     }
 
     /** Clears any restrictions. {@link #restrict(Object)} */
@@ -189,17 +184,35 @@ class HistoryListModel extends AbstractListModel {
         return history;
     }
 
-    /** @see  PopupComponent#selectBestMatch(Object, boolean) */
-    public ChoiceMatch getClosestMatch(Object hint, boolean exact) {
-        ChoiceMatch ret;
+    /** @see  PopupComponent#selectBestMatch(Object) */
+    public ChoiceMatch getClosestMatch(Object hint) {
+        ChoiceMatch ret = new ChoiceMatch();
         if ((stringComparator != null) && (hint instanceof String)) {
-            ret = ChoiceMatch.findOnUnsortedContent(shownHistory,
-                    shownHistory.size(), stringComparator, (String) hint,
-                    exact);
+        	String strStart = (String) hint;        	
+            int strLen = strStart.length();
+            int historyLen = shownHistory.size();
+            while (historyLen-- > 0) {
+                Object content = shownHistory.get(historyLen);
+                String str = content.toString();
+                int len = ChoiceMatch.getMatchingLength(strStart, str, 
+                		stringComparator);
+                if (((len > 0) && (len >= ret.len)) || (ret.len == 0)) {
+                	ret.content = content;
+                    ret.index = historyLen;
+                    ret.len = len;
+                    if ((len == strLen) && (str.length() == strLen)) {
+                        ret.exact = true;
+                        return ret;
+                    }
+                }
+            }
         } else {
-            ret = ChoiceMatch.findExactOnContent(shownHistory, hint);
+        	ret.index = shownHistory.indexOf(hint);
+            if (ret.index != -1) {
+                ret.exact = true;
+                ret.content = hint;
+            }
         }
-
         return ret;
     }
 

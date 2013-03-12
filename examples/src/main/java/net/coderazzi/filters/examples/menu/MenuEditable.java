@@ -45,6 +45,7 @@ public class MenuEditable extends AbstractMenuCheckBoxAction {
 
     @Override protected void actionPerformed(boolean selected) {
         editor.setEditable(selected);
+        main.updateFilterInfo(editor);
     }
 
 }

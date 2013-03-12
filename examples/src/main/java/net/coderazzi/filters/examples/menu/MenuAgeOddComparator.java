@@ -53,7 +53,7 @@ public class MenuAgeOddComparator extends AbstractMenuCheckBoxAction {
     	}
         editor.setComparator(cc);
         editor.setChoicesComparator(cc);
-        main.updateFiltersInfo();
+        main.updateFilterInfo(editor);
     }
 
 }

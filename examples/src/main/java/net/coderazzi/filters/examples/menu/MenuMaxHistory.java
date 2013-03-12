@@ -76,6 +76,7 @@ public class MenuMaxHistory extends JMenu implements ActionListener {
             main.updateFiltersInfo();
         } else {
             editor.setMaxHistory(value);
+            main.updateFilterInfo(editor);
         }
     }
 

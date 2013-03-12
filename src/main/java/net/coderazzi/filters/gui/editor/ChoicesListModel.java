@@ -28,53 +28,117 @@ package net.coderazzi.filters.gui.editor;
 import java.text.Format;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.swing.AbstractListModel;
 
 import net.coderazzi.filters.gui.CustomChoice;
 
 
-abstract class ChoicesListModel extends AbstractListModel {
+/**
+ * List model to handle the choices in the popup menu: it assumes that all the
+ * content belongs to the class of the associated column, which is sorted using
+ * a provided comparator (it is okay if no all elements have the same class as
+ * far as the comparator is able to cope with it).<br>
+ *
+ * <p>It distinguishes between rendered content -where there is no need to sort
+ * or search alphabetically-, and content handled as strings (every non rendered
+ * content is handled as a string).<br>
+ * </p>
+ *
+ * <p>It provides, in special, functionality to keep the content sorted, and to
+ * perform text search on the content.</p>
+ */
+public class ChoicesListModel extends AbstractListModel
+    implements Comparator<ChoicesListModel.Choice> {
 
-    private static final long serialVersionUID = 2233861800925325272L;
+    private static final long serialVersionUID = -8795357002432721893L;
     private Format format;
-    Comparator choicesComparator;
-    Comparator stringComparator;
-    
-    public static ChoicesListModel getCustom(ChoicesListModel current, 
-    		Format format, boolean renderedContent,
-    		Comparator choicesComparator, Comparator stringComparator){
-    	if (current!=null 
-    			&& (renderedContent == (current instanceof RenderedChoicesListModel))
-    			&& current.matches(format, choicesComparator, stringComparator)){
-    		return current;
-    	}
-    	if (renderedContent){
-    		return new RenderedChoicesListModel(choicesComparator, stringComparator);
-    	}
-    	if (stringComparator.equals(choicesComparator)){
-    		return new StringChoicesListModel(format, stringComparator);
-    	}
-    	return new GenericChoicesListModel(format, choicesComparator, stringComparator);
+    private Comparator contentComparator;
+    private Comparator<String> strComparator;
+    private boolean renderedContent;
+    private TreeSet<Choice> content;
+    private TreeSet<Choice> alphaSortedContent;
+    private Object flatContent[];
+    private int size;
+
+    public ChoicesListModel(Format     format,
+                            Comparator choicesComparator,
+                            Comparator stringComparator) {
+        this.format = format;
+        this.strComparator = stringComparator;
+        this.contentComparator = choicesComparator;
+        this.content = new TreeSet<Choice>(this);
+        clearContent();
     }
 
-    public ChoicesListModel(Format format, Comparator choicesComparator, Comparator stringComparator) {
-        this.format = format;
-        this.choicesComparator = choicesComparator;
-        this.stringComparator = stringComparator;
+    /**
+     * Specifies that the content requires no conversion to strings.
+     *
+     * @return  true if this is a change
+     */
+    public boolean setRenderedContent(Comparator choicesComparator,
+                                      Comparator stringComparator) {
+        if (updateComparators(choicesComparator, stringComparator)
+                || !renderedContent) {
+            renderedContent = true;
+            this.strComparator = stringComparator;
+            clearContent();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Specifies that the content is to be handled as strings.
+     *
+     * @param format the formatter to convert objects to strings, can be null
+     * @param choicesComparator the comparator used to sort choices on the
+     *   list model. Can be null to sort content alphabetically.
+     * @param stringComparator
+     * @return  true if choices should be added again.
+     */
+    public boolean setStringContent(Format             format,
+                                    Comparator         choicesComparator,
+                                    Comparator<String> stringComparator) {
+    	if (stringComparator.equals(choicesComparator)) {
+    		choicesComparator = null;
+    	}
+        boolean change = updateComparators(choicesComparator, stringComparator)
+                || renderedContent;
+        if (!change && (format != this.format)) {
+            change = (this.format == null) || (format == null)
+                    || !this.format.equals(format);
+        }
+
+        if (change) {
+            this.format = format;
+            this.strComparator = stringComparator;
+            renderedContent = false;
+            clearContent();
+        }
+
+        return change;
+    }
+
+    @Override public int getSize() {
+        return size;
+    }
+
+    @Override public Object getElementAt(int index) {
+        return flatContent()[index];
     }
 
     /** Clears all content (but ALL matcher). */
-    public abstract void clearContent();
-
-    public boolean matches(Format format, Comparator choicesComparator, Comparator stringComparator){
-    	if (this.choicesComparator.equals(choicesComparator) && this.stringComparator.equals(stringComparator)){
-    		return this.format==null? format==null : this.format.equals(format);
-    	}
-    	return false;
+    public void clearContent() {
+        int currentSize = size;
+        content.clear();
+        content.add(new Choice(CustomChoice.MATCH_ALL, null));
+        fireIntervalRemoved(this, size = 1, currentSize);
     }
 
     /**
@@ -90,196 +154,233 @@ abstract class ChoicesListModel extends AbstractListModel {
         boolean changed = false;
         for (Object o : addedContent) {
             String s = null;
-            if (!(o instanceof CustomChoice)) {
-                if (o == null) {
+            if (o == null) {
+                o = CustomChoice.MATCH_EMPTY;
+            } else if (!renderedContent && !(o instanceof CustomChoice)) {
+                // if null, content is rendered, no need to handle strings
+                s = (format == null) ? o.toString() : format.format(o);
+                if (s.length() == 0) {
                     o = CustomChoice.MATCH_EMPTY;
                 } else {
-                    s = (format == null) ? o.toString() : format.format(o);
-                    if (s.length() == 0) {
-                        o = CustomChoice.MATCH_EMPTY;
-                    } else {
-                        s = parser.escapeChoice(s);
-                    }
+                    s = parser.escapeChoice(s);
                 }
             }
-            changed = addContent(o, s) || changed;
+
+            changed = content.add(new Choice(o, s)) || changed;
         }
 
         if (changed) {
-            fireContentsChanged(this, 0, getSize());
+            flatContent = null;
+            alphaSortedContent = null;
+            fireContentsChanged(this, 0, size = content.size());
         }
 
         return changed;
     }
 
+    /** @see  PopupComponent#selectBestMatch(Object) */
+    public ChoiceMatch getBestMatch(Object hint) {
+        String str = null;
+        if (!renderedContent && (hint instanceof String)) {
+            // is a string (what the user enters), but if there is a format, it
+            // can correspond to an existing element. For example, the right
+            // format being for a date "07/05/12", but the user enters
+            // "7/5/12". In this case, we should automatically return the
+            // updated string. For the time being, this conversion is not yet
+            // made (requires changes on the EditorComponent, and side effects
+            // must be checked...)
+            str = (String) hint;
+            hint = null; // for the time being, we
+        }
+        Choice choice = new Choice(hint, str);
+        ChoiceMatch ret = new ChoiceMatch();
+        Choice match = (hint == null) ? null : content.floor(choice);
+        if ((match != null) && match.equals(choice)) {
+            flatContent(); // ensure that the positions are calculated
+            ret.content = match.get(renderedContent);
+            ret.index = match.idx;
+            ret.exact = true;
+        } else if (!renderedContent) {
+            TreeSet<Choice> alphaContent = getAlphabeticallySortedContent();
+            Choice top = alphaContent.ceiling(choice);
+            Choice low = alphaContent.floor(choice);
+            int clen = (top == null)
+                ? -1
+                : ChoiceMatch.getMatchingLength(top.str, choice.str,
+                    strComparator);
+            int flen = (low == null)
+                ? -1
+                : ChoiceMatch.getMatchingLength(low.str, choice.str,
+                    strComparator);
+            match = (clen > flen) ? top : low;
+            ret.index = match.idx;
+            ret.content = match.get(renderedContent);
+            ret.len = Math.max(clen, flen);
+            ret.exact = match.str.length() == choice.str.length();
+        }
+        return ret;
+    }
 
-    /** @see  PopupComponent#selectBestMatch(Object, boolean) */
-    public abstract ChoiceMatch getClosestMatch(Object hint, boolean exact);
 
     /**
      * Returns the text that could complete the given string<br>
      * The completion string is the larger string that matches all existing
-     * options in this model or the added list.
-     */
-    public abstract String getCompletion(String base, List addedList);
-
-    /**
-     * Method invoked by addContent.
+     * options that already match the provided base.
      *
-     * @param   content
-     * @param   repr
-     *
-     * @return
+     * @param  unsortedList:  additional content to comb through
      */
-    protected boolean addContent(Object content, String repr) {
-        return false;
+    public String getCompletion(String base, List unsortedList) {
+        int minLen = base.length();
+        int maxLen = Integer.MAX_VALUE;
+        String ret = null;
+        Iterator<Choice> it = getAlphabeticallySortedContent().tailSet(
+                new Choice(base, base), true)
+                .iterator();
+        Iterator its = unsortedList.iterator();
+        while ((maxLen > minLen) && (it.hasNext() || its.hasNext())) {
+            String s = it.hasNext() ? it.next().str : its.next().toString();
+            int match = ChoiceMatch.getMatchingLength(base, s, strComparator);
+            if (match == minLen) {
+                if (ret == null) {
+                    ret = s;
+                    maxLen = s.length();
+                } else {
+                    maxLen = Math.min(maxLen,
+                            ChoiceMatch.getMatchingLength(ret, s,
+                                strComparator));
+                }
+            }
+        }
+
+        return (ret == null) ? "" : ret.substring(minLen, maxLen);
+    }
+
+    private TreeSet<Choice> getAlphabeticallySortedContent() {
+        if (alphaSortedContent == null) {
+            flatContent(); // ensure we have the positions on the Choices
+            alphaSortedContent = new TreeSet<Choice>(new ChoiceTextComparator(
+                        strComparator));
+            alphaSortedContent.addAll(content);
+        }
+
+        return alphaSortedContent;
+    }
+
+    private Object[] flatContent() {
+        if (flatContent == null) {
+            int i = size;
+            flatContent = new Object[size];
+
+            Iterator<Choice> it = content.descendingIterator();
+            while (i-- > 0) {
+                flatContent[i] = it.next().index(i).get(renderedContent);
+            }
+        }
+
+        return flatContent;
+    }
+
+    private boolean updateComparators(Comparator choicesComparator,
+                                      Comparator stringComparator) {
+        boolean same = this.strComparator.equals(stringComparator);
+        if (same){
+        	if (choicesComparator==null){
+        		same = this.contentComparator==null;
+        	} else {
+        		same = choicesComparator.equals(this.contentComparator);
+        	}
+        }
+        this.contentComparator = choicesComparator;
+        this.strComparator = stringComparator;
+        return !same;
+    }
+
+    public Comparator<String> getStringComparator() {
+        return strComparator;
+    }
+
+    @Override public int compare(Choice w1, Choice w2) {
+        Object o1 = w1.o;
+        Object o2 = w2.o;
+        if (o1 instanceof CustomChoice) {
+            if (o2 instanceof CustomChoice) {
+                CustomChoice c1 = (CustomChoice) o1;
+                CustomChoice c2 = (CustomChoice) o2;
+                int ret = c1.getPrecedence() - c2.getPrecedence();
+                if (ret == 0) {
+                    // in this case, the comparator is string comparator
+                    ret = strComparator.compare(w1.str, w2.str);
+                }
+
+                return ret;
+            }
+            return -1;
+        }
+        if (o2 instanceof CustomChoice) {
+            return 1;
+        }
+        int diff=0;
+        if (contentComparator!=null){
+        	diff = contentComparator.compare(o1, o2);
+        	if (renderedContent || diff==0){
+        		return diff;
+        	}
+        }
+        int sdiff = strComparator.compare(w1.str, w2.str);
+        return sdiff==0 || diff==0? sdiff : diff;
     }
 
     /**
-     * Returns the text that could complete the given string<br>
-     * The completion string is the larger string that matches all existing
-     * options in this model or the added list.
+     * Instances in the model are wrapped as Choice objects, with added
+     * information on the stringfied representation of the object -null if the
+     * content is rendered- and the position on the model when is sorted
+     * alphabetically.
      */
-    protected String getCompletion(List       sortedContent,
-                                   Object     baseAsContent,
-                                   Comparator sortingComparator,
-                                   List       unsortedContent,
-                                   List       additionalUnsortedContent) {
-        int pos = Collections.binarySearch(sortedContent, baseAsContent,
-                sortingComparator);
-        if (pos >= 0) {
-            // exact match, do nothing else
-            return "";
-        }
+    static public class Choice {
+        public Object o;
+        public String str;
+        public int idx;
 
-        String base = baseAsContent.toString();
-        String ret = base;
-        int len = ret.length();
-        int cs = sortedContent.size();
-        pos = -pos - 1;
-        if (pos < cs) {
-            String use = sortedContent.get(pos).toString();
-            // the position found should start with the base string.
-            // if not, no choice start with it
-            if (ChoiceMatch.getMatchingLength(base, use, stringComparator)
-                    >= len) {
-                ret = use;
-
-                int maxLen = ret.length();
-                while (++pos < cs) {
-                    use = sortedContent.get(pos).toString();
-
-                    int m = ChoiceMatch.getMatchingLength(ret, use,
-                            stringComparator);
-                    if (m < len) {
-                        // options are sorted, as soon as one does not start
-                        // with the base string, no one else will
-                        break;
-                    } else if (m == len) {
-                        return "";
-                    } else if (m < maxLen) {
-                        maxLen = m;
-                    }
-                }
-
-                ret = ret.substring(0, maxLen);
+        public Choice(Object content, String repr) {
+            this.o = content;
+            if (content instanceof CustomChoice) {
+                // choice comparator uses the string for comparison
+                this.str = ((CustomChoice) content).getRepresentation();
+            } else {
+                this.str = repr;
             }
         }
 
-        for (int i = 1; i <= 2; i++) {
-            List l = (i == 1) ? unsortedContent : additionalUnsortedContent;
-            if (l != null) {
-                for (Object o : l) {
-                    String s = o.toString();
-                    int m = ChoiceMatch.getMatchingLength(ret, s,
-                            stringComparator);
-                    if (m == len) {
-                        if (ret != base) {
-                            return ""; // exact match!
-                        }
-
-                        ret = s;
-                    } else if (m > len) {
-                        ret = ret.substring(0, m);
-                    }
-                }
-            }
+        public Choice index(int position) {
+            this.idx = position;
+            return this;
         }
 
-        return ret.substring(len);
-    }
-
-    /** Creation of the Match, for text based, sorted content. */
-    protected <T> T findOnSortedContent(ChoiceMatch base,
-                                        List<T>     sortedContent,
-                                        Comparator  sortingComparator,
-                                        T           hint,
-                                        boolean     fullMatch) {
-        T found = null;
-        int pos = Collections.binarySearch(sortedContent, hint,
-                sortingComparator);
-        if (pos >= 0) {
-            // found it, do nothing else (it is exact)
-            base.exact = true;
-            base.index = pos;
-            found = sortedContent.get(pos);
-        } else if (!fullMatch) {
-            String strStart = hint.toString();
-            // try the two positions around
-            int suggested = -pos - 1;
-            if (suggested < sortedContent.size()) {
-                T suggestion = sortedContent.get(suggested);
-                int len = ChoiceMatch.getMatchingLength(strStart,
-                        suggestion.toString(), stringComparator);
-                if ((len > base.len) || (base.len == 0)) {
-                    base.index = suggested;
-                    found = suggestion;
-                    base.len = len;
-                }
-            }
-            // if suggested is in the custom choices, no need to try
-            if (--suggested >= 0) {
-                T suggestion = sortedContent.get(suggested);
-                int len = ChoiceMatch.getMatchingLength(strStart,
-                        suggestion.toString(), stringComparator);
-                if ((len > base.len) || (base.len == 0)) {
-                    base.index = suggested;
-                    base.len = len;
-                    found = suggestion;
-                }
-            }
+        public Object get(boolean rendered) {
+            return (rendered || (o instanceof CustomChoice)) ? o : str;
         }
 
-        return found;
-    }
+        @Override public int hashCode() {
+            return o.hashCode();
+        }
 
-
-    /**
-     * Comparator for collections containing {@link CustomChoice} instances:
-     * those instances are sorted by their own precedence definitions, and have
-     * precedence over the rest of instances in the collection
-     */
-    class CustomChoiceAwareComparator implements Comparator<Object> {
-
-        @Override public int compare(Object o1, Object o2) {
-            if (o1 instanceof CustomChoice) {
-                if (o2 instanceof CustomChoice) {
-                    CustomChoice c1 = (CustomChoice) o1;
-                    CustomChoice c2 = (CustomChoice) o2;
-                    int ret = c1.getPrecedence() - c2.getPrecedence();
-                    if (ret == 0) {
-                        ret = stringComparator.compare(c1.toString(),
-                                c2.toString());
-                    }
-
-                    return ret;
-                }
-
-                return -1;
-            } else if (o2 instanceof CustomChoice) {
-                return 1;
-            }
-            return choicesComparator.compare(o1, o2);
+        @Override public boolean equals(Object choice) {
+            return (choice instanceof Choice) && ((Choice) choice).o.equals(o);
         }
     }
+
+    /** Comparator to compare Wrappers by their string member. */
+    static private class ChoiceTextComparator implements Comparator<Choice> {
+
+        private Comparator stringComparator;
+
+        public ChoiceTextComparator(Comparator stringComparator) {
+            this.stringComparator = stringComparator;
+        }
+
+        @Override public int compare(Choice w1, Choice w2) {
+            return stringComparator.compare(w1.str, w2.str);
+        }
+    }
+
 }

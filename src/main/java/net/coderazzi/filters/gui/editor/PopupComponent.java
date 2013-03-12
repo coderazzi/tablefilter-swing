@@ -92,7 +92,8 @@ abstract class PopupComponent implements PopupMenuListener {
             Comparator choicesComparator,
             Comparator stringComparator) {
         historyModel = new HistoryListModel();
-        choicesModel = ChoicesListModel.getCustom(null, format, false, choicesComparator, stringComparator);         		
+        choicesModel = new ChoicesListModel(format, choicesComparator,  
+        		stringComparator);         		
         createGui(editor);
     }
 
@@ -185,13 +186,12 @@ abstract class PopupComponent implements PopupMenuListener {
                                       Comparator     stringComparator) {
         hide();
         listRenderer.setUserRenderer(renderer);
-        ChoicesListModel newModel = ChoicesListModel.getCustom(choicesModel, null, true, choicesComparator, stringComparator);
-        if (newModel!=choicesModel){
-	        historyModel.setStringContent(null);
-            choicesList.setModel(choicesModel = newModel);
-            return true;
+        boolean ret = choicesModel.setRenderedContent(choicesComparator, 
+        		stringComparator);
+        if (ret){
+            historyModel.setStringContent(null);
         }
-        return false;
+        return ret;
     }
 
     /** 
@@ -200,16 +200,15 @@ abstract class PopupComponent implements PopupMenuListener {
      */
     public boolean setStringContent(Format             format,
     								Comparator         choicesComparator,
-    								Comparator<String> stringComparator) {
+                                 Comparator<String> stringComparator) {
         hide();
         listRenderer.setUserRenderer(null);
-        ChoicesListModel newModel = ChoicesListModel.getCustom(choicesModel, format, false, choicesComparator, stringComparator);
-        if (newModel!=choicesModel){
+        boolean ret = choicesModel.setStringContent(format, choicesComparator, 
+        		stringComparator);
+        if (ret){
             historyModel.setStringContent(stringComparator);
-            choicesList.setModel(choicesModel = newModel);
-            return true;
         }
-        return false;
+        return ret;
     }
 
     /**
@@ -217,13 +216,13 @@ abstract class PopupComponent implements PopupMenuListener {
      * it will be invalid (null or not string comparator) for rendered content.
      */
     public Comparator<String> getStringComparator() {
-        return historyModel.getStringComparator();
+        return choicesModel.getStringComparator();
     }
 
     /**
      * Finds -and selects- the best match to a given content, using the existing
      * history and choices.<br>
-     * It always favour content belonging to the choices list, rather than to
+     * It always favor content belonging to the choices list, rather than to
      * the history list.
      *
      * @param   hint   an object used to select the match. If the content is
@@ -232,18 +231,13 @@ abstract class PopupComponent implements PopupMenuListener {
      *                 should start with the given hint). If the content is not
      *                 text-based, only exact matches are returned, no matter
      *                 the value of the parameter perfectMatch
-     * @param   exact  when the content is text-based, if no choice/history
-     *                 starts with the given hint string, smaller hint
-     *                 substrings are used, unless perfectMatch is true
      *
-     * @return  null if not match found, or a valid Match otherwise, with non
-     *          null content
+     * @return  a non null match (but its content can be null)
      */
-    public ChoiceMatch selectBestMatch(Object hint, boolean exact) {
-        ChoiceMatch hMatch = historyModel.getClosestMatch(hint, exact);
+    public ChoiceMatch selectBestMatch(Object hint) {
+        ChoiceMatch hMatch = historyModel.getClosestMatch(hint);
         if (choicesModel.getSize() > 0) {
-            ChoiceMatch match = choicesModel.getClosestMatch(hint,
-                    exact || hMatch.exact);
+            ChoiceMatch match = choicesModel.getBestMatch(hint);
             if (isVisible() && (match.index >= 0)) {
                 choicesList.ensureIndexIsVisible(match.index);
             }
@@ -654,7 +648,7 @@ abstract class PopupComponent implements PopupMenuListener {
 
         return ret;
     }
-    
+
     /**
      * The mouse handler will select automatically the choice under the mouse,
      * and passes directly the focus to the popup under the mouse.

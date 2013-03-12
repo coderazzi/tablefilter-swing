@@ -41,18 +41,12 @@ public class MenuAlphaChoicesOrder extends AbstractMenuCheckBoxAction {
     public MenuAlphaChoicesOrder(ActionHandler main, IFilterEditor editor) {
         super(NAME, main);
         this.editor = editor;
-        setSelected((editor == null)
-                ? main.getFilterHeader().hasAlphabeticalOrderOnChoices()
-                : editor.hasAlphabeticalOrderOnChoices());
+        setSelected(editor.getChoicesComparator()==null);
     }
 
     @Override protected void actionPerformed(boolean selected) {
-        if (editor == null) {
-            main.getFilterHeader().setAlphabeticalOrderOnChoices(selected);
-            main.updateFiltersInfo();
-        } else {
-            editor.setAlphabeticalOrderOnChoices(selected);
-        }
+        editor.setChoicesComparator(selected? null : editor.getComparator());
+        main.updateFilterInfo(editor);
     }
 
 }

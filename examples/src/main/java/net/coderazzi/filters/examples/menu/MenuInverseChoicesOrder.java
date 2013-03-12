@@ -52,7 +52,7 @@ public class MenuInverseChoicesOrder extends AbstractMenuCheckBoxAction {
     		cc = new InverseComparator(editor.getComparator());
     	}
         editor.setChoicesComparator(cc);
-        main.updateFiltersInfo();
+        main.updateFilterInfo(editor);
     }
 
 }

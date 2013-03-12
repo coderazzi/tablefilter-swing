@@ -52,6 +52,7 @@ public class MenuIgnoreCase extends AbstractMenuCheckBoxAction {
             main.updateFiltersInfo();
         } else {
             editor.setIgnoreCase(selected);
+            main.updateFilterInfo(editor);
         }
     }
 

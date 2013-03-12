@@ -69,7 +69,7 @@ public class TestData {
             "Lindsay", "Mercy", "Nara", "Rowena", "Sabrina", "Scarlet",
             "Shelby", "Shirley", "Sparrow", "Spring", "Storm", "Summer",
             "Taylor", "Tina", "Trudy", "Ulla", "Verity", "Wendy", "Whitney",
-            "Wilona"
+            " Wilona"
         };
 
     // source:
@@ -219,9 +219,8 @@ public class TestData {
         }
 
         club = getClub();
-        // date is not exact (not everybody can be born at 00:00!)
         date = new GregorianCalendar(random.nextInt(50) + 1940,
-                random.nextInt(12), random.nextInt(28), 1, 1).getTime();
+                random.nextInt(12), random.nextInt(28)).getTime();
         
         if (random.nextBoolean() && random.nextBoolean()) {
         	if (random.nextBoolean()) {
@@ -231,6 +230,8 @@ public class TestData {
         		note = "<html><i>Transferral &#34;started&#34;</i></html>";
         	} else if (random.nextBoolean()){
         		note = "> *";
+        	} else if (random.nextBoolean()){
+        		note = "=";
         	} else {        		
         		note = "<html><font color='red'>&gt; *</font></html>";
         	}

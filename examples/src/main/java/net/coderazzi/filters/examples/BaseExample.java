@@ -64,12 +64,16 @@ public class BaseExample extends JFrame {
     }
     
     private void setupHeader(TableFilterHeader header){
-    	getEditor(header, TestTableModel.COUNTRY, new FlagRenderer())
-    		.setRenderer(new FlagRenderer());
-    	getEditor(header, TestTableModel.NOTE, null)
-			.setEditable(false);
-    	getEditor(header, TestTableModel.AGE, new CenteredRenderer())
-    		.setCustomChoices(AgeCustomChoice.getCustomChoices());    	
+    	IFilterEditor ed = getEditor(header, TestTableModel.COUNTRY, 
+    			new FlagRenderer());
+    	if (ed!=null) ed.setRenderer(new FlagRenderer());
+    	
+    	ed=getEditor(header, TestTableModel.NOTE, null);
+    	if(ed!=null) ed.setEditable(false);
+    	
+    	ed = getEditor(header, TestTableModel.AGE, new CenteredRenderer());
+    	if (ed!=null) ed.setCustomChoices(AgeCustomChoice.getCustomChoices());
+    	
     	getEditor(header, TestTableModel.DATE, 
     		new DateRenderer(header.getParserModel().getFormat(Date.class)));
     }

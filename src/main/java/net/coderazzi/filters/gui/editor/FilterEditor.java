@@ -93,7 +93,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     private Comparator comparator;
     private Comparator choicesComparator;
     private Class modelClass;
-    private boolean alphabeticalChoiceOrder;
     private boolean ignoreCase;
     private boolean enabledUI=true;
 
@@ -107,21 +106,20 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     public FilterEditor(FiltersHandler filtersHandler,
                         int            modelIndex,
                         Class<?>       modelClass,
-                        boolean        alphabeticalChoiceOrder,
                         Look           look) {
         this.filtersHandler = filtersHandler;
         this.modelIndex = modelIndex;
         this.modelClass = modelClass;
-        this.alphabeticalChoiceOrder = alphabeticalChoiceOrder;
         this.format = getParserModel().getFormat(modelClass);
         this.ignoreCase = getParserModel().isIgnoreCase();
         this.comparator = getParserModel().getComparator(modelClass);
-        this.choicesComparator = deduceChoicesComparator(false);
+        this.choicesComparator = modelClass.equals(String.class) 
+        		|| modelClass.isEnum() ? null : comparator;
 
         setLayout(new BorderLayout());
         setBorder(border);
 
-        popup = new PopupComponent(this, format, getChoicesComparator(), 
+        popup = new PopupComponent(this, format, getChoicesComparator(),
         		getStringComparator()) {
 
             @Override protected void choiceSelected(Object selection) {
@@ -142,7 +140,7 @@ public class FilterEditor extends JComponent implements IFilterEditor {
         add(editor, BorderLayout.CENTER);
 
         setLook(look);
-        formatOrComparatorUpdated();
+        editor.updateParser();
     }
 
     /** IFilterEditor method. */
@@ -283,7 +281,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	// comparison operations on the text parser
         if ((comparator != this.comparator) && (comparator != null)) {
             this.comparator = comparator;
-            choicesComparator = deduceChoicesComparator(getRenderer()!=null);
         	formatOrComparatorUpdated();
         }
     }
@@ -292,14 +289,11 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     @Override public Comparator getComparator() {
         return comparator;
     }
-    
+
     /** IFilterEditor method. */
     @Override public void setChoicesComparator(Comparator comparator) {
-    	if (comparator != null){
-    		this.alphabeticalChoiceOrder = false;
-    		this.choicesComparator = comparator;
-    		formatOrComparatorUpdated();
-    	}
+		this.choicesComparator = comparator;
+		formatOrComparatorUpdated();
     }
     
     /** IFilterEditor method. */
@@ -307,21 +301,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     	return choicesComparator;
     }
     
-    /** IFilterEditor method. */
-    @Override public void setAlphabeticalOrderOnChoices(boolean enable) {
-    	this.alphabeticalChoiceOrder = enable;
-    	Comparator oldComparator = getChoicesComparator();
-    	choicesComparator = deduceChoicesComparator(getRenderer()!=null);
-    	if (!getChoicesComparator().equals(oldComparator)){
-    		formatOrComparatorUpdated();
-    	}
-    }
-    
-    /** IFilterEditor method. */
-    @Override public boolean hasAlphabeticalOrderOnChoices() {
-    	return choicesComparator == getStringComparator();
-    }
-
     /** IFilterEditor method. */
     @Override public void setAutoCompletion(boolean enable) {
         editor.setAutoCompletion(enable);
@@ -367,14 +346,13 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     @Override public void setRenderer(ChoiceRenderer renderer) {
     	if (renderer != getRenderer()){
 	        if (renderer == null) {
-	    		choicesComparator = deduceChoicesComparator(false);
 	            popup.setStringContent(format, choicesComparator, 
-	            		getStringComparator());
+	            	getStringComparator());
 	            editor.setTextMode(true);
 	        } else {
-	    		choicesComparator = deduceChoicesComparator(true);
-	            popup.setRenderedContent(renderer, choicesComparator, 
-	            		getStringComparator());
+	            popup.setRenderedContent(renderer, 
+	            	choicesComparator==null? comparator : choicesComparator, 
+	            	getStringComparator());
 	            editor.setRenderMode();
 	        }
 	        requestChoices();
@@ -482,35 +460,18 @@ public class FilterEditor extends JComponent implements IFilterEditor {
         ChoiceRenderer lcr = getRenderer();
         boolean updated;
         if (lcr == null) {
-            updated = popup.setStringContent(format, getChoicesComparator(), 
+            updated = popup.setStringContent(format, choicesComparator, 
             		getStringComparator());
             editor.updateParser();
         } else {
-            updated = popup.setRenderedContent(lcr, getChoicesComparator(), 
+        	//for rendered content, it is required having a non null comparator
+            updated = popup.setRenderedContent(lcr, 
+            		choicesComparator==null? comparator : choicesComparator,
             		getStringComparator());
         }
         if (updated) {
         	requestChoices();
         }
-    }
-    
-    /**
-     * Returns the choices comparator associated to the model class for
-     * the given alphabetical order and renderer mode. 
-     * As opposed to the method without arguments 
-     * (@see {@link #getChoicesComparator()}), this method can 
-     * return null.
-     */
-    private Comparator deduceChoicesComparator(boolean hasRenderer) {
-    	if (!hasRenderer) {
-	    	if (alphabeticalChoiceOrder || 
-	    		modelClass.equals(String.class) || 
-	    		modelClass.equals(Boolean.class) ||
-	    		modelClass.isEnum()){
-	    		return getStringComparator();
-	    	}
-    	}
-    	return comparator;
     }
 
     private IParserModel getParserModel() {
@@ -573,10 +534,10 @@ public class FilterEditor extends JComponent implements IFilterEditor {
                 return false;
             }
 
-            ChoiceMatch cm = popup.selectBestMatch(editor.getContent(), false);
+            ChoiceMatch cm = popup.selectBestMatch(editor.getContent());
             if (cm.content == null) {
                 // select ANYTHING
-                popup.selectBestMatch("", false);
+                popup.selectBestMatch("");
             }
         }
 

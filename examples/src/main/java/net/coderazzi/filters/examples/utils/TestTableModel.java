@@ -62,25 +62,30 @@ public class TestTableModel extends AbstractTableModel {
             Date.class, String.class, String.class
         };
 
-    private static final int COLUMNS_ON_BASIC_MODEL = 5;
-    private static final int COLUMNS_ON_LARGE_MODEL = 9;
-    private static final int COLUMNS_ON_FULL_MODEL = 10;
-    private static int expectedColumns = COLUMNS_ON_BASIC_MODEL;
+    private static final int BASIC_MODEL_COLUMNS = 5;
+    private static final int LARGE_MODEL_COLUMNS = 9;
+    private static final int FULL_MODEL_COLUMNS = 10;
+    private static int expectedColumns = BASIC_MODEL_COLUMNS;
     private List<TestData> data;
     private Set<TestData> modifiedTestData = new HashSet<TestData>();
     private int columnsOrder[];
 
     public static void setLargeModel(boolean enable) {
-        expectedColumns = enable ? COLUMNS_ON_LARGE_MODEL : COLUMNS_ON_BASIC_MODEL;
+        expectedColumns = enable ? LARGE_MODEL_COLUMNS : BASIC_MODEL_COLUMNS;
     }
 
     public static void setFullModel() {
-        expectedColumns = COLUMNS_ON_FULL_MODEL;
+        expectedColumns = FULL_MODEL_COLUMNS;
+    }
+
+    public static void setModelWidth(int w) {
+        expectedColumns = w;
     }
 
     public static TestTableModel createTestTableModel(int elements) {
         return new TestTableModel(getTestData(elements));
     }
+
 
     private static List<TestData> getTestData(int elements) {
         TestData.resetRandomness();
@@ -132,7 +137,7 @@ public class TestTableModel extends AbstractTableModel {
         List<Integer> l = new ArrayList<Integer>();
         int prior = getColumnCount();
         n[0] = 0; // keep always first column as the name
-        n[COLUMNS_ON_LARGE_MODEL] = COLUMNS_ON_LARGE_MODEL; // keep always html country as last one
+        n[LARGE_MODEL_COLUMNS] = LARGE_MODEL_COLUMNS; // keep always html country as last one
         for (int i = 1; i < prior; i++) {
             l.add(new Integer(i));
         }
@@ -141,11 +146,11 @@ public class TestTableModel extends AbstractTableModel {
             n[i] = l.remove(random.nextInt(l.size())).intValue();
         }
 
-        for (int i = prior; i < COLUMNS_ON_LARGE_MODEL; i++) {
+        for (int i = prior; i < LARGE_MODEL_COLUMNS; i++) {
             l.add(new Integer(i));
         }
 
-        for (int i = prior; i < COLUMNS_ON_LARGE_MODEL; i++) {
+        for (int i = prior; i < LARGE_MODEL_COLUMNS; i++) {
             n[i] = l.remove(random.nextInt(l.size())).intValue();
         }
 
@@ -162,7 +167,7 @@ public class TestTableModel extends AbstractTableModel {
         }
 
         columnsOrder = newColumnsOrder;
-        setLargeModel(expectedColumns == COLUMNS_ON_BASIC_MODEL);
+        setLargeModel(expectedColumns == BASIC_MODEL_COLUMNS);
         fireTableStructureChanged();
     }
 

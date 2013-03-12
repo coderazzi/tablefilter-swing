@@ -45,6 +45,7 @@ public class MenuHtmlCountry extends AbstractMenuCheckBoxAction {
 
     @Override protected void actionPerformed(boolean set) {
         editor.setRenderer(set ? new HtmlChoiceRenderer() : null);
+        main.updateFilterInfo(editor);
     }
 
 }

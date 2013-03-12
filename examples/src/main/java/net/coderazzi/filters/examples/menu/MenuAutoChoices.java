@@ -78,6 +78,7 @@ public class MenuAutoChoices extends JMenu implements ActionListener {
             main.updateFiltersInfo();
         } else {
             editor.setAutoChoices(ao);
+            main.updateFilterInfo(editor);
         }
     }
 

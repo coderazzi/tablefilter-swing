@@ -26,73 +26,20 @@
 package net.coderazzi.filters.gui.editor;
 
 import java.util.Comparator;
-import java.util.List;
 
 
 /** Class to find matches in the lists (history / choices). */
 class ChoiceMatch {
-    // index in the list. Will be -1 if the content is empty or a fullMatch
-    // is required and cannot be found
-    int index;
-    // length of the string that is matched. On fullMatch calls, this length
-    // is the passed string's length
-    int len;
     // exact is true if the given index corresponds to an string that fully
     // matches the passed string
     boolean exact;
     // the matched content
     Object content;
-
-    public ChoiceMatch() {
-        this.index = -1;
-    }
-
-    /** Finds the content to match in a list; match must be exact. */
-    public static ChoiceMatch findExactOnContent(List list, Object match) {
-        ChoiceMatch ret = new ChoiceMatch();
-        ret.index = list.indexOf(match);
-        if (ret.index != -1) {
-            ret.exact = true;
-            ret.content = match;
-        }
-
-        return ret;
-    }
-
-    /**
-     * Finds the content to match in a list which can be unsorted<br>
-     * The match does not have to be exact.
-     */
-    public static ChoiceMatch findOnUnsortedContent(List       content,
-                                                    int        len,
-                                                    Comparator strComparator,
-                                                    String     strStart,
-                                                    boolean    fullMatch) {
-        int strLen = strStart.length();
-        ChoiceMatch ret = new ChoiceMatch();
-        while (len-- > 0) {
-            ret.content = content.get(len);
-
-            String str = ret.content.toString();
-            int matchLen = getMatchingLength(strStart, str, strComparator);
-            if (((matchLen > 0) && (matchLen >= ret.len)) || (ret.len == 0)) {
-                ret.index = len;
-                ret.len = matchLen;
-                if ((matchLen == strLen) && (str.length() == strLen)) {
-                    ret.exact = true;
-                    return ret;
-                }
-            }
-        }
-
-        if (fullMatch) {
-            ret.index = -1;
-            ret.len = 0;
-            ret.content = null;
-        }
-
-        return ret;
-    }
+    // index in the list. Will be -1 if the content is empty or a fullMatch
+    // is required and cannot be found
+    int index = -1;
+    // length of the string that is matched, if exact is false.
+    int len;
 
     /** Returns the number of matching characters between two strings. */
     public static int getMatchingLength(String     a,

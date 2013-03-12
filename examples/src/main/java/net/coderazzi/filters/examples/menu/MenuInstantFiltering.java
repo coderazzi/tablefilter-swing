@@ -52,6 +52,7 @@ public class MenuInstantFiltering extends AbstractMenuCheckBoxAction {
             main.updateFiltersInfo();
         } else {
             editor.setInstantFiltering(selected);
+            main.updateFilterInfo(editor);
         }
     }
 

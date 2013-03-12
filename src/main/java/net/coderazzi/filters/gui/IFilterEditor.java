@@ -121,8 +121,8 @@ public interface IFilterEditor {
      * Sets the {@link Comparator} required to compare (and sort) instances of
      * the associated class in the table model.<br>
      * This operation sets also this operator as the choices comparator 
-     * (see {@link #setChoicesComparator(Comparator)}), unless alphabetical
-     * sorting is in place.  
+     * (see {@link #setChoicesComparator(Comparator)})
+     * @param comparator cannot be null
      */
     void setComparator(Comparator comparator);
 
@@ -130,7 +130,10 @@ public interface IFilterEditor {
     Comparator getComparator();
 
     /**
-     * Sets the {@link Comparator} used to sort out the choices.<br>
+     * Sets the {@link Comparator} used to sort out the choices. By default.
+     * this is the same operator associated to the editor. Note that editors 
+     * associated to enumeration types are sorted by default alphabetically.<br>
+     * @param comparator can be set to null to use alphabetic sorting
      * @see IFilterEditor#setComparator(Comparator)
      */
     void setChoicesComparator(Comparator comparator);
@@ -138,25 +141,6 @@ public interface IFilterEditor {
     /** Returns the associated {@link Comparator} choices comparator. */
     Comparator getChoicesComparator();
     
-    /** 
-     * Modifies the flag to display the choices in alphabetical order -when
-     * there is no {@link ChoiceRenderer} in place.<br>
-     * If this flag is not set, the order is dictated by the associated
-     * comparator (see {@link #setComparator(Comparator)}), except when
-     * the associated class is String, Boolean, or an enumeration. In these
-     * cases, the order is still alphabetical, unless a explicit choices
-     * comparator is provided. 
-     * @see IFilterEditor#setChoicesComparator(Comparator)
-     */
-    void setAlphabeticalOrderOnChoices(boolean enable);
-    
-    /**
-     * Returns true if the choices are listed alphabetically.<br>
-     * If false, choices are listed following the choices comparator -which
-     * could still follow alphabetical order-. 
-     * @see IFilterEditor#setAlphabeticalOrderOnChoices(boolean) */
-    boolean hasAlphabeticalOrderOnChoices();
-
     /** Sets the auto completion flag. */
     void setAutoCompletion(boolean enable);
 
