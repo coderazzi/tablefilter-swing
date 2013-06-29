@@ -316,7 +316,7 @@ public class TableFilterHeader extends JPanel {
         return this.instantFilteringEnabled;
     }
 
-    /** Enables instant filtering, as the user edits the filter's text. */
+    /** Enables auto completion, as the user edits the filter's text. */
     public void setAutoCompletion(boolean enable) {
         if (this.autoCompletionEnabled != enable) {
             this.autoCompletionEnabled = enable;
@@ -328,9 +328,19 @@ public class TableFilterHeader extends JPanel {
         }
     }
 
-    /** Returns true if instant filtering is enabled. */
+    /** Returns true if auto completion is enabled. */
     public boolean isAutoCompletion() {
         return this.autoCompletionEnabled;
+    }
+
+    /** Enables / Disables auto selection mode */
+    public void setAutoSelection(boolean enable) {
+        filtersHandler.setAutoSelection(enable);
+    }
+
+    /** Returns true if auto selection is enabled. */
+    public boolean isAutoSelection() {
+        return filtersHandler.isAutoSelection();
     }
 
     /**

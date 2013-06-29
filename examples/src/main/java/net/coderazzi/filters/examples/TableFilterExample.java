@@ -26,7 +26,6 @@ package net.coderazzi.filters.examples;
 
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,6 +50,7 @@ import net.coderazzi.filters.examples.menu.MenuAlphaChoicesOrder;
 import net.coderazzi.filters.examples.menu.MenuAutoChoices;
 import net.coderazzi.filters.examples.menu.MenuAutoCompletion;
 import net.coderazzi.filters.examples.menu.MenuAutoResize;
+import net.coderazzi.filters.examples.menu.MenuAutoSelection;
 import net.coderazzi.filters.examples.menu.MenuColorAction;
 import net.coderazzi.filters.examples.menu.MenuColumnRemove;
 import net.coderazzi.filters.examples.menu.MenuCountryFlagRenderer;
@@ -200,6 +200,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         ret.addSeparator();
         ret.add(new MenuAdaptiveChoices(this));
         ret.add(new MenuAutoCompletion(this, null));
+        ret.add(new MenuAutoSelection(this));
         ret.add(allEnabled);
         ret.add(new MenuFilterOnUpdates(this));
         ret.add(new MenuIgnoreCase(this, null));
