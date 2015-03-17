@@ -31,12 +31,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.text.Format;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -54,6 +51,7 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 import net.coderazzi.filters.IFilter;
 import net.coderazzi.filters.IFilterObserver;
@@ -87,7 +85,7 @@ import net.coderazzi.filters.gui.editor.FilterEditor;
  *
  * @author  Luis M Pena - lu@coderazzi.net
  */
-public class TableFilterHeader extends JPanel {
+public class TableFilterHeader extends JPanel implements PropertyChangeListener {
 
     private static final long serialVersionUID = 5217701111228491294L;
 
@@ -214,6 +212,14 @@ public class TableFilterHeader extends JPanel {
             : columnsController.getFilterEditor(getTable()
                     .convertColumnIndexToView(modelColumn));
     }
+    
+    /** Required to track model changes on the table */
+    @Override public void propertyChange(PropertyChangeEvent evt) {
+    	if ("model".equals(evt.getPropertyName())){
+    		updateLook();
+    		recreateController();
+    	}
+    }
 
     /**
      * <p>Attaches the table where the filtering will be applied.</p>
@@ -233,6 +239,7 @@ public class TableFilterHeader extends JPanel {
         positionHelper.changeTable(oldTable, table);
         if (oldTable != null) {
             oldTable.removeComponentListener(resizer);
+            oldTable.removePropertyChangeListener("model", this);
         }
 
         filtersHandler.setTable(table);
@@ -243,6 +250,7 @@ public class TableFilterHeader extends JPanel {
             updateLook();
             recreateController();
             table.addComponentListener(resizer);
+            table.addPropertyChangeListener("model", this);
         }
 
         filtersHandler.enableNotifications(true);
@@ -886,6 +894,11 @@ public class TableFilterHeader extends JPanel {
          * the new editors with the expected enable state.
          */
         private Boolean handlerEnabled;
+        
+        /**
+         * The model associated to the table when the controller is created.
+         */
+        private TableModel tableModel;
 
         /**
          * Creates the controller for all the columns<br>
@@ -900,6 +913,7 @@ public class TableFilterHeader extends JPanel {
             super.setForeground(foreground);
             super.setBackground(background);
             this.tableColumnModel = getTable().getColumnModel();
+            this.tableModel = getTable().getModel();
 
             boolean enabled = filtersHandler.isEnabled();
             int count = tableColumnModel.getColumnCount();
@@ -1026,46 +1040,59 @@ public class TableFilterHeader extends JPanel {
         /** {@link TableColumnModelListener} interface. */
         @Override public void columnAdded(TableColumnModelEvent e) {
 
-            // when adding or removing columns to the table model, or, in
-            // general, when fireTableStructureChanged() is invoked on a
-            // table model, all columns are removed, and the definitive ones
-            // added.
-            // To avoid sending update notifications to the table, which
-            // may be quite time/CPU consuming, it is better to disable
-            // the notifications and only send them after all columns
-            // have been added or removed.
-            // As there is no way to know when the last column is added
-            // (or removed), the implementation disables the notifications
-            // and request to be auto called eventually. This call (run())
-            // will happen when all the column modifications have concluded,
-            // so then it is safe to reactivate the notifications
-            filtersHandler.enableNotifications(false);
-            if (handlerEnabled == null) {
-                handlerEnabled = filtersHandler.isEnabled();
-            }
-
-            createColumn(e.getToIndex(), handlerEnabled);
-            update();
+        	//Support the case where a model is being changed
+        	if (isCorrectModel()) {
+	
+	            // when adding or removing columns to the table model, or, in
+	            // general, when fireTableStructureChanged() is invoked on a
+	            // table model, all columns are removed, and the definitive 
+        		// ones added.
+	            // To avoid sending update notifications to the table, which
+	            // may be quite time/CPU consuming, it is better to disable
+	            // the notifications and only send them after all columns
+	            // have been added or removed.
+	            // As there is no way to know when the last column is added
+	            // (or removed), the implementation disables the 
+        		// notifications and request to be auto called eventually. 
+        		// This call (run()) will happen when all the column 
+        		// modifications have concluded, so then it is safe to 
+        		// reactivate the notifications
+	            filtersHandler.enableNotifications(false);
+	            if (handlerEnabled == null) {
+	                handlerEnabled = filtersHandler.isEnabled();
+	            }
+	
+	            createColumn(e.getToIndex(), handlerEnabled);
+	            update();
+        	}
         }
 
         /** {@link TableColumnModelListener} interface. */
         @Override public void columnRemoved(TableColumnModelEvent e) {
-
-            // see the comment on columnAdded
-            filtersHandler.enableNotifications(false);
-            if (handlerEnabled == null) {
-                handlerEnabled = filtersHandler.isEnabled();
-            }
-
-            FilterColumnPanel fcp = columns.remove(e.getFromIndex());
-            fcp.detach();
-            remove(fcp);
-            update();
+        	
+        	//Support the case where a model is being changed
+        	if (isCorrectModel()) {
+	            // see the comment on columnAdded
+	            filtersHandler.enableNotifications(false);
+	            if (handlerEnabled == null) {
+	                handlerEnabled = filtersHandler.isEnabled();
+	            }
+	
+	            FilterColumnPanel fcp = columns.remove(e.getFromIndex());
+	            fcp.detach();
+	            remove(fcp);
+	            update();
+        	}
         }
 
         /** {@link TableColumnModelListener} interface. */
         @Override public void columnSelectionChanged(ListSelectionEvent e) {
             // nothing needed here
+        }
+        
+        private boolean isCorrectModel() {
+        	JTable table = getTable();
+        	return table != null && tableModel == table.getModel();
         }
 
         /**

@@ -51,6 +51,9 @@ public class BaseExample extends JFrame {
 
     private static final long serialVersionUID = 382439526043424492L;
     
+    //https://code.google.com/p/tablefilter-swing/issues/detail?id=38&can=1
+    private static boolean ISSUE_38_TEST = true;
+    
     public BaseExample(int rows) {
         super("Table Filter Example");
     	TestTableModel.setLargeModel(true);
@@ -61,6 +64,11 @@ public class BaseExample extends JFrame {
         getContentPane().add(tablePanel);
         
         setupHeader(new TableFilterHeader(table, AutoChoices.ENABLED));
+        
+        if (ISSUE_38_TEST){
+			TestTableModel.setModelWidth(5);
+			table.setModel(TestTableModel.createTestTableModel(1000));
+        }
     }
     
     private void setupHeader(TableFilterHeader header){
