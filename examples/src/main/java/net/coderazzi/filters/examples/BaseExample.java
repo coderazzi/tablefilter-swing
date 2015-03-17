@@ -51,6 +51,9 @@ public class BaseExample extends JFrame {
 
     private static final long serialVersionUID = 382439526043424492L;
     
+    //https://code.google.com/p/tablefilter-swing/issues/detail?id=37&can=1
+    private static boolean ISSUE_37_TEST = true;
+
     //https://code.google.com/p/tablefilter-swing/issues/detail?id=38&can=1
     private static boolean ISSUE_38_TEST = true;
     
@@ -84,6 +87,16 @@ public class BaseExample extends JFrame {
     	
     	getEditor(header, TestTableModel.DATE, 
     		new DateRenderer(header.getParserModel().getFormat(Date.class)));
+    	
+    	if (ISSUE_37_TEST) {    	
+	    	header.addFilter(new net.coderazzi.filters.Filter(){
+	    		javax.swing.RowFilter r = 
+	    				javax.swing.RowFilter.regexFilter("J|j");
+	        	@Override public boolean include(Entry entry) {
+	        		return r.include(entry);
+	        	}
+	        });
+    	}
     }
     
     private IFilterEditor getEditor(TableFilterHeader header, String name, 

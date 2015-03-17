@@ -191,7 +191,8 @@ abstract class ChoicesHandler implements TableModelListener, Runnable {
         }
 
         @Override public String getStringValue(int index) {
-            return formatters[index].format(getValue(index));
+        	Format f = formatters[index];
+            return f == null ? "" : f.format(getValue(index));
         }
     }
 
