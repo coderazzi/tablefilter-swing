@@ -28,9 +28,9 @@
 		<url>http://code.google.com/p/tablefilter-swing/issues/list</url>
 	</issueManagement>
 	<scm>
-		<url>scm:hg:file:///home/coderazzi/development/workspace/tablefilter-swing</url>
-		<connection>scm:hg:file:///home/coderazzi/development/workspace/tablefilter-swing</connection>
-		<developerConnection>scm:hg:file:///home/coderazzi/development/workspace/tablefilter-swing</developerConnection>
+		<url>https://code.google.com/p/tablefilter-swing/</url>
+		<connection>scm:hg:https://code.google.com/p/tablefilter-swing</connection>
+		<developerConnection>scm:hg:https://code.google.com/p/tablefilter-swing</developerConnection>
 	</scm>
 	<dependencies>
 		<dependency>
