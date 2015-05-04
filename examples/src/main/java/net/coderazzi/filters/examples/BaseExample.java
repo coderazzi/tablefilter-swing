@@ -51,10 +51,10 @@ public class BaseExample extends JFrame {
 
     private static final long serialVersionUID = 382439526043424492L;
     
-    //https://code.google.com/p/tablefilter-swing/issues/detail?id=37&can=1
+    //https://bitbucket.org/coderazzi/tablefilter-swing/issue/37/filter-throws-exception-when-some-columns
     private static boolean ISSUE_37_TEST = true;
 
-    //https://code.google.com/p/tablefilter-swing/issues/detail?id=38&can=1
+    //https://bitbucket.org/coderazzi/tablefilter-swing/issue/38/error-when-removing-columns-from-table
     private static boolean ISSUE_38_TEST = true;
     
     public BaseExample(int rows) {

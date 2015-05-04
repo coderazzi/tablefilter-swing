@@ -236,7 +236,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
                 rowsUpdated(firstRow, lastRow, column);
             } else if (event == TableModelEvent.UPDATE) {
                 // an update can signal that all cells have changed
-                // http://code.google.com/p/tablefilter-swing/issues/detail?id=8
+                // https://bitbucket.org/coderazzi/tablefilter-swing/issue/
+                //    8/enabled-adaptive-choices-cause
                 if (lastRow >= rows.size()) {
                     rows.clear();
                     rowsAdded(0, rowEntry.getModel().getRowCount() - 1);
@@ -312,7 +313,8 @@ class AdaptiveChoicesHandler extends ChoicesHandler {
             if (changed) {
                 // only propagate changes if this is not an editor
                 // or the editor has no focus (is still editing)
-                // http://code.google.com/p/tablefilter-swing/issues/detail?id=11
+                // https://bitbucket.org/coderazzi/tablefilter-swing/issue/
+                //   11/slow-progress-with-instant-filtering
                 int editorHandle = getEditorHandle(filter.column);
                 if ((editorHandle == -1)
                         || !editorHandles[editorHandle].editor.isEditing()) {

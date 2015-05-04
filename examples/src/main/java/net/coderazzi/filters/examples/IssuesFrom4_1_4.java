@@ -54,7 +54,8 @@ public class IssuesFrom4_1_4 extends JFrame {
 	static final int ROWS=20;
 	/**
 	 * To verify that the issue 17
-	 * http://code.google.com/p/tablefilter-swing/issues/detail?id=17
+	 * https://bitbucket.org/coderazzi/tablefilter-swing/issue/
+	 *   17/setfilteronupdates-true-not-working-on
 	 * is a JDK bug, 
 	 * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6791934
 	 * set the next variable to false.

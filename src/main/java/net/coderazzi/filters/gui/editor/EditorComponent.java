@@ -702,7 +702,8 @@ class EditorComponent extends JTextField {
                 int moveCaretLeft = 0;
                 boolean singleCharacter = text.length() == 1;
                 // avoid new lines, etc, see
-                // http://code.google.com/p/tablefilter-swing/issues/detail?id=13
+                // https://bitbucket.org/coderazzi/tablefilter-swing/issue/
+                //   13/nullpointerexception-when-pasting-a-string
                 text = newLinePattern.matcher(text).replaceAll(" ");
                 if (autoCompletion && userUpdate && singleCharacter) {
                     String now = getText();

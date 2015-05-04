@@ -25,12 +25,12 @@
 		</license>
 	</licenses>
 	<issueManagement>
-		<url>http://code.google.com/p/tablefilter-swing/issues/list</url>
+		<url>https://bitbucket.org/coderazzi/tablefilter-swing/issues</url>
 	</issueManagement>
 	<scm>
-		<url>https://code.google.com/p/tablefilter-swing/</url>
-		<connection>scm:hg:https://code.google.com/p/tablefilter-swing</connection>
-		<developerConnection>scm:hg:https://code.google.com/p/tablefilter-swing</developerConnection>
+		<url>https://bitbucket.org/coderazzi/tablefilter-swing</url>
+		<connection>scm:hg:https://bitbucket.org/coderazzi/tablefilter-swing</connection>
+		<developerConnection>scm:hg:https://bitbucket.org/coderazzi/tablefilter-swing</developerConnection>
 	</scm>
 	<dependencies>
 		<dependency>
