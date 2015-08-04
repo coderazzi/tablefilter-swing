@@ -614,7 +614,6 @@ class EditorComponent extends JTextField {
                 filter = null;
                 content = text;
                 error = true;
-                match = null;
             }
 
             setError(error);

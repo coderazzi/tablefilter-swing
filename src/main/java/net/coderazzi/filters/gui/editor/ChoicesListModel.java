@@ -204,6 +204,7 @@ public class ChoicesListModel extends AbstractListModel
             TreeSet<Choice> alphaContent = getAlphabeticallySortedContent();
             Choice top = alphaContent.ceiling(choice);
             Choice low = alphaContent.floor(choice);
+            int len = choice.str.length();
             int clen = (top == null)
                 ? -1
                 : ChoiceMatch.getMatchingLength(top.str, choice.str,
@@ -216,7 +217,7 @@ public class ChoicesListModel extends AbstractListModel
             ret.index = match.idx;
             ret.content = match.get(renderedContent);
             ret.len = Math.max(clen, flen);
-            ret.exact = match.str.length() == choice.str.length();
+            ret.exact = (match.str.length() == len) && (len == 0 || ret.len > 0);
         }
         return ret;
     }
