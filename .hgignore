@@ -1,4 +1,4 @@
-
+.idea/workspace.xml
 syntax: regexp
 ^bin$
 syntax: regexp
