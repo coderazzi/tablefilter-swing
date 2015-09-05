@@ -74,7 +74,6 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         	TestTableModel.setLargeModel(true);
         }
         JPanel tablePanel = createGui(modelRows);
-        //table.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         getContentPane().add(tablePanel);
         setJMenuBar(createMenu(tablePanel, modelRows));
         filterHeader.setTable(table);
@@ -92,16 +91,14 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         filterHeader = new TableFilterHeader();
         filterHeader.addHeaderObserver(new IFilterHeaderObserver() {
 
-            @Override
-            public void tableFilterUpdated(
+            @Override public void tableFilterUpdated(
                     TableFilterHeader header,
                     IFilterEditor editor,
                     TableColumn tableColumn) {
                 // no need to react
             }
 
-            @Override
-            public void tableFilterEditorExcluded(
+            @Override public void tableFilterEditorExcluded(
                     TableFilterHeader header,
                     IFilterEditor editor,
                     TableColumn tableColumn) {
@@ -110,8 +107,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
                         true);
             }
 
-            @Override
-            public void tableFilterEditorCreated(
+            @Override public void tableFilterEditorCreated(
                     TableFilterHeader header,
                     IFilterEditor editor,
                     TableColumn tableColumn) {
