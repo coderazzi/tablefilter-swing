@@ -27,6 +27,7 @@ package net.coderazzi.filters.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ComponentAdapter;
@@ -34,11 +35,10 @@ import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.Format;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Set;
 
 import javax.swing.DefaultRowSorter;
@@ -218,7 +218,9 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
     	if ("model".equals(evt.getPropertyName())){
     		updateLook();
     		recreateController();
-    	}
+    	} else if ("componentOrientation".equals(evt.getPropertyName())){
+            recreateController();
+        }
     }
 
     /**
@@ -240,6 +242,7 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
         if (oldTable != null) {
             oldTable.removeComponentListener(resizer);
             oldTable.removePropertyChangeListener("model", this);
+            oldTable.removePropertyChangeListener("componentOrientation", this);
         }
 
         filtersHandler.setTable(table);
@@ -251,6 +254,7 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
             recreateController();
             table.addComponentListener(resizer);
             table.addPropertyChangeListener("model", this);
+            table.addPropertyChangeListener("componentOrientation", this);
         }
 
         filtersHandler.enableNotifications(true);
@@ -869,7 +873,7 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
         private static final long serialVersionUID = -5183169239497633085L;
 
         /** The list of columns, sorted in the view way. */
-        private List<FilterColumnPanel> columns;
+        private LinkedList<FilterColumnPanel> columns;
 
         /** Preferred size of the component. */
         private Dimension preferredSize;
@@ -917,12 +921,10 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
 
             boolean enabled = filtersHandler.isEnabled();
             int count = tableColumnModel.getColumnCount();
-            columns = new ArrayList<FilterColumnPanel>(count);
-
+            columns = new LinkedList<FilterColumnPanel>();
             for (int i = 0; i < count; i++) {
                 createColumn(i, enabled);
             }
-
             preferredSize = new Dimension(0,
                     (count == 0) ? 0
                                  : (columns.get(0).h + filterRowHeightDelta));
@@ -1061,7 +1063,6 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
 	            if (handlerEnabled == null) {
 	                handlerEnabled = filtersHandler.isEnabled();
 	            }
-	
 	            createColumn(e.getToIndex(), handlerEnabled);
 	            update();
         	}
@@ -1077,8 +1078,7 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
 	            if (handlerEnabled == null) {
 	                handlerEnabled = filtersHandler.isEnabled();
 	            }
-	
-	            FilterColumnPanel fcp = columns.remove(e.getFromIndex());
+                FilterColumnPanel fcp = columns.remove(e.getFromIndex());
 	            fcp.detach();
 	            remove(fcp);
 	            update();
@@ -1124,12 +1124,17 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
          */
         void placeComponents() {
             int x = 0;
+            Iterator<FilterColumnPanel> it =
+                    getTable().getComponentOrientation() ==
+                            ComponentOrientation.RIGHT_TO_LEFT?
+                    columns.descendingIterator() :
+                    columns.iterator();
 
-            for (FilterColumnPanel fcp : columns) {
+            while (it.hasNext()) {
+                FilterColumnPanel fcp = it.next();
                 fcp.setBounds(x, 0, fcp.w, preferredSize.height);
                 x += fcp.w;
             }
-
             revalidate();
         }
 

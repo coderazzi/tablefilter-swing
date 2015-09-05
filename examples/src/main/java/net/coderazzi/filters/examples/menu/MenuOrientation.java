@@ -25,28 +25,28 @@
 
 package net.coderazzi.filters.examples.menu;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.table.TableColumn;
-
 import net.coderazzi.filters.examples.ActionHandler;
 
+import java.awt.ComponentOrientation;
 
-/** Recover a column, customizing the associated table columns. */
-public class MenuColumnRecover extends AbstractMenuAction {
 
-    private static final long serialVersionUID = 9137226745345048519L;
+public class MenuOrientation extends AbstractMenuCheckBoxAction {
 
-    private TableColumn tc;
+    private static final long serialVersionUID = 9137226745345035519L;
 
-    public MenuColumnRecover(ActionHandler main, TableColumn tc) {
-        super("Recover column " + (String) tc.getHeaderValue(), main);
-        this.tc = tc;
+    public MenuOrientation(ActionHandler main) {
+        super("Orientation left to right", main);
+        setSelected(main.getTable().getComponentOrientation()
+                != ComponentOrientation.RIGHT_TO_LEFT);
     }
 
-    @Override public void actionPerformed(ActionEvent e) {
-        main.getTable().getColumnModel().addColumn(tc);
-        main.getFilterMenu().remove(this);
+    @Override protected void actionPerformed(boolean selected) {
+        main.getTable().applyComponentOrientation(selected ?
+                ComponentOrientation.LEFT_TO_RIGHT:
+                ComponentOrientation.RIGHT_TO_LEFT);
+        main.getTable().repaint();
+        main.getFilterHeader().repaint();
+        main.getTable().getTableHeader().repaint();
     }
 
 }

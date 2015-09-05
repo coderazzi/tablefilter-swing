@@ -24,7 +24,7 @@
  */
 package net.coderazzi.filters.examples;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Date;
 import java.util.HashSet;
@@ -74,6 +74,7 @@ import net.coderazzi.filters.examples.menu.MenuModelAdd;
 import net.coderazzi.filters.examples.menu.MenuModelChange;
 import net.coderazzi.filters.examples.menu.MenuModelColumnsChange;
 import net.coderazzi.filters.examples.menu.MenuModelRemove;
+import net.coderazzi.filters.examples.menu.MenuOrientation;
 import net.coderazzi.filters.examples.menu.MenuPosition;
 import net.coderazzi.filters.examples.menu.MenuReset;
 import net.coderazzi.filters.examples.menu.MenuRowSize;
@@ -118,6 +119,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         	TestTableModel.setLargeModel(true);
         }
         JPanel tablePanel = createGui(modelRows);
+        //table.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         getContentPane().add(tablePanel);
         setJMenuBar(createMenu(tablePanel, modelRows));
         filterHeader.setTable(table);
@@ -147,14 +149,16 @@ public class TableFilterExample extends JFrame implements ActionHandler {
                         IFilterEditor     editor,
                         TableColumn       tableColumn) {
                     // remove the menu entry associated to this editor
+                    System.out.println("Removing now "+(String) tableColumn.getHeaderValue());
                     getMenu(filtersMenu, (String) tableColumn.getHeaderValue(),
-                        true);
+                            true);
                 }
 
                 @Override public void tableFilterEditorCreated(
                         TableFilterHeader header,
                         IFilterEditor     editor,
                         TableColumn       tableColumn) {
+                    System.out.println("Creaitn now "+tableColumn.getHeaderValue()+"/"+tableColumn.getModelIndex()+"/"+editor.getModelIndex());
                     handleNewColumn(editor, tableColumn);
                 }
             });
@@ -180,6 +184,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         tableMenu.add(new MenuModelRemove(this));
         tableMenu.addSeparator();
         tableMenu.add(new MenuAutoResize(this));
+        tableMenu.add(new MenuOrientation(this));
         tableMenu.addSeparator();
         tableMenu.add(new MenuModelChange(this, modelRows));
         tableMenu.add(new MenuModelChange(this, -1));
@@ -368,8 +373,13 @@ public class TableFilterExample extends JFrame implements ActionHandler {
 
     /** {@link ActionHandler} interface. */
     @Override public void updateFilterInfo(IFilterEditor editor) {
+        int n = table.getColumnModel().getColumnCount();
+        System.out.println("--- "+n);
+        for(int i=0;i<n;i++)System.out.println(table.getColumnModel().getColumn(i).getHeaderValue());
     	String columnName = (String) table.getColumnModel().getColumn(
     			editor.getModelIndex()).getHeaderValue();
+        System.out.println(editor.getModelIndex()+":"+columnName);
+        if (false) return;
         JMenu menu = (JMenu) getMenu(filtersMenu, columnName, false);
         ((JCheckBoxMenuItem) getMenu(menu, MenuAutoCompletion.NAME, false))
             .setSelected(editor.isAutoCompletion());
