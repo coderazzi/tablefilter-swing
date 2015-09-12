@@ -56,7 +56,7 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.1</version>
 				<configuration>
-					<tagBase>file:///home/coderazzi/development/workspace/tablefilter-swing</tagBase>
+					<tagBase>file:///home/coderazzi/development/tablefilter-swing</tagBase>
 					<mavenExecutorId>forked-path</mavenExecutorId>
 				</configuration>
 			</plugin>
