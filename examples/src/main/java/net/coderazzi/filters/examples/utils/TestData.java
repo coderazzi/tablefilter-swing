@@ -134,7 +134,7 @@ public class TestData {
         }
     }
 
-    public static class Flag extends ImageIcon {
+    public static class Flag extends ImageIcon implements Comparable<Flag>{
         private static final long serialVersionUID = 1242769439980562528L;
         private Double redAmount;
         private String fileLocation;
@@ -177,6 +177,11 @@ public class TestData {
         
         public String getFileLocation(){
         	return fileLocation;
+        }
+
+        @Override
+        public int compareTo(Flag o) {
+            return fileLocation.compareTo(o.fileLocation);
         }
     }
 

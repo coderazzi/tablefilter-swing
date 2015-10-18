@@ -483,6 +483,10 @@ public class FiltersHandler extends AndFilter
         }
     }
 
+    public void updateModel(){
+        autoSelector.setSorter(getTable());
+    }
+
     /**
      * <p>Class performing the auto selection.</p>
      *
@@ -500,15 +504,13 @@ public class FiltersHandler extends AndFilter
         boolean autoSelection = FilterSettings.autoSelection;
 
         public void replacedTable(JTable oldTable, JTable newTable) {
-            String EVENTS[] = { "rowSorter", "model" };
-            for (String e : EVENTS) {
-                if (oldTable != null) {
-                    oldTable.removePropertyChangeListener(e, this);
-                }
+            String event = "rowSorter";
+            if (oldTable != null) {
+                oldTable.removePropertyChangeListener(event, this);
+            }
 
-                if (newTable != null) {
-                    newTable.addPropertyChangeListener(e, this);
-                }
+            if (newTable != null) {
+                newTable.addPropertyChangeListener(event, this);
             }
 
             setSorter(newTable);
@@ -518,7 +520,7 @@ public class FiltersHandler extends AndFilter
             setSorter((JTable) evt.getSource());
         }
 
-        private void setSorter(JTable table) {
+        public void setSorter(JTable table) {
             if (this.sorter != null) {
                 this.sorter.removeRowSorterListener(this);
                 this.sorter.setRowFilter(null);

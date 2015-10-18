@@ -857,6 +857,7 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
                 getForeground(), getBackground());
         add(columnsController, BorderLayout.WEST);
         revalidate();
+        filtersHandler.updateModel();
         filtersHandler.enableNotifications(true);
     }
 

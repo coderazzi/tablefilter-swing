@@ -32,6 +32,7 @@ import java.awt.Graphics;
 import java.io.Serializable;
 import java.text.Format;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -172,7 +173,7 @@ public abstract class CustomChoice implements Serializable {
                             	return false;
                             }
                             Format fmt = ed.getFormat();
-                            String s = (fmt == null) ? o.toString() : 
+                            String s = (fmt == null) ? o.toString() :
                             	fmt.format(o);
                             return pattern.matcher(s).matches();
                         }
