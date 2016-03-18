@@ -165,7 +165,7 @@ public class Parser implements IParser {
             int total = expression.length();
             for (int i = 0; i < total; i++) {
                 char ch = expression.charAt(i);
-                if ((ch == '*') || (ch == '?') || (ch == '\\')) {
+                if ((ch == '*') || (ch == '?')) {
                     escapeBuffer.append(expression.substring(lastAdded, i));
                     escapeBuffer.append('\\').append(ch);
                     lastAdded = i + 1;
@@ -422,62 +422,56 @@ public class Parser implements IParser {
 
             for (char c : s.toCharArray()) {
 
-                switch (c) {
-
-                case '\\':
-
-                    if (escaped) {
-                        sb.append("\\");
-                    }
-
-                    escaped = !escaped;
-
-                    break;
-
-                case '[':
-                case ']':
-                case '^':
-                case '$':
-                case '+':
-                case '{':
-                case '}':
-                case '|':
-                case '(':
-                case ')':
-                case '.':
-                    sb.append('\\').append(c);
-                    escaped = false;
-
-                    break;
-
-                case '*':
-
+                if (c == '*'){
                     if (escaped) {
                         sb.append("\\*");
                         escaped = false;
                     } else {
                         sb.append(".*");
                     }
-
-                    break;
-
-                case '?':
-
+                } else if (c == '?'){
                     if (escaped) {
                         sb.append("\\?");
                         escaped = false;
                     } else {
                         sb.append(".");
                     }
+                } else if (c == '\\') {
+                    if (escaped) {
+                        sb.append("\\\\\\\\");
+                    }
+                    escaped = !escaped;
+                } else {
+                    if (escaped) {
+                        sb.append("\\\\");
+                        escaped = false;
+                    }
+                    switch (c) {
+                        case '[':
+                        case ']':
+                        case '^':
+                        case '$':
+                        case '+':
+                        case '{':
+                        case '}':
+                        case '|':
+                        case '(':
+                        case ')':
+                        case '.':
+                            sb.append('\\').append(c);
+                            break;
 
-                    break;
+                        default:
+                            sb.append(c);
+                            break;
 
-                default:
-                    sb.append(c);
-                    escaped = false;
-
-                    break;
+                    }
                 }
+
+            }
+
+            if (escaped) {
+                sb.append("\\\\");
             }
 
             if (instant) {
