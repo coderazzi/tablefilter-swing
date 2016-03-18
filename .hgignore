@@ -9,3 +9,5 @@ syntax: regexp
 ^pom\.xml\.releaseBackup$
 syntax: regexp
 ^doc/api$
+syntax: regexp
+^.idea/libraries$
