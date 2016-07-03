@@ -174,28 +174,17 @@ class PositionHelper implements PropertyChangeListener {
             private static final long serialVersionUID = 7109623726722227105L;
 
             @Override public void setView(Component view) {
+                // if the view is not a table header, somebody is doing
+                // funny stuff. not much to do!
                 if (view instanceof JTableHeader) {
-                    // if the view is not a table header, somebody is doing
-                    // funny stuff. not much to do!
                     removeTableHeader();
-                    placeTableHeader(view);
-                    super.setView(filterHeader);
-                }
-            }
-
-            /**
-             * Locates the passed component in the header, with the position
-             * depending on the current header location.
-             *
-             * @param  header  the table header, added to the current filter
-             *                 header
-             */
-            private void placeTableHeader(Component header) {
-                if (header != null) {
-                    filterHeader.add(header,
-                        (location == Position.TOP) ? BorderLayout.SOUTH
-                                                   : BorderLayout.NORTH);
+                    // the view is always added, even if set non visible
+                    // this way, it can be recovered if the position changes
+                    view.setVisible(location != Position.REPLACE);
+                    filterHeader.add(view, location == Position.INLINE ?
+                            BorderLayout.NORTH : BorderLayout.SOUTH);
                     filterHeader.revalidate();
+                    super.setView(filterHeader);
                 }
             }
 

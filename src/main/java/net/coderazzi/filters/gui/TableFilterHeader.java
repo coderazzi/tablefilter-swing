@@ -105,12 +105,13 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
      *   <li>INLINE: the filter is placed below the table header, above the
      *     table's content.</li>
      *   <li>NONE: the filter is not automatically placed.</li>
+     *   <li>REPLACE: the filter replaces the header (column names).</li>
      * </ul>
      *
      * @author  Luis M Pena - lu@coderazzi.net
      */
     public enum Position {
-        TOP, INLINE, NONE
+        TOP, INLINE, NONE, REPLACE
     }
 
     /** whether the user has explicitly provided colors/font. */

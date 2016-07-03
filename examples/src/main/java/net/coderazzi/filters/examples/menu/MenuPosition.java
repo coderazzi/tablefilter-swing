@@ -57,9 +57,10 @@ public class MenuPosition extends JMenu implements ActionListener {
         super("position");
         this.main = main;
         this.tablePanel = tablePanel;
-        options.put("top (automatic)", Position.TOP);
-        options.put("inline (automatic)", Position.INLINE);
+        options.put("top", Position.TOP);
+        options.put("inline", Position.INLINE);
         options.put("bottom (manual)", Position.NONE);
+        options.put("top, no header", Position.REPLACE);
 
         Position select = main.getFilterHeader().getPosition();
         ButtonGroup group = new ButtonGroup();
