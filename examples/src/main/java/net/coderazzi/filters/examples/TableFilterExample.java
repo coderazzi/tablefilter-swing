@@ -79,6 +79,12 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         filterHeader.setTable(table);
     }
 
+    @Override
+    public void recreate() {
+        dispose();
+        init(DEFAULT_MODEL_ROWS);
+    }
+
     private JPanel createGui(int modelRows) {
         tableModel = TestTableModel.createTestTableModel(modelRows);
         table = new JTable(tableModel);
@@ -167,6 +173,8 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         ret.add(createAppearanceMenu());
         ret.add(new MenuMaxPopupRows(this));
         ret.add(new MenuMaxHistory(this, null));
+        ret.addSeparator();
+        ret.add(new MenuParser(this));
         ret.addSeparator();
         ret.add(new MenuReset(this, null));
 

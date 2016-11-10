@@ -51,4 +51,7 @@ public interface ActionHandler {
 
     /** Updates the filter information associated to the given editor. */
     void updateFilterInfo(IFilterEditor editor);
+
+    /** Recreates the filter header */
+    void recreate();
 }

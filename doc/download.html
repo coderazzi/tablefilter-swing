@@ -15,8 +15,8 @@
   
     <p>
       <span class="mark">TableFilter</span> is open source, under 
-      <a href='#license'>MIT license</a>. Its latest version, 5.2.2, has been
-      released the 17th March 2016. The changelog is available
+      <a href='#license'>MIT license</a>. Its latest version, 5.3.0, has been
+      released the 10th November 2016. The changelog is available
       <a href='#history'>below</a>
     </p>
     
@@ -26,7 +26,7 @@
 	       		<li>Available at BitBucket, as the project 
 	       			<a href='https://bitbucket.org/coderazzi/tablefilter-swing'>tablefilter-swing</a></li>
 	   			<li>Alternatively, they can be downloaded directly as a
-	   				single zip file:<a href='download/tablefilter-src-v5.2.2.zip'>tablefilter-src-v5.2.2.zip</a></li>
+	   				single zip file:<a href='download/tablefilter-src-v5.3.0.zip'>tablefilter-src-v5.3.0.zip</a></li>
 	   			<li>The last Java 5 release was bundled on release 4.5.0: <a href='download/tablefilter-src-v4.5.0.zip'>tablefilter-src-v4.5.0.zip</a></li>
 	       	</ul>
        	</li>
@@ -44,8 +44,8 @@
 			   		javadoc) can be downloaded directly from the maven repository. The
 			   		last versions are hosted at:
 			   		<ul>
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/5.2.2/'>
-			   		 	Version 5.2.2</a></li>
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/5.3.0/'>
+			   		 	Version 5.3.0</a></li>
 			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.5.0/'>
 			   		 	Version 4.5.0 for Java 5</a></li> 
 				    </ul>
@@ -102,6 +102,15 @@ THE SOFTWARE.</pre>
     </p>
 
   <h2><a name="history">History</a></h2>
+
+	<h3>Version 5.3.0 ( 10th November 2016 )</h3>
+	<p>Introduction of the <a href='api/net/coderazzi/filters/gui/LooseParserModel.html'>LooseParserModel</a> parser
+		model, explained in the <a href="howto.html#loose">HowTo section</a>.
+	</p>
+	<p>It also modifies the behaviour of the default parser. On previous versions, entering a filter such as
+	<b>Step</b> would be equivalent to <b>*Step</b>, that is, showing all entries with text starting with Step. The
+	new behaviour is showing all entries that contain Step at some place.</p>
+
 
 	<h3>Version 5.2.2 ( 17th March 2016 )</h3>
 	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issues/42/filter-problem-when-the-value-contains'>issue 42</a>:

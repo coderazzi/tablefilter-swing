@@ -113,8 +113,15 @@ public class ParserModel implements IParserModel {
         Format fmt = (cl == String.class) ? null : editor.getFormat();
         Comparator cmp = (fmt == null) ? null : editor.getComparator();
 
-        return new Parser(fmt, cmp, getStringComparator(ignoreCase), ignoreCase,
+        return createParser(fmt, cmp, getStringComparator(ignoreCase), ignoreCase,
                 editor.getModelIndex());
+    }
+
+    /** Creates the parser as required with the given parameters */
+    protected IParser createParser(Format fmt, Comparator cmp,
+                                  Comparator stringCmp, boolean ignoreCase,
+                                  int modelIndex) {
+        return new Parser(fmt, cmp, stringCmp, ignoreCase, modelIndex);
     }
 
     @Override public boolean isIgnoreCase() {

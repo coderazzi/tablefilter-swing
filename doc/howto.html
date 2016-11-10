@@ -12,6 +12,7 @@
     <li><a href='#sortingevents'>Listening for sorting events</a></li>
     <li><a href='#userfilters'>Create additional user filters</a></li>
     <li><a href='#remove'>Remove the table filter header</a></li>
+    <li><a href='#loose'>Hide the usage of default wildcards on the filter editors</a></li>
   </ul>
 
 <div class="hr">&nbsp;</div>
@@ -98,7 +99,24 @@ check.addItemListener(new ItemListener() {
 
 	<div class="hr">&nbsp;</div>
 
-   </ul>
+      <li><a name='loose'><span class='mark'>Hide the usage of default wildcards on the filter editors</span></a>
+          <p>The default parser model allows the user to enter text such as <b>molly</b> to display all rows that
+          contain the given text. It is equivalent to entering <b>*molly*</b>, and the filter will show this
+          equivalent representation.</p>
+
+          <p>This can be avoided by using a provided alternate parser model:</p>
+
+          <p><pre>FilterSettings.parserModelClass = net.coderazzi.filters.gui.LooseParserModel.class;</pre></p>
+
+          <p>This alternate parser does not display the wildcards, which is an initial advantage. However, it can
+              produce unexpected results in specific cases. For example, in a column with integers, entering
+              as filter the expression <b>2</b> would list all entries that contain that digit and not only
+              the entries with the exact value 2. The default parser would correctly display as filter <b>*2*</b></p>
+      </li>
+
+      <div class="hr">&nbsp;</div>
+
+  </ul>
 
 
 
