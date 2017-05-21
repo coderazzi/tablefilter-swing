@@ -217,7 +217,7 @@ public class ChoicesListModel extends AbstractListModel
             ret.index = match.idx;
             ret.content = match.get(renderedContent);
             ret.len = Math.max(clen, flen);
-            ret.exact = (match.str.length() == len) && (len == 0 || ret.len > 0);
+            ret.exact = (match.str.length() == ret.len) && (len == 0 || ret.len > 0);
         }
         return ret;
     }
