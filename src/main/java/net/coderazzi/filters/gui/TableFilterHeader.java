@@ -25,11 +25,7 @@
 
 package net.coderazzi.filters.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.beans.PropertyChangeEvent;
@@ -49,6 +45,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
@@ -1033,11 +1030,62 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
 
         /** {@link TableColumnModelListener} interface. */
         @Override public void columnMoved(TableColumnModelEvent e) {
-
             if (e.getFromIndex() != e.getToIndex()) {
                 FilterColumnPanel fcp = columns.remove(e.getFromIndex());
                 columns.add(e.getToIndex(), fcp);
                 placeComponents();
+            }
+            // previous block places each filter column in the right position
+            // BUT does not take in consideration the dragging distance
+            JTableHeader header = getTable().getTableHeader();
+            TableColumn tc = header.getDraggedColumn();
+            if (tc != null) {
+                boolean rightToLeft = getTable().getComponentOrientation() ==
+                        ComponentOrientation.RIGHT_TO_LEFT;
+                // Iterate the filter columns, we need to know the previous
+                // and the current column
+                Iterator<FilterColumnPanel> it = rightToLeft?
+                        columns.descendingIterator() :
+                        columns.iterator();
+                FilterColumnPanel previous = null;
+                while (it.hasNext()) {
+                    FilterColumnPanel fcp = it.next();
+                    if (fcp.tc == tc){
+                        Rectangle r = null;
+                        double x = 0;
+                        if (previous != null) {
+                            r = previous.getBounds();
+                            // obtain on X the position that the current
+                            // dragged column should be IF there would be no dragging
+                            // (previous panel plus its width)
+                            x = r.getX() + r.getWidth();
+                        }
+                        // shift now the column to the correct distance
+                        r = fcp.getBounds(r);
+                        r.translate((int)(x - r.getX() + header.getDraggedDistance()), 0);
+                        fcp.setBounds(r);
+
+                        // one detail is left: the Z order of this column should be lower
+                        // that the Z order of the column being dragged over
+                        if (rightToLeft) {
+                            // in this case, previous is the next column, not the one before!
+                            previous = it.hasNext()? it.next() : null;
+                        }
+                        if (previous != null) {
+                            int prevZOrder = getComponentZOrder(previous);
+                            int zOrder = getComponentZOrder(fcp);
+                            boolean overPreviousDragging =  rightToLeft?
+                                    header.getDraggedDistance() > 0 :
+                                    header.getDraggedDistance() < 0;
+                            if (overPreviousDragging != (zOrder < prevZOrder)) {
+                                setComponentZOrder(previous, zOrder);
+                                setComponentZOrder(fcp, prevZOrder);
+                            }
+                        }
+                        break;
+                    }
+                    previous = fcp;
+                }
             }
         }
 
