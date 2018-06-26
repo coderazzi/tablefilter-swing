@@ -32,13 +32,13 @@
 	    	     noindex="false" 
 	    	     nonavbar="false" 
 	    	     notree="false" 
-	    	     source="1.7" 
+	    	     source="1.7"
 	    	     sourcepath="src/main/java" 
 	    	     excludepackagenames='net.coderazzi.filters.gui.editor'
 	    	     splitindex="true" 
 	    	     use="true" 
 	    	     version="true">
-	        <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+	        <link href="https://docs.oracle.com/javase/10/docs/api/"/>
 	    </javadoc>
 	</target>
 
@@ -65,7 +65,7 @@
 	<target name='example' depends='check'>
 		<property name="tmp-bin" value="target/build"/>
 		<property name="example-dir" value="${website-dir}/download"/>
-		<property name="example-jar" value="${example-dir}/example6.jar"/>
+		<property name="example-jar" value="${example-dir}/example.jar"/>
 		<mkdir dir='${tmp-bin}'/>
 		<mkdir dir='${example-dir}'/>
 		<javac destdir='${tmp-bin}' 

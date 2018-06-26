@@ -12,7 +12,7 @@
 </security>
 <resources>
   <j2se version="1.6+" />
-  <jar href="example6.jar"/>
+  <jar href="example.jar"/>
 </resources>
 <application-desc main-class="net.coderazzi.filters.examples.TableFilterExample" />
 </jnlp>
