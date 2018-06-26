@@ -29,8 +29,8 @@
 	</issueManagement>
 	<scm>
 		<url>https://bitbucket.org/coderazzi/tablefilter-swing</url>
-		<connection>scm:hg:https://bitbucket.org/coderazzi/tablefilter-swing</connection>
-		<developerConnection>scm:hg:https://bitbucket.org/coderazzi/tablefilter-swing</developerConnection>
+		<connection>scm:hg:ssh://hg@bitbucket.org/coderazzi/tablefilter-swing</connection>
+		<developerConnection>scm:hg:ssh://hg@bitbucket.org/coderazzi/tablefilter-swing</developerConnection>
 	</scm>
 	<dependencies>
 		<dependency>
