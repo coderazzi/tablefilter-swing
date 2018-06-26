@@ -317,6 +317,16 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     }
 
     /** IFilterEditor method. */
+    @Override public boolean isAllowedInstantVanishing() {
+        return editor.isAllowedInstantVanishing();
+    }
+
+    /** IFilterEditor method. */
+    @Override public void setAllowedInstantVanishing(boolean enable) {
+        editor.setAllowedInstantVanishing(enable);
+    }
+
+    /** IFilterEditor method. */
     @Override public boolean isInstantFiltering() {
         return editor.isInstantFiltering();
     }

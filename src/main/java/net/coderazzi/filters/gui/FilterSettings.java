@@ -118,6 +118,10 @@ public class FilterSettings {
     public static boolean instantFiltering = Boolean.parseBoolean(getString(
                 "InstantFiltering", "true"));
 
+    /** Whether to allow vanishing during instant filtering, false by default. */
+    public static boolean allowInstantVanishing = Boolean.parseBoolean(getString(
+            "AllowInstantVanishing", "false"));
+
     /** The default icon used to represent null/empty values. */
     public static Icon matchEmptyFilterIcon = new ImageIcon(IParser.class
                 .getResource("resources/matchEmptyIcon.png"));

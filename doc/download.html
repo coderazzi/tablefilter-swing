@@ -15,8 +15,8 @@
   
     <p>
       <span class="mark">TableFilter</span> is open source, under 
-      <a href='#license'>MIT license</a>. Its latest version, 5.3.1, has been
-      released the 22nd May 2017. The changelog is available
+      <a href='#license'>MIT license</a>. Its latest version, 5.3.2, has been
+      released the 22nd June 2018. The changelog is available
       <a href='#history'>below</a>
     </p>
     
@@ -26,7 +26,7 @@
 	       		<li>Available at BitBucket, as the project 
 	       			<a href='https://bitbucket.org/coderazzi/tablefilter-swing'>tablefilter-swing</a></li>
 	   			<li>Alternatively, they can be downloaded directly as a
-	   				single zip file:<a href='download/tablefilter-src-v5.3.1.zip'>tablefilter-src-v5.3.1.zip</a></li>
+	   				single zip file:<a href='download/tablefilter-src-v5.3.2.zip'>tablefilter-src-v5.3.2.zip</a></li>
 	   			<li>The last Java 5 release was bundled on release 4.5.0: <a href='download/tablefilter-src-v4.5.0.zip'>tablefilter-src-v4.5.0.zip</a></li>
 	       	</ul>
        	</li>
@@ -102,6 +102,16 @@ THE SOFTWARE.</pre>
     </p>
 
   <h2><a name="history">History</a></h2>
+
+	<h3>Version 5.3.2 ( 22nd June 2018 )</h3>
+	<p>Improvement: changed behaviour of instant filtering,
+		<a href="https://bitbucket.org/coderazzi/tablefilter-swing/issues/44/change-the-behavior-of-unsuccessfull">issue 40: showing no rows</a>,
+		when the filter excludes them (as opposed to just issue a warning, until the user accepts the new filter).
+		There is now a new new setting - allowInstantVanishing- to enable, for instant filtering,
+		the immediate update of the table even if all rows would
+		vanish when the current filter is applied. By default, it is set to false, providing the same behaviour
+		as in previous versions.
+	</p>
 
 	<h3>Version 5.3.1 ( 22nd May 2017 )</h3>
 	<p>Bug in <a href="https://bitbucket.org/coderazzi/tablefilter-swing/pull-requests/1/fixed-bug-in-auto-choices-mode/diff">auto choices mode</a>,

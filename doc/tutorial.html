@@ -372,7 +372,9 @@
      is only set on the current editor, and implies that the filter is not applied
      unless the user specifically presses the Enter key or moves the focus away.
      This behaviour is helpful to avoid sudden vanishing of the table rows if the
-     user enters some wrong character during the edition.</p> 
+     user enters some wrong character during the edition; it can disabled with the method
+     <a href='api/net/coderazzi/filters/gui/TableFilterHeader.html#setAllowInstantVanishing(boolean)'>TableFilterHeader.setAllowInstantVanishing</a>,
+     </p>
      
      <p>Table changes are automatically handled by the library; in case of
      updates, the table row sorter associated to the table can be updated or
@@ -399,7 +401,12 @@
      <ul>
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#adaptiveChoices'>adaptiveChoices</a>,
 	     true by default, sets or unsets the adaptive choices functionality.</li>
-	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#autoChoices'>autoChoices</a>,
+         <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#allowInstantVanishing'>allowInstantVanishing</a>
+         false by default. It applies only for instant filtering; if false, a filter that would produce an empty set
+             of rows is marked with a warning color, but the table is not update unless the user accepts the filter,
+             (by pressing Enter or moving the focus to another field).
+         </li>
+         <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#autoChoices'>autoChoices</a>,
 	     false by default, defines whether the editors should automatically extract the options from
 	     the associated table models.</li>
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#autoCompletion'>autoCompletion</a>,
@@ -429,7 +436,6 @@
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#ignoreCase'>ignoreCase</a></li>
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#instantFiltering'>instantFiltering</a>, 
 	     whether to enable instant filtering, true by default.</li>
-	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#ignoreCase'>ignoreCase</a></li>
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#matchEmptyFilterIcon'>matchEmptyFilterIcon</a>,
 	     path to the resource with the icon for empty matches.</li>
 	     <li><a href='api/net/coderazzi/filters/gui/FilterSettings.html#matchEmptyFilterString'>matchEmptyFilterString</a>,

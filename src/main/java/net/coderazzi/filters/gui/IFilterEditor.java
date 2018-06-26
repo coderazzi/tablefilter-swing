@@ -153,6 +153,12 @@ public interface IFilterEditor {
     /** Returns the instant filtering flag. */
     boolean isInstantFiltering();
 
+    /** Sets the allow instant vanishing flag. */
+    void setAllowedInstantVanishing(boolean enable);
+
+    /** Returns the instant filtering flag. */
+    boolean isAllowedInstantVanishing();
+
     /**
      * Limits the history size.<br>
      * This limit is only used when the popup contains also choices. Otherwise,

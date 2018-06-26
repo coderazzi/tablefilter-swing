@@ -136,6 +136,9 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
     /** Flag to handle instant filtering support. */
     boolean instantFilteringEnabled = FilterSettings.instantFiltering;
 
+    /** Flag to handle allowance for vanishing during instant filtering */
+    boolean instantVanishingEnabled = FilterSettings.allowInstantVanishing;
+
     /** Flag to handle auto completion support. */
     boolean autoCompletionEnabled = FilterSettings.autoCompletion;
 
@@ -327,6 +330,27 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
     /** Returns true if instant filtering is enabled. */
     public boolean isInstantFiltering() {
         return this.instantFilteringEnabled;
+    }
+
+    /**
+     * Enables vanishing during instant filtering<br>
+     * If enabled, entering a filter expression that produces no rows
+     * will hide; otherwise, the filter is just marked with warning color.
+     */
+    public void setAllowedInstantVanishing(boolean enable) {
+        if (this.instantVanishingEnabled != enable) {
+            this.instantVanishingEnabled = enable;
+            if (columnsController != null) {
+                for (FilterEditor fe : columnsController) {
+                    fe.setAllowedInstantVanishing(enable);
+                }
+            }
+        }
+    }
+
+    /** Returns true if vanishing is enabled during instant filtering */
+    public boolean isAllowedInstantVanishing() {
+        return this.instantVanishingEnabled;
     }
 
     /** Enables auto completion, as the user edits the filter's text. */

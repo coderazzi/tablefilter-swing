@@ -168,6 +168,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         ret.add(new MenuFilterOnUpdates(this));
         ret.add(new MenuIgnoreCase(this, null));
         ret.add(new MenuInstantFiltering(this, null));
+        ret.add(new MenuInstantVanishing(this, null));
         ret.add(new MenuAutoChoices(this, null));
         ret.addSeparator();
         ret.add(createAppearanceMenu());
@@ -261,6 +262,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         menu.add(new MenuAutoCompletion(this, editor));
         menu.add(new MenuIgnoreCase(this, editor));
         menu.add(new MenuInstantFiltering(this, editor));
+        menu.add(new MenuInstantVanishing(this, editor));
         menu.add(new MenuAlphaChoicesOrder(this, editor));
         menu.add(new MenuInverseChoicesOrder(this, editor));
         if (ageColumn){
@@ -347,6 +349,8 @@ public class TableFilterExample extends JFrame implements ActionHandler {
             .setSelected(editor.isIgnoreCase());
         ((JCheckBoxMenuItem) getMenu(menu, MenuInstantFiltering.NAME, false))
             .setSelected(editor.isInstantFiltering());
+        ((JCheckBoxMenuItem) getMenu(menu, MenuInstantVanishing.NAME, false))
+                .setSelected(editor.isAllowedInstantVanishing());
         ((JCheckBoxMenuItem) getMenu(menu, MenuUIEnabled.NAME, false))
         	.setSelected(editor.isUserInteractionEnabled());
         ((JCheckBoxMenuItem) getMenu(menu, MenuAlphaChoicesOrder.NAME, false))

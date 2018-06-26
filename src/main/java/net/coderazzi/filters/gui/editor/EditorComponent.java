@@ -72,6 +72,7 @@ class EditorComponent extends JTextField {
     private Controller controller;
     private boolean focus;
     boolean instantFiltering;
+    boolean allowInstantVanishing;
     boolean autoCompletion;
     boolean warning;
     FilterEditor filterEditor;
@@ -156,6 +157,16 @@ class EditorComponent extends JTextField {
     /** Returns the instant filtering flag. */
     public boolean isInstantFiltering() {
         return instantFiltering;
+    }
+
+    /** Sets the instant filtering flag. */
+    public void setAllowedInstantVanishing(boolean enable) {
+        this.allowInstantVanishing = enable;
+    }
+
+    /** Returns the instant filtering flag. */
+    public boolean isAllowedInstantVanishing() {
+        return allowInstantVanishing;
     }
 
     /** Sets the auto completion flag. */
@@ -575,7 +586,7 @@ class EditorComponent extends JTextField {
                                     ChoiceMatch match,
                                     boolean     userUpdate) {
             RowFilter currentFilter = filter;
-            boolean error = false;
+            boolean localError = false;
             if (text == null) {
                 match = null;
                 text = getText();
@@ -595,11 +606,13 @@ class EditorComponent extends JTextField {
                         filter = textParser.parseText(parseEscape(text));
                     }
                 } else if (instantFiltering && userUpdate) {
-                	// time to try the parseInstantText, if needed
+                	// parse the expression as it is. If this would produce
+                    // no rows, evaluate the filter as an instant expression
                     filter = textParser.parseText(parseEscape(text));
                     if (filterEditor.attemptFilterUpdate(filter)) {
                         content = text;
                         setWarning(false);
+                        currentFilter = filter; // to not apply it again below
                     } else {
                         InstantFilter iFilter = textParser.parseInstantText(
                                 parseEscape(text));
@@ -613,12 +626,12 @@ class EditorComponent extends JTextField {
             } catch (ParseException pex) {
                 filter = null;
                 content = text;
-                error = true;
+                localError = true;
             }
 
-            setError(error);
+            setError(localError);
             if (filter != currentFilter) {
-                if (userUpdate) {
+                if (userUpdate && !allowInstantVanishing) {
                     // in this case, the filter is only propagated if it does
                     // not filter all rows out. If it would, just set the
                     // warning color -unset it otherwise-
