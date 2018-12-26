@@ -147,6 +147,12 @@ public interface IFilterEditor {
     /** Returns the auto completion flag. */
     boolean isAutoCompletion();
 
+    /** Sets the auto hide-popup flag*/
+    void setHidePopupOnTableUpdates(boolean set);
+
+    /** Returns the auto hide-popup flag */
+    boolean isHidePopupOnTableUpdates();
+
     /** Sets the instant filtering flag. */
     void setInstantFiltering(boolean enable);
 

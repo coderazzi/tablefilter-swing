@@ -110,6 +110,13 @@ public class FilterSettings {
     public static Position headerPosition = Position.valueOf(getString(
                 "Header.Position", "INLINE"));
 
+    /**
+     * Set to true to automatically hide any filter popups during table updates.
+     * It is false by default.
+     */
+    public static boolean hidePopupsOnTableUpdates = Boolean.parseBoolean(
+            getString("HidePopupsOnTableUpdates", "false"));
+
     /** Whether to ignore case or not, false by default (case sensitive). */
     public static boolean ignoreCase = Boolean.parseBoolean(getString(
                 "IgnoreCase", "true"));

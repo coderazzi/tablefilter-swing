@@ -81,6 +81,10 @@ abstract class PopupComponent implements PopupMenuListener {
     /** This is the total max number of visible rows (history PLUS choices). */
     private int maxVisibleRows;
 
+    /** Hide popup automatically during table updates */
+    boolean hideOnTableUpdates;
+
+
     /** focusedList always refer to one of choicesList or historyList. */
     JList focusedList;
     JList choicesList;
@@ -116,7 +120,7 @@ abstract class PopupComponent implements PopupMenuListener {
      * duplicates are removed-
      */
     public void addChoices(Collection<?> choices, IChoicesParser parser) {
-        if (choicesModel.addContent(choices, parser)) {
+        if (choicesModel.addContent(choices, parser) && hideOnTableUpdates) {
             hide();
         }
     }
@@ -131,7 +135,9 @@ abstract class PopupComponent implements PopupMenuListener {
     /** Clears the choices lists. */
     public void clearChoices() {
         choicesModel.clearContent();
-        hide();
+        if (hideOnTableUpdates) {
+            hide();
+        }
     }
 
     /** Clears the history list. */
@@ -300,7 +306,17 @@ abstract class PopupComponent implements PopupMenuListener {
     public int getMaxHistory() {
         return historyModel.getMaxHistory();
     }
-    
+
+    /** @see  IFilterEditor#setHidePopupOnTableUpdates(boolean) */
+    public void setHideOnTableUpdates(boolean hide) {
+        hideOnTableUpdates = hide;
+    }
+
+    /** @see  IFilterEditor#isHidePopupOnTableUpdates() */
+    public boolean isHideOnTableUpdates() {
+        return hideOnTableUpdates;
+    }
+
     public void setHistory(List<Object> history){
         historyModel.initialize(history);    	
     }

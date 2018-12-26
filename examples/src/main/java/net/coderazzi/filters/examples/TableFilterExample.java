@@ -166,6 +166,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         ret.add(new MenuAutoSelection(this));
         ret.add(allEnabled);
         ret.add(new MenuFilterOnUpdates(this));
+        ret.add(new MenuHidePopups(this, null));
         ret.add(new MenuIgnoreCase(this, null));
         ret.add(new MenuInstantFiltering(this, null));
         ret.add(new MenuInstantVanishing(this, null));
@@ -202,6 +203,8 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         JMenu ret = new JMenu("Miscellaneous");
         ret.setMnemonic(KeyEvent.VK_M);
         ret.add(new MenuEventsWindow(this));
+        ret.addSeparator();
+        ret.add(new MenuUpdateThread(this));
         ret.addSeparator();
         ret.add(new MenuLookAndFeel(this));
 
@@ -262,6 +265,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         menu.add(new MenuAutoCompletion(this, editor));
         menu.add(new MenuIgnoreCase(this, editor));
         menu.add(new MenuInstantFiltering(this, editor));
+        menu.add(new MenuHidePopups(this, editor));
         menu.add(new MenuInstantVanishing(this, editor));
         menu.add(new MenuAlphaChoicesOrder(this, editor));
         menu.add(new MenuInverseChoicesOrder(this, editor));

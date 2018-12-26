@@ -312,8 +312,19 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     }
 
     /** IFilterEditor method. */
+    @Override public void setHidePopupOnTableUpdates(boolean set){ popup.setHideOnTableUpdates(set);}
+
+    /** IFilterEditor method. */
+    @Override public boolean isHidePopupOnTableUpdates(){return popup.isHideOnTableUpdates();}
+
+    /** IFilterEditor method. */
     @Override public void setInstantFiltering(boolean enable) {
         editor.setInstantFiltering(enable);
+    }
+
+    /** IFilterEditor method. */
+    @Override public boolean isInstantFiltering() {
+        return editor.isInstantFiltering();
     }
 
     /** IFilterEditor method. */
@@ -324,11 +335,6 @@ public class FilterEditor extends JComponent implements IFilterEditor {
     /** IFilterEditor method. */
     @Override public void setAllowedInstantVanishing(boolean enable) {
         editor.setAllowedInstantVanishing(enable);
-    }
-
-    /** IFilterEditor method. */
-    @Override public boolean isInstantFiltering() {
-        return editor.isInstantFiltering();
     }
 
     /** IFilterEditor method. */

@@ -139,6 +139,9 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
     /** Flag to handle auto completion support. */
     boolean autoCompletionEnabled = FilterSettings.autoCompletion;
 
+    /** Flag to handle auto closing popups during table updates*/
+    boolean hidePopupsOnTableUpdates = FilterSettings.hidePopupsOnTableUpdates;
+
     /** This is the total max number of visible rows (history PLUS choices). */
     int maxHistory = FilterSettings.maxPopupHistory;
 
@@ -375,6 +378,23 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
     /** Returns true if auto selection is enabled. */
     public boolean isAutoSelection() {
         return filtersHandler.isAutoSelection();
+    }
+
+    /** Enables / Disables automatic hiding of popups during table updates */
+    public void setHidePopupsOnTableUpdates(boolean enable) {
+        if (this.hidePopupsOnTableUpdates != enable) {
+            this.hidePopupsOnTableUpdates = enable;
+            if (columnsController != null) {
+                for (FilterEditor fe : columnsController) {
+                    fe.setHidePopupOnTableUpdates(enable);
+                }
+            }
+        }
+    }
+
+    /** Returns true if popups automatically hide during table updates. */
+    public boolean isHidePopupsOnTableUpdates() {
+        return hidePopupsOnTableUpdates;
     }
 
     /**
@@ -993,6 +1013,7 @@ public class TableFilterHeader extends JPanel implements PropertyChangeListener 
             ret.setMaxHistory(maxHistory);
             ret.setInstantFiltering(instantFilteringEnabled);
             ret.setAutoCompletion(autoCompletionEnabled);
+            ret.setHidePopupOnTableUpdates(hidePopupsOnTableUpdates);
             ret.getFilter().setEnabled(enableIt);
             filtersHandler.addFilterEditor(ret);
 

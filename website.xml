@@ -15,11 +15,11 @@
 				<include name="**/*"/>
 			</fileset>
 		</copy>
-                <!--<copy todir="${website-dir}/api" overwrite="true">-->
-                        <!--<fileset dir='target/apidocs'>-->
-                                <!--<include name="**/*"/>-->
-                        <!--</fileset>-->
-                <!--</copy>-->
+		<copy todir="${website-dir}/api" overwrite="true">
+				<fileset dir='target/apidocs'>
+						<include name="**/*"/>
+				</fileset>
+		</copy>
 	</target>
 	
 	<target name='api' depends='check'>
