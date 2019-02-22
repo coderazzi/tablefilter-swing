@@ -15,8 +15,8 @@
   
     <p>
       <span class="mark">TableFilter</span> is open source, under 
-      <a href='#license'>MIT license</a>. Its latest version, 5.4.0, has been
-      released the 26th June 2018. The changelog is available
+      <a href='#license'>MIT license</a>. Its latest version, 5.5.0, has been
+      released the 22nd February 2019. The changelog is available
       <a href='#history'>below</a>
     </p>
     
@@ -26,7 +26,7 @@
 	       		<li>Available at BitBucket, as the project 
 	       			<a href='https://bitbucket.org/coderazzi/tablefilter-swing'>tablefilter-swing</a></li>
 	   			<li>Alternatively, they can be downloaded directly as a
-	   				single zip file:<a href='download/tablefilter-src-v5.4.0.zip'>tablefilter-src-v5.4.0.zip</a></li>
+	   				single zip file:<a href='download/tablefilter-src-v5.5.0.zip'>tablefilter-src-v5.5.0.zip</a></li>
 	   			<li>The last Java 5 release was bundled on release 4.5.0: <a href='download/tablefilter-src-v4.5.0.zip'>tablefilter-src-v4.5.0.zip</a></li>
 	       	</ul>
        	</li>
@@ -44,10 +44,10 @@
 			   		javadoc) can be downloaded directly from the maven repository. The
 			   		last versions are hosted at:
 			   		<ul>
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/5.4.0/'>
-			   		 	Version 5.4.0</a></li>
+			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/5.5.0/'>
+			   		 	Version 5.5.0</a></li>
 			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.5.0/'>
-			   		 	Version 4.5.0 for Java 5</a></li> 
+			   		 	Version 4.5.0 for Java 5</a></li>
 				    </ul>
 	    		</li>
 	    	</ul>
@@ -102,6 +102,14 @@ THE SOFTWARE.</pre>
     </p>
 
   <h2><a name="history">History</a></h2>
+
+	<h3>Version 5.5.0 ( 22nd February 2019 )</h3>
+	<p>Included new filter settings:
+		<a href='api/net/coderazzi/filters/gui/FilterSettings.html#hidePopupsOnTableUpdates'>
+		hidePopupsOnTableUpdates</a>. On previous versions, a table model update would automatically hide any open
+		filter popups, under the assumption that the values in the popup would change. This is not needed, and the
+		new default behavior is to not hide those popups. This setting allows to revert to the original behaviour.
+	</p>
 
 	<h3>Version 5.4.0 ( 26th June 2018 )</h3>
 	<p>Improvement: changed behaviour of instant filtering,
