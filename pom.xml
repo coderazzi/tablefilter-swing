@@ -124,6 +124,7 @@
 			</build>
 		</profile>
 	</profiles>
+
 	<distributionManagement>
 		<repository>
 			<id>sonatype-nexus-staging</id>
