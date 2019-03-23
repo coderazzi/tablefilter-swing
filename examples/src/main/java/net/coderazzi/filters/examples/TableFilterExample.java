@@ -146,6 +146,7 @@ public class TableFilterExample extends JFrame implements ActionHandler {
         tableMenu.addSeparator();
         tableMenu.add(new MenuModelChange(this, modelRows));
         tableMenu.add(new MenuModelChange(this, -1));
+        tableMenu.add(new MenuAsynchronousModelChange(this));
         tableMenu.add(new MenuModelColumnsChange(this, false));
         tableMenu.add(new MenuModelColumnsChange(this, true));
 
