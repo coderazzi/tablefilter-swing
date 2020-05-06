@@ -9,7 +9,7 @@
 	<url>http://coderazzi.net/tablefilter</url>
 	<organization>
 		<name>coderazzi</name>
-		<url>http://coderazzi.net</url>
+		<url>https://coderazzi.net</url>
 	</organization>
 	<developers>
 		<developer>
@@ -21,22 +21,22 @@
 	<licenses>
 		<license>
 			<name>MIT</name>
-			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<url>https://opensource.org/licenses/mit-license.php</url>
 		</license>
 	</licenses>
 	<issueManagement>
-		<url>https://bitbucket.org/coderazzi/tablefilter-swing/issues</url>
+		<url>https://github.com/coderazzi/tablefilter-swing/issues</url>
 	</issueManagement>
 	<scm>
-		<url>https://bitbucket.org/coderazzi/tablefilter-swing</url>
-		<connection>scm:hg:https://bitbucket.org/coderazzi/tablefilter-swing</connection>
-		<developerConnection>scm:hg:https://bitbucket.org/coderazzi/tablefilter-swing</developerConnection>
+		<url>https://github.com/coderazzi/tablefilter-swing</url>
+		<connection>scm:git:ssh://github.com/coderazzi/tablefilter-swing</connection>
+		<developerConnection>scm:git:ssh://github.com/coderazzi/tablefilter-swing</developerConnection>
 	</scm>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
+			<version>4.13</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -45,7 +45,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -54,16 +54,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.1</version>
+				<version>3.8.1</version>
 				<configuration>
-					<tagBase>file:///Users/coderazzi/development/tablefilter-swing</tagBase>
+					<tagBase>file:///home/coderazzi/development/tablefilter-swing</tagBase>
 					<mavenExecutorId>forked-path</mavenExecutorId>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -76,7 +76,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.7</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -90,7 +90,7 @@
 					<show>protected</show>
 					<excludePackageNames>net.coderazzi.filters.gui.editor</excludePackageNames>
 					<links>
-						<link>http://docs.oracle.com/javase/7/docs/api/</link>
+						<link>https://docs.oracle.com/en/java/javase/14/docs/api</link>
 					</links>
 				</configuration>
 			</plugin>

@@ -15,25 +15,25 @@
   
     <p>
       <span class="mark">TableFilter</span> is open source, under 
-      <a href='#license'>MIT license</a>. Its latest version, 5.5.1, has been
-      released the 22nd February 2019. The changelog is available
+      <a href='#license'>MIT license</a>. Its latest version, 5.5.2, has been
+      released the 6th May 2020. The changelog is available
       <a href='#history'>below</a>
     </p>
     
     <ul>
     	<li><span class='mark'>Sources</span>:
 	       	<ul>
-	       		<li>Available at BitBucket, as the project 
-	       			<a href='https://bitbucket.org/coderazzi/tablefilter-swing'>tablefilter-swing</a></li>
+	       		<li>Available at Github, as the project
+	       			<a href='https://github.com/coderazzi/tablefilter-swing'>tablefilter-swing</a></li>
 	   			<li>Alternatively, they can be downloaded directly as a
-	   				single zip file:<a href='download/tablefilter-src-v5.5.1.zip'>tablefilter-src-v5.5.1.zip</a></li>
+	   				single zip file:<a href='download/tablefilter-src-v5.5.2.zip'>tablefilter-src-v5.5.2.zip</a></li>
 	   			<li>The last Java 5 release was bundled on release 4.5.0: <a href='download/tablefilter-src-v4.5.0.zip'>tablefilter-src-v4.5.0.zip</a></li>
 	       	</ul>
        	</li>
     	<li><span class='mark'>Binaries</span>:
 	    	<ul>
 	    		<li>The binaries are included in the
-	   	  			<a href='http://repo2.maven.org/maven2/net/coderazzi/'>central maven
+	   	  			<a href='https://repo.maven.apache.org/maven2/net/coderazzi/tablefilter-swing'>central maven
 	   	  			repository</a>. This means that, on a maven project, it can be used by
 	   	  			adding the dependency to 
 	   	  			<span class='mark'>net.coderazzi.tablefilter-swing</span>, or to
@@ -44,9 +44,9 @@
 			   		javadoc) can be downloaded directly from the maven repository. The
 			   		last versions are hosted at:
 			   		<ul>
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing/5.5.1/'>
-			   		 	Version 5.5.1</a></li>
-			   		 <li><a href='http://repo2.maven.org/maven2/net/coderazzi/tablefilter-swing-java5/4.5.0/'>
+			   		 <li><a href='https://repo.maven.apache.org/maven2/net/coderazzi/tablefilter-swing/5.5.2/'>
+			   		 	Version 5.5.2</a></li>
+			   		 <li><a href='https://repo.maven.apache.org/maven2/net/coderazzi/tablefilter-swing-java5/4.5.0/'>
 			   		 	Version 4.5.0 for Java 5</a></li>
 				    </ul>
 	    		</li>
@@ -61,11 +61,11 @@
 
     <p>
       <span class="mark">TableFilter</span> is available under the 
-      <a href="http://www.opensource.org/licenses/mit-license.php">MIT</a> 
+      <a href="https://opensource.org/licenses/mit-license.php">MIT</a>
       license.
     </p>
 
-    <pre>Copyright (c) 2007-2015 Luis M. Pena  - lu@coderazzi.net
+    <pre>Copyright (c) 2007-2020 Luis M. Pena  - lu@coderazzi.net
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -103,6 +103,10 @@ THE SOFTWARE.</pre>
 
   <h2><a name="history">History</a></h2>
 
+	<h3>Version 5.5.2 ( 6th May 2020 )</h3>
+	<p>Project moved to Github. No functionality updates, just documentation changes.
+	</p>
+
 	<h3>Version 5.5.1 ( 22nd February 2019 )</h3>
 	<p>Included new filter settings:
 		<a href='api/net/coderazzi/filters/gui/FilterSettings.html#hidePopupsOnTableUpdates'>
@@ -113,7 +117,7 @@ THE SOFTWARE.</pre>
 
 	<h3>Version 5.4.0 ( 26th June 2018 )</h3>
 	<p>Improvement: changed behaviour of instant filtering,
-		<a href="https://bitbucket.org/coderazzi/tablefilter-swing/issues/44/change-the-behavior-of-unsuccessfull">issue 44: showing no rows</a>,
+		<a href="https://github.com/coderazzi/tablefilter-swing/issues/44">issue 44: showing no rows</a>,
 		when the filter excludes them (as opposed to just issue a warning, until the user accepts the new filter).
 		There is now a new new setting - allowInstantVanishing- to enable, for instant filtering,
 		the immediate update of the table even if all rows would
@@ -122,7 +126,7 @@ THE SOFTWARE.</pre>
 	</p>
 
 	<p>Solution for
-		<a href="https://bitbucket.org/coderazzi/tablefilter-swing/issues/43/filter-column-panel-mis-aligment-on-column">issue 43: Filter column panel mis-aligment on column re-ordering</a>:
+		<a href="https://github.com/coderazzi/tablefilter-swing/issues/43">issue 43: Filter column panel mis-aligment on column re-ordering</a>:
 		When dragging a column to re-order, the filter panel does not follow the dragged TableColumn, and
 		only pops to new location on column move event. It will look cleaner if the filter panel moved in
 		sync with the table column being dragged.
@@ -130,8 +134,7 @@ THE SOFTWARE.</pre>
 
 
 	<h3>Version 5.3.1 ( 22nd May 2017 )</h3>
-	<p>Bug in <a href="https://bitbucket.org/coderazzi/tablefilter-swing/pull-requests/1/fixed-bug-in-auto-choices-mode/diff">auto choices mode</a>,
-		solved by user kmirzyns
+	<p>Bug in auto choices mode, solved by user kmirzyns
 	</p>
 
 	<h3>Version 5.3.0 ( 10th November 2016 )</h3>
@@ -144,7 +147,7 @@ THE SOFTWARE.</pre>
 
 
 	<h3>Version 5.2.2 ( 17th March 2016 )</h3>
-	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issues/42/filter-problem-when-the-value-contains'>issue 42</a>:
+	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issues/42'>issue 42</a>:
 		If the filter, or the cell values contain backslashes, there are problems to match the filter and values.
     </p><p>
         The problem was initially found on columns containing windows Paths. The solution includes the added bonus to
@@ -154,23 +157,23 @@ THE SOFTWARE.</pre>
 
 	<h3>Version 5.2.1 ( 18th October 2015 )</h3>
 
-	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issues/41/problem-when-seting-new-model-to-table'>issue 41</a>:
+	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issues/41'>issue 41</a>:
 		Exception when a new model is assigned to a table already associated to a table filter.</p>
 
 
 	<h3>Version 5.2.0 ( 12th September 2015 )</h3>
 
-	<p>Initial support for right to left orientation support: <a href="https://bitbucket.org/coderazzi/tablefilter-swing/issues/40/right-to-left-orientation">Issue 40</a>.
+	<p>Initial support for right to left orientation support: <a href="https://github.com/coderazzi/tablefilter-swing/issues/40">Issue 40</a>.
 	    This release only adjusts automatically the filter header to the orientation setup in the underlying table; without any additional configuration,
 		the filter header changes its own configuration to adapt to the orientation specified for the table.
 	</p>
 
-	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issues/39/wrong-filter-value-when-autochoices-is#comment-20693429'>issue 39</a>:
+	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issues/39'>issue 39</a>:
 		Wrong filter value when AutoChoices is enabled, which happened, in fact, when instant filtering was enabled.</p>
 
 	<h3>Version 5.1.5 ( 5th August 2015 )</h3>
 
-        <p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issues/39/wrong-filter-value-when-autochoices-is#comment-20693429'>issue 39</a>:
+        <p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issues/39'>issue 39</a>:
         Wrong filter value when AutoChoices is enabled, which happened, in fact, when instant filtering was enabled.</p>
 
     <h3>Version 5.1.3 ( 5th May 2015 )</h3>
@@ -179,11 +182,11 @@ THE SOFTWARE.</pre>
 
     <h3>Version 5.1.2 ( 18th March 2015 )</h3>
     
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/37/filter-throws-exception-when-some-columns'>issue 37</a>:
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/37'>issue 37</a>:
     	when a developer adds a custom filter to the table filter header, an exception can be 
     	raised if not all the columns of the model are visible.</p>
 
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/38/error-when-removing-columns-from-table'>issue 38</a>:
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/38'>issue 38</a>:
     	an exception raised in a very uncommon scenario, where a user would attach a table with configured 
     	table model to a table filter header, and before making visible the table, the table model
     	would be changed.</p>
@@ -191,7 +194,7 @@ THE SOFTWARE.</pre>
     <h3>Version 5.1.1 ( 29th June 2013 )</h3>
     
     	<p>This is a very minor release, although it affects to the global API: it solves
-    	<a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/33/not-possible-to-turn-off-auto-selection'>issue 33</a>:
+    	<a href='https://github.com/coderazzi/tablefilter-swing/issue/33'>issue 33</a>:
     	not possible to turn off auto-selection at filter header level.</p>
 
     <h3>Version 5.0.0 ( 12th March 2013 )</h3>
@@ -199,12 +202,12 @@ THE SOFTWARE.</pre>
     	<p>Stopped the development of the release compatible with Java 5. Note that Java 5
     	entered its end-of-life on April 8, 2008 and is no longer supported as of November 3, 2009.</p>
     	
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/31/setcomparator-did-not-refresh-popup'>issue 31</a>:
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/31'>issue 31</a>:
     	setComparator did not refresh PopUp. In previous releases, choices in the filter
     	editors were displayed alphabetically sorted. With this release,
     	choices are sorted with the registered comparator for the given class / editor.</p>
 
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/32/allow-different-sorting-on-choices-box'>issue 32</a>:
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/32'>issue 32</a>:
     	allow different sorting on choices box. A new method is included on
     	the IFilterEditor interface -setChoicesOperator- that the user can
     	invoke to change the sort operator. In special, by invoking this 
@@ -216,24 +219,24 @@ THE SOFTWARE.</pre>
     	<p>Extended TableFilterHeader constructors, to enable setting up 
     	directly the AutoChoices mode.</p>
 
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/28/cells-with-html-tags-do-not-appear-in'>issue 28</a>:
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/28'>issue 28</a>:
     	Cells with HTML &lt;img&gt; tags do not appear in filter choices. This issue is solved
     	by creating a new ChoiceRenderer, the HtmlChoiceRenderer, that must
     	be explicitly set on that column.</p> 
 
     	<p>Provided additional documentation, to cover 
-    	<a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/29/request-enable-full-removal-of-filter'>issue 29</a>,
+    	<a href='https://github.com/coderazzi/tablefilter-swing/issue/29'>issue 29</a>,
     	on the method to remove a filter header.</p>
 
     	<p>Included new example on the distribution.</p>
 
     <h3>Version 4.4.1 ( 2nd September 2012 )</h3>
 
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/25/background-foreground-on-customchoices-not'>issue 25</a>,
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/25'>issue 25</a>,
     	where the library would not use the background / foreground colors provided by CustomChoice
     	instances.</p> 
     
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/26/error-handling-customchoices-with-similar'>issue 26</a>:
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/26'>issue 26</a>:
     	if one CustomChoice' text representation was a substring (from the beginning) of
     	other CustomChoice's representation, selecting the shorter CustomChoice
     	would filter out all rows in the table.</p>
@@ -250,12 +253,12 @@ THE SOFTWARE.</pre>
     	  interface, and all the CustomChoice implementations in the library
     	  can be now safely serialized.</p>
     
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/24/exception-raised-when-updating-table-model'>issue 24</a>,
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/24'>issue 24</a>,
     	which adds a check to avoid a rare exception occurrence.</p>
 
     <h3>Version 4.3.0 ( 17th January 2012 )</h3>
     
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/22/customchoice-not-working-with-wildcards'>issue 22</a>,
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/22'>issue 22</a>,
     	related to CustomChoices not working with wildcards. Its implementation has had impact
     	on the CustomChoice interface, extended with several setters.</p>
 
@@ -263,7 +266,7 @@ THE SOFTWARE.</pre>
     	an operand (such as &gt;), some inner spaces could be removed from the
     	expression.</p>
     	
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/23/html-cell-contents-are-incorrectly'>issue 23</a>;
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/23'>issue 23</a>;
     	the table filter library would not handle properly tables with HTML content. The filter
     	editor choices would be rendered incorrectly and the filtering would not work in many cases.</p>
     	       
@@ -271,22 +274,22 @@ THE SOFTWARE.</pre>
     
     	<p>Extended the IFilterEditor interface with two new methods to
     	handle the user interaction with the editor; the added functionality,
-    	as requested <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/19/request-disable-user-interaction-in'>-issue 19-</a>,
+    	as requested <a href='https://github.com/coderazzi/tablefilter-swing/issue/19'>-issue 19-</a>,
     	allows the programmer to disable the interaction with the editor 
     	without disabling the filter set.</p>
     
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/16/adapativechoices-customchoices'>issue 16</a>,
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/16'>issue 16</a>,
     	related to missing custom choices on enumeration columns.</p>
 
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/20/autochoice-and-table-filtering-does-not'>issue 20</a>,
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/20'>issue 20</a>,
     	to properly filter content with embedded newlines.</p>
     	
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/21/filter-changed-to-incorrect-value-with'>issue 21</a>,
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/21'>issue 21</a>,
     	a bug associated to instant filtering.</p>
     	       
     <h3>Version 4.1.4 ( 26th May 2011 )</h3>
     
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/15/incorrect-render-with-column-type-date'>issue 15</a>,
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/15'>issue 15</a>,
     	where exceptions are raised when the user selects a choice in the 
     	filter editor's combobox if a Format class is associated to that 
     	editor.</p>
@@ -302,7 +305,7 @@ THE SOFTWARE.</pre>
     	side spaces on the table contents are likewise dismissed. Note that
     	this was already the behaviour on previous releases (before 4.1.x).</p>
        
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/13/nullpointerexception-when-pasting-a-string'>issue 13</a>
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/13'>issue 13</a>
     	that would cause a null pointer exception when pasting a string with 
     	embedded new lines on a filter editor.</p>
     	
@@ -313,22 +316,22 @@ THE SOFTWARE.</pre>
     	the editor position or size changed the popup would only change its
     	position and size when reopened.</p> 
   			
-    	<p>Solved <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/14/setautochoices-autochoicesenum-does-not'>issue 14</a>
+    	<p>Solved <a href='https://github.com/coderazzi/tablefilter-swing/issue/14'>issue 14</a>
     	where the usage of AutoChoices.ENUMS was inconsistent or wrong.</p>
     	
     <h3>Version 4.1.2 ( 23rd March 2011 )</h3>
        
     	<p>Solved bug where enabled adaptive choices cause 
     	ArrayIndexOutOfBoundsException when table model is changed: see
-    	<a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/8/enabled-adaptive-choices-cause'>issue</a>.</p>
+    	<a href='https://github.com/coderazzi/tablefilter-swing/issue/8'>issue</a>.</p>
   			
     	<p>Solved bug on slow progress with instant filtering + adaptive choices, 
     	resulting in performance degradation: see
-    	<a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/11/slow-progress-with-instant-filtering'>issue</a>.</p>
+    	<a href='https://github.com/coderazzi/tablefilter-swing/issue/11'>issue</a>.</p>
 
     	<p>Solved bug where wildcard expressions, if case insensitive, fail on
     	Unicode characters: see
-    	<a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/12/wildcard-expressions-if-case-insensitive'>issue</a>.</p>
+    	<a href='https://github.com/coderazzi/tablefilter-swing/issue/12'>issue</a>.</p>
     	
     	<p>Collators comparisons have been removed from the library: 
 		collators were never used on regular expressions
@@ -348,7 +351,7 @@ THE SOFTWARE.</pre>
        
     	<p><span class='mark'>Instant filtering</span>: filtering happens as
     	the user inputs text; implemented after 
-    	<a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/4/adding-filter-on-caretchange-and-new'>requirement</a>.</p>
+    	<a href='https://github.com/coderazzi/tablefilter-swing/issue/4'>requirement</a>.</p>
   			
     	<p><span class='mark'>Auto completion</span> on editable filter editors: 
     	So far was only provided, and required, for non editable
@@ -365,10 +368,10 @@ THE SOFTWARE.</pre>
     	 
     	<p>Possibility to define the height of a filter row (by delta over the
     	default value), functionality implemented after 
-    	<a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/2/table-filter-height-in-substance-l-f'>requirement</a>.</p>
+    	<a href='https://github.com/coderazzi/tablefilter-swing/issue/2'>requirement</a>.</p>
   			
     	<p>Solved bug where the model is added after attaching the filter header: see
-    	<a href='https://bitbucket.org/coderazzi/tablefilter-swing/issue/7/exception-raised-when-a-model-is-set-on'>issue</a>.</p>
+    	<a href='https://github.com/coderazzi/tablefilter-swing/issue/7'>issue</a>.</p>
   			
     	<p>Solved bug where autochoices on booleans or enums would be incomplete</p>
 
@@ -778,7 +781,7 @@ THE SOFTWARE.</pre>
 
     <p>
       Issues, or bugs, can be reported at the 
-      <a href='https://bitbucket.org/coderazzi/tablefilter-swing/issues'>BitBucket</a>
+      <a href='https://github.com/coderazzi/tablefilter-swing/issues'>BitBucket</a>
       host site.
     </p>
     <p>
