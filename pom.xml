@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.coderazzi</groupId>
     <artifactId>tablefilter-swing</artifactId>
     <packaging>jar</packaging>
-    <version>5.5.2-SNAPSHOT</version>
+    <version>5.5.2</version>
     <name>tablefilter-swing</name>
     <description>TableFilter is a set of Swing components to support user-driven filtering on table.</description>
     <url>https://coderazzi.net/tablefilter</url>
