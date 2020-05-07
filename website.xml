@@ -110,7 +110,7 @@
 		<zip destfile='${website-dir}/download/tablefilter-src.zip'
 			basedir='..'
 			includes='tablefilter-swing/**'
-			excludes='*/.hg/**, */bin/**, */target/**'/>
+			excludes='*/.git/**, */bin/**, */target/**'/>
 	</target>
 
 	<target name='check' >
