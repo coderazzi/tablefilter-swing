@@ -10,7 +10,7 @@
 	<target name='all' depends='copy-doc, api, example, src-zip' />
 
 	<target name='copy-doc' depends='check'>
-		<copy todir="${website-dir}">
+		<copy todir="${website-dir}" overwrite="true">
 			<fileset dir='doc'>
 				<include name="**/*"/>
 			</fileset>
