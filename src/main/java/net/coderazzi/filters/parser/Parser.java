@@ -567,7 +567,7 @@ public class Parser implements IParser {
             if (format==null){
                 return (o == null) ? "" : htmlHandler.stripHtml(o.toString());
             }
-            return format.format(o).trim();
+            return o==null? "" : format.format(o).trim();
         }
 
         public Object parseObject(String content) throws ParseException {
