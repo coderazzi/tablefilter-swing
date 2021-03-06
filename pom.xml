@@ -3,7 +3,7 @@
     <groupId>net.coderazzi</groupId>
     <artifactId>tablefilter-swing</artifactId>
     <packaging>jar</packaging>
-    <version>5.5.3-SNAPSHOT</version>
+    <version>5.5.3</version>
     <name>tablefilter-swing</name>
     <description>TableFilter is a set of Swing components to support user-driven filtering on table.</description>
     <url>https://coderazzi.net/tablefilter</url>
@@ -31,7 +31,7 @@
         <url>https://github.com/coderazzi/tablefilter-swing</url>
         <connection>scm:git:ssh://git@github.com/coderazzi/tablefilter-swing</connection>
         <developerConnection>scm:git:ssh://git@github.com/coderazzi/tablefilter-swing</developerConnection>
-        <tag>tablefilter-swing-5.5.2</tag>
+        <tag>tablefilter-swing-5.5.3</tag>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -52,8 +52,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
