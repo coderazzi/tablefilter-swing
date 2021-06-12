@@ -1,19 +1,19 @@
 /**
  * Author:  Luis M Pena  ( lu@coderazzi.net )
  * License: MIT License
- *
+ * <p>
  * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,27 +24,19 @@
  */
 package net.coderazzi.filters.examples.utils;
 
+import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-
 
 public class TestData {
 
-    private static Random random = new Random();
-
-    static final String maleNames[] = { // 50 names
+    static final String[] maleNames = { // 50 names
             /* specifically lower case >*/ "alfred",
             /*-*/ "Alvin", "Blake", "BOb", "Brandon",
             /* to check ignore case */ "BUd", "Burton",
@@ -59,9 +51,8 @@ public class TestData {
             /*-*/ "Raymond", "Richard", "Robert", "Scott", "Spencer", "Stanley",
             /* to verify impact of wildcards on name */ "Sut*ton",
             /*-*/ "Taylor", "Thorne", "Truman", "Tyler", "Wallace",
-        };
-
-    static final String femaleNames[] = { // 49 names
+    };
+    static final String[] femaleNames = { // 49 names
             "Aida", "Ashley", "Audrey", "Beverly", "Brenda", "Brook", "Cameron",
             "Carling", "Chelsea", "Dale", "Dawn", "Devon", "Dustin", "Erika",
             "Farrah", "Harmony", "Hazel", "Heather", "Holly", "Jamie", "Joyce",
@@ -70,11 +61,10 @@ public class TestData {
             "Shelby", "Shirley", "Sparrow", "Spring", "Storm", "Summer",
             "Taylor", "Tina", "Trudy", "Ulla", "Verity", "Wendy", "Whitney",
             " Wilona"
-        };
-
+    };
     // source:
     // http://en.wikipedia.org/wiki/List_of_most_common_surnames#United_States
-    static final String familyNames[] = { // 100 names
+    static final String[] familyNames = { // 100 names
             "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller",
             "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson",
             "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez",
@@ -91,98 +81,13 @@ public class TestData {
             "Long", "Patterson", "Hughes", "Flores", "Washington", "Butler",
             "Simmons", "Foster", "Gonzales", "Bryant", "Alexander", "Russell",
             "Griffin", "Diaz*", "Hayes*"
-        };
-
+    };
     static List<Flag> served = new ArrayList<Flag>();
     static List<Flag> allIcons;
+    private static Random random = new Random();
 
     static {
         getAllIcons();
-    }
-
-    public static enum Club {
-        Alpha, Geeks, Phi, Kappa, Lions
-    }
-
-    /** Custom type. */
-    public static class Tutor implements Comparable<Tutor> {
-        String name, surname;
-
-        Tutor() {
-            name = surname = "";
-        }
-
-        Tutor(String firstName, String surname) {
-        	this.surname = surname;
-            this.name = firstName + " " + surname;
-        }
-
-        @Override public int hashCode() {
-            return name.hashCode();
-        }
-
-        @Override public boolean equals(Object obj) {
-            return (obj instanceof Tutor) && ((Tutor) obj).name.equals(name);
-        }
-
-        @Override public String toString() {
-            return name;
-        }
-
-        @Override public int compareTo(Tutor o) {
-            return (o == null) ? 1 : surname.compareTo(o.surname);
-        }
-    }
-
-    public static class Flag extends ImageIcon implements Comparable<Flag>{
-        private static final long serialVersionUID = 1242769439980562528L;
-        private Double redAmount;
-        private String fileLocation;
-
-        Flag(String name, byte array[]) {
-            super(array);
-            fileLocation = "http://coderazzi.net/private/flags/"+name;
-        }
-
-        public double getRedAmount() {
-            if (redAmount == null) {
-                // Graphics g = getImage().getR();
-                int w = getIconWidth();
-                int h = getIconHeight();
-                if ((w > 0) && (h > 0)) {
-                    BufferedImage buffImage = new BufferedImage(w, h,
-                            BufferedImage.TYPE_INT_ARGB);
-                    buffImage.getGraphics()
-                        .drawImage(this.getImage(), 0, 0, null);
-
-                    int up = 0;
-                    for (int i = 0; i < w; i++) {
-                        for (int j = 0; j < h; j++) {
-                            int c = buffImage.getRGB(i, j);
-                            int red = (c & 0x00ff0000) >> 16;
-                            int green = (c & 0x0000ff00) >> 8;
-                            int blue = c & 0x000000ff;
-                            if ((red > green) && (red > blue)) {
-                                up++;
-                            }
-                        }
-                    }
-
-                    redAmount = ((double) up) / (h * w);
-                }
-            }
-
-            return redAmount;
-        }
-        
-        public String getFileLocation(){
-        	return fileLocation;
-        }
-
-        @Override
-        public int compareTo(Flag o) {
-            return fileLocation.compareTo(o.fileLocation);
-        }
     }
 
     public String name;
@@ -195,7 +100,6 @@ public class TestData {
     public Date date;
     public String note;
     public String htmlFlag;
-
     public TestData() {
         // 1 out of 64 can be with unknown age (null)
         if (random.nextBoolean() || random.nextBoolean() || random
@@ -226,24 +130,24 @@ public class TestData {
         club = getClub();
         date = new GregorianCalendar(random.nextInt(50) + 1940,
                 random.nextInt(12), random.nextInt(28)).getTime();
-        
+
         if (random.nextBoolean() && random.nextBoolean()) {
-        	if (random.nextBoolean()) {
-        		note = "<html><i>Transferral <font color='red'>"+
-        				"not started</font></i></html>";
-        	} else if (random.nextBoolean()){
-        		note = "<html><i>Transferral &#34;started&#34;</i></html>";
-        	} else if (random.nextBoolean()){
-        		note = "> *";
-        	} else if (random.nextBoolean()){
-        		note = "=";
-        	} else {        		
-        		note = "<html><font color='red'>&gt; *</font></html>";
-        	}
+            if (random.nextBoolean()) {
+                note = "<html><i>Transferral <font color='red'>" +
+                        "not started</font></i></html>";
+            } else if (random.nextBoolean()) {
+                note = "<html><i>Transferral &#34;started&#34;</i></html>";
+            } else if (random.nextBoolean()) {
+                note = "> *";
+            } else if (random.nextBoolean()) {
+                note = "=";
+            } else {
+                note = "<html><font color='red'>&gt; *</font></html>";
+            }
         }
-        
-        if (flag!=null){
-        	htmlFlag = "<html><p style='padding: 0px 16px;'><img src=\'"+flag.getFileLocation()+"\'>";
+
+        if (flag != null) {
+            htmlFlag = "<html><p style='padding: 0px 16px;'><img src='" + flag.getFileLocation() + "'>";
         }
     }
 
@@ -252,11 +156,11 @@ public class TestData {
         try {
             Pattern p = Pattern.compile("gif/(.+)\\.gif");
             ZipInputStream zip = new ZipInputStream(TestData.class
-                        .getResourceAsStream(
+                    .getResourceAsStream(
                             "/net/coderazzi/filters/examples/resources/famfamfam_flag_icons.zip"));
             ZipEntry entry;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte buffer[] = new byte[16384];
+            byte[] buffer = new byte[16384];
 
             while ((entry = zip.getNextEntry()) != null) {
                 Matcher m = p.matcher(entry.getName());
@@ -280,7 +184,7 @@ public class TestData {
             zip.close();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null,
-                "Error reading icons:" + ex.getMessage());
+                    "Error reading icons:" + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -292,7 +196,7 @@ public class TestData {
     }
 
     private String getFirstName(boolean male) {
-        String source[] = male ? maleNames : femaleNames;
+        String[] source = male ? maleNames : femaleNames;
 
         return source[random.nextInt(source.length)];
     }
@@ -307,7 +211,7 @@ public class TestData {
     }
 
     private Club getClub() {
-        Club clubs[] = Club.values();
+        Club[] clubs = Club.values();
 
         return clubs[random.nextInt(clubs.length)];
     }
@@ -333,6 +237,95 @@ public class TestData {
         }
 
         return null;
+    }
+
+    public enum Club {
+        Alpha, Geeks, Phi, Kappa, Lions
+    }
+
+    /** Custom type. */
+    public static class Tutor implements Comparable<Tutor> {
+        String name, surname;
+
+        Tutor() {
+            name = surname = "";
+        }
+
+        Tutor(String firstName, String surname) {
+            this.surname = surname;
+            this.name = firstName + " " + surname;
+        }
+
+        @Override
+        public int hashCode() {
+            return name.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return (obj instanceof Tutor) && ((Tutor) obj).name.equals(name);
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        @Override
+        public int compareTo(Tutor o) {
+            return (o == null) ? 1 : surname.compareTo(o.surname);
+        }
+    }
+
+    public static class Flag extends ImageIcon implements Comparable<Flag> {
+        private static final long serialVersionUID = 1242769439980562528L;
+        private Double redAmount;
+        private final String fileLocation;
+
+        Flag(String name, byte[] array) {
+            super(array);
+            fileLocation = "https://coderazzi.net/private/flags/" + name;
+        }
+
+        public double getRedAmount() {
+            if (redAmount == null) {
+                // Graphics g = getImage().getR();
+                int w = getIconWidth();
+                int h = getIconHeight();
+                if ((w > 0) && (h > 0)) {
+                    BufferedImage buffImage = new BufferedImage(w, h,
+                            BufferedImage.TYPE_INT_ARGB);
+                    buffImage.getGraphics()
+                            .drawImage(this.getImage(), 0, 0, null);
+
+                    int up = 0;
+                    for (int i = 0; i < w; i++) {
+                        for (int j = 0; j < h; j++) {
+                            int c = buffImage.getRGB(i, j);
+                            int red = (c & 0x00ff0000) >> 16;
+                            int green = (c & 0x0000ff00) >> 8;
+                            int blue = c & 0x000000ff;
+                            if ((red > green) && (red > blue)) {
+                                up++;
+                            }
+                        }
+                    }
+
+                    redAmount = ((double) up) / (h * w);
+                }
+            }
+
+            return redAmount;
+        }
+
+        public String getFileLocation() {
+            return fileLocation;
+        }
+
+        @Override
+        public int compareTo(Flag o) {
+            return fileLocation.compareTo(o.fileLocation);
+        }
     }
 
 }

@@ -1,19 +1,19 @@
 /**
  * Author:  Luis M Pena  ( lu@coderazzi.net )
  * License: MIT License
- *
+ * <p>
  * Copyright (c) 2007 Luis M. Pena  -  lu@coderazzi.net
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,22 +24,14 @@
  */
 package net.coderazzi.filters.examples.utils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
-import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-
 import net.coderazzi.filters.examples.utils.TestData.Flag;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import java.util.*;
 
 
 public class TestTableModel extends AbstractTableModel {
-
-    private static final long serialVersionUID = -5453866058915361214L;
 
     public static final String NAME = "Name";
     public static final String TUTOR = "Tutor";
@@ -51,24 +43,28 @@ public class TestTableModel extends AbstractTableModel {
     public static final String DATE = "Date";
     public static final String NOTE = "Notes";
     public static final String HTML_COUNTRY = "Country (html)";
-
-    public static String columnNames[] = {
-            NAME, AGE, MALE, TUTOR, COUNTRY, 
-            CLUB, LCNAME, DATE, NOTE, HTML_COUNTRY
-        };
-    private static final Class<?> columnTypes[] = {
+    private static final long serialVersionUID = -5453866058915361214L;
+    private static final Class<?>[] columnTypes = {
             String.class, Integer.class, Boolean.class, TestData.Tutor.class,
-            Flag.class, TestData.Club.class, String.class, 
+            Flag.class, TestData.Club.class, String.class,
             Date.class, String.class, String.class
-        };
-
+    };
     private static final int BASIC_MODEL_COLUMNS = 5;
     private static final int LARGE_MODEL_COLUMNS = 9;
     private static final int FULL_MODEL_COLUMNS = 10;
+    public static String[] columnNames = {
+            NAME, AGE, MALE, TUTOR, COUNTRY,
+            CLUB, LCNAME, DATE, NOTE, HTML_COUNTRY
+    };
     private static int expectedColumns = BASIC_MODEL_COLUMNS;
     private List<TestData> data;
-    private Set<TestData> modifiedTestData = new HashSet<TestData>();
-    private int columnsOrder[];
+    private final Set<TestData> modifiedTestData = new HashSet<TestData>();
+    private int[] columnsOrder;
+
+    public TestTableModel(List<TestData> data) {
+        this.data = data;
+        columnsOrder = getRandomOrder();
+    }
 
     public static void setLargeModel(boolean enable) {
         expectedColumns = enable ? LARGE_MODEL_COLUMNS : BASIC_MODEL_COLUMNS;
@@ -86,7 +82,6 @@ public class TestTableModel extends AbstractTableModel {
         return new TestTableModel(getTestData(elements));
     }
 
-
     private static List<TestData> getTestData(int elements) {
         TestData.resetRandomness();
 
@@ -97,12 +92,6 @@ public class TestTableModel extends AbstractTableModel {
         }
 
         return ltd;
-    }
-
-
-    public TestTableModel(List<TestData> data) {
-        this.data = data;
-        columnsOrder = getRandomOrder();
     }
 
     public void addTestData(TestData data) {
@@ -133,7 +122,7 @@ public class TestTableModel extends AbstractTableModel {
 
     private int[] getRandomOrder() {
         Random random = new Random();
-        int n[] = new int[columnNames.length];
+        int[] n = new int[columnNames.length];
         List<Integer> l = new ArrayList<Integer>();
         int prior = getColumnCount();
         n[0] = 0; // keep always first column as the name
@@ -160,10 +149,10 @@ public class TestTableModel extends AbstractTableModel {
     public void changeModel(JTable table) {
 
         // we keep the same order
-        int newColumnsOrder[] = columnsOrder.clone();
+        int[] newColumnsOrder = columnsOrder.clone();
         for (int i = 0; i < table.getColumnCount(); i++) {
             newColumnsOrder[i] = columnsOrder[table
-                        .convertColumnIndexToModel(i)];
+                    .convertColumnIndexToModel(i)];
         }
 
         columnsOrder = newColumnsOrder;
@@ -199,60 +188,65 @@ public class TestTableModel extends AbstractTableModel {
         return modifiedTestData.contains(td);
     }
 
-    @Override public int getColumnCount() {
+    @Override
+    public int getColumnCount() {
         return expectedColumns;
     }
 
-    @Override public int getRowCount() {
+    @Override
+    public int getRowCount() {
         return data.size();
     }
 
-    @Override public Object getValueAt(int rowIndex, int columnIndex) {
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
         TestData td = data.get(rowIndex);
 
         switch (columnsOrder[columnIndex]) {
 
-        case 0:
-            return td.name;
+            case 0:
+                return td.name;
 
-        case 1:
-            return td.age;
+            case 1:
+                return td.age;
 
-        case 2:
-            return td.male;
+            case 2:
+                return td.male;
 
-        case 3:
-            return td.tutor;
+            case 3:
+                return td.tutor;
 
-        case 4:
-            return td.flag;
+            case 4:
+                return td.flag;
 
-        case 5:
-            return td.club;
+            case 5:
+                return td.club;
 
-        case 6:
-            return td.firstName;
+            case 6:
+                return td.firstName;
 
-        case 7:
-            return td.date;
+            case 7:
+                return td.date;
 
-        case 8:
-            return td.note;
-            
-        case 9:
-        	return td.htmlFlag;
+            case 8:
+                return td.note;
+
+            case 9:
+                return td.htmlFlag;
         }
 
         return null;
     }
 
-    @Override public boolean isCellEditable(int rowIndex, int columnIndex) {
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnsOrder[columnIndex] == 2;
     }
 
-    @Override public void setValueAt(Object value,
-                                     int    rowIndex,
-                                     int    columnIndex) {
+    @Override
+    public void setValueAt(Object value,
+                           int rowIndex,
+                           int columnIndex) {
 
         TestData td = data.get(rowIndex);
         Boolean set = (Boolean) value;
@@ -266,11 +260,13 @@ public class TestTableModel extends AbstractTableModel {
         }
     }
 
-    @Override public Class<?> getColumnClass(int columnIndex) {
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
         return columnTypes[columnsOrder[columnIndex]];
     }
 
-    @Override public String getColumnName(int column) {
+    @Override
+    public String getColumnName(int column) {
         return columnNames[columnsOrder[column]];
     }
 
